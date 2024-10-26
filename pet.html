@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Talking Virtual Pet</title>
+  <style>
+    #pet {
+      width: 200px;
+      height: 200px;
+      background: url('pet.png') no-repeat center center;
+      background-size: contain;
+      animation: idle 2s infinite;
+      cursor: pointer;
+    }
+
+    @keyframes idle {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes happy {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Talking Virtual Pet</h1>
+  <div id="pet"></div>
+  <p id="transcript"></p>
+  
+  <script>
+    const petDiv = document.getElementById('pet');
+    const transcript = document.getElementById('transcript');
+
+    // Speech synthesis setup
+    const synth = window.speechSynthesis;
+
+    // Speech recognition setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    // Start speech recognition
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const speechResult = event.results[0][0].transcript;
+      transcript.textContent = 'You said: ' + speechResult + '.';
+
+      const msg = new SpeechSynthesisUtterance(speechResult);
+      synth.speak(msg);
+      
+      petDiv.style.animation = 'happy 1s';
+    };
+
+    recognition.onspeechend = () => {
+      recognition.stop();
+      setTimeout(() => recognition.start(), 1000); // Restart recognition after a short delay
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error detected: ' + event.error);
+      setTimeout(() => recognition.start(), 1000); // Restart recognition after a short delay in case of error
+    };
+
+    petDiv.addEventListener('animationend', () => {
+      petDiv.style.animation = 'idle 2s infinite';
+    });
+  </script>
+</body>
+</html>
