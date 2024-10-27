@@ -1,254 +1,144 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-	<meta name="viewport"
-		content="width=device-width, initial-scale=1">
-	<meta name="google-site-verification" content="7zk1fx2BZWRu2bATsXN4cTpsqI2Cro3ZxoGGLWSDZ6c" />
-  <link rel="stylesheet"
-		href=
-"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<title>Stenoip Wonder Computer</title>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9575535267287297"
-     crossorigin="anonymous"></script>
-
-	<style>
-	* {
-	box-sizing: border-box;
-	}
-	
-	/* Container Design */
-	.container {
-	border: 2px solid #bdc3c7;
-	border-top-left-radius: 6px;
-	border-top-right-radius: 6px;
-	}
-	
-	.geeks {
-	padding: 10px;
-	background: #f1f1f1;
-	border-top-left-radius: 4px;
-	border-top-right-radius: 4px;
-	}
-	
-	/* Input field design */
-	input[type=text] {
-	width: 100%;
-	border-radius: 3px;
-	border: none;
-	background-color: white;
-	margin-top: -8px;
-	height: 25px;
-	color: gray;
-	padding: 5px;
-	}
-	
-	.gfg {
-	float: left;
-	}
-	
-	.middle {
-	width: 75%;
-	position: relative;
-	}
-	
-	.left {
-	width: 15%;
-	}
-	
-	.right {
-	width: 10%;
-	}
-	
-	.middle i {
-	position: absolute;
-	left: 430px;
-	top: 2px;
-	color: gray;
-	}
-	
-	.geeks:after {
-	content: "";
-	display: table;
-	clear: both;
-	}
-	
-	/* Address bar design */
-	.bar {
-	width: 15px;
-	height: 3px;
-	margin: 3px 0;
-	display: block;
-	background-color: #aaa;
-	}
-	
-	.body {
-	padding: 15px;
-	}
-    .button-19 {
-  appearance: button;
-  background-color: #1899D6;
-  border: solid transparent;
-  border-radius: 16px;
-  border-width: 0 0 4px;
-  box-sizing: border-box;
-  color: #ff8800;
-  cursor: pointer;
-  display: inline-block;
-  font-family: din-round,sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: .8px;
-  line-height: 20px;
-  margin: 0;
-  outline: none;
-  overflow: visible;
-  padding: 13px 16px;
-  text-align: center;
-  text-transform: uppercase;
-  touch-action: manipulation;
-  transform: translateZ(0);
-  transition: filter .2s;
-  user-select: none;
-  -webkit-user-select: none;
-  vertical-align: middle;
-  white-space: nowrap;
-  width: 100%;
-}
-
-.button-19:after {
-  background-clip: padding-box;
-  background-color: #e33d3d;
-  border: solid transparent;
-  border-radius: 16px;
-  border-width: 0 0 4px;
-  bottom: -4px;
-  content: "";
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: -1;
-}
-
-.button-19:main,
-.button-19:focus {
-  user-select: auto;
-}
-
-.button-19:hover:not(:disabled) {
-  filter: brightness(1.1);
-  -webkit-filter: brightness(1.1);
-}
-
-.button-19:disabled {
-  cursor: auto;
-}
-
-.button-19:active {
-  border-width: 4px 0 0;
-  background: none;
-}
-  .p1 {
-  font-family: "Times New Roman", Times, serif;
-}
-
-.p2 {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.p3 {
-  font-family: "Lucida Console", "Courier New", monospace;
-}
-   h1 {text-align: center;}
-     h2 {text-align: center;}
-       h3 {text-align: center;}
-</style>
-
-
-
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Text Editor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .toolbar {
+      margin-bottom: 10px;
+    }
+    .toolbar button, .toolbar select, .toolbar input {
+      padding: 5px 10px;
+      margin-right: 5px;
+    }
+    .editor-container {
+      border: 1px solid #ccc;
+      padding: 10px;
+      min-height: 300px;
+      overflow-y: auto;
+    }
+    .page {
+      height: 842px; /* A4 Page height */
+      border-bottom: 1px dashed #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    #hidden {
+      display: none;
+    }
+  </style>
 </head>
+<body>
+  <h1>Web Text Editor</h1>
+  <div class="toolbar">
+    <button onclick="execCmd('bold')">Bold</button>
+    <button onclick="execCmd('italic')">Italic</button>
+    <button onclick="execCmd('underline')">Underline</button>
+    <button onclick="execCmd('insertOrderedList')">Numbered List</button>
+    <button onclick="execCmd('insertUnorderedList')">Bullet List</button>
+    <button onclick="execCmd('justifyLeft')">Left Align</button>
+    <button onclick="execCmd('justifyCenter')">Center Align</button>
+    <button onclick="execCmd('justifyRight')">Right Align</button>
+    <select onchange="execCmdWithArg('fontName', this.value)">
+      <option value="Arial">Arial</option>
+      <option value="Courier">Courier</option>
+      <option value="Times New Roman">Times New Roman</option>
+    </select>
+    <select onchange="execCmdWithArg('fontSize', this.value)">
+      <option value="1">8</option>
+      <option value="2">10</option>
+      <option value="3">12</option>
+      <option value="4">14</option>
+      <option value="5">18</option>
+      <option value="6">24</option>
+      <option value="7">36</option>
+    </select>
+    <input type="file" onchange="uploadImage(event)">
+    <button onclick="downloadDoc()">Download as DOCX</button>
+    <button onclick="downloadPdf()">Download as PDF</button>
+  </div>
+  <div id="editor" class="editor-container" contenteditable="true">
+    <div class="page">Start typing here...</div>
+  </div>
+  <div id="hidden"></div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/6.1.0-beta.5/index.js"></script>
 
-<body onload="startTime()">
+  <script>
+    function execCmd(command) {
+      document.execCommand(command, false, null);
+      checkPagination();
+    }
 
-	<div class="container">
-		<div class="geeks">
-			<div class="gfg left">
-				
-			
+    function execCmdWithArg(command, arg) {
+      document.execCommand(command, false, arg);
+      checkPagination();
+    }
 
-			</div>
+    function checkPagination() {
+      const pages = document.querySelectorAll('.page');
+      const editor = document.getElementById('editor');
+      pages.forEach(page => {
+        if (page.offsetHeight > editor.clientHeight) {
+          const newPage = document.createElement('div');
+          newPage.className = 'page';
+          editor.appendChild(newPage);
+        }
+      });
+    }
 
-			
-			<div class="gfg middle">
-				
-                <!-- StenoSearch-->
-                
-              <script async src="https://cse.google.com/cse.js?cx=63de7b7e7f71042d6">
-</script>
-<div class="gcse-search"></div>
+    function uploadImage(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.maxWidth = '100%';
+        document.execCommand('insertHTML', false, img.outerHTML);
+      };
+      reader.readAsDataURL(file);
+    }
 
-				<!-- End of StenoSearch Code-->
-                
-                <i class="fa fa-search"
-				aria-hidden="true">
-				</i>
-			</div>
-			<div class="gfg right">
-				<div style="float:right">
-			
-            <!-- Time -->
-            <h4>Time:</h4>
-       <div id="txt"></div>
+    async function downloadDoc() {
+      const editorContent = document.getElementById('editor').innerHTML;
+      const doc = new docx.Document();
+      const parser = new DOMParser();
+      const docContent = parser.parseFromString(editorContent, 'text/html');
+      const children = [];
 
-<script>
-function startTime() {
-  const today = new Date();
-  let h = today.getHours();
-  let m = today.getMinutes();
-  let s = today.getSeconds();
-  m = checkTime(m);
-  s = checkTime(s);
-  document.getElementById('txt').innerHTML =  h + ":" + m + ":" + s;
-  setTimeout(startTime, 1000);
-}
+      docContent.body.querySelectorAll('.page').forEach(page => {
+        const para = new docx.Paragraph(page.innerHTML);
+        children.push(para);
+      });
 
-function checkTime(i) {
-  if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
-  return i;
-}
-</script>
-				<!-- End of time code -->
-                </div>
-			</div>
-		</div>
+      doc.addSection({ children });
 
-		<div class="body">
-<iframe frameborder="0" src="https://demo.filestash.app/login?type=tmp&amp;next=/view/tmp.docx&amp;userID=b4WP9Z4KNrVC" class="__web-inspector-hide-shortcut__" height="500px" width="900px"></iframe>
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        </div>
-	</div>
+      const blob = await docx.Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'document.docx';
+      a.click();
+    }
 
-
-    <!-- Do not paste text, button, link and etc. here -->
-
-  <a href= "https://stenowondercomputer.w3spaces-preview.com/original.html#gsc.tab=0">Miss old version? Return to original.</a>
-
-
-
-
-
-
+    function downloadPdf() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const pages = document.querySelectorAll('.page');
+      pages.forEach((page, index) => {
+        if (index > 0) {
+          doc.addPage();
+        }
+        doc.text(page.innerText || page.textContent, 10, 10);
+      });
+      doc.save('document.pdf');
+    }
+  </script>
 </body>
-
 </html>
