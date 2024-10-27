@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clocker</title>
+    <title>Live Calendar and Global Clocks</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h1>Clocker</h1>
+    <h1>Live Monthly Calendar and Global Clocks</h1>
     <div class="calendar" id="calendar"></div>
     <div class="analog-clock" id="analog-clock">
         <div class="hand" id="hour-hand" style="height: 4px;"></div>
@@ -104,4 +104,44 @@
             const hours = now.getHours();
 
             const secondDegree = ((seconds / 60) * 360) + 90;
-            const minuteDegree = ((minutes / 60) * 360) + ((seconds
+            const minuteDegree = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
+            const hourDegree = ((hours / 12) * 360) + ((minutes / 60) * 30) + 90;
+
+            secondHand.style.transform = `rotate(${secondDegree}deg)`;
+            minuteHand.style.transform = `rotate(${minuteDegree}deg)`;
+            hourHand.style.transform = `rotate(${hourDegree}deg)`;
+        }
+
+        // Digital Clocks for Different Time Zones
+        const timeZones = [
+            { name: "New York", offset: -4 },
+            { name: "London", offset: 0 },
+            { name: "Tokyo", offset: 9 },
+            { name: "Sydney", offset: 10 }
+        ];
+
+        function updateTimeZones() {
+            const timeZonesElement = document.getElementById('time-zones');
+            const now = new Date();
+
+            let timeZonesHTML = '';
+            timeZones.forEach(tz => {
+                const localTime = new Date(now.getTime() + tz.offset * 3600 * 1000);
+                timeZonesHTML += `<div class="time-zone"><strong>${tz.name}:</strong> ${localTime.toLocaleTimeString()}</div>`;
+            });
+
+            timeZonesElement.innerHTML = timeZonesHTML;
+        }
+
+        function init() {
+            generateCalendar();
+            updateAnalogClock();
+            updateTimeZones();
+            setInterval(updateAnalogClock, 1000);
+            setInterval(updateTimeZones, 1000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
