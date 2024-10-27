@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Basic Email</title>
+  <title>Email Service</title>
   <style>
     .email-form {
       max-width: 500px;
@@ -30,7 +30,7 @@
 <body>
   <div class="email-form">
     <h2>Send an Email</h2>
-    <form action="" method="post">
+    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
       <input type="text" name="to" placeholder="To" required>
       <input type="text" name="subject" placeholder="Subject" required>
       <textarea name="message" placeholder="Message" required></textarea>
@@ -43,7 +43,7 @@
     $to = $_POST['to'];
     $subject = $_POST['subject'];
     $message = $_POST['message'];
-    $headers = "From: mystenoipcompany@gmail.com";
+    $headers = "From: youremail@example.com";
 
     if (mail($to, $subject, $message, $headers)) {
       echo "<p>Email sent successfully!</p>";
