@@ -1,71 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="google-site-verification" content="7zk1fx2BZWRu2bATsXN4cTpsqI2Cro3ZxoGGLWSDZ6c" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Stenoip Wonder Computer</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9575535267287297" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock and Calendar</title>
     <style>
-        * { box-sizing: border-box; }
-        .container { border: 2px solid #bdc3c7; border-top-left-radius: 6px; border-top-right-radius: 6px; }
-        .geeks { padding: 10px; background: #f1f1f1; border-top-left-radius: 4px; border-top-right-radius: 4px; }
-        input[type=text] { width: 100%; border-radius: 3px; border: none; background-color: white; margin-top: -8px; height: 25px; color: gray; padding: 5px; }
-        .gfg { float: left; }
-        .middle { width: 75%; position: relative; }
-        .left { width: 15%; }
-        .right { width: 10%; }
-        .middle i { position: absolute; left: 430px; top: 2px; color: gray; }
-        .geeks:after { content: ""; display: table; clear: both; }
-        .bar { width: 15px; height: 3px; margin: 3px 0; display: block; background-color: #aaa; }
-        .body { padding: 15px; }
-        .button-19 { appearance: button; background-color: #1899D6; border: solid transparent; border-radius: 16px; border-width: 0 0 4px; box-sizing: border-box; color: #ff8800; cursor: pointer; display: inline-block; font-family: din-round, sans-serif; font-size: 15px; font-weight: 700; letter-spacing: .8px; line-height: 20px; margin: 0; outline: none; overflow: visible; padding: 13px 16px; text-align: center; text-transform: uppercase; touch-action: manipulation; transform: translateZ(0); transition: filter .2s; user-select: none; -webkit-user-select: none; vertical-align: middle; white-space: nowrap; width: 100%; }
-        .button-19:after { background-clip: padding-box; background-color: #e33d3d; border: solid transparent; border-radius: 16px; border-width: 0 0 4px; bottom: -4px; content: ""; left: 0; position: absolute; right: 0; top: 0; z-index: -1; }
-        .button-19:main,.button-19:focus { user-select: auto; }
-        .button-19:hover:not(:disabled) { filter: brightness(1.1); -webkit-filter: brightness(1.1); }
-        .button-19:disabled { cursor: auto; }
-        .button-19:active { border-width: 4px 0 0; background: none; }
-        .p1 { font-family: "Times New Roman", Times, serif; }
-        .p2 { font-family: Arial, Helvetica, sans-serif; }
-        .p3 { font-family: "Lucida Console", "Courier New", monospace; }
-        h1 { text-align: center; }
-        h2 { text-align: center; }
-        h3 { text-align: center; }
-        .phone { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 150px; margin: 0 auto; }
-        .button { padding: 20px; background-color: #1899D6; color: white; font-size: 20px; text-align: center; border-radius: 5px; cursor: pointer; }
-        .button:hover { background-color: #ff8800; }
-        .call-button { grid-column: span 3; padding: 20px; background-color: #e33d3d; color: white; font-size: 20px; text-align: center; border-radius: 5px; cursor: pointer; }
-        .call-button:hover { background-color: #bdc3c7; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        .clock {
+            margin: 20px auto;
+            width: 200px;
+            height: 200px;
+            border: 5px solid #333;
+            border-radius: 50%;
+            position: relative;
+        }
+        .clock .hand {
+            width: 50%;
+            height: 6px;
+            background: #333;
+            position: absolute;
+            top: 50%;
+            transform-origin: 100%;
+            transform: rotate(90deg);
+        }
+        .clock .second-hand {
+            height: 2px;
+            background: red;
+        }
+        .digital-clock {
+            font-size: 2em;
+            margin: 20px;
+        }
+        .date {
+            font-size: 1.5em;
+            margin: 10px;
+        }
+        .calendar {
+            margin-top: 20px;
+        }
+        .calendar th, .calendar td {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #ddd;
+        }
+        .calendar th {
+            background: #f4f4f4;
+        }
     </style>
 </head>
 <body>
-    <div class="phone">
-        <div class="button" onclick="addDigit('1')">1</div>
-        <div class="button" onclick="addDigit('2')">2</div>
-        <div class="button" onclick="addDigit('3')">3</div>
-        <div class="button" onclick="addDigit('4')">4</div>
-        <div class="button" onclick="addDigit('5')">5</div>
-        <div class="button" onclick="addDigit('6')">6</div>
-        <div class="button" onclick="addDigit('7')">7</div>
-        <div class="button" onclick="addDigit('8')">8</div>
-        <div class="button" onclick="addDigit('9')">9</div>
-        <div class="button" onclick="addDigit('0')">0</div> <!-- Added the 0 button -->
-        <div class="call-button" onclick="makeCall()">Call</div>
+    <h1>Clock and Calendar</h1>
+    <div class="clock">
+        <div class="hand hour-hand"></div>
+        <div class="hand minute-hand"></div>
+        <div class="hand second-hand"></div>
     </div>
-    <div id="phoneNumber" style="text-align: center; margin-top: 20px;"></div>
+    <div class="digital-clock" id="digitalClock"></div>
+    <div class="date" id="currentDate"></div>
+    <table class="calendar" id="calendar">
+        <thead>
+            <tr>
+                <th>Sun</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
     <script>
-        let phoneNumber = '';
-        function addDigit(digit) {
-            phoneNumber += digit;
-            document.getElementById('phoneNumber').innerHTML = phoneNumber;
+        function updateClock() {
+            const now = new Date();
+            const secondHand = document.querySelector('.second-hand');
+            const minuteHand = document.querySelector('.minute-hand');
+            const hourHand = document.querySelector('.hour-hand');
+            const seconds = now.getSeconds();
+            const minutes = now.getMinutes();
+            const hours = now.getHours();
+            secondHand.style.transform = \`rotate(\${(seconds / 60) * 360 + 90}deg)\`;
+            minuteHand.style.transform = \`rotate(\${(minutes / 60) * 360 + 90}deg)\`;
+            hourHand.style.transform = \`rotate(\${(hours / 12) * 360 + 90}deg)\`;
+            document.getElementById('digitalClock').innerText = now.toLocaleTimeString();
+            document.getElementById('currentDate').innerText = now.toLocaleDateString();
         }
-        function makeCall() {
-            if (phoneNumber.length > 0) {
-                window.location.href = 'tel:' + phoneNumber;
-            } else {
-                alert('Please enter a phone number first');
+
+        function generateCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const calendarBody = document.querySelector('.calendar tbody');
+            calendarBody.innerHTML = '';
+            let row = document.createElement('tr');
+            for (let i = 0; i < firstDay; i++) {
+                let cell = document.createElement('td');
+                row.appendChild(cell);
             }
+            for (let i = 1; i <= daysInMonth; i++) {
+                let cell = document.createElement('td');
+                cell.innerText = i;
+                row.appendChild(cell);
+                if ((i + firstDay) % 7 === 0) {
+                    calendarBody.appendChild(row);
+                    row = document.createElement('tr');
+                }
+            }
+            calendarBody.appendChild(row);
         }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+        generateCalendar();
     </script>
 </body>
 </html>
