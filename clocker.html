@@ -3,126 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clock and Calendar</title>
+    <title>Live Monthly Calendar</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            padding: 50px;
-        }
-        .clock {
-            margin: 20px auto;
-            width: 200px;
-            height: 200px;
-            border: 5px solid #333;
-            border-radius: 50%;
-            position: relative;
-        }
-        .clock .hand {
-            width: 50%;
-            height: 6px;
-            background: #333;
-            position: absolute;
-            top: 50%;
-            transform-origin: 100%;
-            transform: rotate(90deg);
-        }
-        .clock .second-hand {
-            height: 2px;
-            background: red;
-        }
-        .digital-clock {
-            font-size: 2em;
-            margin: 20px;
-        }
-        .date {
-            font-size: 1.5em;
-            margin: 10px;
         }
         .calendar {
+            display: inline-block;
             margin-top: 20px;
         }
-        .calendar th, .calendar td {
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            vertical-align: middle;
-            border: 1px solid #ddd;
+        .day {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border: 1px solid #ccc;
+            margin: 2px;
+            vertical-align: top;
         }
-        .calendar th {
-            background: #f4f4f4;
+        .today {
+            background-color: #007bff;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <h1>Clock and Calendar</h1>
-    <div class="clock">
-        <div class="hand hour-hand"></div>
-        <div class="hand minute-hand"></div>
-        <div class="hand second-hand"></div>
-    </div>
-    <div class="digital-clock" id="digitalClock"></div>
-    <div class="date" id="currentDate"></div>
-    <table class="calendar" id="calendar">
-        <thead>
-            <tr>
-                <th>Sunt</th>
-                <th>Mon</th>
-                <th>Tue</th>
-                <th>Wed</th>
-                <th>Thu</th>
-                <th>Fri</th>
-                <th>Sat</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <h1>Live Monthly Calendar</h1>
+    <div class="calendar" id="calendar"></div>
 
     <script>
-        function updateClock() {
-            const now = new Date();
-            const secondHand = document.querySelector('.second-hand');
-            const minuteHand = document.querySelector('.minute-hand');
-            const hourHand = document.querySelector('.hour-hand');
-            const seconds = now.getSeconds();
-            const minutes = now.getMinutes();
-            const hours = now.getHours();
-            secondHand.style.transform = \`rotate(\${(seconds / 60) * 360 + 90}deg)\`;
-            minuteHand.style.transform = \`rotate(\${(minutes / 60) * 360 + 90}deg)\`;
-            hourHand.style.transform = \`rotate(\${(hours / 12) * 360 + 90}deg)\`;
-            document.getElementById('digitalClock').innerText = now.toLocaleTimeString();
-            document.getElementById('currentDate').innerText = now.toLocaleDateString();
-        }
-
         function generateCalendar() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
+            const calendarElement = document.getElementById('calendar');
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
             const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const calendarBody = document.querySelector('.calendar tbody');
-            calendarBody.innerHTML = '';
-            let row = document.createElement('tr');
+            const lastDate = new Date(year, month + 1, 0).getDate();
+
+            let calendarHTML = `<h2>${today.toLocaleString('default', { month: 'long' })} ${year}</h2>`;
+
             for (let i = 0; i < firstDay; i++) {
-                let cell = document.createElement('td');
-                row.appendChild(cell);
+                calendarHTML += `<div class="day"></div>`;
             }
-            for (let i = 1; i <= daysInMonth; i++) {
-                let cell = document.createElement('td');
-                cell.innerText = i;
-                row.appendChild(cell);
-                if ((i + firstDay) % 7 === 0) {
-                    calendarBody.appendChild(row);
-                    row = document.createElement('tr');
+
+            for (let date = 1; date <= lastDate; date++) {
+                if (date === today.getDate()) {
+                    calendarHTML += `<div class="day today">${date}</div>`;
+                } else {
+                    calendarHTML += `<div class="day">${date}</div>`;
                 }
             }
-            calendarBody.appendChild(row);
+
+            calendarElement.innerHTML = calendarHTML;
         }
 
-        setInterval(updateClock, 1000);
-        setInterval(generateCalendar, 86400000); // Update calendar every 24 hours
-        updateClock();
-        generateCalendar();
+        function init() {
+            generateCalendar();
+            setInterval(generateCalendar, 86400000); // Update daily
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
