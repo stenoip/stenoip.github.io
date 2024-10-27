@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Protected Page</title>
+</head>
+<body>
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+      alert('You must be logged in to view this page.');
+      window.location.href = 'index.html'; // Redirect to login page
+    }
+  </script>
+  <h2>Protected Content</h2>
+  <!-- Your protected content goes here -->
+</body>
+</html>
