@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Email Service</title>
+  <style>
+    .email-form {
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #bdc3c7;
+      border-radius: 8px;
+    }
+    .email-form input, .email-form textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #bdc3c7;
+      border-radius: 4px;
+    }
+    .email-form button {
+      padding: 10px 20px;
+      background-color: #1899D6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-form">
+    <h2>Send an Email</h2>
+    <form action="send_email.php" method="post">
+      <input type="text" name="to" placeholder="To">
+      <input type="text" name="subject" placeholder="Subject">
+      <textarea name="message" placeholder="Message"></textarea>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+</body>
+</html>
