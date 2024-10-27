@@ -16,11 +16,11 @@
   <br>
   <canvas id="canvas" width="640" height="480"></canvas>
   <br>
-  <button id="download-photo" style="display:none;">Download Photo</button>
+  <a id="download-photo" style="display:none;" download="photo.png">Download Photo</a>
   <br>
   <video id="recorded-video" width="640" height="480" controls></video>
   <br>
-  <button id="download-video" style="display:none;">Download Video</button>
+  <a id="download-video" style="display:none;" download="video.webm">Download Video</a>
 
   <script>
     const video = document.getElementById('video');
@@ -30,9 +30,9 @@
     const startRecordingButton = document.getElementById('start-recording');
     const stopRecordingButton = document.getElementById('stop-recording');
     const switchCameraButton = document.getElementById('switch-camera');
-    const downloadPhotoButton = document.getElementById('download-photo');
+    const downloadPhotoLink = document.getElementById('download-photo');
     const recordedVideo = document.getElementById('recorded-video');
-    const downloadVideoButton = document.getElementById('download-video');
+    const downloadVideoLink = document.getElementById('download-video');
     
     let mediaRecorder;
     let recordedChunks = [];
@@ -78,18 +78,16 @@
         recordedChunks = [];
         const url = URL.createObjectURL(blob);
         recordedVideo.src = url;
-        downloadVideoButton.style.display = 'inline';
-        downloadVideoButton.href = url;
-        downloadVideoButton.download = 'video.webm';
+        downloadVideoLink.style.display = 'inline';
+        downloadVideoLink.href = url;
       };
     }
     
     capturePhotoButton.addEventListener('click', () => {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const dataUrl = canvas.toDataURL('image/png');
-      downloadPhotoButton.style.display = 'inline';
-      downloadPhotoButton.href = dataUrl;
-      downloadPhotoButton.download = 'photo.png';
+      downloadPhotoLink.style.display = 'inline';
+      downloadPhotoLink.href = dataUrl;
     });
     
     startRecordingButton.addEventListener('click', () => {
