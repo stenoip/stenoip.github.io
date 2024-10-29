@@ -359,7 +359,6 @@ body.hide-header .header {
     <!-- Header Greetings -->
     <h1 class="title">Hello, I am Sir Praterich </h1>
     <p class="subtitle">How can I help you today?</p>
-
     <iframe src="https://briaai-bria-2-3-fast.hf.space" width="100%" height="600" scrolling="yes" class="iframe-class" frameborder="0"></iframe>
     <!-- Suggestion list -->
     <ul class="suggestion-list">
@@ -381,10 +380,8 @@ body.hide-header .header {
       </li>
     </ul>
   </header>
-
   <!-- Chat List / Container -->
   <div class="chat-list"></div>
-
   <!-- Typing Area -->
   <div class="typing-area">
     <form action="#" class="typing-form">
@@ -395,27 +392,11 @@ body.hide-header .header {
       <div class="action-buttons">
         <span id="theme-toggle-button" class="icon material-symbols-rounded">light_mode</span>
         <span id="delete-chat-button" class="icon material-symbols-rounded">delete</span>
+        <input type="file" id="file-upload" class="icon" accept="image/*,video/*" />
       </div>
     </form>
-  <form action="#" class="typing-form">
-    <div class="input-wrapper">
-        <input type="text" placeholder="Enter a prompt here" class="typing-input" required />
-        <button id="send-message-button" class="icon material-symbols-rounded">send</button>
-    </div>
-    <div class="action-buttons">
-        <span id="theme-toggle-button" class="icon material-symbols-rounded">light_mode</span>
-        <span id="delete-chat-button" class="icon material-symbols-rounded">delete</span>
-        <input type="file" id="file-upload" class="icon" accept="image/*,video/*" />
-    </div>
-</form>
-	  
-	  
-	  
-	  <p class="disclaimer-text">
-      Sirr Praterich  may display inaccurate info, including about people, so double-check its responses. Copyright Stenoip Company
-    </p>
-  </div>
-
+    <p class="disclaimer-text">
+      Sir Praterich may display inaccurate info, including about people, so double-check its responses. Copyright Stenoip 
   <script>
      const typingForm = document.querySelector(".typing-form");
 const chatContainer = document.querySelector(".chat-list");
