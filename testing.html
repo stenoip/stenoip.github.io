@@ -574,7 +574,38 @@ deleteChatButton.addEventListener("click", () => {
   }
 });
 
-// Set userMessage and handle outgoing chat when a suggestion is clicked
+const fileUploadInput = document.querySelector("#file-upload");
+
+fileUploadInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const fileContent = e.target.result;
+            if (file.type.startsWith("image/")) {
+                analyzeImage(fileContent);
+            } else if (file.type.startsWith("video/")) {
+                analyzeVideo(fileContent);
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+const analyzeImage = (fileContent) => {
+    // Function to analyze image content
+    console.log("Analyzing image", fileContent);
+    // Add your image analysis code here
+};
+
+const analyzeVideo = (fileContent) => {
+    // Function to analyze video content
+    console.log("Analyzing video", fileContent);
+    // Add your video analysis code here
+};
+
+	  
+	  // Set userMessage and handle outgoing chat when a suggestion is clicked
 suggestions.forEach(suggestion => {
   suggestion.addEventListener("click", () => {
     userMessage = suggestion.querySelector(".text").innerText;
