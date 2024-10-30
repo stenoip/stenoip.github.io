@@ -90,7 +90,7 @@
       const pages = document.querySelectorAll('.page');
       const editor = document.getElementById('editor');
       pages.forEach(page => {
-        if (page.offsetHeight > editor.clientHeight) {
+        if (page.textContent.length > 300 && page.offsetHeight > editor.clientHeight) {
           const newPage = document.createElement('div');
           newPage.className = 'page';
           editor.appendChild(newPage);
