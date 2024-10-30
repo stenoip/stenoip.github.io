@@ -301,7 +301,25 @@ google.dom.append(a)}}function e(){if(document.f&&document.f.btnI)document.f.btn
 <iframe src="https://www.crazygames.com/embed/cut-the-rope-ebx" style="width: 500px; height: 500px;" frameborder="0" allow="gamepad *;"></iframe>
 
 
-			
+	<div id="gameContainer" style="height: 576px; width: 1024px;">
+  <a href="https://html5gameshq.com/?r=embed-ref" target="_blank">More Games at HTML5GamesHQ...</a>
+</div>
+
+<script>
+  function createIframe() {
+    var iframe = document.createElement('iframe');
+    iframe.style.height = '100%';
+    iframe.style.width = '100%';
+    iframe.src = 'https://html5gameshq.com/iframed/cut-the-rope';
+    iframe.frameBorder = '0';
+    iframe.scrolling = 'no';
+    document.getElementById('gameContainer').appendChild(iframe);
+  }
+
+  // Call the function to create the iframe
+  createIframe();
+</script>
+		
         
         
         </div>
