@@ -3,141 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Web Text Editor</title>
+  <title>Google Play Style Template</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    .toolbar {
+      background-color: #f5f5f5;
       display: flex;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-    .toolbar button, .toolbar select, .toolbar input {
-      padding: 5px 10px;
-      margin-right: 5px;
+    .container {
+      text-align: center;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
     }
-    .editor-container {
-      border: 1px solid #ccc;
-      padding: 10px;
-      min-height: 300px;
-      overflow-y: auto;
+    .app-icon {
+      width: 100px;
+      height: 100px;
+      border-radius: 16px;
+      margin-bottom: 20px;
     }
-    .page {
-      height: 842px; /* A4 Page height */
-      border-bottom: 1px dashed #ccc;
-      padding: 10px;
-      margin-bottom: 10px;
+    .app-title {
+      font-size: 24px;
+      margin: 0 0 10px;
     }
-    #hidden {
-      display: none;
+    .app-description {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      text-align: center;
+      color: #fff;
+      background-color: #34a853;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .button:hover {
+      background-color: #2c8c45;
+    }
+    .button.google {
+      background-color: #4285f4;
+    }
+    .button.google:hover {
+      background-color: #357ae8;
     }
   </style>
 </head>
 <body>
-  <h1>Web Text Editor</h1>
-  <div class="toolbar">
-    <button onclick="execCmd('bold')"><b>B</b></button>
-    <button onclick="execCmd('italic')"><i>I</i></button>
-    <button onclick="execCmd('underline')"><u>U</u></button>
-    <button onclick="execCmd('strikeThrough')"><s>S</s></button>
-    <button onclick="execCmd('insertOrderedList')">Numbered List</button>
-    <button onclick="execCmd('insertUnorderedList')">Bullet List</button>
-    <button onclick="execCmd('justifyLeft')">Left Align</button>
-    <button onclick="execCmd('justifyCenter')">Center Align</button>
-    <button onclick="execCmd('justifyRight')">Right Align</button>
-    <button onclick="execCmd('justifyFull')">Justify</button>
-    <button onclick="execCmd('indent')">Indent</button>
-    <button onclick="execCmd('outdent')">Outdent</button>
-    <select onchange="execCmdWithArg('fontName', this.value)">
-      <option value="Arial">Arial</option>
-      <option value="Courier">Courier</option>
-      <option value="Times New Roman">Times New Roman</option>
-    </select>
-    <select onchange="execCmdWithArg('fontSize', this.value)">
-      <option value="1">8</option>
-      <option value="2">10</option>
-      <option value="3">12</option>
-      <option value="4">14</option>
-      <option value="5">18</option>
-      <option value="6">24</option>
-      <option value="7">36</option>
-    </select>
-    <input type="color" onchange="execCmdWithArg('foreColor', this.value)">
-    <input type="color" onchange="execCmdWithArg('hiliteColor', this.value)">
-    <input type="file" onchange="uploadImage(event)">
-    <button onclick="downloadDoc()">Download as DOCX</button>
-    <button onclick="downloadPdf()">Download as PDF</button>
+  <div class="container">
+    <img src="app-icon.png" alt="App Icon" class="app-icon">
+    <h1 class="app-title">Your App Title</h1>
+    <p class="app-description">Short description of your app goes here.</p>
+    <div class="buttons">
+      <a href="your-apk-link-1" class="button">Download APK 1</a>
+      <a href="your-apk-link-2" class="button google">Download APK 2</a>
+    </div>
   </div>
-  <div id="editor" class="editor-container" contenteditable="true">
-    <div class="page">Start typing here...</div>
-  </div>
-  <div id="hidden"></div>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/6.1.0-beta.5/index.js"></script>
-  <script>
-    function execCmd(command) {
-      document.execCommand(command, false, null);
-      checkPagination();
-    }
-    function execCmdWithArg(command, arg) {
-      document.execCommand(command, false, arg);
-      checkPagination();
-    }
-    function checkPagination() {
-      const pages = document.querySelectorAll('.page');
-      const editor = document.getElementById('editor');
-      pages.forEach(page => {
-        if (page.textContent.length > 300 && page.offsetHeight > editor.clientHeight) {
-          const newPage = document.createElement('div');
-          newPage.className = 'page';
-          editor.appendChild(newPage);
-        }
-      });
-    }
-    function uploadImage(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.style.maxWidth = '100%';
-        document.execCommand('insertHTML', false, img.outerHTML);
-      };
-      reader.readAsDataURL(file);
-    }
-    async function downloadDoc() {
-      const editorContent = document.getElementById('editor').innerHTML;
-      const doc = new docx.Document();
-      const parser = new DOMParser();
-      const docContent = parser.parseFromString(editorContent, 'text/html');
-      const children = [];
-      docContent.body.querySelectorAll('.page').forEach(page => {
-        const para = new docx.Paragraph(page.innerHTML);
-        children.push(para);
-      });
-      doc.addSection({ children });
-      const blob = await docx.Packer.toBlob(doc);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'document.docx';
-      a.click();
-    }
-    function downloadPdf() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const pages = document.querySelectorAll('.page');
-      pages.forEach((page, index) => {
-        if (index > 0) {
-          doc.addPage();
-        }
-        doc.text(page.innerText || page.textContent, 10, 10);
-      });
-      doc.save('document.pdf');
-    }
-  </script>
 </body>
 </html>
