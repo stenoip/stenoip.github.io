@@ -16,11 +16,14 @@
       height: 100vh;
       margin: 0;
     }
+    #game-container {
+      display: flex;
+    }
     canvas {
       background-color: #000;
       border: 2px solid #fff;
       display: block;
-      margin: 20px auto;
+      margin: 20px;
     }
     .controls {
       text-align: center;
@@ -65,7 +68,10 @@
 </head>
 <body>
   <h1>Stenoip Blocks</h1>
-  <canvas id="tetris" width="320" height="640"></canvas>
+  <div id="game-container">
+    <canvas id="tetris" width="320" height="640"></canvas>
+    <canvas id="next" width="160" height="160"></canvas>
+  </div>
   <div class="controls">
     <button class="easy" onclick="startGame('easy')">Easy Mode</button>
     <button class="hard" onclick="startGame('hard')">Hard Mode</button>
@@ -84,6 +90,8 @@
   <script>
     const canvas = document.getElementById('tetris');
     const context = canvas.getContext('2d');
+    const nextCanvas = document.getElementById('next');
+    const nextContext = nextCanvas.getContext('2d');
     const grid = 32;
     const colors = [
       '#f00', '#ff8000', '#ff0', '#0f0', '#0ff', '#00f', '#8000ff',
@@ -104,6 +112,7 @@
     let gameSpeed = 500;
     let position = { x: 3, y: 0 };
     let tetromino = getRandomTetromino();
+    let nextTetromino = getRandomTetromino();
 
     function getRandomTetromino() {
       const keys = Object.keys(tetrominos);
@@ -114,7 +123,7 @@
       };
     }
 
-    function drawTetromino(tetromino, offsetX = 0, offsetY = 0) {
+    function drawTetromino(tetromino, context, offsetX = 0, offsetY = 0) {
       tetromino.shape.forEach((row, y) => {
         row.forEach((value, x) => {
           if (value) {
@@ -125,29 +134,43 @@
       });
     }
 
-    function clearCanvas() {
+    function clearCanvas(context) {
       context.fillStyle = '#000';
-      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillRect(0, 0, context.canvas.width, context.canvas.height);
     }
 
     function update(time = 0) {
       if (gameOver) return;
 
-      clearCanvas();
-      drawTetromino(tetromino);
+      clearCanvas(context);
+      drawTetromino(tetromino, context);
       
       position.y++;
 
       if (position.y + tetromino.shape.length > canvas.height / grid) {
         position = { x: 3, y: 0 };
-        tetromino = getRandomTetromino();
+        tetromino = nextTetromino;
+        nextTetromino = getRandomTetromino();
         gameOver = !isValidMove(position.x, position.y);
+        drawNextTetromino();
       }
 
       rAF = requestAnimationFrame(update);
       setTimeout(() => {
         if (gameOver) cancelAnimationFrame(rAF);
       }, gameSpeed);
+    }
+
+    function drawNextTetromino() {
+      clearCanvas(nextContext);
+      tetromino.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) {
+            nextContext.fillStyle = nextTetromino.color;
+            nextContext.fillRect(x * grid, y * grid, grid - 1, grid - 1);
+          }
+        });
+      });
     }
 
     function isValidMove(x, y) {
@@ -168,21 +191,21 @@
     function moveLeft() {
       if (isValidMove(position.x - 1, position.y)) {
         position.x--;
-        drawTetromino(tetromino);
+        drawTetromino(tetromino, context);
       }
     }
 
     function moveRight() {
       if (isValidMove(position.x + 1, position.y)) {
         position.x++;
-        drawTetromino(tetromino);
+        drawTetromino(tetromino, context);
       }
     }
 
     function moveDown() {
       if (isValidMove(position.x, position.y + 1)) {
         position.y++;
-        drawTetromino(tetromino);
+        drawTetromino(tetromino, context);
       }
     }
 
@@ -193,7 +216,7 @@
 
       if (isValidMove(position.x, position.y)) {
         tetromino.shape = nextShape;
-        drawTetromino(tetromino);
+        drawTetromino(tetromino, context);
       }
     }
 
@@ -201,9 +224,11 @@
       gameSpeed = difficulty === 'easy' ? 500 : 300;
       position = { x: 3, y: 0 };
       tetromino = getRandomTetromino();
+      nextTetromino = getRandomTetromino();
       gameOver = false;
       cancelAnimationFrame(rAF);
       update();
+      drawNextTetromino();
     }
 
     document.addEventListener('keydown', event => {
