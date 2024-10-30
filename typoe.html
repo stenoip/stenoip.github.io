@@ -10,6 +10,8 @@
       padding: 20px;
     }
     .toolbar {
+      display: flex;
+      flex-wrap: wrap;
       margin-bottom: 10px;
     }
     .toolbar button, .toolbar select, .toolbar input {
@@ -36,14 +38,18 @@
 <body>
   <h1>Web Text Editor</h1>
   <div class="toolbar">
-    <button onclick="execCmd('bold')">Bold</button>
-    <button onclick="execCmd('italic')">Italic</button>
-    <button onclick="execCmd('underline')">Underline</button>
+    <button onclick="execCmd('bold')"><b>B</b></button>
+    <button onclick="execCmd('italic')"><i>I</i></button>
+    <button onclick="execCmd('underline')"><u>U</u></button>
+    <button onclick="execCmd('strikeThrough')"><s>S</s></button>
     <button onclick="execCmd('insertOrderedList')">Numbered List</button>
     <button onclick="execCmd('insertUnorderedList')">Bullet List</button>
     <button onclick="execCmd('justifyLeft')">Left Align</button>
     <button onclick="execCmd('justifyCenter')">Center Align</button>
     <button onclick="execCmd('justifyRight')">Right Align</button>
+    <button onclick="execCmd('justifyFull')">Justify</button>
+    <button onclick="execCmd('indent')">Indent</button>
+    <button onclick="execCmd('outdent')">Outdent</button>
     <select onchange="execCmdWithArg('fontName', this.value)">
       <option value="Arial">Arial</option>
       <option value="Courier">Courier</option>
@@ -58,6 +64,8 @@
       <option value="6">24</option>
       <option value="7">36</option>
     </select>
+    <input type="color" onchange="execCmdWithArg('foreColor', this.value)">
+    <input type="color" onchange="execCmdWithArg('hiliteColor', this.value)">
     <input type="file" onchange="uploadImage(event)">
     <button onclick="downloadDoc()">Download as DOCX</button>
     <button onclick="downloadPdf()">Download as PDF</button>
@@ -69,30 +77,26 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/6.1.0-beta.5/index.js"></script>
-
   <script>
     function execCmd(command) {
       document.execCommand(command, false, null);
       checkPagination();
     }
-
     function execCmdWithArg(command, arg) {
       document.execCommand(command, false, arg);
       checkPagination();
     }
-
     function checkPagination() {
       const pages = document.querySelectorAll('.page');
       const editor = document.getElementById('editor');
       pages.forEach(page => {
-        if (page.offsetHeight > editor.clientHeight) {
+        if (page.textContent.length > 300 && page.offsetHeight > editor.clientHeight) {
           const newPage = document.createElement('div');
           newPage.className = 'page';
           editor.appendChild(newPage);
         }
       });
     }
-
     function uploadImage(event) {
       const file = event.target.files[0];
       const reader = new FileReader();
@@ -104,21 +108,17 @@
       };
       reader.readAsDataURL(file);
     }
-
     async function downloadDoc() {
       const editorContent = document.getElementById('editor').innerHTML;
       const doc = new docx.Document();
       const parser = new DOMParser();
       const docContent = parser.parseFromString(editorContent, 'text/html');
       const children = [];
-
       docContent.body.querySelectorAll('.page').forEach(page => {
         const para = new docx.Paragraph(page.innerHTML);
         children.push(para);
       });
-
       doc.addSection({ children });
-
       const blob = await docx.Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -126,7 +126,6 @@
       a.download = 'document.docx';
       a.click();
     }
-
     function downloadPdf() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
