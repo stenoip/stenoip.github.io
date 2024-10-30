@@ -3,76 +3,217 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Play Style Template</title>
+  <title>Stenoip Blocks</title>
   <style>
     body {
+      background-color: #000;
+      color: #fff;
       font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
       margin: 0;
     }
-    .container {
+    canvas {
+      background-color: #000;
+      border: 2px solid #fff;
+      display: block;
+      margin: 20px auto;
+    }
+    .controls {
       text-align: center;
-      background: #fff;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
+      margin-top: 20px;
     }
-    .app-icon {
-      width: 100px;
-      height: 100px;
-      border-radius: 16px;
-      margin-bottom: 20px;
-    }
-    .app-title {
-      font-size: 24px;
-      margin: 0 0 10px;
-    }
-    .app-description {
-      font-size: 16px;
-      color: #666;
-      margin-bottom: 20px;
-    }
-    .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-    .button {
-      display: inline-block;
+    .controls button {
       padding: 10px 20px;
-      font-size: 16px;
-      text-align: center;
+      margin: 5px;
+      font-size: 18px;
       color: #fff;
-      background-color: #34a853;
+      background-color: #f00;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      text-decoration: none;
     }
-    .button:hover {
-      background-color: #2c8c45;
+    .controls button.easy {
+      background-color: #0f0;
     }
-    .button.google {
-      background-color: #4285f4;
+    .controls button.hard {
+      background-color: #f00;
     }
-    .button.google:hover {
-      background-color: #357ae8;
+    .mobile-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .mobile-controls button {
+      padding: 10px 20px;
+      font-size: 18px;
+      color: #fff;
+      background-color: #f00;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .instructions {
+      margin-top: 20px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="app-icon.png" alt="App Icon" class="app-icon">
-    <h1 class="app-title">Your App Title</h1>
-    <p class="app-description">Short description of your app goes here.</p>
-    <div class="buttons">
-      <a href="your-apk-link-1" class="button">Download APK 1</a>
-      <a href="your-apk-link-2" class="button google">Download APK 2</a>
-    </div>
+  <h1>Stenoip Blocks</h1>
+  <canvas id="tetris" width="320" height="640"></canvas>
+  <div class="controls">
+    <button class="easy" onclick="startGame('easy')">Easy Mode</button>
+    <button class="hard" onclick="startGame('hard')">Hard Mode</button>
   </div>
+  <div class="mobile-controls">
+    <button onclick="moveLeft()">Left</button>
+    <button onclick="rotate()">Rotate</button>
+    <button onclick="moveRight()">Right</button>
+    <button onclick="moveDown()">Down</button>
+  </div>
+  <div class="instructions">
+    <p>WASD Controls:</p>
+    <p>W - Rotate, A - Left, S - Down, D - Right</p>
+    <p>Mobile Controls: Use the buttons below the game canvas.</p>
+  </div>
+  <script>
+    const canvas = document.getElementById('tetris');
+    const context = canvas.getContext('2d');
+    const grid = 32;
+    const colors = [
+      '#f00', '#ff8000', '#ff0', '#0f0', '#0ff', '#00f', '#8000ff',
+    ];
+
+    const tetrominos = {
+      'I': [[1,1,1,1]],
+      'J': [[1,0,0], [1,1,1]],
+      'L': [[0,0,1], [1,1,1]],
+      'O': [[1,1], [1,1]],
+      'S': [[0,1,1], [1,1,0]],
+      'Z': [[1,1,0], [0,1,1]],
+      'T': [[0,1,0], [1,1,1]],
+    };
+
+    let rAF = null;
+    let gameOver = false;
+    let gameSpeed = 500;
+    let position = { x: 3, y: 0 };
+    let tetromino = getRandomTetromino();
+
+    function getRandomTetromino() {
+      const keys = Object.keys(tetrominos);
+      const key = keys[Math.floor(Math.random() * keys.length)];
+      return {
+        shape: tetrominos[key],
+        color: colors[Math.floor(Math.random() * colors.length)],
+      };
+    }
+
+    function drawTetromino(tetromino, offsetX = 0, offsetY = 0) {
+      tetromino.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) {
+            context.fillStyle = tetromino.color;
+            context.fillRect((position.x + x + offsetX) * grid, (position.y + y + offsetY) * grid, grid - 1, grid - 1);
+          }
+        });
+      });
+    }
+
+    function clearCanvas() {
+      context.fillStyle = '#000';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function update(time = 0) {
+      if (gameOver) return;
+
+      clearCanvas();
+      drawTetromino(tetromino);
+      
+      position.y++;
+
+      if (position.y + tetromino.shape.length > canvas.height / grid) {
+        position = { x: 3, y: 0 };
+        tetromino = getRandomTetromino();
+        gameOver = !isValidMove(position.x, position.y);
+      }
+
+      rAF = requestAnimationFrame(update);
+      setTimeout(() => {
+        if (gameOver) cancelAnimationFrame(rAF);
+      }, gameSpeed);
+    }
+
+    function isValidMove(x, y) {
+      for (let row = 0; row < tetromino.shape.length; row++) {
+        for (let col = 0; col < tetromino.shape[row].length; col++) {
+          if (tetromino.shape[row][col]) {
+            const newX = x + col;
+            const newY = y + row;
+            if (newX < 0 || newX >= canvas.width / grid || newY >= canvas.height / grid || context.getImageData(newX * grid, newY * grid, 1, 1).data[3] !== 0) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+    function moveLeft() {
+      if (isValidMove(position.x - 1, position.y)) {
+        position.x--;
+        drawTetromino(tetromino);
+      }
+    }
+
+    function moveRight() {
+      if (isValidMove(position.x + 1, position.y)) {
+        position.x++;
+        drawTetromino(tetromino);
+      }
+    }
+
+    function moveDown() {
+      if (isValidMove(position.x, position.y + 1)) {
+        position.y++;
+        drawTetromino(tetromino);
+      }
+    }
+
+    function rotate() {
+      const nextShape = tetromino.shape[0].map((_, index) =>
+        tetromino.shape.map(row => row[index]).reverse()
+      );
+
+      if (isValidMove(position.x, position.y)) {
+        tetromino.shape = nextShape;
+        drawTetromino(tetromino);
+      }
+    }
+
+    function startGame(difficulty) {
+      gameSpeed = difficulty === 'easy' ? 500 : 300;
+      position = { x: 3, y: 0 };
+      tetromino = getRandomTetromino();
+      gameOver = false;
+      cancelAnimationFrame(rAF);
+      update();
+    }
+
+    document.addEventListener('keydown', event => {
+      if (event.keyCode === 37) moveLeft();
+      if (event.keyCode === 39) moveRight();
+      if (event.keyCode === 40) moveDown();
+      if (event.keyCode === 38) rotate();
+    });
+
+    startGame('easy');
+  </script>
 </body>
 </html>
