@@ -3,242 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stenoip Blocks</title>
+  <title>My Simple Browser with Tabs</title>
   <style>
     body {
-      background-color: #000;
-      color: #fff;
       font-family: Arial, sans-serif;
+    }
+    .browser {
+      border: 2px solid #333;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 800px;
+      margin: 50px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .tabs {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      background: #e0e0e0;
+      border-bottom: 1px solid #333;
     }
-    #game-container {
-      display: flex;
-    }
-    canvas {
-      background-color: #000;
-      border: 2px solid #fff;
-      display: block;
-      margin: 20px;
-    }
-    .controls {
+    .tab {
+      padding: 10px;
+      cursor: pointer;
+      flex: 1;
       text-align: center;
-      margin-top: 20px;
+      border-right: 1px solid #333;
     }
-    .controls button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 18px;
-      color: #fff;
-      background-color: #f00;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+    .tab:last-child {
+      border-right: none;
     }
-    .controls button.easy {
-      background-color: #0f0;
+    .tab-content {
+      display: none;
+      height: 500px;
+      background: #fff;
+      padding: 20px;
     }
-    .controls button.hard {
-      background-color: #f00;
-    }
-    .mobile-controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .mobile-controls button {
-      padding: 10px 20px;
-      font-size: 18px;
-      color: #fff;
-      background-color: #f00;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .instructions {
-      margin-top: 20px;
-      font-size: 14px;
+    .tab-content.active {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <h1>Stenoip Blocks</h1>
-  <div id="game-container">
-    <canvas id="tetris" width="320" height="640"></canvas>
-    <canvas id="next" width="160" height="160"></canvas>
+  <div class="browser">
+    <div class="tabs" id="tabs-container">
+      <div class="tab" onclick="openTab(event, 'tab1')">Tab 1</div>
+      <div class="tab" onclick="openTab(event, 'tab2')">Tab 2</div>
+      <div class="tab" onclick="openTab(event, 'tab3')">Tab 3</div>
+    </div>
+    <div class="tab-content" id="tab1">
+      <h2>Tab 1 Content</h2>
+      <p>Welcome to Tab 1.</p>
+    </div>
+    <div class="tab-content" id="tab2">
+      <h2>Tab 2 Content</h2>
+      <p>Welcome to Tab 2.</p>
+    </div>
+    <div class="tab-content" id="tab3">
+      <h2>Tab 3 Content</h2>
+      <p>Welcome to Tab 3.</p>
+    </div>
   </div>
-  <div class="controls">
-    <button class="easy" onclick="startGame('easy')">Easy Mode</button>
-    <button class="hard" onclick="startGame('hard')">Hard Mode</button>
-  </div>
-  <div class="mobile-controls">
-    <button onclick="moveLeft()">Left</button>
-    <button onclick="rotate()">Rotate</button>
-    <button onclick="moveRight()">Right</button>
-    <button onclick="moveDown()">Down</button>
-  </div>
-  <div class="instructions">
-    <p>WASD Controls:</p>
-    <p>W - Rotate, A - Left, S - Down, D - Right</p>
-    <p>Mobile Controls: Use the buttons below the game canvas.</p>
-  </div>
+  <button onclick="addTab()">Add Tab</button>
   <script>
-    const canvas = document.getElementById('tetris');
-    const context = canvas.getContext('2d');
-    const nextCanvas = document.getElementById('next');
-    const nextContext = nextCanvas.getContext('2d');
-    const grid = 32;
-    const colors = [
-      '#f00', '#ff8000', '#ff0', '#0f0', '#0ff', '#00f', '#8000ff',
-    ];
+    const maxTabs = 20;
 
-    const tetrominos = {
-      'I': [[1,1,1,1]],
-      'J': [[1,0,0], [1,1,1]],
-      'L': [[0,0,1], [1,1,1]],
-      'O': [[1,1], [1,1]],
-      'S': [[0,1,1], [1,1,0]],
-      'Z': [[1,1,0], [0,1,1]],
-      'T': [[0,1,0], [1,1,1]],
-    };
-
-    let rAF = null;
-    let gameOver = false;
-    let gameSpeed = 500;
-    let position = { x: 3, y: 0 };
-    let tetromino = getRandomTetromino();
-    let nextTetromino = getRandomTetromino();
-
-    function getRandomTetromino() {
-      const keys = Object.keys(tetrominos);
-      const key = keys[Math.floor(Math.random() * keys.length)];
-      return {
-        shape: tetrominos[key],
-        color: colors[Math.floor(Math.random() * colors.length)],
-      };
-    }
-
-    function drawTetromino(tetromino, context, offsetX = 0, offsetY = 0) {
-      tetromino.shape.forEach((row, y) => {
-        row.forEach((value, x) => {
-          if (value) {
-            context.fillStyle = tetromino.color;
-            context.fillRect((position.x + x + offsetX) * grid, (position.y + y + offsetY) * grid, grid - 1, grid - 1);
-          }
-        });
-      });
-    }
-
-    function clearCanvas(context) {
-      context.fillStyle = '#000';
-      context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-    }
-
-    function update(time = 0) {
-      if (gameOver) return;
-
-      clearCanvas(context);
-      drawTetromino(tetromino, context);
-      
-      position.y++;
-
-      if (position.y + tetromino.shape.length > canvas.height / grid) {
-        position = { x: 3, y: 0 };
-        tetromino = nextTetromino;
-        nextTetromino = getRandomTetromino();
-        gameOver = !isValidMove(position.x, position.y);
-        drawNextTetromino();
+    function openTab(evt, tabName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tab-content");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
       }
-
-      rAF = requestAnimationFrame(update);
-      setTimeout(() => {
-        if (gameOver) cancelAnimationFrame(rAF);
-      }, gameSpeed);
-    }
-
-    function drawNextTetromino() {
-      clearCanvas(nextContext);
-      tetromino.shape.forEach((row, y) => {
-        row.forEach((value, x) => {
-          if (value) {
-            nextContext.fillStyle = nextTetromino.color;
-            nextContext.fillRect(x * grid, y * grid, grid - 1, grid - 1);
-          }
-        });
-      });
-    }
-
-    function isValidMove(x, y) {
-      for (let row = 0; row < tetromino.shape.length; row++) {
-        for (let col = 0; col < tetromino.shape[row].length; col++) {
-          if (tetromino.shape[row][col]) {
-            const newX = x + col;
-            const newY = y + row;
-            if (newX < 0 || newX >= canvas.width / grid || newY >= canvas.height / grid || context.getImageData(newX * grid, newY * grid, 1, 1).data[3] !== 0) {
-              return false;
-            }
-          }
-        }
+      tablinks = document.getElementsByClassName("tab");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
       }
-      return true;
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.className += " active";
     }
 
-    function moveLeft() {
-      if (isValidMove(position.x - 1, position.y)) {
-        position.x--;
-        drawTetromino(tetromino, context);
+    function addTab() {
+      const tabsContainer = document.getElementById("tabs-container");
+      const currentTabs = tabsContainer.getElementsByClassName("tab").length;
+
+      if (currentTabs < maxTabs) {
+        const newTabIndex = currentTabs + 1;
+        const newTab = document.createElement("div");
+        newTab.className = "tab";
+        newTab.textContent = "Tab " + newTabIndex;
+        newTab.setAttribute("onclick", `openTab(event, 'tab${newTabIndex}')`);
+        tabsContainer.appendChild(newTab);
+
+        const newTabContent = document.createElement("div");
+        newTabContent.className = "tab-content";
+        newTabContent.id = "tab" + newTabIndex;
+        newTabContent.innerHTML = `<h2>Tab ${newTabIndex} Content</h2><p>Welcome to Tab ${newTabIndex}.</p>`;
+        document.querySelector(".browser").appendChild(newTabContent);
+      } else {
+        alert("Maximum number of tabs reached!");
       }
     }
 
-    function moveRight() {
-      if (isValidMove(position.x + 1, position.y)) {
-        position.x++;
-        drawTetromino(tetromino, context);
-      }
-    }
-
-    function moveDown() {
-      if (isValidMove(position.x, position.y + 1)) {
-        position.y++;
-        drawTetromino(tetromino, context);
-      }
-    }
-
-    function rotate() {
-      const nextShape = tetromino.shape[0].map((_, index) =>
-        tetromino.shape.map(row => row[index]).reverse()
-      );
-
-      if (isValidMove(position.x, position.y)) {
-        tetromino.shape = nextShape;
-        drawTetromino(tetromino, context);
-      }
-    }
-
-    function startGame(difficulty) {
-      gameSpeed = difficulty === 'easy' ? 500 : 300;
-      position = { x: 3, y: 0 };
-      tetromino = getRandomTetromino();
-      nextTetromino = getRandomTetromino();
-      gameOver = false;
-      cancelAnimationFrame(rAF);
-      update();
-      drawNextTetromino();
-    }
-
-    document.addEventListener('keydown', event => {
-      if (event.keyCode === 37) moveLeft();
-      if (event.keyCode === 39) moveRight();
-      if (event.keyCode === 40) moveDown();
-      if (event.keyCode === 38) rotate();
-    });
-
-    startGame('easy');
+    // Open the default tab
+    document.getElementsByClassName('tab')[0].click();
   </script>
 </body>
 </html>
