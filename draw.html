@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Drawing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .controls label, .controls input, .controls select {
+            margin: 0 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.js"></script>
+</head>
+<body>
+    <h1>Advanced Drawing Game</h1>
+    <div class="controls">
+        <label for="colorPicker">Color: </label>
+        <input type="color" id="colorPicker">
+        <label for="toolSelect">Tool: </label>
+        <select id="toolSelect">
+            <option value="pencil">Pencil</option>
+            <option value="pen">Pen</option>
+            <option value="highlighter">Highlighter</option>
+            <option value="eraser">Eraser</option>
+        </select>
+    </div>
+    <div id="canvasContainer"></div>
+    <script>
+        let currentTool = 'pencil';
+        let colorPicker;
+        let toolSelect;
+
+        function setup() {
+            adjustCanvasSize();
+            colorPicker = select('#colorPicker');
+            toolSelect = select('#toolSelect');
+            toolSelect.changed(changeTool);
+            background(255);
+        }
+
+        function draw() {
+            if (mouseIsPressed) {
+                strokeWeight(getStrokeWeight());
+                if (currentTool === 'eraser') {
+                    stroke(255); // Background color for eraser
+                } else {
+                    stroke(getColor());
+                }
+                if (currentTool === 'highlighter') {
+                    drawingContext.globalAlpha = 0.3;
+                } else {
+                    drawingContext.globalAlpha = 1.0;
+                }
+                line(pmouseX, pmouseY, mouseX, mouseY);
+            }
+        }
+
+        function getStrokeWeight() {
+            switch (currentTool) {
+                case 'pencil':
+                    return 2;
+                case 'pen':
+                    return 4;
+                case 'highlighter':
+                    return 8;
+                case 'eraser':
+                    return 10;
+            }
+        }
+
+        function getColor() {
+            const rgb = hexToRgb(colorPicker.value());
+            return color(rgb.r, rgb.g, rgb.b);
+        }
+
+        function hexToRgb(hex) {
+            const bigint = parseInt(hex.substring(1), 16);
+            const r = (bigint >> 16) & 255;
+            const g = (bigint >> 8) & 255;
+            const b = bigint & 255;
+            return { r, g, b };
+        }
+
+        function changeTool() {
+            currentTool = toolSelect.value();
+        }
+
+        function windowResized() {
+            adjustCanvasSize();
+        }
+
+        function adjustCanvasSize() {
+            if (windowWidth > 768) { // Desktop
+                resizeCanvas(windowWidth - 80, windowHeight - 160);
+            } else { // Mobile
+                resizeCanvas(windowWidth - 40, windowHeight - 160);
+            }
+        }
+    </script>
+</body>
+</html>
