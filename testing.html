@@ -1,109 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Simple Browser with Tabs</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
-    .browser {
-      border: 2px solid #333;
-      border-radius: 8px;
-      overflow: hidden;
-      width: 800px;
-      margin: 50px auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-    .tabs {
-      display: flex;
-      background: #e0e0e0;
-      border-bottom: 1px solid #333;
-    }
-    .tab {
-      padding: 10px;
-      cursor: pointer;
-      flex: 1;
-      text-align: center;
-      border-right: 1px solid #333;
-    }
-    .tab:last-child {
-      border-right: none;
-    }
-    .tab-content {
-      display: none;
-      height: 500px;
-      background: #fff;
-      padding: 20px;
-    }
-    .tab-content.active {
-      display: block;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stenoip Wonder Computer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
+        body {
+            font-family: 'Google Sans', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 70%;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .search-bar button {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            background-color: #0078d4;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-bar button:hover {
+            background-color: #005ba1;
+        }
+        .suggestions {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 70%;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1;
+        }
+        .suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+        .news {
+            margin-bottom: 20px;
+        }
+        .news h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #0078d4;
+        }
+        .news iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 10px;
+        }
+        .ads {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .ads img {
+            width: 48%;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        .ads img:hover {
+            transform: scale(1.05);
+        }
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .links button {
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #0078d4;
+            color: white;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .links button:hover {
+            background-color: #005ba1;
+            transform: translateY(-3px);
+        }
+        @keyframes intro {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .intro-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: intro 2s ease-in-out forwards;
+        }
+        .intro-image {
+            width: 300px;
+            height: auto;
+        }
+        @keyframes intro {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .intro-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: intro 2s ease-in-out forwards;
+        }
+        .intro-image {
+            width: 300px;
+            height: auto;
+        }
+    </style>
+    <script>
+        const links = [
+            { name: 'Camera', url: 'https://stenoip.github.io/swc/camera' },
+            { name: 'Clocker', url: 'https://stenoip.github.io/swc/clocker' },
+            { name: 'Draw', url: 'https://stenoip.github.io/swc/draw' },
+            { name: 'Games', url: 'https://stenoip.github.io/swc/games' },
+            { name: 'Maps', url: 'https://stenoip.github.io/swc/maps' },
+            { name: 'Media', url: 'https://stenoip.github.io/swc/media' },
+            { name: 'Minecraft 1.9', url: 'https://stenoip.github.io/swc/mineraft1.9' },
+            { name: 'Pet', url: 'https://stenoip.github.io/swc/pet' },
+            { name: 'Phone', url: 'https://stenoip.github.io/swc/phone' },
+            { name: 'Sir Praterich', url: 'https://stenoip.github.io/swc/sir praterich' },
+            { name: 'Space Map', url: 'https://stenoip.github.io/swc/space-map' },
+            { name: 'Testing', url: 'https://stenoip.github.io/swc/testing' },
+            { name: 'Typoe', url: 'https://stenoip.github.io/swc/typoe' },
+            { name: 'Video', url: 'https://stenoip.github.io/swc/video' }
+        ];
+
+        function search() {
+            const query = document.getElementById('search-input').value;
+            const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
+            if (matchedLink) {
+                window.location.href = matchedLink.url + '?q=' + encodeURIComponent(query);
+            }
+        }
+
+        function showSuggestions() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const suggestionsContainer = document.getElementById('suggestions');
+            suggestionsContainer.innerHTML = '';
+            const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
+            filteredLinks.forEach(link => {
+                const suggestion = document.createElement('div');
+                suggestion.textContent = link.name;
+                suggestion.onclick = () => {
+                    document.getElementById('search-input').value = link.name;
+                    search();
+                };
+                suggestionsContainer.appendChild(suggestion);
+            });
+            suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
+        }
+
+        window.onload = function() {
+            const intro = document.createElement('div');
+            intro.className = 'intro-animation';
+            const introImage = document.createElement('img');
+            introImage.src = 'path/to/your/image.jpg'; // Replace with your image path
+            introImage.className = 'intro-image';
+            intro.appendChild(introImage);
+            document.body.appendChild(intro);
+
+            const audio = new Audio('path/to/your/sound.mp3'); // Replace with your sound file path
+            audio.play();
+
+            setTimeout(() => {
+                intro.style.display = 'none';
+                window.location.href = 'https://stenoip.github.io/swc/'; // Redirect to homepage after intro
+            }, 11000); // Hide after 11 seconds
+        };
+    </script>
 </head>
 <body>
-  <div class="browser">
-    <div class="tabs" id="tabs-container">
-      <div class="tab" onclick="openTab(event, 'tab1')">Tab 1</div>
-      <div class="tab" onclick="openTab(event, 'tab2')">Tab 2</div>
-      <div class="tab" onclick="openTab(event, 'tab3')">Tab 3</div>
+    <div class="container">
+        <div class="header">
+            <h1>Stenoip Wonder Computer</h1>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search...">
+            <button onclick="search()">Search</button>
+            <div class="suggestions" id="suggestions" style="display:none;"></div>
+        </div>
+        <div class="news">
+            <h2>Latest News</h2>
+            <iframe src="https://www.reuters.com" width="100%" height="400"></iframe>
+        </div>
+        <div class="ads">
+            <img src="ad1.jpg" alt="Ad 1">
+            <img src="ad2.jpg" alt="Ad 2">
+        </div>
+        <div class="links">
+            <button onclick="window.location.href='https://stenoip.github.io/swc/camera'">Camera</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/clocker'">Clocker</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/draw'">Draw</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/games'">Games</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/maps'">Maps</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/media'">Media</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/mineraft1.9'">Minecraft 1.9</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/pet'">Pet</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/phone'">Phone</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/sir praterich'">Sir Praterich</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/space-map'">Space Map</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/testing'">Testing</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/typoe'">Typoe</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/video'">Video</button>
+        </div>
     </div>
-    <div class="tab-content" id="tab1">
-      <h2>Tab 1 Content</h2>
-      <p>Welcome to Tab 1.</p>
+    <div>
+        <p>Sound Effect by <a href="https://pixabay.com/users/sound-work-43218837/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=200026">Łukasz Przystasz</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=200026">Pixabay</a></p>
     </div>
-    <div class="tab-content" id="tab2">
-      <h2>Tab 2 Content</h2>
-      <p>Welcome to Tab 2.</p>
-    </div>
-    <div class="tab-content" id="tab3">
-      <h2>Tab 3 Content</h2>
-      <p>Welcome to Tab 3.</p>
-    </div>
-  </div>
-  <button onclick="addTab()">Add Tab</button>
-  <script>
-    const maxTabs = 20;
-
-    function openTab(evt, tabName) {
-      var i, tabcontent, tablinks;
-      tabcontent = document.getElementsByClassName("tab-content");
-      for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-      }
-      tablinks = document.getElementsByClassName("tab");
-      for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-      }
-      document.getElementById(tabName).style.display = "block";
-      evt.currentTarget.className += " active";
-    }
-
-    function addTab() {
-      const tabsContainer = document.getElementById("tabs-container");
-      const currentTabs = tabsContainer.getElementsByClassName("tab").length;
-
-      if (currentTabs < maxTabs) {
-        const newTabIndex = currentTabs + 1;
-        const newTab = document.createElement("div");
-        newTab.className = "tab";
-        newTab.textContent = "Tab " + newTabIndex;
-        newTab.setAttribute("onclick", `openTab(event, 'tab${newTabIndex}')`);
-        tabsContainer.appendChild(newTab);
-
-        const newTabContent = document.createElement("div");
-        newTabContent.className = "tab-content";
-        newTabContent.id = "tab" + newTabIndex;
-        newTabContent.innerHTML = `<h2>Tab ${newTabIndex} Content</h2><p>Welcome to Tab ${newTabIndex}.</p>`;
-        document.querySelector(".browser").appendChild(newTabContent);
-      } else {
-        alert("Maximum number of tabs reached!");
-      }
-    }
-
-    // Open the default tab
-    document.getElementsByClassName('tab')[0].click();
-  </script>
 </body>
 </html>
