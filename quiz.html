@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zuiz - World and Space Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Zuiz - World and Space Quiz</h1>
+    <div id="quiz"></div>
+    <button onclick="submitQuiz()">Submit</button>
+    <div id="result"></div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the largest planet in our solar system?",
+                options: ["Earth", "Jupiter", "Saturn", "Mars"],
+                answer: 1
+            },
+            {
+                question: "What country is also known as the Land of the Rising Sun?",
+                options: ["China", "Japan", "Thailand", "India"],
+                answer: 1
+            },
+            {
+                question: "What is the capital of France?",
+                options: ["Berlin", "Paris", "Madrid", "Rome"],
+                answer: 1
+            },
+            {
+                question: "What is the hottest planet in the solar system?",
+                options: ["Mercury", "Venus", "Earth", "Mars"],
+                answer: 1
+            },
+            {
+                question: "Which ocean is the largest?",
+                options: ["Atlantic", "Indian", "Pacific", "Arctic"],
+                answer: 2
+            },
+            {
+                question: "Who was the first human to journey into outer space?",
+                options: ["Neil Armstrong", "Yuri Gagarin", "Buzz Aldrin", "John Glenn"],
+                answer: 1
+            },
+            {
+                question: "What is the largest continent on Earth?",
+                options: ["Africa", "Asia", "Europe", "Antarctica"],
+                answer: 1
+            },
+            {
+                question: "What is the closest star to Earth?",
+                options: ["Alpha Centauri", "Sirius", "Proxima Centauri", "Betelgeuse"],
+                answer: 2
+            },
+            {
+                question: "What is the smallest planet in our solar system?",
+                options: ["Mercury", "Venus", "Mars", "Pluto"],
+                answer: 0
+            },
+            {
+                question: "Which country is known for its pyramids?",
+                options: ["Mexico", "Greece", "India", "Egypt"],
+                answer: 3
+            }
+        ];
+
+        function loadQuiz() {
+            const quizDiv = document.getElementById('quiz');
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `<p>${index + 1}. ${q.question}</p>`;
+                q.options.forEach((option, i) => {
+                    questionDiv.innerHTML += `
+                        <input type="radio" name="question${index}" value="${i}">
+                        <label>${option}</label><br>`;
+                });
+                quizDiv.appendChild(questionDiv);
+            });
+        }
+
+        function submitQuiz() {
+            let correctAnswers = 0;
+            questions.forEach((q, index) => {
+                const userAnswer = document.querySelector(`input[name="question${index}"]:checked`);
+                if (userAnswer && parseInt(userAnswer.value) === q.answer) {
+                    correctAnswers++;
+                }
+            });
+            const score = (correctAnswers / questions.length) * 100;
+            let feedback = '';
+
+            if (score >= 90) {
+                feedback = 'Excellent!';
+            } else if (score >= 80) {
+                feedback = 'Great!';
+            } else if (score >= 70) {
+                feedback = 'Good!';
+            } else if (score >= 65) {
+                feedback = 'Study more!';
+            } else {
+                feedback = 'F for Failure. You should study!';
+            }
+
+            document.getElementById('result').innerText = `You scored ${score}% - ${feedback}`;
+        }
+
+        loadQuiz();
+    </script>
+</body>
+</html>
