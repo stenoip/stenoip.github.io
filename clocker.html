@@ -223,6 +223,69 @@ function updateAnalogClock() {
     secondHand.style.transform = `rotate(${secondDegree}deg)`;
     minuteHand.style.transform = `rotate(${minuteDegree}deg)`;
     hourHand.style.transform = `rotate(${hourDegree}[_{{{CITATION{{{_1{](https://github.com/diegoperezm/from-text-to-html-emmet/tree/5413baca824c7a21078e0986682449ace80d9cf5/README.md)[_{{{CITATION{{{_2{](https://github.com/qiwiidev21/qiwii-adaptive/tree/f7f3929eb46be53b3e7a9d5815562765cdd8d2e1/src%2Fscreens%2FSchedule%2Findex.js)[_{{{CITATION{{{_3{](https://github.com/meto92/SoftUni--JS-Core--JS-Advanced/tree/d7cb7a5f1558b03a488478a8699cde68b4e88282/Exercises%2F03.%20jQuery%2FExercises%2F06.%20Calendar%2Fcalendar.js)
+   // Timer
+let timerInterval;
+
+function startTimer() {
+    const timerInput = document.getElementById('timer-input').value;
+    let timerTime = parseInt(timerInput) * 60;
+
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+
+    timerInterval = setInterval(() => {
+        if (timerTime <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById('timer-display').textContent = "Time's up!";
+            return;
+        }
+
+        timerTime--;
+        const minutes = Math.floor(timerTime / 60);
+        const seconds = timerTime % 60;
+        document.getElementById('timer-display').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+// Stopwatch
+let stopwatchInterval;
+let stopwatchTime = 0;
+
+function startStopwatch() {
+    if (stopwatchInterval) {
+        clearInterval(stopwatchInterval);
+    }
+
+    stopwatchInterval = setInterval(() => {
+        stopwatchTime++;
+        const hours = Math.floor(stopwatchTime / 3600);
+        const minutes = Math.floor((stopwatchTime % 3600) / 60);
+        const seconds = stopwatchTime % 60;
+        document.getElementById('stopwatch-display').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+function stopStopwatch() {
+    clearInterval(stopwatchInterval);
+}
+
+function resetStopwatch() {
+    clearInterval(stopwatchInterval);
+    stopwatchTime = 0;
+    document.getElementById('stopwatch-display').textContent = "00:00:00";
+}
+
+function init() {
+    generateCalendar(currentYear, currentMonth);
+    updateAnalogClock();
+    updateTimeZones();
+    setInterval(updateAnalogClock, 1000);
+    setInterval(updateTimeZones, 1000);
+}
+
+window.onload = init;
+
     </script>
 </body>
 </html>
