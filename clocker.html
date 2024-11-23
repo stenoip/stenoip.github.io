@@ -8,6 +8,8 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            background-color: #f0f8ff;
+            color: #333;
         }
         .calendar {
             margin-top: 20px;
@@ -32,6 +34,10 @@
             background-color: #007bff;
             color: white;
         }
+        .holiday {
+            background-color: #ff4f4f;
+            color: white;
+        }
         .analog-clock {
             width: 200px;
             height: 200px;
@@ -39,6 +45,7 @@
             border-radius: 50%;
             position: relative;
             margin: 0 auto;
+            background-color: #fff;
         }
         .number {
             position: absolute;
@@ -56,9 +63,27 @@
         .time-zone {
             margin: 5px 0;
         }
+        .time-zones {
+            margin-top: 20px;
+        }
+        .timer, .stopwatch {
+            margin-top: 20px;
+        }
+        .theme-january { background-color: #E3F2FD; }
+        .theme-february { background-color: #F8BBD0; }
+        .theme-march { background-color: #C8E6C9; }
+        .theme-april { background-color: #FFECB3; }
+        .theme-may { background-color: #D1C4E9; }
+        .theme-june { background-color: #FFCCBC; }
+        .theme-july { background-color: #F0F4C3; }
+        .theme-august { background-color: #FFE0B2; }
+        .theme-september { background-color: #DCEDC8; }
+        .theme-october { background-color: #FFAB91; }
+        .theme-november { background-color: #B3E5FC; }
+        .theme-december { background-color: #D7CCC8; }
     </style>
 </head>
-<body>
+<body class="">
     <h1>Clocker</h1>
     <div class="calendar">
         <div class="calendar-header">
@@ -83,120 +108,209 @@
     </div>
     <div class="time-zones" id="time-zones"></div>
 
+    <div class="timer">
+        <h2>Timer</h2>
+        <input type="number" id="timer-input" placeholder="Minutes" min="0">
+        <button onclick="startTimer()">Start Timer</button>
+        <div id="timer-display"></div>
+    </div>
+
+    <div class="stopwatch">
+        <h2>Stopwatch</h2>
+        <button onclick="startStopwatch()">Start</button>
+        <button onclick="stopStopwatch()">Stop</button>
+        <button onclick="resetStopwatch()">Reset</button>
+        <div id="stopwatch-display">00:00:00</div>
+    </div>
+
     <script>
-        const holidays = {
-            "2024-12-25": "Christmas Day",
-            "2024-12-26": "Boxing Day",
-            // Add more holidays here
-        };
+const holidays = {
+    // Canadian Holidays
+    "2024-01-01": "New Year's Day",
+    "2024-03-29": "Good Friday",
+    "2024-05-20": "Victoria Day",
+    "2024-07-01": "Canada Day",
+    "2024-08-05": "Civic Holiday",
+    "2024-09-02": "Labour Day",
+    "2024-10-14": "Thanksgiving",
+    "2024-12-25": "Christmas Day",
+    "2024-12-26": "Boxing Day"
+};
 
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
 
-        // Generate Calendar
-        function generateCalendar(year, month) {
-            const calendarDaysElement = document.getElementById('calendar-days');
-            const monthYearElement = document.getElementById('month-year');
-            const today = new Date();
-            const firstDay = new Date(year, month, 1).getDay();
-            const lastDate = new Date(year, month + 1, 0).getDate();
+// Generate Calendar
+function generateCalendar(year, month) {
+    const calendarDaysElement = document.getElementById('calendar-days');
+    const monthYearElement = document.getElementById('month-year');
+    const today = new Date();
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
 
-            const monthNames = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
 
-            monthYearElement.textContent = `${monthNames[month]} ${year}`;
-            calendarDaysElement.innerHTML = '';
+    monthYearElement.textContent = `${monthNames[month]} ${year}`;
+    calendarDaysElement.innerHTML = '';
 
-            for (let i = 0; i < firstDay; i++) {
-                calendarDaysElement.innerHTML += `<div class="day"></div>`;
-            }
+    for (let i = 0; i < firstDay; i++) {
+        calendarDaysElement.innerHTML += `<div class="day"></div>`;
+    }
 
-            for (let date = 1; date <= lastDate; date++) {
-                const currentDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
-                const isHoliday = holidays[currentDate] !== undefined;
+    for (let date = 1; date <= lastDate; date++) {
+        const currentDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+        const isHoliday = holidays[currentDate] !== undefined;
 
-                let dayClass = "day";
-                if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
-                    dayClass += " today";
-                }
-                if (isHoliday) {
-                    dayClass += " holiday";
-                }
-
-                calendarDaysElement.innerHTML += `<div class="${dayClass}">${date}</div>`;
-            }
+        let dayClass = "day";
+        if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
+            dayClass += " today";
+        }
+        if (isHoliday) {
+            dayClass += " holiday";
         }
 
-        function prevMonth() {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            generateCalendar(currentYear, currentMonth);
+        calendarDaysElement.innerHTML += `<div class="${dayClass}">${date}</div>`;
+    }
+}
+
+// Switch Themes based on Month
+function switchTheme() {
+    const body = document.querySelector('body');
+    const month = new Date().getMonth();
+    const themes = [
+        "lightblue", "lightgray", "lightgreen", "lightyellow", "lightpink",
+        "lightcoral", "lightcyan", "lightgoldenrodyellow", "lightseagreen",
+        "lightsalmon", "lightsteelblue", "lightpurple"
+    ];
+    body.style.backgroundColor = themes[month];
+}
+
+function prevMonth() {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    generateCalendar(currentYear, currentMonth);
+}
+
+function nextMonth() {
+    currentMonth++;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    generateCalendar(currentYear, currentMonth);
+}
+
+// Analog Clock
+function updateAnalogClock() {
+    const now = new Date();
+    const secondHand = document.getElementById('second-hand');
+    const minuteHand = document.getElementById('minute-hand');
+    const hourHand = document.getElementById('hour-hand');
+
+    const seconds = now.getSeconds();
+    const minutes = now.getMinutes();
+    const hours = now.getHours();
+
+    const secondDegree = ((seconds / 60) * 360) + 90;
+    const minuteDegree = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
+    const hourDegree = ((hours % 12) / 12 * 360) + ((minutes / 60) * 30) + 90;
+
+    secondHand.style.transform = `rotate(${secondDegree}deg)`;
+    minuteHand.style.transform = `rotate(${minuteDegree}deg)`;
+    hourHand.style.transform = `rotate(${hourDegree}deg)`;
+}
+
+// Digital Clocks for Different Time Zones
+const timeZones = [
+    { name: "New York", offset: -5 },
+    { name: "London", offset: 0 },
+    { name: "Tokyo", offset: 9 },
+    { name: "Sydney", offset: 10 }
+];
+
+function updateTimeZones() {
+    const timeZonesElement = document.getElementById('time-zones');
+    const now = new Date();
+
+    let timeZonesHTML = '';
+    timeZones.forEach(tz => {
+        const localTime = new Date(now.getTime() + tz.offset * 3600 * 1000);
+        timeZonesHTML += `<div class="time-zone"><strong>${tz.name}:</strong> ${localTime.toLocaleTimeString('en-GB')}</div>`;
+    });
+
+    timeZonesElement.innerHTML = timeZonesHTML;
+}
+
+// // Stopwatch
+let stopwatchInterval;
+let stopwatchTime = 0;
+
+function startStopwatch() {
+    if (stopwatchInterval) {
+        clearInterval(stopwatchInterval);
+    }
+
+    stopwatchInterval = setInterval(() => {
+        stopwatchTime++;
+        const hours = Math.floor(stopwatchTime / 3600);
+        const minutes = Math.floor((stopwatchTime % 3600) / 60);
+        const seconds = stopwatchTime % 60;
+        document.getElementById('stopwatch-display').textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+function stopStopwatch() {
+    clearInterval(stopwatchInterval);
+}
+
+function resetStopwatch() {
+    clearInterval(stopwatchInterval);
+    stopwatchTime = 0;
+    document.getElementById('stopwatch-display').textContent = "00:00:00";
+}
+
+// Timer
+let timerInterval;
+
+function startTimer() {
+    const timerInput = document.getElementById('timer-input').value;
+    let timerTime = parseInt(timerInput) * 60;
+
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+
+    timerInterval = setInterval(() => {
+        if (timerTime <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById('timer-display').textContent = "Time's up!";
+            return;
         }
 
-        function nextMonth() {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            generateCalendar(currentYear, currentMonth);
-        }
+        timerTime--;
+        const minutes = Math.floor(timerTime / 60);
+        const seconds = timerTime % 60;
+        document.getElementById('timer-display').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
 
-        // Analog Clock
-        function updateAnalogClock() {
-            const now = new Date();
-            const secondHand = document.getElementById('second-hand');
-            const minuteHand = document.getElementById('minute-hand');
-            const hourHand = document.getElementById('hour-hand');
+function init() {
+    switchTheme();
+    generateCalendar(currentYear, currentMonth);
+    updateAnalogClock();
+    updateTimeZones();
+    setInterval(updateAnalogClock, 1000);
+    setInterval(updateTimeZones, 1000);
+}
 
-            const seconds = now.getSeconds();
-            const minutes = now.getMinutes();
-            const hours = now.getHours();
+window.onload = init;
 
-            const secondDegree = ((seconds / 60) * 360) + 90;
-            const minuteDegree = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
-            const hourDegree = ((hours / 12) * 360) + ((minutes / 60) * 30) + 90;
-
-            secondHand.style.transform = `rotate(${secondDegree}deg)`;
-            minuteHand.style.transform = `rotate(${minuteDegree}deg)`;
-            hourHand.style.transform = `rotate(${hourDegree}deg)`;
-        }
-
-        // Digital Clocks for Different Time Zones
-        const timeZones = [
-            { name: "New York", offset: -5 },
-            { name: "London", offset: 0 },
-            { name: "Tokyo", offset: 9 },
-            { name: "Sydney", offset: 10 }
-        ];
-
-        function updateTimeZones() {
-            const timeZonesElement = document.getElementById('time-zones');
-            const now = new Date();
-
-            let timeZonesHTML = '';
-            timeZones.forEach(tz => {
-                const localTime = new Date(now.getTime() + tz.offset * 3600 * 1000);
-                timeZonesHTML += `<div class="time-zone"><strong>${tz.name}:</strong> ${localTime.toLocaleTimeString('en-GB')}</div>`;
-            });
-
-            timeZonesElement.innerHTML = timeZonesHTML;
-        }
-
-        function init() {
-            generateCalendar(currentYear, currentMonth);
-            updateAnalogClock();
-            updateTimeZones();
-            setInterval(updateAnalogClock, 1000);
-            setInterval(updateTimeZones, 1000);
-        }
-
-        window.onload = init; 
-    </script>
+</script>
 </body>
 </html>
