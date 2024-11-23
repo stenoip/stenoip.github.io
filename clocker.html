@@ -69,6 +69,9 @@
         .time-zones {
             margin-top: 20px;
         }
+        .timer, .stopwatch {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -96,142 +99,130 @@
     </div>
     <div class="time-zones" id="time-zones"></div>
 
+    <div class="timer">
+        <h2>Timer</h2>
+        <input type="number" id="timer-input" placeholder="Minutes" min="0">
+        <button onclick="startTimer()">Start Timer</button>
+        <div id="timer-display"></div>
+    </div>
+
+    <div class="stopwatch">
+        <h2>Stopwatch</h2>
+        <button onclick="startStopwatch()">Start</button>
+        <button onclick="stopStopwatch()">Stop</button>
+        <button onclick="resetStopwatch()">Reset</button>
+        <div id="stopwatch-display">00:00:00</div>
+    </div>
+
     <script>
         const holidays = {
-            // UK Holidays
-            "2024-01-01": "New Year's Day",
-            "2024-03-29": "Good Friday",
-            "2024-04-01": "Easter Monday",
-            "2024-05-06": "Early May Bank Holiday",
-            "2024-05-27": "Spring Bank Holiday",
-            "2024-08-26": "Summer Bank Holiday",
-            "2024-12-25": "Christmas Day",
-            "2024-12-26": "Boxing Day",
-            // US Holidays
-            "2024-01-01": "New Year's Day",
-            "2024-01-15": "Martin Luther King Jr. Day",
-            "2024-02-19": "Presidents' Day",
-            "2024-05-27": "Memorial Day",
-            "2024-07-04": "Independence Day",
-            "2024-09-02": "Labor Day",
-            "2024-10-14": "Columbus Day",
-            "2024-11-11": "Veterans Day",
-            "2024-11-28": "Thanksgiving",
-            "2024-12-25": "Christmas Day",
-            // Canadian Holidays
-            "2024-01-01": "New Year's Day",
-            "2024-03-29": "Good Friday",
-            "2024-05-20": "Victoria Day",
-            "2024-07-01": "Canada Day",
-            "2024-08-05": "Civic Holiday",
-            "2024-09-02": "Labour Day",
-            "2024-10-14": "Thanksgiving",
-            "2024-12-25": "Christmas Day",
-            "2024-12-26": "Boxing Day"
-        };
+    // UK Holidays
+    "2024-01-01": "New Year's Day",
+    "2024-03-29": "Good Friday",
+    "2024-04-01": "Easter Monday",
+    "2024-05-06": "Early May Bank Holiday",
+    "2024-05-27": "Spring Bank Holiday",
+    "2024-08-26": "Summer Bank Holiday",
+    "2024-12-25": "Christmas Day",
+    "2024-12-26": "Boxing Day",
+    // US Holidays
+    "2024-01-01": "New Year's Day",
+    "2024-01-15": "Martin Luther King Jr. Day",
+    "2024-02-19": "Presidents' Day",
+    "2024-05-27": "Memorial Day",
+    "2024-07-04": "Independence Day",
+    "2024-09-02": "Labor Day",
+    "2024-10-14": "Columbus Day",
+    "2024-11-11": "Veterans Day",
+    "2024-11-28": "Thanksgiving",
+    "2024-12-25": "Christmas Day",
+    // Canadian Holidays
+    "2024-01-01": "New Year's Day",
+    "2024-03-29": "Good Friday",
+    "2024-05-20": "Victoria Day",
+    "2024-07-01": "Canada Day",
+    "2024-08-05": "Civic Holiday",
+    "2024-09-02": "Labour Day",
+    "2024-10-14": "Thanksgiving",
+    "2024-12-25": "Christmas Day",
+    "2024-12-26": "Boxing Day"
+};
 
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
 
-        // Generate Calendar
-        function generateCalendar(year, month) {
-            const calendarDaysElement = document.getElementById('calendar-days');
-            const monthYearElement = document.getElementById('month-year');
-            const today = new Date();
-            const firstDay = new Date(year, month, 1).getDay();
-            const lastDate = new Date(year, month + 1, 0).getDate();
+// Generate Calendar
+function generateCalendar(year, month) {
+    const calendarDaysElement = document.getElementById('calendar-days');
+    const monthYearElement = document.getElementById('month-year');
+    const today = new Date();
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
 
-            monthYearElement.textContent = `${today.toLocaleString('default', { month: 'long' })} ${year}`;
-            calendarDaysElement.innerHTML = '';
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
 
-            for (let i = 0; i < firstDay; i++) {
-                calendarDaysElement.innerHTML += `<div class="day"></div>`;
-            }
+    monthYearElement.textContent = `${monthNames[month]} ${year}`;
+    calendarDaysElement.innerHTML = '';
 
-            for (let date = 1; date <= lastDate; date++) {
-                const currentDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
-                const isHoliday = holidays[currentDate] !== undefined;
+    for (let i = 0; i < firstDay; i++) {
+        calendarDaysElement.innerHTML += `<div class="day"></div>`;
+    }
 
-                let dayClass = "day";
-                if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
-                    dayClass += " today";
-                }
-                if (isHoliday) {
-                    dayClass += " holiday";
-                }
+    for (let date = 1; date <= lastDate; date++) {
+        const currentDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+        const isHoliday = holidays[currentDate] !== undefined;
 
-                calendarDaysElement.innerHTML += `<div class="${dayClass}">${date}</div>`;
-            }
+        let dayClass = "day";
+        if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
+            dayClass += " today";
+        }
+        if (isHoliday) {
+            dayClass += " holiday";
         }
 
-        function prevMonth() {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            generateCalendar(currentYear, currentMonth);
-        }
-
-        function nextMonth() {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            generateCalendar(currentYear, currentMonth);
-        }
-
-        // Analog Clock
-        function updateAnalogClock() {
-            const now = new Date();
-            const secondHand = document.getElementById('second-hand');
-            const minuteHand = document.getElementById('minute-hand');
-            const hourHand = document.getElementById('hour-hand');
-
-            const seconds = now.getSeconds();
-            const minutes = now.getMinutes();
-            const hours = now.getHours();
-
-            const secondDegree = ((seconds / 60) * 360) + 90;
-            const minuteDegree = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
-            const hourDegree = ((hours / 12) * 360) + ((minutes / 60) * 30) + 90;
-
-            secondHand.style.transform = `rotate(${secondDegree}deg)`;
-            minuteHand.style.transform = `rotate(${minuteDegree}deg)`;
-            hourHand.style.transform = `rotate(${hourDegree}deg)`;
-        }
-
-        // Digital Clocks for Different Time Zones
-        const timeZones = [
-            { name: "New York", offset: -5 },
-            { name: "London", offset: 0 },
-            { name: "Tokyo", offset: 9 },
-            { name: "Sydney", offset: 10 }
-        function updateTimeZones() {
-    const timeZonesElement = document.getElementById('time-zones');
-    const now = new Date();
-
-    let timeZonesHTML = '';
-    timeZones.forEach(tz => {
-        const localTime = new Date(now.getTime() + tz.offset * 3600 * 1000);
-        timeZonesHTML += `<div class="time-zone"><strong>${tz.name}:</strong> ${localTime.toLocaleTimeString('en-GB')}</div>`;
-    });
-
-    timeZonesElement.innerHTML = timeZonesHTML;
+        calendarDaysElement.innerHTML += `<div class="${dayClass}">${date}</div>`;
+    }
 }
 
-function init() {
+function prevMonth() {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
     generateCalendar(currentYear, currentMonth);
-    updateAnalogClock();
-    updateTimeZones();
-    setInterval(updateAnalogClock, 1000);
-    setInterval(updateTimeZones, 1000);
 }
 
-window.onload = init;
-</script>
+function nextMonth() {
+    currentMonth++;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    generateCalendar(currentYear, currentMonth);
+}
+
+// Analog Clock
+function updateAnalogClock() {
+    const now = new Date();
+    const secondHand = document.getElementById('second-hand');
+    const minuteHand = document.getElementById('minute-hand');
+    const hourHand = document.getElementById('hour-hand');
+
+    const seconds = now.getSeconds();
+    const minutes = now.getMinutes();
+    const hours = now.getHours();
+
+    const secondDegree = ((seconds / 60) * 360) + 90;
+    const minuteDegree = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
+    const hourDegree = ((hours / 12) * 360) + ((minutes / 60) * 30) + 90;
+
+    secondHand.style.transform = `rotate(${secondDegree}deg)`;
+    minuteHand.style.transform = `rotate(${minuteDegree}deg)`;
+    hourHand.style.transform = `rotate(${hourDegree}[_{{{CITATION{{{_1{](https://github.com/diegoperezm/from-text-to-html-emmet/tree/5413baca824c7a21078e0986682449ace80d9cf5/README.md)[_{{{CITATION{{{_2{](https://github.com/qiwiidev21/qiwii-adaptive/tree/f7f3929eb46be53b3e7a9d5815562765cdd8d2e1/src%2Fscreens%2FSchedule%2Findex.js)[_{{{CITATION{{{_3{](https://github.com/meto92/SoftUni--JS-Core--JS-Advanced/tree/d7cb7a5f1558b03a488478a8699cde68b4e88282/Exercises%2F03.%20jQuery%2FExercises%2F06.%20Calendar%2Fcalendar.js)
+    </script>
 </body>
 </html>
-
-                                                                                  
