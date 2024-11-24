@@ -179,6 +179,84 @@
             <button onclick="search()">Search</button>
             <div class="suggestions" id="suggestions" style="display:none;"></div>
         </div>
+        <script>
+        (function(d, s, id) {
+            if (d.getElementById(id)) {
+                if (window.__TOMORROW__) {
+                    window.__TOMORROW__.renderWidget();
+                }
+                return;
+            }
+            const fjs = d.getElementsByTagName(s)[0];
+            const js = d.createElement(s);
+            js.id = id;
+            js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
+
+            fjs.parentNode.insertBefore(js, fjs);
+        })(document, 'script', 'tomorrow-sdk');
+        </script>
+
+        <div class="tomorrow"
+           data-location-id="122795,052149,064500,050388,072102,015101"
+           data-language="EN"
+           data-unit-system="METRIC"
+           data-skin="light"
+           data-widget-type="aqi6"
+           style="padding-bottom:22px;position:relative;"
+        >
+          <a
+            href="https://www.tomorrow.io/weather-api/"
+            rel="nofollow noopener noreferrer"
+            target="_blank"
+            style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;"
+          >
+            <img
+              alt="Powered by the Tomorrow.io Weather API"
+              src="https://weather-website-client.tomorrow.io/img/powered-by.svg"
+              width="250"
+              height="18"
+            />
+          </a>
+        </div>
+     <script>
+        (function(d, s, id) {
+            if (d.getElementById(id)) {
+                if (window.__TOMORROW__) {
+                    window.__TOMORROW__.renderWidget();
+                }
+                return;
+            }
+            const fjs = d.getElementsByTagName(s)[0];
+            const js = d.createElement(s);
+            js.id = id;
+            js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
+
+            fjs.parentNode.insertBefore(js, fjs);
+        })(document, 'script', 'tomorrow-sdk');
+        </script>
+
+        <div class="tomorrow"
+           data-location-id="122795"
+           data-language="EN"
+           data-unit-system="METRIC"
+           data-skin="light"
+           data-widget-type="upcoming"
+           style="padding-bottom:22px;position:relative;"
+        >
+          <a
+            href="https://www.tomorrow.io/weather-api/"
+            rel="nofollow noopener noreferrer"
+            target="_blank"
+            style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;"
+          >
+            <img
+              alt="Powered by the Tomorrow.io Weather API"
+              src="https://weather-website-client.tomorrow.io/img/powered-by.svg"
+              width="250"
+              height="18"
+            />
+          </a>
+        </div>
         <div class="news">
             <h2>Latest News</h2>
             <iframe src="https://www.reuters.com" width="100%" height="400"></iframe>
