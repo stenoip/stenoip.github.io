@@ -122,7 +122,7 @@
         <button onclick="resetStopwatch()">Reset</button>
         <div id="stopwatch-display">00:00:00</div>
     </div>
-
+<div class="countdown"> <h1>Christmas Countdown</h1> <div id="timer"></div> </div> <script> function countdown() { const now = new Date(); const christmas = new Date(now.getFullYear(), 11, 25); if (now.getMonth() == 11 && now.getDate() > 25) { christmas.setFullYear(christmas.getFullYear() + 1); } const timeDifference = christmas - now; const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60)); const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000); document.getElementById("timer").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`; } setInterval(countdown, 1000); </script>
     <script>
 const holidays = {
     // Canadian Holidays
