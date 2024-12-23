@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompmasine - Advanced Scientific Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .calculator {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        .display {
+            width: 100%;
+            height: 50px;
+            background-color: #222;
+            color: #fff;
+            text-align: right;
+            padding: 10px;
+            font-size: 24px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .keys {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #f4f4f4;
+        }
+
+        button:hover {
+            background-color: #ddd;
+        }
+
+        .operator {
+            background-color: #ff9500;
+            color: #fff;
+        }
+
+        .operator:hover {
+            background-color: #e68900;
+        }
+
+        .equal {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .equal:hover {
+            background-color: #0056b3;
+        }
+
+        .clear {
+            background-color: #ff3b30;
+            color: #fff;
+        }
+
+        .clear:hover {
+            background-color: #c5281b;
+        }
+
+        .extra-buttons, .prob-buttons, .stat-buttons {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="keys">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button onclick="appendToDisplay('(')">(</button>
+            <button onclick="appendToDisplay(')')">)</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            <button class="operator" onclick="appendToDisplay('%')">%</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('*')">*</button>
+            <button class="operator" onclick="appendToDisplay('sqrt(')">√</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            <button class="operator" onclick="appendToDisplay('**')">x^y</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            <button class="operator" onclick="appendToDisplay('exp(')">e^x</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button class="equal" onclick="calculateResult()">=</button>
+            <button onclick="toggleExtraButtons()">Extra</button>
+            <button class="operator" onclick="appendToDisplay('10**')">10^x</button>
+            <button class="extra-buttons" onclick="toggleProbButtons()">Prb</button>
+            <button class="extra-buttons" onclick="toggleStatButtons()">Stat</button>
+            <button class="extra-buttons operator" onclick="appendPiToDisplay()">𝝅</button>
+            <button class="extra-buttons operator" onclick="appendToDisplay('E')">e</button>
+            <button class="extra-buttons operator" onclick="appendToDisplay('sin(')">sin</button>
+            <button class="extra-buttons operator" onclick="appendToDisplay('cos(')">cos</button>
+            <button class="extra-buttons operator" onclick="appendToDisplay('tan(')">tan</button>
+            <button class="extra-buttons operator" onclick="appendToDisplay('log(')">log</button>
+            <button class="extra-buttons operator" onclick="appendToDisplay('ln(')">ln</button>
+            <button class="prob-buttons" onclick="appendToDisplay('nPr(')">nPr</button>
+            <button class="prob-buttons" onclick="appendToDisplay('nCr(')">nCr</button>
+            <button class="prob-buttons" onclick="appendToDisplay('factorial(')">!</button>
+            <button class="prob-buttons" onclick="toggleProbButtons()">Back</button>
+            <button class="stat-buttons" onclick="enterData()">Enter Data</button>
+            <button class="stat-buttons" onclick="calculateMean()">Mean</button>
+            <button class="stat-buttons" onclick="calculateMedian()">Median</button>
+            <button class="stat-buttons" onclick="calculateMode()">Mode</button>
+            <button class="stat-buttons" onclick="toggleStatButtons()">Back</button>
+        </div>
+    </div>
+    <script>
+        function clearDisplay() {
+            document.getElementById('display').innerText = '0';
+        }
+
+        function appendToDisplay(value) {
+            const display = document.getElementById('display');
+            if (display.innerText === '0') {
+                display.innerText = value;
+            } else {
+                display.innerText += value;
+            }
+        }
+
+        function appendPiToDisplay() {
+            const display = document.getElementById('display');
+            if (display.innerText === '0') {
+                display.innerText = '𝝅';
+            } else {
+                display.innerText += '𝝅';
+            }
+        }
+
+        function calculateResult() {
+            const display = document.getElementById('display');
+            let expression = display.innerText.replace(/\^/g, '**').replace(/𝝅/g, 'Math.PI').replace(/E/g, 'Math.E').replace(/sin/g, 'Math.sin').replace(/cos/g, 'Math.cos').replace(/tan/g, 'Math.tan').replace(/log/g, 'Math.log10').replace(/ln/g, 'Math.log').replace(/sqrt/g, 'Math.sqrt').replace(/exp/g, 'Math.exp').replace(/pow/g, 'Math.pow').replace(/factorial/g, 'factorial');
+            try {
+                display.innerText = eval(expression);
+            } catch (error) {
+                display.innerText = 'Error';
+            }
+        }
+
+        function toggleExtraButtons() {
+            const extraButtons = document.querySelectorAll('.extra-buttons');
+            extraButtons.forEach(button => button.style.display = button.style.display === 'none' ? 'block' : 'none');
+        }
+
+        function toggleProbButtons() {
+            const probButtons = document.querySelectorAll('.prob-buttons');
+            probButtons.forEach(button => button.style.display = button.style.display === 'none' ? 'block' : 'none');
+            toggleExtraButtons();
+        }
+
+        function toggleStatButtons() {
+            const statButtons = document.querySelectorAll('.stat-buttons');
+            statButtons.forEach(button => button.style.display = button.style.display === 'none' ? 'block' : 'none');
+            toggleExtraButtons();
+        }
+
+        function factorial(n) {
+            return n ? n * factorial(n - 1) : 1;
+        }
+
+        function enterData() {
+            const data = prompt('Enter numbers separated by commas:');
+            const numbers = data.split(',').map(Number);
+            localStorage.setItem('data', JSON.stringify(numbers));
+        }
+
+        function calculateMean() {
+            const data = JSON.parse(localStorage.getItem('data') || '[]');
+            const sum = data.reduce((a, b) => a + b, 0);
+            const mean = sum / data.length;
+            document.getElementById('display').innerText = mean;
+        }
+
+      function calculateMedian() {
+    const data = JSON.parse(localStorage.getItem('data') || '[]');
+    data.sort((a, b) => a - b);
+    let median;
+    if (data.length % 2 === 0) {
+        median = (data[data.length / 2 - 1] + data[data.length / 2]) / 2;
+    } else {
+        median = data[(data.length - 1) / 2];
+    }
+    document.getElementById('display').innerText = median;
+}
+
+function calculateMode() {
+    const data = JSON.parse(localStorage.getItem('data') || '[]');
+    const frequency = {};
+    let maxFreq = 0;
+    let modes = [];
+
+    data.forEach(num => {
+        frequency[num] = (frequency[num] || 0) + 1;
+        if (frequency[num] > maxFreq) {
+            maxFreq = frequency[num];
+            modes = [num];
+        } else if (frequency[num] === maxFreq) {
+            modes.push(num);
+        }
+    });
+
+    document.getElementById('display').innerText = modes.length === data.length ? 'No mode' : modes.join(', ');
+}
+</script>
+</body>
+</html>
