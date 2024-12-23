@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html> 
+  <head>
+    <title>Processing.JS inside Webpages: Template</title> 
+  </head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(400, 400); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+//Credit to Falling Pixel by JstuffJr
+
+
+//Hit ctrl-f to search 
+//---------------------------------------------------------//
+//  Table of Contents                   //
+//---------------------------------------------------------//
+// I: Variable Definitions
+//  IA: Constants
+//  IB: gameState
+//  IC: UI Variables
+//  ID: Timer Variables
+//  IE: For Loop Variables
+//  IF: startScreen Variables
+//      IFi: Transition to gameScreen Variables
+//    IG: gameScreen Variables
+// II: Graphics Setup
+// III: Function Definitions
+//  IIIA: Utility Functions
+//      IIIAi: drawLetter
+//      IIIAii: drawWord
+//  IIIB: UI Listeners
+//      IIIBi: mousePressed
+//      IIIBii: mouseReleased
+//      IIIBiii: keyPressed
+//  IIIC: gameState Functions
+//      IIICi: startScreen Functions
+//          IIICia: updateStartScreen
+//          IIICib: drawStartScreen
+//          IIICii: gameScreen Functions
+//          IIICiia: gameScreenUpdate
+//          IIICiia: gameScreenDraw
+// IV: draw
+//---------------------------------------------------------//
+
+//I: Variable Definitions
+//IA: Constants
+var WHITE = color(255, 255, 255);
+var BLACK = color(0, 0, 0);
+var RED = color(255, 0, 0);
+var BLUE = color(0, 0, 255);
+var PIXEL_SIZE = 4;
+var PIXEL_COLOR = BLACK;
+var VERSION = "0.9.2";
+
+//IB: GameState
+var gameState = "startScreen";
+var stateSetupFlag = true;
+var debugInfo = false;
+
+//IC: UI Variables
+var isMousePressed = false;
+var isMouseReleased = true;
+var pressedKeys = [];
+
+//ID: Timer Variables
+var genericTimeToken;
+var genericTimeToken2;
+var genericTimeToken4;
+var genericTimeToken3;
+
+//IE: For Loop Variables
+var i;
+var j;
+var k;
+var l;
+//Animation Variables
+var isAnimationOver = false;
+var isEntranceAnimationOver;
+
+//IF: startScreen Variables
+var backgroundPixels;
+var numberOfPixels;
+var buttonHighlighted = null;
+var buttonClicked = null;
+    //Pixel Background Variables
+    var pixelstartx;
+    var pixelstarty;
+    //IFi: Transition Variables
+    var buttonY = 0;
+    var transparency = 0;
+    var textScale = 0;
+    var textAdjustment = 0;
+
+//    IG: gameScreen Variables
+    var level;
+    var score;
+    var scoreModifier;
+    var scoreString;
+    var levelString;
+    var fieldArray;
+    var playerPixelX;
+    var playerPixelY;
+    var downKeyModifier;
+    var delayBeforePixelDrop;
+//     IGi: Transition to gameScreen Variables
+        var drawMenuBar;
+        var pixelDropCounter;
+//      IGii: Generating Field Varaibles
+        var isLevelBeaten;
+        var numberOfEnemyPixels;
+        var numberOfEnemyPixelsGenerated;
+        var pixelGenerateSpeed;
+//      IGiii: Game Running Variables
+        var isGameOver;
+        var collisionOccured;
+        var hasDownKeyBeenHeld;
+//      IGiv: Particle Explosion Variables
+        var particles;
+        var particleColor;
+        var particleXModifier;
+        var particleYModifier;
+//      Transition To Ending Screen Variables
+        var switchToEndingScreen;
+//      IGv: Timing Variables
+        var timeAtLastUpdate;
+        var timeSinceLastUpdate;
+        var timeDownKeyHasBeenHeld;
+
+//IH Ending Screen Variables
+    var entranceTransparency;
+    var entranceYMod;
+    var scoreCounter;
+    var scoreCounterScale;
+    var isScoreScaleAnimationDone;
+    var noticeTransparency;
+    var debugVars;
+
+// II: Graphics Setup
+noStroke();
+
+// III: Function Definitions
+// IIIA: Utility Functions
+// IIIAi: drawLetter - for drawing letters in pixelated font
+var drawLetter = function(letter, x, y, size){
+    if(letter === "A"){
+        rect(x + size, y, size, size);
+        rect(x, y + size, size, 4*size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x + 2*size, y + size, size, 4*size);
+    }
+    if(letter === "B"){
+            rect(x + size, y, size, size);
+            rect(x, y, size, 5*size);
+            rect(x + 2*size, y + size, size, size);
+            rect(x + size, y + 2*size, size, size);
+            rect(x + 2*size, y + 3*size, size, size);
+            rect(x + size, y + 4*size, size, size);
+    }
+    if(letter === "C"){
+        rect(x + size, y, 2*size, size);
+        rect(x, y + size, size, 3*size);
+        rect(x + size, y + 4*size, 2*size, size);
+    }
+    if(letter === "D"){
+        rect(x, y, size, 5*size);
+        rect(x + size, y, size, size);
+        rect(x + size, y + 4*size, size, size);
+        rect(x + 2*size, y + size, size, 3*size);
+    }
+    if(letter === "E"){
+        rect(x + size, y, 2*size, size);
+        rect(x, y + size, size, size);
+        rect(x + size, y + 2*size, 2*size, size);
+        rect(x, y + 3*size, size, size);
+        rect(x + size, y + 4*size, 2*size,size);
+    }
+    if(letter === "F"){
+        rect(x + size, y, 2*size, size);
+        rect(x, y + size, size, size);
+        rect(x + size, y + 2*size, 2*size, size);
+        rect(x, y + 3*size, size, 2*size);
+    }
+    if(letter === "G"){
+        rect(x + size, y, 2*size, size);
+        rect(x, y + size, size, 3*size);
+        rect(x + size, y + 4*size, 2*size, size);
+        rect(x + 2*size, y + 3*size, size, size);
+    }
+    if(letter === "H"){
+        rect(x, y, size, 5*size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x + 2*size, y, size, 5*size);
+    }
+    if(letter === "I"){
+        rect(x, y, size, 5*size);
+    }
+    if(letter === "J"){
+        rect(x, y, 3*size, size);
+        rect(x + 1*size, y + size, size, 3*size);
+        rect(x, y + 4*size, size, size);
+    }
+    if(letter === "K"){
+        rect(x, y, size, 5*size);
+        rect(x + size, y + size, size, 2*size);
+        rect(x + 2*size, y, size, size);
+        rect(x + 2*size, y + 3*size, size, 2*size);
+    }
+    if(letter === "L"){
+        rect(x, y, size, 4*size);
+        rect(x + size, y + 4*size, size, size);
+    }
+    if(letter === "M"){
+        rect(x, y + size, size, 4*size);
+        rect(x + size, y, size, size);
+        rect(x + 2*size, y + size, size, 3*size);
+        rect(x + 3*size, y, size, size);
+        rect(x + 4*size, y + size, size, 4*size);
+    }
+    if(letter === "N"){
+        rect(x, y, size, 5*size);
+        rect(x + size, y, size, 2*size);
+        rect(x + 2*size, y + 2*size, size, 2*size);
+        rect(x + 3*size, y, size, 5*size);
+    }
+    if(letter === "O"){
+        rect(x + size, y, 2*size, size);
+        rect(x, y + size, size, 3 * size);
+        rect(x + 3*size, y + size, size, 3 * size);
+        rect(x + size, y + 4*size, 2*size, size);
+    }
+    if(letter === "P"){
+        rect(x + size, y, size, size);
+        rect(x + 2*size, y + size, size, size);
+        rect(x, y + size, size, 4*size);
+        rect(x + size, y + 2*size, size, size);
+    }
+    if(letter === "Q"){
+        rect(x + size, y, 2*size, size);
+        rect(x, y + size, size, 2*size);
+        rect(x + 3*size, y + size, size, 2*size);
+        rect(x + size, y + 3*size, 2*size, size);
+        rect(x + 3*size, y + 4*size, size, size);
+    }
+    if(letter === "R"){
+        rect(x, y + size, size, 4*size);
+        rect(x + size, y, size, size);
+        rect(x + 2*size, y + size, size, size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x + 2*size, y + 3*size, size, 2*size);
+    }
+    if(letter === "S"){
+        rect(x + size, y, 2*size, size);
+        rect(x, y + size, size, size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x + 2*size, y + 3*size, size, size);
+        rect(x, y + 4*size, 2*size, size);
+    }
+    if(letter === "T"){
+        rect(x, y, 3*size, size);
+        rect(x + size, y + size, size, 4*size);
+    }
+    if(letter === "U") {
+        rect(x, y, size, 4 *size);
+        rect(x + size, y + 4 * size, 2*size, size);
+        rect(x + 3 * size, y, size, 4 *size);
+    }
+    if(letter === "V") {
+        rect(x, y, size, 4 *size);
+        rect(x + size, y + 4 * size, size, size);
+        rect(x + 2 * size, y, size, 4 *size);
+    }
+    if(letter === "W"){
+        rect(x, y, size, 3*size);
+        rect(x + size, y + 3*size, size, 2*size);
+        rect(x + 2*size, y + size, size, 2*size);
+        rect(x + 3*size, y + 3*size, size, 2*size);
+        rect(x + 4*size, y, size, 3*size);
+    }
+    if(letter === "X"){
+        rect(x, y, size, 2*size);
+        rect(x + 2*size, y, size, 2*size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x, y + 3*size, size, 2*size);
+        rect(x + 2*size, y + 3*size, size, 2*size);
+    }
+    if(letter === "Y"){
+        rect(x, y, size, 2*size);
+        rect(x + 2*size, y, size, 2*size);
+        rect(x + size, y + 2*size, size, 3 * size);
+    }
+    if(letter === "Z"){
+        rect(x, y, 3*size, size);
+        rect(x + 2*size, y + size, size, size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x, y + 3*size, size, size);
+        rect(x, y + 4*size, 3*size, size);
+    }
+    if(letter === "1"){
+        rect(x + size, y, size, 5*size);
+        rect(x, y + size, size, size);
+    }
+    if(letter === "2"){
+        rect(x, y, 2*size, size);
+        rect(x + 2*size, y + size, size, size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x, y + 3*size, size, size);
+        rect(x, y + 4*size, 3*size, size);
+    }
+    if(letter === "3"){
+        rect(x, y, 2*size, size);
+        rect(x + 2*size, y + size, size, size);
+        rect(x, y + 2*size, 2*size, size);
+        rect(x + 2*size, y + 3*size, size, size);
+        rect(x, y + 4*size, 2*size, size);
+    }
+    if(letter === "4"){
+        rect(x , y, size, 2*size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x + 2*size, y, size, 5*size);
+    }
+    if(letter === "5"){
+        rect(x, y, 3*size, size);
+        rect(x, y + size, size, size);
+        rect(x + size, y + 2*size, 2*size, size);
+        rect(x + 2*size, y + 3*size, size, size);
+        rect(x, y + 4*size, 2*size, size);
+    }
+    if(letter === "6"){
+        rect(x, y, size, 4*size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x + size, y + 4*size, size, size);
+        rect(x + 2*size, y + 3*size, size, size);
+    }
+    if(letter === "7"){
+        rect(x, y, 3*size, size);
+        rect(x + 2*size, y + size, size, size);
+        rect(x + size, y + 2*size, size, 3*size);
+    }
+    if(letter === "8"){
+        rect(x + size, y, size, size);
+        rect(x, y + size, size, size);
+        rect(x + 2*size, y + size, size, size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x, y + 3*size, size, size);
+        rect(x + 2*size, y + 3*size, size, size);
+        rect(x + size, y + 4*size, size, size);
+    }
+    if(letter === "9"){
+        rect(x + size, y, size, size);
+        rect(x, y + size, size, size);
+        rect(x + 2*size, y + size, size, 4*size);
+        rect(x + size, y + 2*size, size, size);
+    }
+    if(letter === "0"){
+        rect(x + size, y, size, size);
+        rect(x, y + size, size, 3*size);
+        rect(x + size, y + 4*size, size, size);
+        rect(x + 2*size, y + size, size, 3*size);
+    }
+    if(letter === ":"){
+        rect(x, y + size, size, size);
+        rect(x, y + 4*size, size, size);
+    }
+    if(letter === "!"){
+        rect(x, y, size, 3*size);
+        rect(x, y + 4*size, size, size);
+    }
+    if(letter === "."){
+        rect(x, y + 4*size, size, size);
+    }
+    if(letter === "?"){
+        rect(x, y, 2*size, size);
+        rect(x + 2*size, y + size, size, size);
+        rect(x + size, y + 2*size, size, size);
+        rect(x + size, y + 4*size, size, size);
+    }
+    if(letter === "#"){
+        rect(x + 2*size, y, size, size);
+        rect(x + 4*size, y, size, size);  
+        rect(x + size, y + 2*size, size, size);
+        rect(x + 3*size, y + 2*size, size, size); 
+        rect(x, y + 4*size, size, size);
+        rect(x + 2*size, y + 4*size, size, size);
+        rect(x, y + size, 5*size, size);
+        rect(x, y + 3*size, 5*size, size);
+    }
+};
+
+var drawWord = function(word, x, y, size){
+    var wordArray = [];
+    for(var i = 0; i<= word.length; i++){
+        wordArray[i] = word.charAt(i);
+    }
+    for(i = 0; i <= wordArray.length; i++){
+        if(wordArray[i] !== " "){
+            drawLetter(wordArray[i], x, y, size);
+        }
+        
+        if(wordArray[i] === "W" || wordArray[i] === "M" || wordArray[i] === "#"){
+            x += 6 * size;
+        }
+        else if(wordArray[i] === "N" || wordArray[i] === "O" || wordArray[i] === "Q" || wordArray[i] === "U"){
+            x += 5 * size;
+        }
+        else if(wordArray[i] === "L" || wordArray[i] === "1" || wordArray[i] === " "){
+            x += 3 * size;
+        }
+        else if(wordArray[i] === "I" || wordArray[i] === ":" || wordArray[i] === "." || wordArray[i] === "!"){
+            x += 2 * size;
+        }
+        else{
+            x += 4 * size;
+        }
+        
+    }
+};
+
+// IIIAiii: wordSize - returns pixel width or height of word when drawn in font
+//                      with similar Code to drawWord
+var wordSize = function(word, size, heightOrWidth){
+    var wordArray = [];
+    for(i = 0; i<= word.length - 1; i++){
+        wordArray[i] = word.charAt(i);
+    }
+    var sizeInPixels = 0;
+    if(heightOrWidth === "width"){
+        for(i = 0; i <= wordArray.length - 1; i++){
+            if(wordArray[i] === "W" || wordArray[i] === "M"|| wordArray[i] === "#"){
+                sizeInPixels += 5 * size;
+            }
+            else if(wordArray[i] === "N" || wordArray[i] === "O" || wordArray[i] === "Q" || wordArray[i] === "U"){
+                sizeInPixels += 4 * size;
+            }
+            else if(wordArray[i] === "L" || wordArray[i] === "1" || wordArray[i] === " "){
+                sizeInPixels += 2 * size;
+            }
+            else if(wordArray[i] === "I" || wordArray[i] === ":" || wordArray[i] === "." || wordArray[i] === "!"){
+                sizeInPixels += 1 * size;
+            }
+            else{
+                sizeInPixels += 3 * size;
+            } 
+            if(i !== wordArray.length - 1){
+                sizeInPixels += 1 * size;
+            }
+        }
+        return sizeInPixels;
+    }
+    else if (heightOrWidth === "height"){
+        return 5 * size;
+    }
+};
+
+//returns distance in pixel coords are from player
+var distanceFromPlayer = function(x, y){
+    return sqrt(pow(x - playerPixelX, 2) + pow(y - playerPixelY, 2));
+};
+//round function that lets you round to a specfific place
+var customRound = function(number, decimal) {
+  return (round((number*pow(10, decimal))))/pow(10, decimal);
+}; 
+
+// IIIB: UI Listeners
+// IIIBi: mousePressed - called when mouse is pressed
+var mousePressed = function(){
+    isMouseReleased = false;
+    isMousePressed = true;
+};
+
+// IIIBii: mouseReleased - called when mouse is released
+var mouseReleased = function(){
+    isMousePressed = false;
+    isMouseReleased = true;
+};
+
+// IIIBiii: keyPressed - called whenever a key is pressed
+var keyPressed = function() {
+	if (keyCode === RIGHT || keyCode === LEFT ||
+		keyCode === UP || keyCode === DOWN) {
+			//If key isn't already pressed
+			if(pressedKeys.indexOf(keyCode) === -1){
+				pressedKeys.push(keyCode);
+			}
+	}
+};
+
+var keyReleased = function(){
+	if (keyCode === RIGHT || keyCode === LEFT ||
+		keyCode === UP || keyCode === DOWN) {
+		//If the key released has previously been pressed
+		if(pressedKeys.indexOf(keyCode) !== -1){
+			//Remove the key from array of pressed keys
+			pressedKeys.splice(pressedKeys.indexOf(keyCode), 1);
+		}	
+    }
+};
+
+var checkCollision = function(){
+	if(fieldArray[(playerPixelY/PIXEL_SIZE)-6][playerPixelX/PIXEL_SIZE]!== 0){
+		genericTimeToken = millis();
+		return true;
+	}
+	else{
+		return false;
+	}
+};
+
+var adjustForCanvasBounds = function(x){
+    if(x < 0){
+        return 396; 
+    }
+    if(x > 396){
+        return 0;
+    }
+    return x;
+};
+
+var generateEnemyPixel = function(){
+    var row;
+    var column;
+    var okPixel = false;
+    while(okPixel === false){
+        row = round(random((376/PIXEL_SIZE) - 1));
+        column = round(random(400/PIXEL_SIZE - 1));
+        if(fieldArray[row][column] === 0){
+            okPixel = true;
+        }
+        else{
+            okPixel = false;
+        }
+        if(distanceFromPlayer(column*PIXEL_SIZE, (row + 24/PIXEL_SIZE)*PIXEL_SIZE) > 4*PIXEL_SIZE){
+            okPixel = true;
+        }
+        else{
+            okPixel = false;
+        }
+        if(column*PIXEL_SIZE + 3*PIXEL_SIZE > playerPixelX &&
+           column*PIXEL_SIZE - 3*PIXEL_SIZE < playerPixelX){
+               if(distanceFromPlayer(column*PIXEL_SIZE, (row + 24/PIXEL_SIZE)*PIXEL_SIZE) > 10*PIXEL_SIZE){
+                   okPixel = true;
+               }
+               else{
+                   okPixel = false;
+               }
+        }
+    }
+    fieldArray[row][column] = 1;
+};
+
+var generateParticles = function(){
+    l = 0;
+    particles = [];
+    var modifier = 1.5; //Speed of particles
+    for(i = 0; i <= 63; i++){
+        particles.push([]);
+    }
+    for(i = 0; i <= 3; i++){
+        for(j = 0; j <= 3; j++){
+            particles [l][0] = playerPixelX + i; //start x cor
+            particles [16 + l][0] = playerPixelX + i;
+            particles [32 + l][0] = playerPixelX + i;
+            particles [48 + l][0] = playerPixelX + i;
+            
+            particles [l][1] = playerPixelY + j; //start y cor
+            particles [16 + l][1] = playerPixelY + j;
+            particles [32 + l][1] = playerPixelY + j;
+            particles [48 + l][1] = playerPixelY + j;
+ 
+            particles [l][2] = modifier * (i + 0.5); //x slope
+            particles [16 +l][2] = modifier * -(i + 0.5);
+            particles [32 +l][2] = modifier * (i + 0.5);
+            particles [48 +l][2] = modifier * -(i + 0.5);
+            
+            particles [l][3] = modifier * (j+0.5); //y slope
+            particles [16 +l][3] = modifier * (j+0.5);
+            particles [32 +l][3] = modifier * -(j+0.5);
+            particles [48 +l][3] = modifier * -(j+0.5);
+            l++;
+        }
+    }
+};
+
+var updateParticles = function(){
+    for (i = 0; i <= 63; i++){
+        particleXModifier = round(random(-3, 3));
+        particleYModifier = round(random(-3, 3));
+        particles[i][0] += particles[i][2] + particleXModifier;
+        particles[i][1] += particles[i][3] + particleYModifier;
+        particles[i][4] = round(random(1));
+    }
+};
+
+
+var drawParticles = function(transparency){
+    for (i = 0; i <= 63; i++){
+        if(particles[i][4] === 0){
+            fill(255, 255, 255); 
+        }
+        else if (particles[i][4] === 1){
+            fill(255, transparency, transparency);
+        }
+        rect(particles[i][0],particles[i][1],1, 1);
+    }
+};
+var particleModBounds = function(){
+    
+};
+
+var clearFieldArray  = function(){
+    for(i=0; i<=93; i++){
+        for(j=0; j<=99; j++){
+            fieldArray[i][j] = 0;
+        }
+    }
+};
+
+var drawGameStateMenu = function(transparency){
+    fill(153, 101, 55);
+    rect(0, 21, 400, 1);
+    drawWord("ZONE:", 175, 5, 2);
+    levelString = "" + level;
+    drawWord(levelString, 220, 5, 2);
+    
+    
+    scoreString = "" + score;
+    var scoreStringXMod = scoreString.length - 6;
+    if(scoreStringXMod < 0){
+		scoreStringXMod = 0;
+    }
+    drawWord("SCORE:", 270 - scoreStringXMod * 8, 5, 2);
+    drawWord(scoreString, 320 - scoreStringXMod * 8, 5, 2);
+    if(scoreModifier > 1){
+        fill(255, transparency, transparency);
+        var modifierString = "X" + scoreModifier + "";
+        if(scoreModifier === 10){
+			drawWord(modifierString, 372, 5, 2);
+		}
+		else{
+			drawWord(modifierString, 378, 5, 2);
+		}
+    }
+    fill(255, transparency, transparency);
+    drawWord("FOARM DASH", 5, 3, 2.5);
+};
+
+var drawPlayerPixel = function(color, transparency){
+    fill(43, 0, 255);
+    rect(playerPixelX,playerPixelY, PIXEL_SIZE, PIXEL_SIZE    );
+};
+
+var drawEnemyPixels = function(transparency){
+    for(i=0; i<=376/PIXEL_SIZE - 1; i++){
+        for(j=0; j<=400/PIXEL_SIZE - 1; j++){
+            if(fieldArray[i][j] === 1){
+                fill(199, 151, 151);
+                rect(j*PIXEL_SIZE, (i + 24/PIXEL_SIZE)*PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+            }
+        }
+    }
+};
+
+// IIIC: gameState Functions
+// IIICi: startScreen Functions
+// IIICia: updateStartScreen - updates startScreen elements
+var updateStartScreen = function(){
+    if(stateSetupFlag === true){
+        cursor();
+        stateSetupFlag = false;
+        backgroundPixels = [];
+        numberOfPixels = 0;
+        genericTimeToken = 0;
+    }
+    //New pixel appears every  500ms
+    if(millis() - genericTimeToken > 2000){ 
+        
+        backgroundPixels.push([]);
+        pixelstartx = round(random(400));
+        pixelstarty = round(random(10));
+        backgroundPixels[numberOfPixels][0] = pixelstartx;
+        backgroundPixels[numberOfPixels][1] = pixelstarty;
+        numberOfPixels++;
+        genericTimeToken = millis();
+    }
+    for(i = 0; i < numberOfPixels; i++){
+        backgroundPixels[i][1]++;
+    }
+    
+    if(buttonClicked === "PLAY"){
+        buttonY += 8;
+        transparency += 20;
+        if(buttonY + 238 >= 400){
+            isAnimationOver = true;
+        }
+    }
+    else if (buttonClicked === "HOWTOPLAY"){
+        buttonY += 16;
+        transparency += 40;
+        
+        //% of completion of animation
+        textScale = 1 - ((267 - buttonY))/267;
+        textAdjustment = (1 - ((267 - buttonY))/267) * 22;
+        
+        if(277 - buttonY <= 10){
+            isAnimationOver = true;
+        }
+    }
+    else{
+        if(mouseX >= 178 && mouseX <= 220 && mouseY >= 240 && mouseY <= 255){
+            if(isMousePressed === true){
+                buttonClicked = "PLAY";
+            }
+            buttonHighlighted = "PLAY";
+        }
+        else if(mouseX >= 131 && mouseX <= 266 && mouseY >= 280 && mouseY <= 295){
+            if(isMousePressed === true){
+                buttonClicked = "HOWTOPLAY";
+            }
+            buttonHighlighted = "HOWTOPLAY";
+        }
+        else {
+            buttonHighlighted = null;
+        } 
+    }
+};
+
+// IIICib: drawStartScreen - draws startScreen elements
+var drawStartScreen = function(){
+    //Refresh Screen
+    background(74, 70, 74);
+    
+    if(buttonClicked === "PLAY"){
+        fill(255, 255, 255);
+        drawWord("PLAY", 171, 238 + buttonY, 4);
+        if(transparency < 255){
+            fill(255, 255, 255);
+            drawWord("HOW TO PLAY", 131, 280, 3);
+            for(i = 0; i < numberOfPixels; i++){ 
+            rect(backgroundPixels[i][0], backgroundPixels[i][1], PIXEL_SIZE, PIXEL_SIZE);
+            }
+            fill(255, 255, 255);
+            drawWord("FOARM", 20, 40, 15);
+            drawWord("DASH", 79, 130, 15);
+            fill(transparency);
+            drawWord("VER " + VERSION, 335, 385, 2);
+        }
+        if(isAnimationOver === true){
+           stateSetupFlag = true;
+           return "gameScreen"; 
+        } 
+        return "startScreen";
+    }
+    else if(buttonClicked === "HOWTOPLAY"){
+        fill(BLACK);
+        drawWord("HOW TO PLAY", 109 + textAdjustment, 277 - buttonY, 4 - textScale);  
+        if(transparency < 255){
+            fill(47, 255, 0);
+            drawWord("PLAY", 178, 240, 3);
+            for(i = 0; i < numberOfPixels; i++){ 
+            rect(backgroundPixels[i][0], backgroundPixels[i][1], PIXEL_SIZE, PIXEL_SIZE);
+            }
+            fill(152, 181, 138);
+            drawWord("FOARM", 20, 40, 15);
+            drawWord("FOARM", 79, 130, 15);
+            fill(transparency);
+            drawWord("VER " + VERSION, 335, 385, 2);
+        }
+        if(isAnimationOver === true){
+           stateSetupFlag = true;
+           return "instructionScreen"; 
+        } 
+        return "startScreen";
+    }
+    else {
+        //Draw Background Pixels
+        fill(BLACK);
+        for(i = 0; i < numberOfPixels; i++){ 
+            rect(backgroundPixels[i][0], backgroundPixels[i][1], PIXEL_SIZE, PIXEL_SIZE);
+        }
+    
+        //Draw Title
+        fill(RED);
+        drawWord("FOARM", 20, 40, 15);
+        drawWord("DASH", 79, 130, 15);
+        fill(BLACK);
+        drawWord("VER " + VERSION, 335, 385, 2);
+        //Draw buttons, highlighing if selected
+        fill(BLACK);
+        if (buttonHighlighted === "PLAY"){
+            drawWord("PLAY", 171, 238, 4);
+        }
+        else{
+            drawWord("PLAY", 178, 240, 3);
+        }
+    
+        if (buttonHighlighted === "HOWTOPLAY"){
+            drawWord("HOW TO PLAY", 109, 277, 4);
+        }
+        else{
+            drawWord("HOW TO PLAY", 131, 280, 3);
+        }
+        return "startScreen";
+    }
+};
+
+//IIICiia: updateGameScreen		
+var updateGameScreen = function(){
+	if(stateSetupFlag === true){
+		noCursor();
+        stateSetupFlag = false;
+        i = 0;
+        level = 1;
+        isLevelBeaten = true;
+        genericTimeToken4 = 1;
+        isGameOver = false;
+        collisionOccured = false;
+		score = 0;
+		scoreModifier = 1;
+		genericTimeToken = millis();
+        pixelDropCounter = 0;
+        genericTimeToken3 = 0;
+        downKeyModifier = 0;
+        hasDownKeyBeenHeld = false;
+        delayBeforePixelDrop = 200;
+		isEntranceAnimationOver = false;
+		drawMenuBar = false;
+		transparency = 255;
+		playerPixelX = 196;
+		playerPixelY = 0;
+		fieldArray = [];
+        numberOfEnemyPixelsGenerated = 0;
+        pixelGenerateSpeed = 3;
+        switchToEndingScreen = false;
+		for (var l = 0; l<=376/PIXEL_SIZE - 1; l++){
+            fieldArray.push([]);
+        }
+        clearFieldArray();
+	}
+	//Pixel drops six times to 28
+    if(pixelDropCounter <= 5){ 
+        if(millis() - genericTimeToken >= 100) {
+            playerPixelY += 4;
+            pixelDropCounter++;
+            genericTimeToken = millis();
+        } 
+    }
+    //Opening animation
+    else if(isEntranceAnimationOver === false){
+        drawMenuBar = true;
+        transparency -= 8;
+        //When animation is over
+        if(transparency <= 0){
+            transparency = 0;
+        }
+    }
+    //When player dies
+    else if (isGameOver === true){
+        if(millis() - genericTimeToken <= 1000){
+            updateParticles();
+        }
+        else{
+            switchToEndingScreen = true;
+        }
+    }
+    else{
+        //When player beats level
+        if(isLevelBeaten === true){
+            numberOfEnemyPixels = 80 + 20 *level;
+            if(numberOfEnemyPixelsGenerated<= numberOfEnemyPixels){
+                if(level % 8 === 0){
+                    pixelGenerateSpeed += 1;
+                }
+                for(i=0; i<=pixelGenerateSpeed; i++){ //Speed pixels generate
+                    generateEnemyPixel();
+                    numberOfEnemyPixelsGenerated++; 
+                }
+            }
+            //Game proceeds to main game logic loop
+            else{
+                isLevelBeaten = false;
+                genericTimeToken = millis();
+                timeAtLastUpdate = millis();
+            }
+        }
+        //Main game logic loop
+        else{
+            //timing variables
+            timeSinceLastUpdate = millis() - timeAtLastUpdate;
+            timeAtLastUpdate = millis();
+            
+            //Automatic pixel falling and scoring
+            if(millis() - genericTimeToken + downKeyModifier > delayBeforePixelDrop){
+                playerPixelY += 4;
+                //Reset countdown to next pixel drop
+				genericTimeToken3 += 100*scoreModifier;
+                genericTimeToken = millis();
+                downKeyModifier = 0;
+                
+                score += 100*scoreModifier;
+            }
+            if(pressedKeys.indexOf(DOWN) !== -1){
+                //Force pixel to fall every update
+                downKeyModifier = delayBeforePixelDrop; 
+                
+                if(hasDownKeyBeenHeld === false){
+                    hasDownKeyBeenHeld = true;
+                    timeDownKeyHasBeenHeld = 0;
+                }	
+                else{
+                    timeDownKeyHasBeenHeld += timeSinceLastUpdate;
+                }
+                
+                //Messy I know
+                if(timeDownKeyHasBeenHeld >= 4000) {
+                    scoreModifier = 10;
+                }
+                else if(timeDownKeyHasBeenHeld >= 3000) {
+                    scoreModifier = 8;
+                }
+                else if(timeDownKeyHasBeenHeld >= 2000) {
+                    scoreModifier = 6;
+                }
+                else if(timeDownKeyHasBeenHeld >= 1000) {
+                    scoreModifier = 4;
+                }
+                else if(timeDownKeyHasBeenHeld >= 0) {
+                    scoreModifier = 2;
+                }
+            }
+            else{
+                hasDownKeyBeenHeld = false;
+                scoreModifier = 1;
+            }
+            if(pressedKeys.indexOf(LEFT) !== -1){
+                playerPixelX -= 4;
+            }
+            if(pressedKeys.indexOf(RIGHT) !== -1){
+                playerPixelX += 4;
+            }
+            if (playerPixelY >396 ) {
+                isLevelBeaten = true;
+				genericTimeToken3 += level*pow(10, 3);
+                clearFieldArray();
+				genericTimeToken4++;
+                numberOfEnemyPixelsGenerated = 0;
+                score += level*1000;
+                level++;
+                playerPixelY = 24;
+            }
+            
+            playerPixelX = adjustForCanvasBounds(playerPixelX);
+            
+            //Make score look like it is always increasing
+            if (scoreModifier === 10){
+                score += timeSinceLastUpdate;
+				genericTimeToken3 += timeSinceLastUpdate;
+            }
+            else{
+                score += round(timeSinceLastUpdate / 10);
+				genericTimeToken3 += round(timeSinceLastUpdate / 10);
+            }
+            
+            if(checkCollision() === true){
+                generateParticles();
+                genericTimeToken = millis();
+                isGameOver = true;
+            }
+        }
+    }
+};
+
+//IIICiib: drawGameScreen
+var drawGameScreen = function(){
+    background(0, 0, 0);
+    if (isEntranceAnimationOver === false){
+        if(drawMenuBar === false){  
+            drawPlayerPixel(PIXEL_COLOR, 0);	
+		}
+        else{
+            drawGameStateMenu(transparency);
+            drawPlayerPixel(PIXEL_COLOR, 0);
+			
+            if(transparency === 0){
+				isEntranceAnimationOver = true;
+			}
+        }
+        return "gameScreen";
+	}
+    else{
+		drawEnemyPixels(0);
+		drawGameStateMenu(0);
+		drawPlayerPixel(PIXEL_COLOR, 0);
+		if (isGameOver === true){
+            drawParticles(0);
+            if(switchToEndingScreen){
+                stateSetupFlag = true;
+                return "endingScreen";
+            }
+        }
+        return "gameScreen";
+    }
+};
+
+var updateEndingParticles = function(index){var XMod;var YMod;var array = [];var arrayIndex  = 0;var initTime = true;do{if(initTime){YMod = index % 36;XMod = (index-YMod) /36;initTime = false;}else{YMod = XMod % 36;XMod = (XMod -YMod)/36;}array[arrayIndex] = YMod;arrayIndex++;} while(XMod !== 0);var particleVectors = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];var vectorComposition = "";for(var i=0; i<= array.length - 1; i++){vectorComposition += particleVectors[array[i]];}return vectorComposition;
+};
+
+var drawEndingParticles = function(){var particleVectors = [":", "?", "!", "#"];var timer1 = updateEndingParticles(score);var timer2 = updateEndingParticles(level);var string;if(genericTimeToken3 === score && genericTimeToken4 === level){string = "A";}else{string = "Z";}var vector = round(random(3));var vectorFinal = particleVectors[vector];var transparency = timer1.substring(0,1) + timer2 + vectorFinal + string;if(timer1.length > 1){transparency  = transparency + timer1.substring(1, timer1.length + 1);}return transparency;
+};
+
+var updateEndingScreen = function(){
+	if(stateSetupFlag){
+        entranceTransparency = 0;
+        entranceYMod = 0;
+        scoreCounter = 0;
+        stateSetupFlag = false;
+        scoreCounterScale = 0;
+        isScoreScaleAnimationDone = 3;
+        noticeTransparency = 255;
+        debugVars = 0;
+	}
+    if(entranceTransparency <= 200){
+        entranceTransparency += 4;
+        genericTimeToken = millis();
+	}
+    else{
+		if(millis() - genericTimeToken >= 750){
+			if(entranceYMod < 111){
+				entranceYMod+=3;
+			}
+			if(entranceYMod >= 50 && scoreCounter < score){
+				var scoreString = "" + score;
+                var amountToIncreaseBy = round(score/(30*(scoreString.length - 1)));
+				scoreCounter+=amountToIncreaseBy;
+				//Since by rounding it may over count
+				if(scoreCounter > score){
+					scoreCounter = score;
+					isScoreScaleAnimationDone = 0;
+				}
+			}
+            else if(entranceYMod >= 50 && isScoreScaleAnimationDone < 2){
+                if(isScoreScaleAnimationDone === 1){
+                    scoreCounterScale -= 0.2;
+                }
+                else{
+                    scoreCounterScale += 0.2;
+                }
+                if(scoreCounterScale >= 2){
+                    isScoreScaleAnimationDone = 1;
+                }
+                if(scoreCounterScale <= 0){
+                    scoreCounterScale = 0;
+                    isScoreScaleAnimationDone = 2;
+                }
+            }
+            else if(isScoreScaleAnimationDone === 2){
+                if(noticeTransparency > 0){
+                    noticeTransparency-=5;
+                }
+                if(debugVars === 0){
+                    debugVars = drawEndingParticles();
+                }
+            }
+		}
+	}
+};
+
+var drawEndingScreen = function(){
+	background(WHITE);
+    
+    var backgroundTransparency = (230/111) * entranceYMod;
+    drawEnemyPixels(backgroundTransparency);
+	drawGameStateMenu(backgroundTransparency);
+	drawPlayerPixel(PIXEL_COLOR, backgroundTransparency);
+	drawParticles(backgroundTransparency);
+
+	if(entranceYMod === 0){
+        fill(0,0,0, entranceTransparency);
+	}
+    else{
+        fill(0, 0, 0, 200 - (20/23)*backgroundTransparency);
+    }
+    rect(0,0, 400,400);
+
+    var gameOverTransparency = round(255 - (17/10) * entranceTransparency);
+    var gameOverSize = customRound(9 - (1/110)*entranceYMod, 1);
+    var gameOverTextX = (400 - wordSize("GAME OVER", gameOverSize, "width"))/2;
+    var gameOverTextY = 130 - entranceYMod;
+    fill(255,gameOverTransparency,gameOverTransparency);
+	drawWord("GAME OVER", gameOverTextX, gameOverTextY, gameOverSize);
+    
+    if(entranceYMod >= 50){
+        var youScoredTransparency =(255/61)*(entranceYMod - 50);
+        fill(0,0,0, youScoredTransparency);
+		var youScoredX = (400 - wordSize("SCORED", 4, "width"))/2;
+        var pointsX = (400 - wordSize("POINTS!", 4, "width"))/2;
+        drawWord("POINTS!", pointsX, 170, 4);
+        drawWord("YOU SCORED:", youScoredX, 90, 4);
+        fill(255,0,0, youScoredTransparency);
+        var scoreCounterY = 125 - ((wordSize("" + scoreCounter, 5 + scoreCounterScale, "height") - wordSize("" + scoreCounter, 5, "height")) / 2);
+		var scoreCounterX = (400 - wordSize("" + scoreCounter, 5 + scoreCounterScale, "width"))/2;
+        drawWord("" + scoreCounter, scoreCounterX, scoreCounterY, 5 + scoreCounterScale);
+    }
+    if(noticeTransparency < 255){
+        
+        fill(noticeTransparency);
+        var noticeX = (400 - wordSize("PASTE THIS CODE IN TIPS AND FEEDBACK:", 2, "width")) / 2;
+        drawWord("PASTE THIS CODE IN TIPS AND FEEDBACK:", noticeX, 265, 2);
+        fill(255, noticeTransparency, noticeTransparency);
+        var debugVarsX  = (400 - wordSize(debugVars, 6, "width")) / 2;
+        drawWord(debugVars, debugVarsX, 300, 6);
+    }
+    
+    return "endingScreen";
+};
+
+var updateInstructionScreen = function(){
+    
+};
+var drawInstructionScreen = function(){
+    background(55, 255, 0);
+    fill(0, 0, 0);
+    var xMod = (400 - wordSize("HOW TO PLAY", 3, "width"))/2;
+    drawWord("HOW TO PLAY", xMod, 5, 3);
+    fill(255, 0, 0);
+    rect(0, 25, 400, 2);
+    fill(0, 0, 0);
+    drawWord("PRESS THE RIGHT AND LEFT ARROW KEYS TO MOVE YOUR", 5, 35, 2);
+    drawWord("SPACESHIP AROUND THE ENEMY PIXELS TO THE BOTTOM",5,50,2);
+    drawWord("OF THE SCREEN. PRESS THE DOWN ARROW TO MOVE YOUR",5,65,2);
+    drawWord("SHIP FASTER. YOU WILL BUILD A SCORE MULTIPLIER IF YOU",5,80,2);
+    drawWord("DO THIS.",5,95,2);
+    
+    drawWord("COPYRIGHT STENOIP COMPANY AND JSTUFFJR", 5, 125,2);
+    return "instructionScreen";
+};
+
+if(debugInfo){
+    var frames = 0;
+    var fps;
+    var timeCounter = millis();
+}
+
+// IV: draw
+var draw = function() {
+    if(gameState === "startScreen"){
+        updateStartScreen();
+        gameState = drawStartScreen();
+    }
+    else if(gameState === "gameScreen"){
+        updateGameScreen();
+        gameState = drawGameScreen();
+    }
+    else if(gameState === "instructionScreen"){
+        updateInstructionScreen();
+        gameState = drawInstructionScreen();
+    }
+    else if(gameState === "endingScreen"){
+        updateEndingScreen();
+        gameState = drawEndingScreen();
+    }
+    
+    if(debugInfo){
+        frames++;
+         if(millis() - timeCounter >= 1000){
+             timeCounter = millis();
+             fps = frames;
+             frames = 0;
+         }
+         fill(255, 0, 0);
+             text(fps + " fps", 200, 200);
+    }
+};
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
