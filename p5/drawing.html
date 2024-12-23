@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html> 
+  <head>
+    <title>Images on ProcessingJS</title> 
+  </head>
+  <body>
+	<!--Visit line 22 -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(400, 400); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+/**
+Welcome to the world of drawing in the TEKENJE IT Game, were you can draw in style. In ths NEW update, you can draw 2 ways! You can use your mouse and more recently, the arrow keys! To change colour, go to line 32. Happy Drawing!.
+*/
+
+background(255, 255, 255);
+noStroke();
+
+
+
+
+
+var keys = [];
+keyPressed = function() {
+    keys[keyCode] = true;
+};
+keyReleased = function() {
+    keys[keyCode] = false;
+};
+
+var speed = 1;
+var x = 185;
+var y = 260;
+
+    
+
+
+
+
+draw = function() {
+    if (mouseIsPressed) {
+   //Change colour with fill.
+    fill(0, 0, 0);
+    
+    
+                          //Make bigger(20,20 is default).
+    ellipse(mouseX, mouseY, 20, 20);    
+    }
+    
+
+ellipse(x,y,10,10);
+     
+     
+     if (keys[LEFT]) {
+        x = x - speed;
+    }
+    
+    if (keys[RIGHT]) {
+        x = x + speed;
+    }
+    
+    if (keys[UP]) {
+        y = y - speed;
+    }
+    
+    if (keys[DOWN]) {
+        y = y + speed;
+    }
+
+
+};
+
+
+
+
+    
+
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</html>
