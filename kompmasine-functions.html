@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graph of y = mx + b</title>
+    <title>Kompmasine - Function Plotter</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -34,10 +34,10 @@
             margin-right: 10px;
         }
 
-        input[type="number"] {
+        input[type="text"] {
             margin-right: 20px;
             padding: 5px;
-            width: 80px;
+            width: 200px;
         }
 
         button {
@@ -52,37 +52,50 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        .note {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Graph of y = mx + b</h1>
+        <h1>Kompmasine - Function Plotter</h1>
         <canvas id="graphCanvas" width="600" height="400"></canvas>
         <div class="controls">
-            <label for="slope">Slope (m):</label>
-            <input type="number" id="slope" value="1" step="0.1">
-            <label for="intercept">Y-Intercept (b):</label>
-            <input type="number" id="intercept" value="0" step="0.1">
+            <label for="function">Function (y=):</label>
+            <input type="text" id="function" placeholder="Enter function, e.g., sin(x) + x">
             <button onclick="plotGraph()">Plot Graph</button>
+        </div>
+        <div class="note">
+            Note: You can enter functions like <code>sin(x)</code>, <code>cos(x)</code>, <code>tan(x)</code>, <code>3.14</code> (for π), and standard arithmetic operations. Use multiplication explicitly as <code>*</code> if needed.
         </div>
     </div>
     <script>
+        let chart;
+
         function plotGraph() {
-            const m = parseFloat(document.getElementById('slope').value);
-            const b = parseFloat(document.getElementById('intercept').value);
+            const funcStr = document.getElementById('function').value;
             const ctx = document.getElementById('graphCanvas').getContext('2d');
 
             const labels = [];
             const data = [];
-            for (let x = -10; x <= 10; x += 0.5) {
-                labels.push(x);
-                data.push(m * x + b);
+            for (let x = -10; x <= 10; x += 0.1) {
+                labels.push(x.toFixed(1));
+                try {
+                    const y = eval(funcStr.replace(/pi/g, '3.14').replace(/([0-9.]+)(x)/g, '$1*$2').replace(/sin/g, 'Math.sin').replace(/cos/g, 'Math.cos').replace(/tan/g, 'Math.tan'));
+                    data.push(y);
+                } catch (error) {
+                    data.push(null);
+                }
             }
 
             const chartData = {
                 labels: labels,
                 datasets: [{
-                    label: `y = ${m}x + ${b}`,
+                    label: `y = ${funcStr}`,
                     data: data,
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 2,
@@ -91,7 +104,11 @@
                 }]
             };
 
-            new Chart(ctx, {
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
                 type: 'line',
                 data: chartData,
                 options: {
