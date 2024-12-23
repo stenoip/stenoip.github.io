@@ -161,29 +161,58 @@
     </div>
 
     <div class="stopwatch">
-   <h2> 
-            Stop Watch</h2>
-        <div id="time">
-            <span class="digit" id="hr">
-                00</span>
-            <span class="txt">Hr</span>
-            <span class="digit" id="min">
-                00</span>
-            <span class="txt">Min</span>
-            <span class="digit" id="sec">
-                00</span>
-            <span class="txt">Sec</span>
-            <span class="digit" id="count">
-                00</span>
-        </div>
-        <div id="buttons">
-            <button class="btn" id="start">
-                Start</button>
-            <button class="btn" id="stop">
-                Stop</button>
-            <button class="btn" id="reset">
-                Reset</button>
-        </div>
+   <h2>Stopwatch</h2>
+    <div id="display">00:00:00:000</div>
+    <button onclick="startStopwatch()">Start</button>
+    <button onclick="stopStopwatch()">Stop</button>
+    <button onclick="resetStopwatch()">Reset</button>
+
+    <script>
+        let startTime;
+        let updatedTime;
+        let difference;
+        let tInterval;
+        let running = false;
+
+        function startStopwatch() {
+            if (!running) {
+                startTime = new Date().getTime();
+                tInterval = setInterval(updateTime, 10); // Update every 10 milliseconds
+                running = true;
+            }
+        }
+
+        function stopStopwatch() {
+            if (running) {
+                clearInterval(tInterval);
+                running = false;
+            }
+        }
+
+        function resetStopwatch() {
+            clearInterval(tInterval);
+            document.getElementById("display").innerHTML = "00:00:00:000";
+            running = false;
+        }
+
+        function updateTime() {
+            updatedTime = new Date().getTime();
+            difference = updatedTime - startTime;
+
+            let hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            let milliseconds = Math.floor((difference % 1000));
+
+            hours = (hours < 10) ? "0" + hours : hours;
+            minutes = (minutes < 10) ? "0" + minutes : minutes;
+            seconds = (seconds < 10) ? "0" + seconds : seconds;
+            milliseconds = (milliseconds < 100) ? "0" + milliseconds : milliseconds;
+            milliseconds = (milliseconds < 10) ? "0" + milliseconds : milliseconds;
+
+            document.getElementById("display").innerHTML = hours + ":" + minutes + ":" + seconds + ":" + milliseconds;
+        }
+    </script>
     </div>
 
     <script src="script.js">
