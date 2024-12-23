@@ -109,18 +109,164 @@
     <div class="time-zones" id="time-zones"></div>
 
     <div class="timer">
-        <h2>Timer</h2>
-        <input type="number" id="timer-input" placeholder="Minutes" min="0">
-        <button onclick="startTimer()">Start Timer</button>
-        <div id="timer-display"></div>
+ 
+    <h2>Set Timer</h2>
+    <label for="hours">Hours:</label>
+    <input type="number" id="hours" min="0" value="0">
+    <label for="minutes">Minutes:</label>
+    <input type="number" id="minutes" min="0" value="0">
+    <label for="seconds">Seconds:</label>
+    <input type="number" id="seconds" min="0" value="0">
+    <button onclick="startTimer()">Start Timer</button>
+    <button onclick="stopSound()">Stop Sound</button>
+    <h2 id="countdown"></h2>
+
+    <!-- Add an audio element for the alarm sound -->
+    <audio id="alarmSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto" loop></audio>
+
+    <script>
+        function startTimer() {
+            var hours = parseInt(document.getElementById('hours').value);
+            var minutes = parseInt(document.getElementById('minutes').value);
+            var seconds = parseInt(document.getElementById('seconds').value);
+
+            var totalTimeInSeconds = (hours * 3600) + (minutes * 60) + seconds;
+
+            var countdown = document.getElementById('countdown');
+            var alarmSound = document.getElementById('alarmSound');
+
+            var timer = setInterval(function() {
+                if (totalTimeInSeconds <= 0) {
+                    clearInterval(timer);
+                    countdown.innerHTML = "Time's up!";
+                    alarmSound.play(); // Play alarm sound when time is up
+                } else {
+                    var hrs = Math.floor(totalTimeInSeconds / 3600);
+                    var mins = Math.floor((totalTimeInSeconds % 3600) / 60);
+                    var secs = totalTimeInSeconds % 60;
+                    countdown.innerHTML = `${hrs}h ${mins}m ${secs}s`;
+                    totalTimeInSeconds--;
+                }
+            }, 1000);
+        }
+
+        function stopSound() {
+            var alarmSound = document.getElementById('alarmSound');
+            alarmSound.pause();
+            alarmSound.currentTime = 0; // Reset the audio to the start
+        }
+    </script>
+
+
     </div>
 
     <div class="stopwatch">
-        <h2>Stopwatch</h2>
-        <button onclick="startStopwatch()">Start</button>
-        <button onclick="stopStopwatch()">Stop</button>
-        <button onclick="resetStopwatch()">Reset</button>
-        <div id="stopwatch-display">00:00:00</div>
+   <h2> 
+            Stop Watch</h2>
+        <div id="time">
+            <span class="digit" id="hr">
+                00</span>
+            <span class="txt">Hr</span>
+            <span class="digit" id="min">
+                00</span>
+            <span class="txt">Min</span>
+            <span class="digit" id="sec">
+                00</span>
+            <span class="txt">Sec</span>
+            <span class="digit" id="count">
+                00</span>
+        </div>
+        <div id="buttons">
+            <button class="btn" id="start">
+                Start</button>
+            <button class="btn" id="stop">
+                Stop</button>
+            <button class="btn" id="reset">
+                Reset</button>
+        </div>
+    </div>
+
+    <script src="script.js">
+    let startBtn = document.getElementById('start');
+let stopBtn = document.getElementById('stop');
+let resetBtn = document.getElementById('reset');
+
+let hour = 00;
+let minute = 00;
+let second = 00;
+let count = 00;
+
+startBtn.addEventListener('click', function () {
+    timer = true;
+    stopWatch();
+});
+
+stopBtn.addEventListener('click', function () {
+    timer = false;
+});
+
+resetBtn.addEventListener('click', function () {
+    timer = false;
+    hour = 0;
+    minute = 0;
+    second = 0;
+    count = 0;
+    document.getElementById('hr').innerHTML = "00";
+    document.getElementById('min').innerHTML = "00";
+    document.getElementById('sec').innerHTML = "00";
+    document.getElementById('count').innerHTML = "00";
+});
+
+function stopWatch() {
+    if (timer) {
+        count++;
+
+        if (count == 100) {
+            second++;
+            count = 0;
+        }
+
+        if (second == 60) {
+            minute++;
+            second = 0;
+        }
+
+        if (minute == 60) {
+            hour++;
+            minute = 0;
+            second = 0;
+        }
+
+        let hrString = hour;
+        let minString = minute;
+        let secString = second;
+        let countString = count;
+
+        if (hour < 10) {
+            hrString = "0" + hrString;
+        }
+
+        if (minute < 10) {
+            minString = "0" + minString;
+        }
+
+        if (second < 10) {
+            secString = "0" + secString;
+        }
+
+        if (count < 10) {
+            countString = "0" + countString;
+        }
+
+        document.getElementById('hr').innerHTML = hrString;
+        document.getElementById('min').innerHTML = minString;
+        document.getElementById('sec').innerHTML = secString;
+        document.getElementById('count').innerHTML = countString;
+        setTimeout(stopWatch, 10);
+    }
+}
+
+    </script>
     </div>
 <div class="countdown"> <h1>Christmas Countdown</h1> <div id="timer"></div> </div> <script> function countdown() { const now = new Date(); const christmas = new Date(now.getFullYear(), 11, 25); if (now.getMonth() == 11 && now.getDate() > 25) { christmas.setFullYear(christmas.getFullYear() + 1); } const timeDifference = christmas - now; const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60)); const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000); document.getElementById("timer").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`; } setInterval(countdown, 1000); </script>
     <script>
