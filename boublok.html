@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boublok - HTML & PJS Editor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .editor-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+        }
+
+        .editor-buttons button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .editor-buttons button:hover {
+            background-color: #0056b3;
+        }
+
+        .editor {
+            flex: 1;
+            display: flex;
+        }
+
+        textarea {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            resize: none;
+            font-family: monospace;
+            font-size: 16px;
+        }
+
+        iframe {
+            flex: 1;
+            border: none;
+            margin: 0;
+        }
+
+        .note {
+            padding: 10px;
+            font-size: 14px;
+            color: #555;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-buttons">
+        <button onclick="runCode()">Run</button>
+        <button onclick="saveCode()">Save</button>
+        <button onclick="switchEditor()">Switch to PJS</button>
+    </div>
+    <div class="editor-container">
+        <div id="html-editor" class="editor">
+            <textarea id="html-code" placeholder="Type HTML/CSS/JS code here..."></textarea>
+            <iframe id="output"></iframe>
+        </div>
+        <div id="pjs-editor" class="editor" style="display: none;">
+            <textarea id="pjs-code" placeholder="NOTE! Does not work. Work in Progess."></textarea>
+            <iframe id="pjs-output" src="about:blank"></iframe>
+        </div>
+    </div>
+    <div class="note">
+        Note: For the HTML editor, you can write HTML, CSS, and JavaScript. For the Processing JavaScript editor, use the Processing.js syntax. Make sure to use explicit multiplication (*) when needed.
+    </div>
+    <script>
+        function runCode() {
+            const isHtmlEditor = document.getElementById('html-editor').style.display !== 'none';
+            const code = isHtmlEditor ? document.getElementById('html-code').value : document.getElementById('pjs-code').value;
+            const output = isHtmlEditor ? document.getElementById('output') : document.getElementById('pjs-output');
+
+            if (isHtmlEditor) {
+                output.contentDocument.open();
+                output.contentDocument.write(code);
+                output.contentDocument.close();
+            } else {
+                const pjsScript = `
+                    <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"><\/script>
+                    <canvas id="processing-canvas"></canvas>
+                    <script>
+                        const canvas = document.getElementById('processing-canvas');
+                        const pjs = new Processing(canvas, function(p) {
+                            ${code}
+                        });
+                    <\/script>
+                `;
+                output.contentDocument.open();
+                output.contentDocument.write(`<html><body>${pjsScript}</body></html>`);
+                output.contentDocument.close();
+            }
+        }
+
+        function saveCode() {
+            const isHtmlEditor = document.getElementById('html-editor').style.display !== 'none';
+            const code = isHtmlEditor ? document.getElementById('html-code').value : document.getElementById('pjs-code').value;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = isHtmlEditor ? 'code.html' : 'code.pjs';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function switchEditor() {
+            const htmlEditor = document.getElementById('html-editor');
+            const pjsEditor = document.getElementById('pjs-editor');
+            const button = document.querySelector('.editor-buttons button:nth-child(3)');
+            
+            if (htmlEditor.style.display === 'none') {
+                htmlEditor.style.display = 'flex';
+                pjsEditor.style.display = 'none';
+                button.textContent = 'Switch to PJS';
+            } else {
+                htmlEditor.style.display = 'none';
+                pjsEditor.style.display = 'flex';
+                button.textContent = 'Switch to HTML';
+            }
+        }
+    </script>
+</body>
+</html>
