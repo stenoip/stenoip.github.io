@@ -126,13 +126,13 @@
     <script>
 const holidays = {
     // Canadian Holidays
-    "2024-01-01": "New Year's Day",
-    "2024-03-29": "Good Friday",
-    "2024-05-20": "Victoria Day",
-    "2024-07-01": "Canada Day",
-    "2024-08-05": "Civic Holiday",
-    "2024-09-02": "Labour Day",
-    "2024-10-14": "Thanksgiving",
+    "2025-01-01": "New Year's Day",
+    "2025-03-29": "Good Friday",
+    "2025-05-20": "Victoria Day",
+    "2025-07-01": "Canada Day",
+    "2025-08-05": "Civic Holiday",
+    "2025-09-02": "Labour Day",
+    "2025-11-27": "Thanksgiving",
     "2024-12-25": "Christmas Day",
     "2024-12-26": "Boxing Day"
 };
@@ -312,5 +312,59 @@ function init() {
 window.onload = init;
 
 </script>
+
+
+    <h1>Set Timer</h1>
+    <label for="hours">Hours:</label>
+    <input type="number" id="hours" min="0" value="0">
+    <label for="minutes">Minutes:</label>
+    <input type="number" id="minutes" min="0" value="0">
+    <label for="seconds">Seconds:</label>
+    <input type="number" id="seconds" min="0" value="0">
+    <button onclick="startTimer()">Start Timer</button>
+    <button onclick="stopSound()">Stop Sound</button>
+    <h2 id="countdown"></h2>
+
+    <!-- Add an audio element for the alarm sound -->
+    <audio id="alarmSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto" loop></audio>
+
+    <script>
+        function startTimer() {
+            var hours = parseInt(document.getElementById('hours').value);
+            var minutes = parseInt(document.getElementById('minutes').value);
+            var seconds = parseInt(document.getElementById('seconds').value);
+
+            var totalTimeInSeconds = (hours * 3600) + (minutes * 60) + seconds;
+
+            var countdown = document.getElementById('countdown');
+            var alarmSound = document.getElementById('alarmSound');
+
+            var timer = setInterval(function() {
+                if (totalTimeInSeconds <= 0) {
+                    clearInterval(timer);
+                    countdown.innerHTML = "Time's up!";
+                    alarmSound.play(); // Play alarm sound when time is up
+                } else {
+                    var hrs = Math.floor(totalTimeInSeconds / 3600);
+                    var mins = Math.floor((totalTimeInSeconds % 3600) / 60);
+                    var secs = totalTimeInSeconds % 60;
+                    countdown.innerHTML = `${hrs}h ${mins}m ${secs}s`;
+                    totalTimeInSeconds--;
+                }
+            }, 1000);
+        }
+
+        function stopSound() {
+            var alarmSound = document.getElementById('alarmSound');
+            alarmSound.pause();
+            alarmSound.currentTime = 0; // Reset the audio to the start
+        }
+    </script>
+</body>
+</html>
+
+
+
+
 </body>
 </html>
