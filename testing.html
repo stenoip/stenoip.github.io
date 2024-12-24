@@ -41,20 +41,32 @@
             intro.appendChild(introImage);
             document.body.appendChild(intro);
 
-            const audio = new Audio('new_swc_intro.mp3');
-            audio.preload = 'auto';
+            // Create an audio context
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-            function playIntro() {
-                audio.play();
-                document.removeEventListener('click', playIntro);
-            }
+            // Fetch the audio file and decode it
+            fetch('new_swc_intro.mp3')
+                .then(response => response.arrayBuffer())
+                .then(data => audioContext.decodeAudioData(data))
+                .then(buffer => {
+                    const source = audioContext.createBufferSource();
+                    source.buffer = buffer;
+                    source.connect(audioContext.destination);
 
-            document.addEventListener('click', playIntro);
+                    // Play audio on first interaction
+                    function playIntro() {
+                        source.start(0);
+                        document.removeEventListener('click', playIntro);
+                    }
 
-            setTimeout(() => {
-                intro.style.display = 'none';
-                window.location.href = 'https://stenoip.github.io/swc/index-home'; // Redirect to homepage after intro
-            }, 11000); // Hide after 11 seconds
+                    document.addEventListener('click', playIntro);
+
+                    setTimeout(() => {
+                        intro.style.display = 'none';
+                        window.location.href = 'https://stenoip.github.io/swc/index-home'; // Redirect to homepage after intro
+                    }, 11000); // Hide after 11 seconds
+                })
+                .catch(error => console.error('Error loading audio:', error));
         };
     </script>
 </head>
