@@ -1,115 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StenoVids</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-            margin: 0;
-            padding: 0;
+            body.classList.toggle('dark-mode');
+            const header = document.querySelector('header');
+            const footer = document.querySelector('footer');
+            const videoBoxes = document.querySelectorAll('.video-box');
+            const datePlaceholders = document.querySelectorAll('.date-placeholder');
+            
+            header.classList.toggle('dark-mode');
+            footer.classList.toggle('dark-mode');
+            videoBoxes.forEach(box => box.classList.toggle('dark-mode'));
+            datePlaceholders.forEach(date => date.classList.toggle('dark-mode'));
         }
-        header {
-            background-color: #444;
-            padding: 10px 0;
-            text-align: center;
-            border-bottom: 3px solid #ccc;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 2.5em;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-        .video-placeholder {
-            background: #222;
-            color: #fff;
-            text-align: center;
-            font-size: 1.5em;
-            height: 0;
-            padding-bottom: 56.25%;
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .video-placeholder video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        footer {
-            background-color: #444;
-            padding: 10px 0;
-            text-align: center;
-            border-top: 3px solid #ccc;
-        }
-        .theater-seating {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        .seat {
-            width: 50px;
-            height: 50px;
-            background-color: #888;
-            border-radius: 5px;
-        }
-        .seat.occupied {
-            background-color: #d9534f;
-        }
-        .seat.selected {
-            background-color: #5cb85c;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>StenoVids</h1>
-    </header>
-    <div class="container">
-        <!-- First video placeholder -->
-        <div class="video-placeholder">
-            <video controls>
-                <source src="video1.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-
-        <!-- Second video placeholder -->
-        <div class="video-placeholder">
-            <video controls>
-                <source src="videos/firstvid.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-
-        <!-- Third video placeholder -->
-        <div class="video-placeholder">
-            <video controls>
-                <source src="video3.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-
-        <!-- Movie theater seating -->
-        <div class="theater-seating">
-            <div class="seat"></div>
-            <div class="seat occupied"></div>
-            <div class="seat selected"></div>
-            <div class="seat"></div>
-            <div class="seat"></div>
-        </div>
-    </div>
-    <footer>
-        &copy; Stenoip Company, 23rd December 2024
-    </footer>
+    </script>
 </body>
 </html>
