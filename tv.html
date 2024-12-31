@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stenoip Wonder Computer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Google Sans', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            width: 100%;
+        }
+        .search-bar input {
+            padding: 15px;
+            width: 70%;
+            font-size: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .search-bar button {
+            padding: 15px;
+            font-size: 20px;
+            border: none;
+            background-color: #0078d4;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-bar button:hover {
+            background-color: #005ba1;
+        }
+        .suggestions {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 70%;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1;
+        }
+        .suggestions div {
+            padding: 15px;
+            cursor: pointer;
+        }
+        .suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .links button {
+            padding: 20px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            background-color: #0078d4;
+            color: white;
+            border-radius: 5px;
+            margin: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .links button:hover {
+            background-color: #005ba1;
+            transform: translateY(-3px);
+        }
+    </style>
+    <script>
+        const links = [
+            { name: 'Camera', url: 'https://stenoip.github.io/swc/camera' },
+            { name: 'Clocker', url: 'https://stenoip.github.io/swc/clocker' },
+            { name: 'Draw', url: 'https://stenoip.github.io/swc/draw' },
+            { name: 'Games', url: 'https://stenoip.github.io/swc/games' },
+            { name: 'Maps', url: 'https://stenoip.github.io/swc/maps' },
+            { name: 'Media', url: 'https://stenoip.github.io/swc/media' },
+            { name: 'Minecraft 1.9', url: 'https://stenoip.github.io/swc/mineraft1-9' },
+            { name: 'Pet', url: 'https://stenoip.github.io/swc/pet' },
+            { name: 'Phone', url: 'https://stenoip.github.io/swc/phone' },
+            { name: 'Sir Praterich', url: 'https://stenoip.github.io/swc/sir praterich' },
+            { name: 'Space Map', url: 'https://stenoip.github.io/swc/space-map' },
+            { name: 'Testing', url: 'https://stenoip.github.io/swc/testing' },
+            { name: 'Typoe', url: 'https://stenoip.github.io/swc/typoe' },
+            { name: 'Video', url: 'https://stenoip.github.io/swc/video' },
+            { name: 'Quiz', url: 'https://stenoip.github.io/swc/quiz' },
+            { name: 'FlappyBird', url: 'https://stenoip.github.io/swc/flappybird' },
+            { name: 'Old Stenoip', url: 'https://stenoip.github.io/swc/anniversary' },
+            { name: 'Javascript: Foram Dash', url: 'https://stenoip.github.io/swc/p5/foramdash' },
+            { name: 'Javascript: Car', url: 'https://stenoip.github.io/swc/p5/car' },
+            { name: 'Javascript:Draw It', url: 'https://stenoip.github.io/p5/drawing' },
+            { name: 'Javascript: Tomato', url: 'https://stenoip.github.io/swc/p5/tomato' },
+            { name: 'Javascript: Tafeltennis', url: 'https://stenoip.github.io/swc/p5/tafeltennis' },
+            { name: 'Function Plot', url: 'https://stenoip.github.io/swc/kompmasine-functions' },
+            { name: 'Kompmasine Calculator', url: 'https://stenoip.github.io/swc/kompmasine' },
+            { name: 'Boublok Coding', url: 'https://stenoip.github.io/swc/boublok' },
+            { name: 'Tetris', url: 'https://stenoip.github.io/swc/tetris' }
+        ];
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            const focusedElement = document.activeElement;
+            const focusableElements = document.querySelectorAll('button, input');
+
+            let currentIndex = Array.from(focusableElements).indexOf(focusedElement);
+
+            switch (key) {
+                case 'ArrowUp':
+                    if (currentIndex > 0) {
+                        focusableElements[currentIndex - 1].focus();
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (currentIndex < focusableElements.length - 1) {
+                        focusableElements[currentIndex + 1].focus();
+                    }
+                    break;
+                case 'Enter':
+                    focusedElement.click();
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        function search() {
+            const query = document.getElementById('search-input').value;
+            const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
+            if (matchedLink) {
+                window.location.href = matchedLink.url + '?q=' + encodeURIComponent(query);
+            }
+        }
+
+        function showSuggestions() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const suggestionsContainer = document.getElementById('suggestions');
+            suggestionsContainer.innerHTML = '';
+            const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
+            filteredLinks.forEach(link => {
+                const suggestion = document.createElement('div');
+                suggestion.textContent = link.name;
+                suggestion.onclick = () => {
+                    document.getElementById('search-input').value = link.name;
+                    search();
+                };
+                suggestionsContainer.appendChild(suggestion);
+            });
+            suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Stenoip Wonder Computer</h1>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search...">
+            <button onclick="search()">Search</button>
+            <div class="suggestions" id="suggestions" style="display:none;"></div>
+        </div>
+        <div class="links">
+            <button onclick="window.location.href='https://stenoip.github.io/swc/camera'">Camera</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/clocker'">Clocker</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/draw'">Draw</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/games'">Games</button>
+            <button onclick="window.location.href='https://stenoip.github.io/swc/maps'">Maps</button>
+            <!-- Add more buttons as needed -->
+        </div>
+    </div>
+</body>
+[_{{{CITATION{{{_1{](https://github.com/buribalazs/smooth-drag-order/tree/7b40d21d076c3e31765f61481f537beaf4c5ec9f/README.md)
+</html>
