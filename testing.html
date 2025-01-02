@@ -1,76 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stenoip Wonder Computer</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
-        body {
-            font-family: 'Google Sans', sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .intro-animation {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: intro 2s ease-in-out forwards;
-        }
-        .intro-image {
-            width: 300px;
-            height: auto;
-        }
-        @keyframes intro {
-            0% { opacity: 0; transform: scale(0.5); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-    </style>
-    <script>
-        window.onload = function() {
-            const intro = document.createElement('div');
-            intro.className = 'intro-animation';
-            const introImage = document.createElement('img');
-            introImage.src = 'path/to/your/image.jpg'; // Replace with your image path
-            introImage.className = 'intro-image';
-            intro.appendChild(introImage);
-            document.body.appendChild(intro);
-
-            // Create an audio context
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-            // Fetch the audio file and decode it
-            fetch('new_swc_intro.mp3')
-                .then(response => response.arrayBuffer())
-                .then(data => audioContext.decodeAudioData(data))
-                .then(buffer => {
-                    const source = audioContext.createBufferSource();
-                    source.buffer = buffer;
-                    source.connect(audioContext.destination);
-
-                    // Play audio on first interaction
-                    function playIntro() {
-                        source.start(0);
-                        document.removeEventListener('click', playIntro);
-                    }
-
-                    document.addEventListener('click', playIntro);
-
-                    setTimeout(() => {
-                        intro.style.display = 'none';
-                        window.location.href = 'https://stenoip.github.io/swc/index-home'; // Redirect to homepage after intro
-                    }, 11000); // Hide after 11 seconds
-                })
-                .catch(error => console.error('Error loading audio:', error));
-        };
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="swc.png">
+  <title>StenoCam</title>
+  <style>
+    body {
+      font-family: 'Google Sans', Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    video, canvas, .controls {
+      margin: 10px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+    .controls button {
+      background-color: #1a73e8;
+      color: #ffffff;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <p>Music by <a href="https://pixabay.com/users/muzaproduction-24990238/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=13087">Aleksandr Karabanov</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=13087">Pixabay</a></p>
+  <h1>StenoCam</h1>
+  <video id="video" width="640" height="480" autoplay></video>
+  <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+  <div class="controls">
+    <button id="capture-photo">Capture Photo</button>
+    <button id="start-recording">Start Recording</button>
+    <button id="stop-recording" disabled>Stop Recording</button>
+    <button id="switch-camera">Switch Camera</button>
+    <button id="apply-filter">Apply Filter</button>
+    <button id="enable-slow-motion">Slow Motion</button>
+    <button id="enable-pro-mode">Pro Mode</button>
+    <button id="enable-night-mode">Night Mode</button>
+    <button id="enable-panorama-mode">Panorama Mode</button>
+  </div>
+  <a id="download-photo" style="display:none;" download="photo.png">Download Photo</a>
+  <video id="recorded-video" width="640" height="480" controls></video>
+  <a id="download-video" style="display:none;" download="video.webm">Download Video</a>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const capturePhotoButton = document.getElementById('capture-photo');
+    const startRecordingButton = document.getElementById('start-recording');
+    const stopRecordingButton = document.getElementById('stop-recording');
+    const switchCameraButton = document.getElementById('switch-camera');
+    const applyFilterButton = document.getElementById('apply-filter');
+    const enableSlowMotionButton = document.getElementById('enable-slow-motion');
+    const enableProModeButton = document.getElementById('enable-pro-mode');
+    const enableNightModeButton = document.getElementById('enable-night-mode');
+    const enablePanoramaModeButton = document.getElementById('enable-panorama-mode');
+    const downloadPhotoLink = document.getElementById('download-photo');
+    const recordedVideo = document.getElementById('recorded-video');
+    const downloadVideoLink = document.getElementById('download-video');
+    
+    let mediaRecorder;
+    let recordedChunks = [];
+    let currentStream;
+    let currentDeviceIndex = 0;
+    let devices = [];
+
+    navigator.mediaDevices.enumerateDevices()
+      .then(deviceInfos => {
+        devices = deviceInfos.filter(device => device.kind === 'videoinput');
+        initializeStream();
+      })
+      .catch(error => console.error('Error accessing media devices.', error));
+
+    function initializeStream() {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
+      const videoSource = devices[currentDeviceIndex].deviceId;
+      const constraints = {
+        video: { deviceId: videoSource ? { exact: videoSource } : undefined },
+        audio: true
+      };
+
+      navigator.mediaDevices.getUserMedia(constraints)
+        .then(stream => {
+          currentStream = stream;
+          video.srcObject = stream;
+          setupMediaRecorder(stream);
+        })
+        .catch(error => console.error('Error accessing media devices.', error));
+    }
+
+    function setupMediaRecorder(stream) {
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = function(event) {
+        if (event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+      mediaRecorder.onstop = function() {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        recordedChunks = [];
+        const url = URL.createObjectURL(blob);
+        recordedVideo.src = url;
+        downloadVideoLink.style.display = 'inline';
+        downloadVideoLink.href = url;
+      };
+    }
+
+    capturePhotoButton.addEventListener('click', () => {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/png');
+      downloadPhotoLink.style.display = 'inline';
+      downloadPhotoLink.href = dataUrl;
+      canvas.style.display = 'block';
+    });
+
+    applyFilterButton.addEventListener('click', () => {
+      context.filter = 'grayscale(100%)'; // Apply a grayscale filter for demo
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    });
+
+    startRecordingButton.addEventListener('click', () => {
+      mediaRecorder.start();
+      startRecordingButton.disabled = true;
+      stopRecordingButton.disabled = false;
+    });
+
+    stopRecordingButton.addEventListener('click', () => {
+      mediaRecorder.stop();
+      startRecordingButton.disabled = false;
+      stopRecordingButton.disabled = true;
+    });
+
+    switchCameraButton.addEventListener('click', () => {
+      currentDeviceIndex = (currentDeviceIndex + 1) % devices.length;
+      initializeStream();
+    });
+
+    enableSlowMotionButton.addEventListener('click', () => {
+      video.playbackRate = 0.5; // Slow motion
+    });
+
+    enableProModeButton.addEventListener('click', () => {
+      context.filter = 'contrast(150%) brightness(120%)'; // Example Pro mode settings
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    });
+
+    enableNightModeButton.addEventListener('click', () => {
+      context.filter = 'brightness(50%) contrast(200%)'; // Example Night mode settings
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    });
+
+    enablePanoramaModeButton.addEventListener('click', () => {
+      // Panorama mode logic (this is a placeholder)
+      alert('Panorama mode activated.');
+    });
+  </script>
 </body>
 </html>
