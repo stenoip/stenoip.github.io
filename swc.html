@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="10;url=https://stenoip.github.io">
+    <title>Redirecting...</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('https://source.unsplash.com/random/1920x1080?landscape') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        a {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .countdown {
+            font-size: 1.5em;
+            margin-top: 10px;
+            color: #FFD700;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let countdown = 10;
+            const countdownElement = document.getElementById('countdown');
+            const interval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                if (countdown === 0) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Redirecting...</h1>
+        <p>We have moved to a new URL to offer personalized ads and exciting new features. You will be redirected to our new site in <span id="countdown">10</span> seconds.</p>
+        <p>If you are not redirected automatically, follow this <a href="https://stenoip.github.io">link</a>.</p>
+    </div>
+</body>
+</html>
