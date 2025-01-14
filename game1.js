@@ -1,3 +1,16 @@
+// Initialize canvas and context
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// Define the Tile class
 var Tile = function(x, y, face) {
     this.x = x;
     this.y = y;
@@ -8,11 +21,12 @@ var Tile = function(x, y, face) {
 };
 
 Tile.prototype.draw = function() {
-    fill(255, 255, 0);
-    strokeWeight(2);
-    rect(this.x, this.y, this.size, this.size, 10);
+    ctx.fillStyle = 'yellow';
+    ctx.fillRect(this.x, this.y, this.size, this.size);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(this.x, this.y, this.size, this.size);
     if (this.isFaceUp) {
-        image(this.face, this.x, this.y, this.size, this.size);
+        ctx.drawImage(this.face, this.x, this.y, this.size, this.size);
     }
 };
 
@@ -26,24 +40,18 @@ var NUM_COLS = 4;  // Adjust number of columns for better fit
 var NUM_ROWS = 4;  // Adjust number of rows for better fit
 
 // Declare an array of all possible faces
-var faces = [
-    getImage("space/0"),
-    getImage("space/6"),
-    getImage("space/1"),
-    getImage("space/2"),
-    getImage("space/3"),
-    getImage("space/4"),
-    getImage("space/5"),
-    getImage("space/7"),
-    getImage("space/8"),
-    getImage("space/9")
-];
+var faces = [];
+for (let i = 0; i < 10; i++) {
+    let img = new Image();
+    img.src = `https://www.khanacademy.org/computer-programming/space/${i}`;
+    faces.push(img);
+}
 
 // Make an array which has 2 of each, then randomize it
 var possibleFaces = faces.slice(0);
 var selected = [];
 for (var i = 0; i < (NUM_COLS * NUM_ROWS) / 2; i++) {
-    var randomInd = floor(random(possibleFaces.length));
+    var randomInd = Math.floor(Math.random() * possibleFaces.length);
     var face = possibleFaces[randomInd];
     selected.push(face);
     selected.push(face);
@@ -74,8 +82,6 @@ for (var i = 0; i < NUM_COLS; i++) {
     }
 }
 
-background(255, 255, 255);
-
 var numTries = 0;
 var numMatches = 0;
 var flippedTiles = [];
@@ -85,7 +91,10 @@ var delayStartFC = null;
 var currentPlayer = 1;
 var playerScores = [0, 0];
 
-mouseClicked = function() {
+canvas.addEventListener('click', function(event) {
+    var rect = canvas.getBoundingClientRect();
+    var mouseX = event.clientX - rect.left;
+    var mouseY = event.clientY - rect.top;
     for (var i = 0; i < tiles.length; i++) {
         var tile = tiles[i];
         if (tile.isUnderMouse(mouseX, mouseY)) {
@@ -94,7 +103,7 @@ mouseClicked = function() {
                 flippedTiles.push(tile);
                 if (flippedTiles.length === 2) {
                     numTries++;
-                    if (flippedTiles[0].face === flippedTiles[1].face) {
+                    if (flippedTiles[0].face.src === flippedTiles[1].face.src) {
                         flippedTiles[0].isMatch = true;
                         flippedTiles[1].isMatch = true;
                         flippedTiles.length = 0;
@@ -103,17 +112,18 @@ mouseClicked = function() {
                     } else {
                         currentPlayer = currentPlayer === 1 ? 2 : 1;
                     }
-                    delayStartFC = frameCount;
+                    delayStartFC = performance.now();
                 }
             }
-            loop();
         }
     }
-};
+});
 
-draw = function() {
-    background(255, 64, 0);
-    if (delayStartFC && (frameCount - delayStartFC) > 30) {
+function draw() {
+    ctx.fillStyle = 'rgb(255, 64, 0)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (delayStartFC && (performance.now() - delayStartFC) > 1000) {
         for (var i = 0; i < tiles.length; i++) {
             var tile = tiles[i];
             if (!tile.isMatch) {
@@ -122,7 +132,6 @@ draw = function() {
         }
         flippedTiles = [];
         delayStartFC = null;
-        noLoop();
     }
 
     for (var i = 0; i < tiles.length; i++) {
@@ -130,20 +139,22 @@ draw = function() {
     }
 
     // Display player scores
-    fill(0, 0, 0);
-    textSize(20);
-    text("Player 1: " + playerScores[0], 20, 20);
-    text("Player 2: " + playerScores[1], 320, 20);
+    ctx.fillStyle = 'black';
+    ctx.font = '20px Arial';
+    ctx.fillText("Player 1: " + playerScores[0], 20, 20);
+    ctx.fillText("Player 2: " + playerScores[1], 320, 20);
 
     if (numMatches === tiles.length / 2) {
-        textSize(30);
-        text("Game Won!", 20, 575);
+        ctx.font = '30px Arial';
+        ctx.fillText("Game Won!", 20, canvas.height - 80);
         var winner = playerScores[0] > playerScores[1] ? "Player 1" : "Player 2";
         if (playerScores[0] === playerScores[1]) {
             winner = "It's a tie!";
         }
-        text(winner + " wins with " + numTries + " tries!", 20, 605);
+        ctx.fillText(winner + " wins with " + numTries + " tries!", 20, canvas.height - 40);
     }
-};
 
-noLoop();
+    requestAnimationFrame(draw);
+}
+
+draw();
