@@ -1,23 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>106 Puzzle Game</title>
+<html> 
+  <head>
+    <title>Full Page Canvas with Processing.js</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-        }
-        canvas {
-            display: block;
-        }
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
     </style>
-</head>
-<body>
-    <script src="p5.min.js"></script> <!-- Include p5.js library -->
-    <script src="game1.js"></script>
-</body>
+  </head>
+  <body>
+    <!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
+ 
+  <!-- Include the processing.js library -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(window.innerWidth, window.innerHeight); 
+      frameRate(30);
+        
+      // Paste code from Khan Academy here:
+      fill(255, 255, 0);
+      ellipse(width/2, height/2, 200, 200);
+      noFill();
+      stroke(0, 0, 0);
+      strokeWeight(2);
+      arc(width/2, height/2, 150, 100, 0, PI);
+      fill(0, 0, 0);
+      ellipse(width/2 + 50, height/2, 10, 10);
+      ellipse(width/2 - 47, height/2, 10, 10);
+    }};
+    
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+
+  // Adjust canvas size when the window is resized
+  window.onresize = function() {
+    processingInstance.size(window.innerWidth, window.innerHeight);
+  };
+  </script>
 </html>
