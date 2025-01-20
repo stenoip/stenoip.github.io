@@ -135,6 +135,60 @@
             background-color: #005ba1;
             transform: translateY(-3px);
         }
+        /* New Developer Features Styles */
+body.theme-gray {
+    background-color: #e0e0e0;
+    color: #333;
+}
+body.theme-black {
+    background-color: #000;
+    color: #fff;
+}
+body.theme-white {
+    background-color: #fff;
+    color: #000;
+}
+.developer-console {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    overflow-y: auto;
+    z-index: 1000;
+    padding: 10px;
+}
+.developer-editor {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    z-index: 1000;
+    padding: 10px;
+}
+.performance-metrics {
+    display: none;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 10px;
+    z-index: 1000;
+}
+.developer-mode .developer-console,
+.developer-mode .developer-editor,
+.developer-mode .performance-metrics {
+    display: block;
+}
+
     </style>
     <script>
         const links = [
@@ -307,6 +361,7 @@
 </iframe>
         <iframe allow="autoplay" width="100%" height="200" src="https://www.iheart.com/live/1067-lite-fm-1477/?embed=true" frameborder="0"></iframe>
         <div class="links">
+            <div id="clock" class="clock"><label class="clock-label">Current Time</label></div> 
             <button onclick="window.location.href='https://stenoip.github.io/swc/camera'">Camera</button>
             <button onclick="window.location.href='https://stenoip.github.io/swc/clocker'">Clocker</button>
             <button onclick="window.location.href='https://stenoip.github.io/swc/draw'">Draw</button>
@@ -321,7 +376,203 @@
             <button onclick="window.location.href='https://stenoip.github.io/swc/testing'">Testing</button>
             <button onclick="window.location.href='https://stenoip.github.io/swc/typoe'">Typoe</button>
             <button onclick="window.location.href='https://stenoip.github.io/swc/video'">Video</button>
-        
+
+
+
+
+
+
+<!--Settings JS code-->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('settings.json')
+            .then(response => response.json())
+            .then(settings => {
+                document.body.classList.add(`theme-${settings.theme}`);
+
+                // Apply Clock
+                const clockElement = document.getElementById('clock');
+                function updateClock() {
+                    const now = new Date();
+                    const options = settings.clockFormat === '24' ? { hour12: false } : { hour12: true };
+                    clockElement.textContent = now.toLocaleTimeString(undefined, options);
+                }
+                setInterval(updateClock, 1000);
+                updateClock();
+
+                // Apply Language Translation
+                const translations = {
+                    EN: {
+                        header: 'Stenoip Wonder Computer',
+                        searchPlaceholder: 'Search...',
+                        adsLabel: 'Advertisements',
+                        clockLabel: 'Current Time',
+                        buttonCamera: 'Camera',
+                        buttonClocker: 'Clocker',
+                        buttonDraw: 'Draw',
+                        buttonGames: 'Games',
+                        buttonMaps: 'Maps',
+                        buttonMedia: 'Media',
+                        buttonMinecraft: 'Minecraft 1.9',
+                        buttonPet: 'Pet',
+                        buttonPhone: 'Phone',
+                        buttonSirPraterich: 'Sir Praterich',
+                        buttonSpaceMap: 'Space Map',
+                        buttonTesting: 'Testing',
+                        buttonTypoe: 'Typoe',
+                        buttonVideo: 'Video',
+                    },
+                    DE: {
+                        header: 'Stenoip Wunder Computer',
+                        searchPlaceholder: 'Suchen...',
+                        adsLabel: 'Werbung',
+                        clockLabel: 'Aktuelle Zeit',
+                        buttonCamera: 'Kamera',
+                        buttonClocker: 'Uhr',
+                        buttonDraw: 'Zeichnen',
+                        buttonGames: 'Spiele',
+                        buttonMaps: 'Karten',
+                        buttonMedia: 'Medien',
+                        buttonMinecraft: 'Minecraft 1.9',
+                        buttonPet: 'Haustier',
+                        buttonPhone: 'Telefon',
+                        buttonSirPraterich: 'Sir Praterich',
+                        buttonSpaceMap: 'Weltraumkarte',
+                        buttonTesting: 'Testen',
+                        buttonTypoe: 'Typoe',
+                        buttonVideo: 'Video',
+                    },
+                    FR: {
+                        header: 'Ordinateur Merveilleux Stenoip',
+                        searchPlaceholder: 'Chercher...',
+                        adsLabel: 'Publicités',
+                        clockLabel: 'Heure Actuelle',
+                        buttonCamera: 'Caméra',
+                        buttonClocker: 'Horloge',
+                        buttonDraw: 'Dessiner',
+                        buttonGames: 'Jeux',
+                        buttonMaps: 'Cartes',
+                        buttonMedia: 'Médias',
+                        buttonMinecraft: 'Minecraft 1.9',
+                        buttonPet: 'Animal de compagnie',
+                        buttonPhone: 'Téléphone',
+                        buttonSirPraterich: 'Sir Praterich',
+                        buttonSpaceMap: 'Carte Spatiale',
+                        buttonTesting: 'Test',
+                        buttonTypoe: 'Typoe',
+                        buttonVideo: 'Vidéo',
+                    },
+                    ZH: {
+                        header: '斯特诺奇妙计算机',
+                        searchPlaceholder: '搜索...',
+                        adsLabel: '广告',
+                        clockLabel: '当前时间',
+                        buttonCamera: '相机',
+                        buttonClocker: '时钟',
+                        buttonDraw: '绘画',
+                        buttonGames: '游戏',
+                        buttonMaps: '地图',
+                        buttonMedia: '媒体',
+                        buttonMinecraft: 'Minecraft 1.9',
+                        buttonPet: '宠物',
+                        buttonPhone: '电话',
+                        buttonSirPraterich: 'Sir Praterich',
+                        buttonSpaceMap: '空间地图',
+                        buttonTesting: '测试',
+                        buttonTypoe: 'Typoe',
+                        buttonVideo: '视频',
+                    },
+                    ES: {
+                        header: 'Computadora Maravillosa Stenoip',
+                        searchPlaceholder: 'Buscar...',
+                        adsLabel: 'Anuncios',
+                        clockLabel: 'Hora Actual',
+                        buttonCamera: 'Cámara',
+                        buttonClocker: 'Reloj',
+                        buttonDraw: 'Dibujar',
+                        buttonGames: 'Juegos',
+                        buttonMaps: 'Mapas',
+                        buttonMedia: 'Medios',
+                        buttonMinecraft: 'Minecraft 1.9',
+                        buttonPet: 'Mascota',
+                        buttonPhone: 'Teléfono',
+                        buttonSirPraterich: 'Sir Praterich',
+                        buttonSpaceMap: 'Mapa Espacial',
+                        buttonTesting: 'Prueba',
+                        buttonTypoe: 'Typoe',
+                        buttonVideo: 'Video',
+                    },
+                };
+
+                // Applying Translations
+                const lang = translations[settings.language];
+                document.getElementById('header-title').textContent = lang.header;
+                document.getElementById('search-input').placeholder = lang.searchPlaceholder;
+                document.querySelector('.ads-label').textContent = lang.adsLabel;
+                document.querySelector('.clock-label').textContent = lang.clockLabel;
+
+                // Translate buttons
+                document.querySelectorAll('.links button').forEach((button, index) => {
+                    const buttonText = `button${button.textContent.replace(/\s+/g, '')}`;
+                    button.textContent = lang[buttonText];
+                });
+
+                // Apply Developer Mode
+                if (settings.enableConsole) {
+                    const consoleElement = document.createElement('div');
+                    consoleElement.className = 'developer-console';
+                    document.body.appendChild(consoleElement);
+
+                    const originalConsoleLog = console.log;
+                    console.log = function(...args) {
+                        originalConsoleLog(...args);
+                        const logMessage = document.createElement('div');
+                        logMessage.textContent = args.join(' ');
+                        consoleElement.appendChild(logMessage);
+                    };
+                }
+
+                if (settings.enableEditor) {
+                    const editorElement = document.createElement('div');
+                    editorElement.className = 'developer-editor';
+                    document.body.appendChild(editorElement);
+                    editorElement.innerHTML = '<div id="editor"></div>';
+                    const editorScript = document.createElement('script');
+                    editorScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js';
+                    document.head.appendChild(editorScript);
+                    editorScript.onload = () => {
+                        const editor = ace.edit('editor');
+                        editor.setTheme('ace/theme/monokai');
+                        editor.session.setMode('ace/mode/html');
+                        editor.setValue(document.documentElement.outerHTML);
+                        editor.session.on('change', () => {
+                            const newHTML = editor.getValue();
+                            document.open();
+                            document.write(newHTML);
+                            document.close();
+                        });
+                    };
+                }
+
+                if (settings.enablePerformanceMetrics) {
+                    const metricsElement = document.createElement('div');
+                    metricsElement.className = 'performance-metrics';
+                    document.body.appendChild(metricsElement);
+
+                    function updateMetrics() {
+                        const memory = window.performance.memory;
+                        const loadTime = window.performance.timing.domContentLoadedEventEnd - window.performance.timing.navigationStart;
+                        metricsElement.textContent = `Memory: ${(memory.usedJSHeapSize / 1048576).toFixed(2)} MB / ${(memory.totalJSHeapSize / 1048576).toFixed(2)} MB | Load Time: ${loadTime} ms`;
+                    }
+                    setInterval(updateMetrics, 1000);
+                    updateMetrics();
+                }
+            });
+    });
+</script>
+<!-- End of Settings JS code -->
+
+            
 <a href="mailto:customerserviceforstenoip@gmail.com">
     <p>If you need help or want an advertisement, contact customerserviceforstenoip@gmail.com. </p>
 </a>
