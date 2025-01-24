@@ -4,458 +4,221 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StenoMedia</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-    body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-}
-
-header {
-    background-color: #333;
-    color: white;
-    padding: 10px 0;
-    text-align: center;
-}
-
-header h1 {
-    margin: 0;
-}
-
-header nav {
-    margin: 10px 0;
-}
-
-header nav a {
-    color: white;
-    text-decoration: none;
-    margin: 0 10px;
-}
-
-header nav a:hover {
-    text-decoration: underline;
-}
-
-main {
-    margin: 20px;
-}
-
-h2 {
-    color: #333;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    width: 300px;
-    margin: auto;
-}
-
-input, select, textarea, button {
-    margin-bottom: 10px;
-    padding: 10px;
-    font-size: 16px;
-}
-
-button {
-    background-color: #333;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #555;
-}
-
-.video-item {
-    margin-bottom: 20px;
-}
-
-.comments-section {
-    margin-top: 10px;
-}
-
-.comments-section textarea {
-    width: 100%;
-    height: 100px;
-}
-
-.comments-section button {
-    width: 100%;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 10px;
-    text-align: left;
-}
-
-th {
-    background-color: #333;
-    color: white;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-ul li {
-    padding: 5px 0;
-}
-
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #ff4500; /* Fiery colour */
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        nav {
+            background-color: #ff6347; /* Light pink */
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+            position: sticky;
+            top: 3.5rem;
+            z-index: 999;
+            flex-wrap: wrap;
+        }
+        nav a {
+            color: white;
+            text-align: center;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+        }
+        nav a:hover {
+            background-color: #ff7f50;
+            border-radius: 5px;
+        }
+        .container {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section {
+            background-color: #fff;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat {
+            margin-top: 2rem;
+        }
+        footer {
+            background-color: #ff4500;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+        }
+        .icons {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .icons a {
+            color: #fff;
+            margin: 0 0.5rem;
+        }
+        .theme-selector {
+            margin: 1rem 0;
+        }
+        .post-creation {
+            margin: 2rem 0;
+            background-color: #ffefd5;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .post-creation input, .post-creation textarea {
+            width: 100%;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .post-creation button {
+            background-color: #ff4500;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .post-creation button:hover {
+            background-color: #ff6347;
+        }
+        /* Media Queries for Responsiveness */
+        @media (max-width: 1200px) {
+            .container {
+                padding: 1rem;
+            }
+        }
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+            }
+            nav a {
+                padding: 0.5rem;
+            }
+            .post-creation {
+                padding: 0.5rem;
+            }
+        }
+        @media (max-width: 480px) {
+            header {
+                padding: 0.5rem;
+            }
+            nav {
+                padding: 0.5rem 0;
+            }
+            nav a {
+                padding: 0.5rem;
+            }
+            .post-creation input, .post-creation textarea {
+                padding: 0.25rem;
+            }
+            .post-creation button {
+                padding: 0.5rem;
+            }
+            footer {
+                padding: 0.5rem;
+            }
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js" crossorigin></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.2.0/react-router-dom.min.js" crossorigin></script>
-    <script src="https://cdn.jsdelivr.net/npm/babel-standalone/babel.min.js"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
+    <header>
+        <h1>Welcome to StenoMedia</h1>
+    </header>
+    <nav>
+        <a href="#home"><i class="fas fa-home"></i> Home</a>
+        <a href="#profile"><i class="fas fa-user"></i> Profile</a>
+        <a href="#messages"><i class="fas fa-envelope"></i> Messages</a>
+        <a href="#notifications"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+        <select id="theme-selector" class="theme-selector" onchange="changeTheme()">
+            <option value="fiery">Fiery</option>
+            <option value="cool">Cool</option>
+            <option value="dark">Dark</option>
+        </select>
+    </nav>
+    <div class="container">
+        <div class="section" id="home">
+            <h2>Home</h2>
+            <p>Welcome to your feed. Here you'll find the latest updates from your connections.</p>
+        </div>
+        <div class="section" id="profile">
+            <h2>Profile</h2>
+            <p>Manage your profile information and view your posts.</p>
+        </div>
+        <div class="section" id="messages">
+            <h2>Messages</h2>
+            <p>Check your messages and start new conversations.</p>
+        </div>
+        <div class="section" id="notifications">
+            <h2>Notifications</h2>
+            <p>Stay updated with the latest notifications from your friends and activities.</p>
+        </div>
+        <div class="section" id="settings">
+            <h2>Settings</h2>
+            <p>Adjust your account settings and preferences.</p>
+        </div>
+        <div class="section chat">
+            <h2>Chat Room</h2>
+            <iframe src="https://www3.cbox.ws/box/?boxid=3543794&boxtag=A9ZAl0" width="100%" height="450" allowtransparency="yes" allow="autoplay" frameborder="0" marginheight="0" marginwidth="0" scrolling="auto"></iframe>
+        </div>
+        <div class="section post-creation">
+            <h2>Create a Post</h2>
+            <input type="text" placeholder="What's on your mind?">
+            <textarea placeholder="Share your thoughts..."></textarea>
+            <button>Post</button>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2025 StenoMedia. All rights reserved.</p>
+        <div class="icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+    </footer>
 
-        const { BrowserRouter: Router, Route, Switch, Link } = window.ReactRouterDOM;
-
-        // Register Component
-        const Register = () => {
-            const [username, setUsername] = React.useState('');
-            const [email, setEmail] = React.useState('');
-            const [password, setPassword] = React.useState('');
-
-            const handleSubmit = async (event) => {
-                event.preventDefault();
-                const response = await fetch('/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password }),
-                });
-                if (response.ok) alert('User registered successfully!');
-                else alert('Registration failed!');
-            };
-
-            return (
-                <div>
-                    <h2>Register</h2>
-                    <form onSubmit={handleSubmit}>
-                        <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-                        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                        <button type="submit">Register</button>
-                    </form>
-                </div>
-            );
-        };
-
-        // Login Component
-        const Login = () => {
-            const [email, setEmail] = React.useState('');
-            const [password, setPassword] = React.useState('');
-
-            const handleSubmit = async (event) => {
-                event.preventDefault();
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password }),
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    localStorage.setItem('token', data.accessToken);
-                    alert('Login successful!');
-                    window.location.href = '/upload';
-                } else {
-                    alert('Login failed!');
-                }
-            };
-
-            return (
-                <div>
-                    <h2>Login</h2>
-                    <form onSubmit={handleSubmit}>
-                        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                        <button type="submit">Login</button>
-                    </form>
-                </div>
-            );
-        };
-
-        // Upload Component
-        const Upload = () => {
-            const [selectedFile, setSelectedFile] = React.useState(null);
-            const [privacy, setPrivacy] = React.useState('public');
-
-            const handleFileChange = (event) => setSelectedFile(event.target.files[0]);
-            const handlePrivacyChange = (event) => setPrivacy(event.target.value);
-            const handleUpload = async () => {
-                const formData = new FormData();
-                formData.append('file', selectedFile);
-                formData.append('privacy', privacy);
-                const token = localStorage.getItem('token');
-                await fetch('/upload', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData,
-                });
-            };
-
-            return (
-                <div>
-                    <h2>Upload Video</h2>
-                    <input type="file" onChange={handleFileChange} />
-                    <select value={privacy} onChange={handlePrivacyChange}>
-                        <option value="public">Public</option>
-                        <option value="unlisted">Unlisted</option>
-                        <option value="private">Private</option>
-                    </select>
-                    <button onClick={handleUpload}>Upload</button>
-                </div>
-            );
-        };
-
-        // VideoList Component
-        const VideoList = () => {
-            const [videos, setVideos] = React.useState([]);
-            const [comments, setComments] = React.useState({});
-            const [newComment, setNewComment] = React.useState('');
-
-            React.useEffect(() => {
-                async function fetchVideos() {
-                    const response = await fetch('/videos');
-                    const data = await response.json();
-                    setVideos(data);
-                }
-                fetchVideos();
-            }, []);
-
-            const handleCommentChange = (event, videoId) => setComments({ ...comments, [videoId]: event.target.value });
-            const handleCommentSubmit = async (videoId) => {
-                const token = localStorage.getItem('token');
-                await fetch(`/videos/${videoId}/comments`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ text: comments[videoId] }),
-                });
-                setComments({ ...comments, [videoId]: '' });
-            };
-            const handleShare = (videoUrl) => { navigator.clipboard.writeText(`${window.location.origin}${videoUrl}`); alert('Video URL copied to clipboard!'); };
-            const handleEmbed = (videoUrl) => { navigator.clipboard.writeText(`<iframe src="${window.location.origin}${videoUrl}" width="560" height="315" frameborder="0" allowfullscreen></iframe>`); alert('Embed code copied to clipboard!'); };
-
-            return (
-                <div>
-                    <h2>Videos</h2>
-                    {videos.map((video) => (
-                        <div key={video._id} className="video-item">
-                            <h3>{video.title}</h3>
-                            <video src={video.url} controls width="600" />
-                            <div>
-                                <button onClick={() => handleShare(video.url)}>Share</button>
-                                <button onClick={() => handleEmbed(video.url)}>Embed</button>
-                            </div>
-                            <div className="comments-section">
-                                <h4>Comments</h4>
-                                <iframe src="https://www3.cbox.ws/box/?boxid=3543794&boxtag=A9ZAl0" width="100%" height="450" allowtransparency="yes" allow="autoplay" frameborder="0" marginheight="0" marginwidth="0" scrolling="auto"></iframe>	 => 
-                        </div>
-                    ))}
-                </div>
-            );
-        };
-
-        // ControlPanel Component
-        const ControlPanel = () => {
-            const [users, setUsers] = React.useState([]);
-            const [ads, setAds] = React.useState('');
-
-            React.useEffect(() => {
-                async function fetchUsers() {
-                    const response = await fetch('/users');
-                    const data = await response.json();
-                    setUsers(data);
-                }
-                fetchUsers();
-            }, []);
-
-            const handleDelete = async (userId) => {
-                await fetch(`/users/${userId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                });
-                setUsers(users.filter(user => user._id !== userId));
-            };
-            const handleAdsChange = (event) => setAds(event.target.value);
-            const handleAdsSubmit = async () => {
-                await fetch('/update-ads', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                    body: JSON.stringify({ ads }),
-                });
-            };
-
-            return (
-                <div>
-                    <h2>Control Panel</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map((user) => (
-                                <tr key={user._id}>
-                                    <td>{user._id}</td>
-                                    <td>{user.username}</td>
-                                    <td>{user.email}</td>
-                                    <td>
-                                        <button onClick={() => handleDelete(user._id)}>Delete</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <div>
-                        <h3>Manage Ads</h3>
-                        <textarea value={ads} onChange={handleAdsChange} rows="4" cols="50"></textarea>
-                              <button onClick={handleAdsSubmit}>Update Ads</button>
-                    </div>
-                </div>
-            );
-        };
-
-        // GoogleSignIn Component
-        const GoogleSignIn = () => {
-            React.useEffect(() => {
-                window.gapi.load('auth2', () => {
-                    window.gapi.auth2.init({
-                        client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
-                    });
-                });
-            }, []);
-
-            const onSuccess = (googleUser) => {
-                const profile = googleUser.getBasicProfile();
-                console.log('ID: ' + profile.getId());
-                console.log('Name: ' + profile.getName());
-                console.log('Email: ' + profile.getEmail());
-                // Process login data as needed
-            };
-
-            const onFailure = (error) => {
-                console.log(error);
-            };
-
-            return (
-                <div>
-                    <h2>Google Sign-In</h2>
-                    <div className="g-signin2" data-onsuccess="onSuccess" data-onfailure="onFailure"></div>
-                </div>
-            );
-        };
-
-        // Playlists Component
-        const Playlists = () => {
-            const [playlists, setPlaylists] = React.useState([]);
-            const [newPlaylist, setNewPlaylist] = React.useState('');
-            const [selectedVideos, setSelectedVideos] = React.useState([]);
-
-            React.useEffect(() => {
-                async function fetchPlaylists() {
-                    const response = await fetch('/playlists');
-                    const data = await response.json();
-                    setPlaylists(data);
-                }
-                fetchPlaylists();
-            }, []);
-
-            const handlePlaylistChange = (event) => setNewPlaylist(event.target.value);
-            const handleCreatePlaylist = async () => {
-                const response = await fetch('/playlists', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    },
-                    body: JSON.stringify({ name: newPlaylist, videos: selectedVideos }),
-                });
-                if (response.ok) {
-                    setNewPlaylist('');
-                    // Fetch updated playlists
-                }
-            };
-
-            const handleSelectVideo = (videoId) => {
-                if (selectedVideos.includes(videoId)) {
-                    setSelectedVideos(selectedVideos.filter(id => id !== videoId));
-                } else {
-                    setSelectedVideos([...selectedVideos, videoId]);
-                }
-            };
-
-            return (
-                <div>
-                    <h2>Playlists</h2>
-                    <input
-                        type="text"
-                        placeholder="New Playlist Name"
-                        value={newPlaylist}
-                        onChange={handlePlaylistChange}
-                    />
-                    <button onClick={handleCreatePlaylist}>Create Playlist</button>
-                    <ul>
-                        {playlists.map((playlist) => (
-                            <li key={playlist._id}>
-                                {playlist.name}
-                                <ul>
-                                    {playlist.videos.map((video) => (
-                                        <li key={video._id}>{video.title}</li>
-                                    ))}
-                                </ul>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            );
-        };
-
-        const App = () => (
-            <Router>
-                <header>
-                    <h1>StenoMedia</h1>
-                    <nav>
-                        <Link to="/register">Register</Link> | <Link to="/login">Login</Link> | <Link to="/upload">Upload</Link> | <Link to="/videos">Videos</Link> | <Link to="/control-panel">Control Panel</Link> | <Link to="/google-signin">Google Sign-In</Link> | <Link to="/playlists">Playlists</Link>
-                    </nav>
-                </header>
-                <main>
-                    <Switch>
-                        <Route path="/register" component={Register} />
-                        <Route path="/login" component={Login} />
-                        <Route path="/upload" component={Upload} />
-                        <Route path="/videos" component={VideoList} />
-                        <Route path="/control-panel" component={ControlPanel} />
-                        <Route path="/google-signin" component={GoogleSignIn} />
-                        <Route path="/playlists" component={Playlists} />
-                    </Switch>
-                </main>
-            </Router>
-        );
-
-        ReactDOM.render(<App />, document.getElementById('root'));
+    <script>
+        function changeTheme() {
+            const theme = document.getElementById('theme-selector').value;
+            if (theme === 'fiery') {
+                document.body.style.backgroundColor = '#f4f4f4';
+                document.querySelector('header').style.backgroundColor = '#ff4500';
+                document.querySelector('footer').style.backgroundColor = '#ff4500';
+                document.querySelector('nav').style.backgroundColor = '#ff6347';
+            } else if (theme === 'cool') {
+                document.body.style.backgroundColor = '#e0f7fa';
+                document.querySelector('header').style.backgroundColor = '#00acc1';
+                document.querySelector('footer').style.backgroundColor = '#00acc1';
+                document.querySelector('nav').style.backgroundColor = '#00bcd4';
+            } else if (theme === 'dark') {
+                document.body.style.backgroundColor = '#333';
+                document.querySelector('header').style.backgroundColor = '#555';
+                document.querySelector('footer').style.backgroundColor = '#555';
+                document.querySelector('nav').style.backgroundColor = '#666';
+            }
+        }
     </script>
 </body>
 </html>
