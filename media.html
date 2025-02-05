@@ -162,11 +162,24 @@
             <h2>Home</h2>
             <p>Welcome to your feed. Here you'll find the latest updates from your connections.</p>
         </div>
-       <div class="section chat">
-            <h2>Chat Room</h2>
-         <iframe src="https://go.arena.im/embed/chat/stenoip-company/s8PTqKp"style="border: 0; border-radius: 4px; width:800px height:800px "></iframe>
-        
-        </div>
+         <div class="section chat">
+        <h2>Chat Room</h2>
+        <iframe id="chatIframe" src="https://go.arena.im/embed/chat/stenoip-company/s8PTqKp" style="border: 0; border-radius: 4px; width: 800px; height: 800px;"></iframe>
+        <button onclick="toggleFullScreen()">Toggle Full-Screen</button>
+    </div>
+
+    <script>
+        function toggleFullScreen() {
+            var iframe = document.getElementById("chatIframe");
+            if (!document.fullscreenElement) {
+                iframe.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+    </script>
        
         <div class="section" id="settings">
             <h2>Settings</h2>
