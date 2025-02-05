@@ -188,7 +188,14 @@ body.theme-white {
 .developer-mode .performance-metrics {
     display: block;
 }
-
+/*File(Offline) Search  */
+     input[type="text"] { padding: 10px; width: 100%; max-width: 300px; border: 1px solid #ccc; border-radius: 5px; margin-top: 20px; }
+        #suggestions { border: 1px solid #ccc; max-width: 300px; max-height: 150px; overflow-y: auto; display: none; margin-top: 10px; background-color: #fff; border-radius: 5px; }
+        #suggestions div { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        #suggestions div:last-child { border-bottom: none; }
+        #suggestions div:hover { background-color: #f1f1f1; }
+        .hidden { display: none; }
+        /* End of this code*/
     </style>
     <script>
         const links = [
@@ -352,7 +359,98 @@ body.theme-white {
         <div class="ads">
            <a href="https://www.mcdonalds.com/us/en-us.html"> <img src="https://vicimediainc.com/wp-content/uploads/2020/04/Ad-Creative-6.jpg" alt="Ad 1"></a>
            <a href="https://www.motorola.com/us/smartphones-motorola-edge-gen-5/p?ds_rl=1280756&gad_source=1&ds_rl=1280756&gclid=EAIaIQobChMI677r1fjriQMVs11HAR0NIhQSEAAYAiAAEgILEfD_BwE&gclsrc=aw.ds&skuId=1112"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUrqtMZWbEcP4k4oBl_uHYdtvCHZdcCVNy-A&s" alt="Ad 2"></a>
-    <!--Google Ads Verify-->
+   
+     
+     
+     <div class="container">
+        <button id="searchButton" class="button" onclick="toggleSearch()">Turn On Search for SWC Online</button>
+        <div id="searchContainer" class="hidden">
+            <input type="text" id="searchInput" placeholder="Search projects..." onkeyup="searchProjects()" autocomplete="off" />
+            <div id="suggestions"></div>
+        </div>
+    </div>
+
+    <script>
+        const projects = [
+            'camera.html',
+            'swc/clocker.html',
+            'draw.html',
+            'games.html',
+            'maps.html',
+            'media.html',
+            'mineraft1-9.html',
+            'pet.html',
+            'phone.html',
+            'sir-praterich.html',
+            'space-map.html',
+            'testing.html',
+            'typoe.html',
+            'video.html',
+            'quiz.html',
+            'flappybird.html',
+            'anniversary.html',
+            'p5/foramdash.html',
+            'p5/car.html',
+            'p5/drawing.html',
+            'p5/tomato.html',
+            'p5/tafeltennis.html',
+            'kompmasine-functions.html',
+            'kompmasine.html',
+            'boublok.html',
+            'tetris.html',
+            'download.html',
+            'compass.html',
+            'search.html',
+            'my-solar-system.html'
+        ];
+
+        function toggleSearch() {
+            const searchContainer = document.getElementById('searchContainer');
+            const searchButton = document.getElementById('searchButton');
+            if (searchContainer.classList.contains('hidden')) {
+                searchContainer.classList.remove('hidden');
+                searchButton.textContent = 'Turn Off Search';
+            } else {
+                searchContainer.classList.add('hidden');
+                searchButton.textContent = 'Turn On Search';
+            }
+        }
+
+        function searchProjects() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const suggestions = document.getElementById('suggestions');
+            suggestions.innerHTML = '';
+
+            if (input) {
+                const filteredProjects = projects.filter(project => project.toLowerCase().includes(input));
+                filteredProjects.forEach(project => {
+                    const suggestionItem = document.createElement('div');
+                    suggestionItem.textContent = project;
+                    suggestionItem.onclick = () => window.location.href = project;
+                    suggestions.appendChild(suggestionItem);
+                });
+
+                suggestions.style.display = 'block';
+            } else {
+                suggestions.style.display = 'none';
+            }
+        }
+    </script>
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   <!--Google Ads Verify-->
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9575535267287297"
      crossorigin="anonymous"></script>
         </div>
