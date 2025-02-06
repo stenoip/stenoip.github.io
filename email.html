@@ -73,7 +73,7 @@ button:hover {
                 <input type="password" id="registerPassword" placeholder="Password" required>
                 <button type="submit">Register</button>
             </form>
-            <form id="loginForm">
+            <form id="loginForm" action="/login" method="POST">
                 <h2>Login</h2>
                 <input type="text" id="loginUsername" placeholder="Username" required>
                 <input type="password" id="loginPassword" placeholder="Password" required>
@@ -115,8 +115,10 @@ document.getElementById('registerForm').addEventListener('submit', function(even
             document.getElementById('auth').style.display = 'none';
             document.getElementById('emailSection').style.display = 'block';
         }
-    }).catch(error => {
+    })
+    .catch(error => {
         console.error('Error:', error);
+        alert('Registration failed, please try again.');
     });
 });
 
@@ -140,8 +142,10 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
             document.getElementById('emailSection').style.display = 'block';
             loadInbox();
         }
-    }).catch(error => {
+    })
+    .catch(error => {
         console.error('Error:', error);
+        alert('Login failed, please try again.');
     });
 });
 
@@ -163,8 +167,10 @@ document.getElementById('emailForm').addEventListener('submit', function(event) 
     .then(data => {
         alert(data.message);
         loadInbox();
-    }).catch(error => {
+    })
+    .catch(error => {
         console.error('Error:', error);
+        alert('Failed to send email, please try again.');
     });
 });
 
@@ -191,11 +197,12 @@ function loadInbox() {
             `;
             emailsContainer.appendChild(emailDiv);
         });
-    }).catch(error => {
-        console.error('Error:', error);    
-                      });
-});
-
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to load inbox, please try again.');
+    });
+}
 
         
     </script>
