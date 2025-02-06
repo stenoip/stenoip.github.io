@@ -38,15 +38,18 @@
             padding: 20px;
         }
         #editor {
-            width: 100%;
-            height: 400px;
+            width: 793.7007874px;
+            height: 1122.519685px;
             border: 1px solid #ccc;
             padding: 10px;
             resize: none;
+            overflow: auto;
+            white-space: pre-wrap;
         }
         .page-break {
             border-top: 2px dashed #bbb;
             margin: 20px 0;
+            width: 100%;
         }
     </style>
 </head>
@@ -96,7 +99,7 @@
     </div>
     <div id="insertCommands" class="command-bar">
         <button onclick="insertImage()">Insert Image</button>
-        <button onclick="insertYouTubeVideo()">Insert YouTube Video</button>
+        <button onclick="insertYouTubeIframe()">Insert YouTube Iframe</button>
     </div>
     <div id="layoutCommands" class="command-bar">
         <button onclick="document.execCommand('formatBlock', false, 'h1')">Heading 1</button>
@@ -112,7 +115,7 @@
         <button onclick="toggleFullscreen()">Toggle Fullscreen</button>
     </div>
     <div id="editor-container">
-        <div id="editor" contenteditable="true" oninput="checkPageBreak()"></div>
+        <div id="editor" contenteditable="true" oninput="checkPageBreak()" onkeydown="handleTab(event)"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
     <script>
@@ -136,17 +139,12 @@
             }
         }
 
-        function insertYouTubeVideo() {
-            const url = prompt("Enter YouTube video URL:");
-            if (url) {
-                const iframe = document.createElement('iframe');
-                iframe.src = `https://www.youtube.com/embed/${url.split('v=')[1]}`;
-                iframe.width = '560';
-                iframe.height = '315';
-                iframe.frameBorder = '0';
-                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-                iframe.allowFullscreen = true;
-                document.getElementById('editor').appendChild(iframe);
+        function insertYouTubeIframe() {
+            const iframeCode = prompt("Enter YouTube iframe code:");
+            if (iframeCode) {
+                const div = document.createElement('div');
+                div.innerHTML = iframeCode;
+                document.getElementById('editor').appendChild(div);
             }
         }
 
@@ -166,6 +164,13 @@
             }
         }
 
+        function handleTab(event) {
+            if (event.key === 'Tab') {
+                event.preventDefault();
+                document.execCommand('insertText', false, '\t');
+            }
+        }
+
         function checkPageBreak() {
             const editor = document.getElementById('editor');
             const content = editor.textContent || editor.innerText;
@@ -179,6 +184,7 @@
                 const breakPosition = i * 3000;
                 const pageBreak = document.createElement('div');
                 pageBreak.classList.add('page-break');
+                pageBreak.style.width = '100%';
                 const range = document.createRange();
                 range.setStart(editor.firstChild, breakPosition);
                 range.setEnd(editor.firstChild, breakPosition);
@@ -198,11 +204,11 @@
                 const doc = new jsPDF();
                 doc.fromHTML(content, 10, 10);
                 doc.save('document.pdf');
-                              return;
+                return;
             } else if (format === 'doc') {
                 const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
                               "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-                              "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML to Word Document</title></head><body>";
+                              "xmlns='http://www.w3.org/TR/REC-html40'><head>                              <meta charset='utf-8'><title>Export HTML to Word Document</title></head><body>";
                 const footer = "</body></html>";
                 const sourceHTML = header + content + footer;
                 const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
