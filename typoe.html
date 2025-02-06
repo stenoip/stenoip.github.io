@@ -3,417 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typoe - Advanced Text Processor</title>
+    <title>Typoe - Word Processor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
         }
-        .container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            margin: auto;
+        .ribbon {
+            display: flex;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ccc;
         }
-        .menu button {
-            margin: 5px;
-            padding: 10px 15px;
-            font-size: 16px;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .menu button:hover {
-            background-color: #0056b3;
-        }
-        .section {
-            display: none;
-            margin-top: 20px;
-        }
-        textarea {
-            width: 100%;
-            height: 200px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 10px;
-            font-size: 16px;
-            resize: none;
-            margin-top: 20px;
-            white-space: pre-wrap;
-            overflow-wrap: break-word;
-        }
-        .button-container {
-            margin-top: 20px;
-        }
-        .button-container button {
-            background: #007BFF;
-            color: white;
-            border: none;
+        .tab {
             padding: 10px 20px;
-            border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
+        }
+        .tab:hover {
+            background-color: #ddd;
+        }
+        .command-bar {
+            display: none;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ccc;
+            padding: 10px;
+        }
+        .command-bar.active {
+            display: flex;
+        }
+        .command-bar button,
+        .command-bar select,
+        .command-bar input {
             margin-right: 10px;
         }
-        .button-container button:hover {
-            background: #0056b3;
+        #editor-container {
+            padding: 20px;
         }
-        .output {
-            margin-top: 20px;
-            font-size: 18px;
+        #editor {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            resize: none;
         }
-        #videoUpload {
-            display: none;
-        }
-        #imageUpload {
-            display: none;
+        .page-break {
+            border-top: 2px dashed #bbb;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Typoe - Advanced Text Processor</h1>
-        <div class="menu">
-            <button onclick="showSection('files')">Files</button>
-            <button onclick="showSection('home')">Home</button>
-            <button onclick="showSection('input')">Input</button>
-            <button onclick="showSection('draw')">Draw</button>
-            <button onclick="showSection('view')">View</button>
-        </div>
-        <div id="files" class="section">
-            <button onclick="newDocument()">New</button>
-            <button onclick="openDocument()">Open</button>
-            <button onclick="saveDocument()">Save</button>
-            <button onclick="saveAsDocument()">Save As</button>
-            <button onclick="printDocument()">Print</button>
-        </div>
-        <div id="home" class="section">
-            <button onclick="cutText()">Cut</button>
-            <button onclick="copyText()">Copy</button>
-            <button onclick="pasteText()">Paste</button>
-            <button onclick="changeFont('Arial')">Arial</button>
-            <button onclick="changeFont('Times New Roman')">Times New Roman</button>
-            <button onclick="changeFont('Courier New')">Courier New</button>
-            <button onclick="changeFont('Georgia')">Georgia</button>
-            <button onclick="changeFont('Verdana')">Verdana</button>
-            <button onclick="changeFont('Comic Sans MS')">Comic Sans MS</button>
-            <button onclick="changeFont('Tahoma')">Tahoma</button>
-            <button onclick="changeFontSize(10)">10px</button>
-            <button onclick="changeFontSize(12)">12px</button>
-            <button onclick="changeFontSize(14)">14px</button>
-            <button onclick="changeFontSize(16)">16px</button>
-            <button onclick="changeFontSize(18)">18px</button>
-            <button onclick="changeFontSize(20)">20px</button>
-            <button onclick="changeFontSize(24)">24px</button>
-            <button onclick="boldText()">Bold</button>
-            <button onclick="italicText()">Italic</button>
-            <button onclick="underlineText()">Underline</button>
-            <button onclick="alignText('left')">Align Left</button>
-            <button onclick="alignText('center')">Align Center</button>
-            <button onclick="alignText('right')">Align Right</button>
-            <button onclick="alignText('justify')">Justify</button>
-        </div>
-        <div id="input" class="section">
-            <button onclick="handleText()">Process Text</button>
-            <button onclick="charCount()">Character Count</button>
-            <button onclick="wordCount()">Word Count</button>
-            <button onclick="reverseText()">Reverse Text</button>
-            <button onclick="upperCaseText()">Upper Case</button>
-            <button onclick="lowerCaseText()">Lower Case</button>
-            <button onclick="uploadVideo()">Upload YouTube Video</button>
-            <button onclick="uploadImage()">Upload Image</button>
-            <input type="file" id="videoUpload" accept="video/*">
-            <input type="file" id="imageUpload" accept="image/*">
-        </div>
-        <div id="draw" class="section">
-            <button onclick="drawFreehand()">Freehand Drawing</button>
-            <button onclick="insertShape('circle')">Circle</button>
-            <button onclick="insertShape('rectangle')">Rectangle</button>
-            <button onclick="addTextBox()">Text Box</button>
-            <button onclick="chooseColor()">Choose Color</button>
-        </div>
-        <div id="view" class="section">
-            <button onclick="zoomIn()">Zoom In</button>
-            <button onclick="zoomOut()">Zoom Out</button>
-            <button onclick="toggleFullScreen()">Full Screen</button>
-            <button onclick="toggleRuler()">Ruler</button>
-            <button onclick="dictate()">Dictate</button>
-            <button onclick="changeLanguage()">Change Spell Checker Language</button>
-        </div>
-        <textarea id="textInput" placeholder="Type something..."></textarea>
-        <div class="button-container">
-            <button onclick="downloadAsText()">Download as Text</button>
-            <button onclick="downloadAsPDF()">Download as PDF</button>
-            <button onclick="downloadAsDOCX()">Download as DOCX</button>
-        </div>
-        <div class="output" id="output"></div>
+    <div class="ribbon">
+        <div class="tab" id="fileTab" onclick="showCommands('fileCommands')">File</div>
+        <div class="tab" id="homeTab" onclick="showCommands('homeCommands')">Home</div>
+        <div class="tab" id="insertTab" onclick="showCommands('insertCommands')">Insert</div>
+        <div class="tab" id="layoutTab" onclick="showCommands('layoutCommands')">Page Layout</div>
+        <div class="tab" id="referencesTab" onclick="showCommands('referencesCommands')">References</div>
+        <div class="tab" id="reviewTab" onclick="showCommands('reviewCommands')">Review</div>
+        <div class="tab" id="viewTab" onclick="showCommands('viewCommands')">View</div>
     </div>
-<script>
-  document.addEventListener('DOMContentLoaded', (event) => {
-    if (localStorage.getItem('textInput')) {
-        document.getElementById('textInput').value = localStorage.getItem('textInput');
-    }
+    <div id="fileCommands" class="command-bar">
+        <button onclick="saveAs('txt')">Save as .txt</button>
+        <button onclick="saveAs('pdf')">Save as .pdf</button>
+        <button onclick="saveAs('doc')">Save as .doc</button>
+        <input type="text" id="docTitle" placeholder="Document Title" oninput="changeTitle()">
+    </div>
+    <div id="homeCommands" class="command-bar">
+        <button onclick="document.execCommand('bold')">Bold</button>
+        <button onclick="document.execCommand('italic')">Italic</button>
+        <button onclick="document.execCommand('underline')">Underline</button>
+        <button onclick="document.execCommand('insertUnorderedList')">Bullets</button>
+        <button onclick="document.execCommand('insertOrderedList')">Numbering</button>
+        <button onclick="document.execCommand('justifyLeft')">Align Left</button>
+        <button onclick="document.execCommand('justifyCenter')">Align Center</button>
+        <button onclick="document.execCommand('justifyRight')">Align Right</button>
+        <select onchange="document.execCommand('fontSize', false, this.value)">
+            <option value="1">10pt</option>
+            <option value="2">13pt</option>
+            <option value="3">16pt</option>
+            <option value="4">18pt</option>
+            <option value="5">24pt</option>
+            <option value="6">32pt</option>
+            <option value="7">48pt</option>
+        </select>
+        <select onchange="document.execCommand('fontName', false, this.value)">
+            <option value="Arial">Arial</option>
+            <option value="Courier">Courier</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Verdana">Verdana</option>
+        </select>
+        <input type="color" onchange="document.execCommand('foreColor', false, this.value)">
+    </div>
+    <div id="insertCommands" class="command-bar">
+        <button onclick="insertImage()">Insert Image</button>
+        <button onclick="insertYouTubeVideo()">Insert YouTube Video</button>
+    </div>
+    <div id="layoutCommands" class="command-bar">
+        <button onclick="document.execCommand('formatBlock', false, 'h1')">Heading 1</button>
+        <button onclick="document.execCommand('formatBlock', false, 'h2')">Heading 2</button>
+    </div>
+    <div id="referencesCommands" class="command-bar">
+        <button onclick="document.execCommand('createLink', false, prompt('Enter URL:'))">Insert Link</button>
+    </div>
+    <div id="reviewCommands" class="command-bar">
+        <button onclick="toggleSpellCheck()">Toggle Spell Check</button>
+    </div>
+    <div id="viewCommands" class="command-bar">
+        <button onclick="toggleFullscreen()">Toggle Fullscreen</button>
+    </div>
+    <div id="editor-container">
+        <div id="editor" contenteditable="true" oninput="checkPageBreak()"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            showCommands('homeCommands');
+        });
 
-    function saveText() {
-        localStorage.setItem('textInput', document.getElementById('textInput').value);
-    }
-
-    document.getElementById('textInput').addEventListener('input', saveText);
-});
-
-function showSection(section) {
-    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
-    document.getElementById(section).style.display = 'block';
-}
-
-function newDocument() {
-    document.getElementById('textInput').value = '';
-    saveText();
-}
-
-function openDocument() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.txt';
-    input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = e => {
-            document.getElementById('textInput').value = e.target.result;
-            saveText();
-        };
-        reader.readAsText(file);
-    };
-    input.click();
-}
-
-function saveDocument() {
-    const textInput = document.getElementById('textInput').value;
-    const blob = new Blob([textInput], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "document.txt";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-function saveAsDocument() {
-    const textInput = document.getElementById('textInput').value;
-    const blob = new Blob([textInput], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = prompt("Enter new file name:", "document.txt");
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-function printDocument() {
-    const textInput = document.getElementById('textInput').value;
-    const printWindow = window.open('', '', 'height=400,width=800');
-    printWindow.document.write('<pre>' + textInput + '</pre>');
-    printWindow.document.close();
-    printWindow.print();
-}
-
-function cutText() {
-    document.execCommand('cut');
-    saveText();
-}
-
-function copyText() {
-    document.execCommand('copy');
-}
-
-function pasteText() {
-    document.execCommand('paste');
-    saveText();
-}
-
-function changeFont(font) {
-    document.getElementById('textInput').style.fontFamily = font;
-    saveText();
-}
-
-function changeFontSize(size) {
-    document.getElementById('textInput').style.fontSize = size + 'px';
-    saveText();
-}
-
-function boldText() {
-    const textInput = document.getElementById('textInput');
-    textInput.style.fontWeight = textInput.style.fontWeight === 'bold' ? 'normal' : 'bold';
-    saveText();
-}
-
-function italicText() {
-    const textInput = document.getElementById('textInput');
-    textInput.style.fontStyle = textInput.style.fontStyle === 'italic' ? 'normal' : 'italic';
-    saveText();
-}
-
-function underlineText() {
-    const textInput = document.getElementById('textInput');
-    textInput.style.textDecoration = textInput.style.textDecoration === 'underline' ? 'none' : 'underline';
-    saveText();
-}
-
-function alignText(alignment) {
-    document.getElementById('textInput').style.textAlign = alignment;
-    saveText();
-}
-
-function handleText() {
-    const textInput = document.getElementById('textInput').value;
-    const outputDiv = document.getElementById('output');
-
-    const charCount = textInput.length;
-    const wordCount = textInput.trim().split(/\s+/).length;
-    const reversedText = textInput.split('').reverse().join('');
-    const upperCaseText = textInput.toUpperCase();
-    const lowerCaseText = textInput.toLowerCase();
-
-    outputDiv.innerHTML = `
-        <p><strong>Character Count:</strong> ${charCount}</p>
-        <p><strong>Word Count:</strong> ${wordCount}</p>
-        <p><strong>Reversed Text:</strong> ${reversedText}</p>
-        <p><strong>Upper Case:</strong> ${upperCaseText}</p>
-        <p><strong>Lower Case:</strong> ${lowerCaseText}</p>
-    `;
-}
-
-function handleKeyDown(e) {
-    if (e.key === 'Tab') {
-        e.preventDefault();
-        const textArea = document.getElementById('textInput');
-        const start = textArea.selectionStart;
-        const end = textArea.selectionEnd;
-
-        textArea.value = textArea.value.substring(0, start) + '\t' + textArea.value.substring(end);
-        textArea.selectionStart = textArea.selectionEnd = start + 1;
-
-        saveText();
-    }
-}
-
-function addPageBreak() {
-    const textInput = document.getElementById('textInput');
-    const charLimit = 1000;
-    const pages = Math.ceil(textInput.value.length / charLimit);
-    textInput.value = textInput.value.match(new RegExp(`(.|[\r\n]){1,${charLimit}}`, 'g')).join('\n\n--- Page Break ---\n\n');
-    saveText();
-}
-
-document.getElementById('textInput').addEventListener('keydown', handleKeyDown);
-document.getElementById('textInput').addEventListener('input', addPageBreak);
-
-function drawFreehand() {
-    // Implement freehand drawing functionality
-}
-
-function insertShape(shape) {
-    // Implement shape insertion functionality
-}
-
-function addTextBox() {
-    // Implement adding text boxes functionality
-}
-
-function chooseColor() {
-    // Implement color picker functionality
-}
-
-function zoomIn() {
-    const textInput = document.getElementById('textInput');
-    const currentSize = parseInt(window.getComputedStyle(textInput).fontSize);
-    textInput.style.fontSize = (currentSize + 2) + 'px';
-    saveText();
-}
-
-function zoomOut() {
-    const textInput = document.getElementById('textInput');
-    const currentSize = parseInt(window.getComputedStyle(textInput).fontSize);
-    textInput.style.fontSize = (currentSize - 2) + 'px';
-    saveText();
-}
-
-function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
+        function showCommands(commandId) {
+            const commandBars = document.querySelectorAll('.command-bar');
+            commandBars.forEach(cb => cb.classList.remove('active'));
+            document.getElementById(commandId).classList.add('active');
         }
-    }
-}
 
-function toggleRuler() {
-    // Implement ruler toggle functionality
-}
+        function insertImage() {
+            const url = prompt("Enter image URL:");
+            if (url) {
+                const img = document.createElement('img');
+                img.src = url;
+                img.style.maxWidth = '100%';
+                document.getElementById('editor').appendChild(img);
+            }
+        }
 
-function clearText() {
-    document.getElementById('textInput').value = '';
-    document.getElementById('output').innerHTML = '';
-    saveText();
-}
+        function insertYouTubeVideo() {
+            const url = prompt("Enter YouTube video URL:");
+            if (url) {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${url.split('v=')[1]}`;
+                iframe.width = '560';
+                iframe.height = '315';
+                iframe.frameBorder = '0';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                iframe.allowFullscreen = true;
+                document.getElementById('editor').appendChild(iframe);
+            }
+        }
 
-function downloadAsText() {
-    const textInput = document.getElementById('textInput').value;
-    const blob = new Blob([textInput], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "text.txt";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
+        function toggleSpellCheck() {
+            const editor = document.getElementById('editor');
+            editor.spellcheck = !editor.spellcheck;
+            editor.focus();
+        }
 
-function downloadAsPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const textInput = document.getElementById('textInput').value;
-    doc.text(textInput, 10, 10);
-    doc.save("text.pdf");
-}
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
 
-function downloadAsDOCX() {
-    const textInput = document.getElementById('textInput').value;
-    const doc = new window.docxtemplater();
-    doc.loadZip(new JSZip());
-    doc.setData({ text: textInput });
-    doc.render();
-    const out = doc.getZip().generate({ type: "blob" });
-    saveAs(out, "text.docx");
-}
+        function checkPageBreak() {
+            const editor = document.getElementById('editor');
+            const content = editor.textContent || editor.innerText;
+            const pageCount = Math.ceil(content.length / 3000);
 
-function uploadVideo() {
-    document.getElementById('videoUpload').click();
-}
+            // Clear existing page breaks
+            document.querySelectorAll('.page-break').forEach(pb => pb.remove());
 
-function uploadImage() {
-    document.getElementById('imageUpload').click();
-}
+            // Add page breaks
+            for (let i = 1; i < pageCount; i++) {
+                const breakPosition = i * 3000;
+                const pageBreak = document.createElement('div');
+                pageBreak.classList.add('page-break');
+                const range = document.createRange();
+                range.setStart(editor.firstChild, breakPosition);
+                range.setEnd(editor.firstChild, breakPosition);
+                range.insertNode(pageBreak);
+            }
+        }
 
-function dictate() {
-    // Implement dictation functionality
-}
+        function saveAs(format) {
+            const editor = document.getElementById('editor');
+            const content = editor.innerHTML;
+            let blob;
+            
+            if (format === 'txt') {
+                blob = new Blob([content], { type: 'text/plain' });
+            } else if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.fromHTML(content, 10, 10);
+                doc.save('document.pdf');
+                              return;
+            } else if (format === 'doc') {
+                const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+                              "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+                              "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML to Word Document</title></head><body>";
+                const footer = "</body></html>";
+                const sourceHTML = header + content + footer;
+                const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+                const fileDownload = document.createElement("a");
+                document.body.appendChild(fileDownload);
+                fileDownload.href = source;
+                fileDownload.download = 'document.doc';
+                fileDownload.click();
+                document.body.removeChild(fileDownload);
+                return;
+            }
 
-function changeLanguage() {
-    // Implement spell checker language change functionality
-}
-    
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = 'document.' + format;
+            a.click();
+        }
 
-</script>
+        function changeTitle() {
+            const docTitle = document.getElementById('docTitle').value;
+            document.title = docTitle;
+        }
+    </script>
 </body>
-  
 </html>
