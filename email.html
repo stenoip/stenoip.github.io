@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MailSteno</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input, textarea {
+    resize: none;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#inbox {
+    margin-top: 20px;
+}
+
+.email {
+    background-color: #e9e9e9;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+
+  
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>MailSteno</h1>
+        <div id="auth">
+            <form id="registerForm">
+                <h2>Register</h2>
+                <input type="text" id="registerUsername" placeholder="Username" required>
+                <input type="password" id="registerPassword" placeholder="Password" required>
+                <button type="submit">Register</button>
+            </form>
+            <form id="loginForm">
+                <h2>Login</h2>
+                <input type="text" id="loginUsername" placeholder="Username" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+        <div id="emailSection" style="display:none;">
+            <form id="emailForm">
+                <h2>Compose Email</h2>
+                <input type="email" id="emailRecipient" placeholder="Recipient" required>
+                <input type="text" id="emailSubject" placeholder="Subject" required>
+                <textarea id="emailBody" placeholder="Body" required></textarea>
+                <input type="password" id="emailPassword" placeholder="Email Password" required>
+                <button type="submit">Send</button>
+            </form>
+            <div id="inbox">
+                <h2>Inbox</h2>
+                <div id="emails"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+document.getElementById('registerForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const username = document.getElementById('registerUsername').value;
+    const password = document.getElementById('registerPassword').value;
+
+    fetch('/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    });
+});
+
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.message === 'Login successful!') {
+            document.getElementById('auth').style.display = 'none';
+            document.getElementById('emailSection').style.display = 'block';
+            loadInbox();
+        }
+    });
+});
+
+document.getElementById('emailForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const recipient = document.getElementById('emailRecipient').value;
+    const subject = document.getElementById('emailSubject').value;
+    const body = document.getElementById('emailBody').value;
+    const password = document.getElementById('emailPassword').value;
+
+    fetch('/send_email', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ recipient, subject, body, password }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        loadInbox();
+    });
+});
+
+function loadInbox() {
+    fetch('/inbox', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(emails => {
+        const emailsContainer = document.getElementById('emails');
+        emailsContainer.innerHTML = '';
+        emails.forEach(email => {
+            const emailDiv = document.createElement('div');
+            emailDiv.classList.add('email');
+            emailDiv.innerHTML = `
+                <strong>From:</strong> ${email.sender} <br>
+                <strong>Subject:</strong> ${email.subject} <br>
+                <strong>Body:</strong> ${email.body} <br>
+                <strong>Timestamp:</strong> ${new Date(email.timestamp).toLocaleString()}
+            `;
+            emailsContainer.appendChild(emailDiv);
+        });
+    });
+}
+
+    </script>
+</body>
+</html>
