@@ -111,6 +111,12 @@ document.getElementById('registerForm').addEventListener('submit', function(even
     .then(response => response.json())
     .then(data => {
         alert(data.message);
+        if (data.message === 'User registered successfully!') {
+            document.getElementById('auth').style.display = 'none';
+            document.getElementById('emailSection').style.display = 'block';
+        }
+    }).catch(error => {
+        console.error('Error:', error);
     });
 });
 
@@ -134,6 +140,8 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
             document.getElementById('emailSection').style.display = 'block';
             loadInbox();
         }
+    }).catch(error => {
+        console.error('Error:', error);
     });
 });
 
@@ -155,6 +163,8 @@ document.getElementById('emailForm').addEventListener('submit', function(event) 
     .then(data => {
         alert(data.message);
         loadInbox();
+    }).catch(error => {
+        console.error('Error:', error);
     });
 });
 
@@ -181,8 +191,11 @@ function loadInbox() {
             `;
             emailsContainer.appendChild(emailDiv);
         });
-    });
-}
+    }).catch(error => {
+        console.error('Error:', error);    
+                      });
+});
+
 
         
     </script>
