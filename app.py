@@ -7,7 +7,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import imaplib
-import email as em
+import email
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mailsteno.db'
@@ -32,7 +32,7 @@ def load_user(user_id):
 def register():
     data = request.get_json()
     username = data['username']
-    email = f"{username}@semail.com"
+    email = f"{data['username']}@semail.com"
     password = generate_password_hash(data['password'])
     new_user = User(username=username, email=email, password_hash=password)
     db.session.add(new_user)
@@ -63,7 +63,7 @@ def send_email():
     body = data['body']
     
     sender_email = current_user.email
-    sender_password = data['password']
+    sender_password = data['password']  # Use a secure method to store and retrieve email password
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
@@ -101,7 +101,7 @@ def inbox():
         for i in id_list:
             result, message_data = mail.fetch(i, '(RFC822)')
             raw_email = message_data[0][1].decode('utf-8')
-            msg = em.message_from_string(raw_email)
+            msg = email.message_from_string(raw_email)
 
             email_data = {
                 'sender': msg['from'],
