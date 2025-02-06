@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +6,8 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, curren
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import imaplib
+import email
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mailsteno.db'
@@ -79,10 +81,40 @@ def send_email():
     except Exception as e:
         return jsonify({'message': str(e)}), 500
 
-@app.route('/inbox', methods=['GET'])
+@app.route('/inbox', methods=['POST'])
 def inbox():
-    # Logic to retrieve emails from the server for the authenticated user
-    return jsonify([]), 200
+    if not current_user.is_authenticated:
+        return jsonify({'message': 'User not authenticated!'}), 401
+    data = request.get_json()
+    email_password = data['password']
+
+    try:
+        mail = imaplib.IMAP4_SSL('imap.yourmailserver.com')
+        mail.login(current_user.email, email_password)
+        mail.select('inbox')
+
+        result, data = mail.search(None, 'ALL')
+        mail_ids = data[0]
+        id_list = mail_ids.split()
+
+        emails = []
+        for i in id_list:
+            result, message_data = mail.fetch(i, '(RFC822)')
+            raw_email = message_data[0][1].decode('utf-8')
+            msg = email.message_from_string(raw_email)
+
+            email_data = {
+                'sender': msg['from'],
+                'subject': msg['subject'],
+                'body': msg.get_payload(decode=True).decode('utf-8'),
+                'timestamp': msg['date']
+            }
+            emails.append(email_data)
+        
+        mail.logout()
+        return jsonify(emails), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
 
 if __name__ == '__main__':
     db.create_all()
