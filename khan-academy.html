@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ball-Scroller</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+    }
+    #mycanvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="mycanvas"></canvas> 
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+    var programCode = function(processingInstance) {
+      with (processingInstance) {
+        size(window.innerWidth, window.innerHeight); 
+        frameRate(60);
+        
+        var playerX = width / 4;
+        var playerY = height - 50;
+        var playerSize = 50;
+        var gravity = 1;
+        var velocityY = 0;
+        var jumpStrength = -15;
+        var obstacles = [];
+        var score = 0;
+
+        // Player character design
+        function drawPlayer() {
+          fill(255, 0, 0);
+          ellipse(playerX, playerY, playerSize, playerSize);
+          fill(0);
+          ellipse(playerX - 10, playerY - 10, 10, 10);
+          ellipse(playerX + 10, playerY - 10, 10, 10);
+          arc(playerX, playerY + 10, 20, 20, 0, PI);
+        }
+
+        // Obstacle design
+        function drawObstacles() {
+          fill(0, 255, 0);
+          for (var i = 0; i < obstacles.length; i++) {
+            rect(obstacles[i].x, obstacles[i].y, obstacles[i].w, obstacles[i].h);
+            obstacles[i].x -= 5; // Move obstacle to the left
+          }
+        }
+
+        // Add new obstacles
+        function addObstacle() {
+          var obstacleHeight = 20 + Math.random() * 100;
+          obstacles.push({x: width, y: height - obstacleHeight, w: 20, h: obstacleHeight});
+        }
+
+        function keyPressed() {
+          if (key == ' ' && playerY >= height - 50) {
+            velocityY = jumpStrength;
+          }
+        }
+
+        function draw() {
+          background(255);
+          
+          // Apply gravity
+          playerY += velocityY;
+          velocityY += gravity;
+
+          // Prevent player from falling through the ground
+          if (playerY > height - 50) {
+            playerY = height - 50;
+            velocityY = 0;
+          }
+
+          // Draw player and obstacles
+          drawPlayer();
+          drawObstacles();
+
+          // Remove off-screen obstacles and add new ones
+          if (obstacles.length > 0 && obstacles[0].x < -20) {
+            obstacles.shift();
+            addObstacle();
+          }
+
+          // Increase score
+          score++;
+          fill(0);
+          text("Score: " + score, 10, 20);
+
+          // Collision detection
+          for (var i = 0; i < obstacles.length; i++) {
+            if (playerX + playerSize / 2 > obstacles[i].x && playerX - playerSize / 2 < obstacles[i].x + obstacles[i].w &&
+                playerY + playerSize / 2 > obstacles[i].y) {
+              // Game over
+              fill(0);
+              textSize(32);
+              text("Game Over", width / 2 - 80, height / 2);
+              noLoop();
+            }
+          }
+        }
+
+        // Add initial obstacles
+        for (var i = 0; i < 5; i++) {
+          addObstacle();
+        }
+      }
+    };
+
+    // Get the canvas that ProcessingJS will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function to ProcessingJS constructor
+    var processingInstance = new Processing(canvas, programCode); 
+  </script>
+</body>
+</html>
