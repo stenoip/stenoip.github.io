@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinity Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .counter {
+            font-size: 48px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .word-form {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="counter">0</div>
+    <div class="controls">
+        <label for="rate">Rate (numbers per second): </label>
+        <input type="text" id="rate" value="1,000" pattern="[0-9,]+" title="Enter a number with commas (e.g., 1,000,000)">
+        <button id="startButton">Start</button>
+        <button id="pauseButton">Pause</button>
+    </div>
+    <div class="word-form">Zero</div>
+    <script>
+        let count = 0;
+        let interval = 1000 / parseNumber(document.getElementById('rate').value);
+        let timer;
+        const counterElement = document.querySelector('.counter');
+        const wordFormElement = document.querySelector('.word-form');
+
+        function formatNumber(number) {
+            return number.toLocaleString('en-US');
+        }
+
+        function numberToWords(number) {
+            const words = [
+                'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 
+                'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 
+                'eighteen', 'nineteen'
+            ];
+            const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+            const scales = ['', 'thousand', 'million', 'billion', 'trillion'];
+
+            if (number < 20) {
+                return words[number];
+            }
+
+            const wordArray = [];
+            let scaleIndex = 0;
+
+            while (number > 0) {
+                const chunk = number % 1000;
+                if (chunk) {
+                    const chunkWords = chunkToWords(chunk);
+                    if (scaleIndex > 0) {
+                        chunkWords.push(scales[scaleIndex]);
+                    }
+                    wordArray.unshift(chunkWords.join(' '));
+                }
+                number = Math.floor(number / 1000);
+                scaleIndex++;
+            }
+
+            return wordArray.join(' ');
+
+            function chunkToWords(chunk) {
+                const chunkWords = [];
+                if (chunk >= 100) {
+                    chunkWords.push(words[Math.floor(chunk / 100)]);
+                    chunkWords.push('hundred');
+                    chunk %= 100;
+                }
+                if (chunk >= 20) {
+                    chunkWords.push(tens[Math.floor(chunk / 10)]);
+                    chunk %= 10;
+                }
+                if (chunk > 0) {
+                    chunkWords.push(words[chunk]);
+                }
+                return chunkWords;
+            }
+        }
+
+        function parseNumber(numberStr) {
+            return parseInt(numberStr.replace(/,/g, ''), 10);
+        }
+
+        function updateCounter() {
+            count += 1;
+            counterElement.textContent = formatNumber(count);
+            wordFormElement.textContent = numberToWords(count);
+        }
+
+        document.getElementById('startButton').addEventListener('click', function() {
+            clearInterval(timer);
+            interval = 1000 / parseNumber(document.getElementById('rate').value);
+            timer = setInterval(updateCounter, interval);
+        });
+
+        document.getElementById('pauseButton').addEventListener('click', function() {
+            clearInterval(timer);
+        });
+    </script>
+</body>
+</html>
