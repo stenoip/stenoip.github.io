@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Mummy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5dc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #4682b4;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #ffffff;
+        }
+
+        .content {
+            margin: 20px;
+            text-align: center;
+        }
+
+        .content p {
+            font-size: 1.2em;
+            color: #333333;
+        }
+
+        .placeholder {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            background-color: #8b4513;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: #ffffff;
+            font-size: 1.5em;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .export-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .export-button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            background-color: #4682b4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Happy Birthday!</h1>
+    </header>
+    <div class="content">
+        <div class="placeholder">Picture Placeholder</div>
+        <p>Wishing you a day filled with love, joy, and all your favorite things. Have an amazing birthday celebration!</p>
+    </div>
+ 
+    <footer>
+        <p>&copy; 2025 Birthday Celebration</p>
+    </footer>
+    <script>
+        function exportPage() {
+            const element = document.createElement('a');
+            const content = document.documentElement.outerHTML;
+            const file = new Blob([content], { type: 'text/html' });
+            element.href = URL.createObjectURL(file);
+            element.download = 'birthday_page.html';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+    </script>
+   <div class="button-container">
+        <button class="export-button" onclick="exportPage()">Export to Friends</button>
+    </div>
+</body>
+</html>
