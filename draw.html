@@ -26,7 +26,7 @@
       background-color: #ffffff;
     }
 
-    button, input[type="color"], input[type="range"] {
+    button, input[type="color"], input[type="range"], input[type="number"], input[type="file"] {
       padding: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
@@ -34,7 +34,7 @@
       cursor: pointer;
     }
 
-    button:hover, input[type="color"]:hover, input[type="range"]:hover {
+    button:hover, input[type="color"]:hover, input[type="range"]:hover, input[type="number"]:hover, input[type="file"]:hover {
       background-color: #e0e0e0;
     }
   </style>
@@ -45,7 +45,14 @@
     <button id="pen">Pen</button>
     <button id="brush">Brush</button>
     <button id="eraser">Eraser</button>
-    <input type="color" id="colorPicker">
+    <div>
+      <label for="rPicker">R:</label>
+      <input type="number" id="rPicker" min="0" max="255" value="0">
+      <label for="gPicker">G:</label>
+      <input type="number" id="gPicker" min="0" max="255" value="0">
+      <label for="bPicker">B:</label>
+      <input type="number" id="bPicker" min="0" max="255" value="0">
+    </div>
     <input type="range" id="sizePicker" min="1" max="50" value="5">
     <input type="color" id="bgColorPicker" value="#ffffff">
     <input type="file" id="imageLoader" name="imageLoader">
@@ -123,9 +130,18 @@
       tool = 'eraser';
       color = '#FFFFFF';  // Assuming white background
     });
-    document.getElementById('colorPicker').addEventListener('input', (e) => {
-      color = e.target.value;
-    });
+
+    const updateColor = () => {
+      const r = document.getElementById('rPicker').value;
+      const g = document.getElementById('gPicker').value;
+      const b = document.getElementById('bPicker').value;
+      color = `rgb(${r},${g},${b})`;
+    };
+
+    document.getElementById('rPicker').addEventListener('input', updateColor);
+    document.getElementById('gPicker').addEventListener('input', updateColor);
+    document.getElementById('bPicker').addEventListener('input', updateColor);
+    
     document.getElementById('sizePicker').addEventListener('input', (e) => {
       size = e.target.value;
     });
