@@ -114,30 +114,30 @@
         .btns:hover {
             background-color: #f1f3f4;
         }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .search {
+                width: 80%;
+            }
+
+            .container {
+                padding: 100px 0;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Intro video -->
-<video class="intro-video" autoplay muted playsinline onended="showMainContent()">
-    <source src="intro.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
-
-<script>
-    // Function to unmute the video after the page has loaded
-    window.addEventListener('load', () => {
-        const video = document.querySelector('.intro-video');
-        video.muted = false;  // Unmute the video after the page loads
-        video.play();  // Ensure the video starts playing
-    });
-
-    function showMainContent() {
-        document.querySelector('.intro-video').style.display = 'none'; // Hide the intro video
-        document.getElementById('main-content').style.display = 'block'; // Display main content
-    }
-</script>
-
-
+    <video class="intro-video" autoplay playsinline loop>
+        <source src="intro.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
     <!-- Main content -->
     <div id="main-content">
