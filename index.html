@@ -1,329 +1,355 @@
 <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Settings - Stenoip Wonder Computer</title>
-    <link rel="icon" type="image/png" href="settings.png">
-     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-     <title>Stenoip Wonder Computer</title>
-     <style>
-         /* General Styles */
-         body {
-             font-family: 'Google Sans', sans-serif;
-             background-color: #f0f0f0;
-             font-family: Arial, sans-serif;
-             margin: 0;
-             display: flex;
-             flex-direction: column;
-             align-items: center;
-             height: 100vh;
-             overflow: hidden;
-         }
-         .container {
-             width: 80%;
-             max-width: 800px;
-             background-color: white;
-             padding: 20px;
-             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-             overflow-y: auto;
-             margin-top: 20px;
-             border-radius: 10px;
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" href="new_swc.png" type="image/png">
+ <title>Stenoip Wonder Computer</title>
  
-         /* Fullscreen video styling */
-         .intro-video {
-             position: fixed;
-             top: 0;
-             left: 0;
-             width: 100%;
-             height: 100%;
-             object-fit: cover;
-             z-index: 10;
-         }
- 
-         /* Hide content initially */
-         #main-content {
-             display: none;
-         }
- 
-         /* Header styles */
-         .header {
-             text-align: center;
-             margin-bottom: 20px;
-             font-size: 13px;
-             text-align: right;
-             padding: 22px 10px;
-             background-color: white;
-         }
-         .settings-group {
-             margin-bottom: 20px;
- 
-         .menuItems {
-             font-size: 13px;
-             padding: 0 20px;
-             display: inline-block;
-         }
-         .settings-group h2 {
-             margin-bottom: 10px;
-             color: #0078d4;
- 
-         .header a {
-             text-decoration: none;
-             color: #000;
-         }
-         .settings-group label {
-             display: block;
-             margin-bottom: 5px;
- 
-         .header a:hover {
-             text-decoration: underline;
-         }
-         .settings-group input, .settings-group select, .settings-group textarea {
-             width: 100%;
-             padding: 10px;
-             margin-bottom: 10px;
- 
-         /* Dropdown styling */
-         .menu {
-             position: relative;
-             display: inline-block;
-         }
- 
-         .dropdown-content {
-             width: 270px;
-             padding: 28px;
-             border: 1px solid #ccc;
-             border-radius: 5px;
-             box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
-             display: none;
-             position: absolute;
-             z-index: 1;
-             right: 0;
-             background-color: white;
-         }
- 
-         .menuItems:hover .dropdown-content {
-             display: block;
-         }
- 
-         .appLogo {
-             text-align: center;
-             display: inline-block;
-             width: 86px;
-             padding: 5px;
-         }
-         .buttons {
-             display: flex;
-             justify-content: space-between;
- 
-         .menuItemLogo {
-             width: 50px;
-             height: 50px;
-         }
-         .buttons button {
- 
-         /* Search box styles */
-         .container {
-             text-align: center;
-             padding: 140px 0 160px;
-         }
- 
-         .search {
-             font-size: 13px;
-             padding: 14px;
-             width: 600px;
-             color: #222;
-             border: 1px solid #dfe1e5;
-             border-radius: 24px;
-         }
- 
-         .btns {
-             margin: 7px 0;
-             padding: 10px 20px;
-             font-size: 16px;
-             border: none;
-             background-color: #0078d4;
-             color: white;
-             font-size: 14px;
-             color: #5F6368;
-             background-color: #f8f9fa;
-             border: 1px solid #dfe1e5;
-             border-radius: 5px;
-             cursor: pointer;
-             transition: background-color 0.3s;
-         }
-         .buttons button:hover {
-             background-color: #005ba1;
- 
-         .btns:hover {
-             background-color: #f1f3f4;
-         }
-     </style>
- </head>
- <body>
- <!-- Intro Video -->
- <div id="intro-video" style="position: absolute; top: 0; left: 0; width: 100%; height: 100vh; background: #000;">
-     <video autoplay playsinline controls onended="hideIntroVideo()" style="width: 100%; height: 100%; object-fit: cover;">
-         <source src="path/to/your/video.mp4" type="video/mp4">
-     <!-- Intro video -->
-     <video class="intro-video" autoplay playsinline onended="showMainContent()">
-         <source src="intro.mp4" type="video/mp4">
-         Your browser does not support the video tag.
-     </video>
- </div>
- 
-   
-   <div class="container">
-     <!-- Main content -->
-     <div id="main-content">
-         <div class="header">
-             <h1>Settings</h1>
-         </div>
-         <div class="settings-group">
-             <h2>General</h2>
-             <label for="theme">Theme:</label>
-             <select id="theme">
-                 <option value="gray">Gray</option>
-                 <option value="black">Black</option>
-                 <option value="white">White</option>
-             </select>
-         </div>
-         <div class="settings-group">
-             <h2>Clock</h2>
-             <label for="clockFormat">Clock Format:</label>
-             <select id="clockFormat">
-                 <option value="12">12-hour (AM/PM)</option>
-                 <option value="24">24-hour (Military)</option>
-             </select>
-             <span class="menuItems"><a href="https://www.gmail.com">Gmail</a></span>
-             <span class="menuItems"><a href="#">Images</a></span>
-             <span class="menuItems menu">
-                 <span class="menu">Apps</span>
-                 <div class="dropdown-content">
-                     <!-- Google App Icons -->
-                     <div class="appLogo">
-                         <a href="#"><img class="menuItemLogo" src="http://pluspng.com/img-png/google-logo-png-open-2000.png"></a>
-                         <div class="caption">Search</div>
-                     </div>
-                     <div class="appLogo">
-                         <a href="#"><img class="menuItemLogo" src="http://pluspng.com/img-png/google-maps-png-google-maps-icon-1600.png"></a>
-                         <div class="caption">Maps</div>
-                     </div>
-                     <div class="appLogo">
-                         <a href="#"><img class="menuItemLogo" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Google_Drive_logo.png"></a>
-                         <div class="caption">Drive</div>
-                     </div>
-                     <div class="appLogo">
-                         <a href="#"><img class="menuItemLogo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Google-calendar.svg/1024px-Google-calendar.svg.png"></a>
-                         <div class="caption">Calendar</div>
-                     </div>
-                 </div>
-             </span>
-         </div>
-         <div class="settings-group">
-             <h2>Weather</h2>
-             <label for="weatherLocationId">Location ID:</label>
-             <input type="text" id="weatherLocationId">
-             <label for="weatherLanguage">Language:</label>
-             <select id="weatherLanguage">
-                 <option value="EN">English</option>
-                 <option value="DE">German</option>
-                 <option value="FR">French</option>
-                 <option value="ZH">Mandarin</option>
-                 <option value="ES">Spanish (Spain)</option>
-             </select>
-             <label for="weatherUnitSystem">Unit System:</label>
-             <input type="text" id="weatherUnitSystem">
-             <label for="weatherSkin">Skin:</label>
-             <input type="text" id="weatherSkin">
-         </div>
-         <div class="settings-group">
-             <h2>Developer Features</h2>
-             <label for="enableConsole">Enable Console Output:</label>
-             <input type="checkbox" id="enableConsole">
-             <label for="enableEditor">Enable Code Editor:</label>
-             <input type="checkbox" id="enableEditor">
-             <label for="enablePerformanceMetrics">Show Performance Metrics:</label>
-             <input type="checkbox" id="enablePerformanceMetrics">
-             <label for="featureToggles">Feature Toggles (comma-separated):</label>
-             <input type="text" id="featureToggles">
-             <label for="apiKeys">API Keys (JSON format):</label>
-             <textarea id="apiKeys"></textarea>
-         </div>
-         <div class="buttons">
-             <button onclick="saveSettings()">Save</button>
-             <button onclick="resetSettings()">Reset</button>
- 
-         <div class="container">
-             <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Stenoip Logo">
-             <div class="search">
-                 <input type="text" placeholder="Search here...">
-             </div>
-             <div>
-                 <button class="btns">Google Search</button>
-                 <button class="btns">I'm Feeling Lucky</button>
-             </div>
-         </div>
-     </div>
- 
-     <script>
-         function loadSettings() {
-             fetch('settings.json')
-                 .then(response => response.json())
-                 .then(settings => {
-                     document.getElementById('theme').value = settings.theme;
-                     document.getElementById('clockFormat').value = settings.clockFormat;
-                     document.getElementById('weatherLocationId').value = settings.weatherLocationId;
-                     document.getElementById('weatherLanguage').value = settings.weatherLanguage;
-                     document.getElementById('weatherUnitSystem').value = settings.weatherUnitSystem;
-                     document.getElementById('weatherSkin').value = settings.weatherSkin;
-                     document.getElementById('enableConsole').checked = settings.enableConsole;
-                     document.getElementById('enableEditor').checked = settings.enableEditor;
-                     document.getElementById('enablePerformanceMetrics').checked = settings.enablePerformanceMetrics;
-                     document.getElementById('featureToggles').value = settings.featureToggles.join(',');
-                     document.getElementById('apiKeys').value = JSON.stringify(settings.apiKeys, null, 2);
-                 });
-         }
- 
-         function saveSettings() {
-             const settings = {
-                 theme: document.getElementById('theme').value,
-                 clockFormat: document.getElementById('clockFormat').value,
-                 weatherLocationId: document.getElementById('weatherLocationId').value,
-                 weatherLanguage: document.getElementById('weatherLanguage').value,
-                 weatherUnitSystem: document.getElementById('weatherUnitSystem').value,
-                 weatherSkin: document.getElementById('weatherSkin').value,
-                 enableConsole: document.getElementById('enableConsole').checked,
-                 enableEditor: document.getElementById('enableEditor').checked,
-                 enablePerformanceMetrics: document.getElementById('enablePerformanceMetrics').checked,
-                 featureToggles: document.getElementById('featureToggles').value.split(',').map(item => item.trim()),
-                 apiKeys: JSON.parse(document.getElementById('apiKeys').value)
-             };
-             
-             fetch('settings.json', {
-                 method: 'POST',
-                 headers: {
-                     'Content-Type': 'application/json'
-                 },
-                 body: JSON.stringify(settings)
-             }).then(response => {
-                 if (response.ok) {
-                     alert('Settings saved successfully!');
-                 } else {
-                     alert('Failed to save settings.');
-                 }
-             });
-         }
- 
-         function resetSettings() {
-             loadSettings();
-         }
- 
-         document.addEventListener('DOMContentLoaded', loadSettings);
-         function showMainContent() {
-             document.querySelector('.intro-video').style.display = 'none'; // Hide the intro video
-             document.getElementById('main-content').style.display = 'block'; // Display main content
-         }
-     </script>
- </body>
- </html>
+    <style>
+   -     /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        /* Fullscreen video styling */
+        .intro-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 10;
+        }
+
+        /* Hide content initially */
+        #main-content {
+            display: none;
+            background: rgb(240, 191, 111);
+        }
+
+        /* Header styles */
+        .header {
+            font-size: 13px;
+            text-align: right;
+            padding: 22px 10px;
+            background-color: rgb(240, 191, 111);
+        }
+
+        .menuItems {
+            font-size: 13px;
+            padding: 0 20px;
+            display: inline-block;
+        }
+
+        .header a {
+            text-decoration: none;
+            color: rgb(0, 0, 0);
+        }
+
+        .header a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dropdown styling */
+        .menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            width: 270px;
+            padding: 28px;
+            border: 1px solid rgb(220, 225, 229);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+            display: none;
+            position: absolute;
+            z-index: 1;
+            right: 0;
+            background-color: rgb(255, 255, 255);
+        }
+
+        .menuItems:hover .dropdown-content {
+            display: block;
+        }
+
+        .appLogo {
+            text-align: center;
+            display: inline-block;
+            width: 86px;
+            padding: 5px;
+        }
+
+        .menuItemLogo {
+            width: 50px;
+            height: 50px;
+        }
+
+        .caption {
+            text-align: center;
+        }
+
+        /* Search box styles */
+        .container {
+            text-align: center;
+            padding: 140px 0 160px;
+        }
+
+        .search {
+            font-size: 14px;
+            padding: 12px 20px;
+            width: 600px;
+            color: rgb(51, 51, 51);
+            border: 1px solid rgb(223, 225, 229);
+            border-radius: 24px;
+            outline: none;
+            background-color: rgb(241, 243, 244);
+            margin: 0 auto;
+            display: block;
+        }
+
+        .search:focus {
+            border-color: rgb(66, 133, 244);
+        }
+
+        /* Button styles */
+        .btns {
+            margin: 7px 0;
+            padding: 20px 40px;
+            font-size: 18px;
+            color: rgb(95, 99, 104);
+            background-color: rgb(248, 249, 250);
+            border: 1px solid rgb(223, 225, 229);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btns:hover {
+            background-color: rgb(241, 243, 244);
+        }
+
+        /* Learn Centre Button (larger and center-aligned) */
+        .learn-centre-btn {
+            margin: 20px 0;
+            padding: 20px 50px;
+            font-size: 22px;
+            background-color: rgb(66, 133, 244);
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        .learn-centre-btn:hover {
+            background-color: rgb(57, 103, 204);
+        }
+
+        /* Skip button styles */
+        .skip-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: rgb(66, 133, 244);
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .skip-btn:hover {
+            background-color: rgb(57, 103, 204);
+        }
+
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: rgb(255, 255, 255);
+            border: 1px solid rgb(223, 225, 229);
+            border-radius: 5px;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .result-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .result-item:hover {
+            background-color: rgb(241, 243, 244);
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .search {
+                width: 80%;
+            }
+
+            .container {
+                padding: 100px 0;
+            }
+        }
+         /* Center-aligned footer */
+        .footer {
+            text-align: center;
+            margin-top: auto;
+            padding: 20px;
+            font-size: 12px;
+            color: rgb(95, 99, 104);
+           background-color: rgb(240, 191, 111); /* Footer background color */
+        }
+
+        .footer a {
+           background-color: rgb(240, 191, 111); /* Footer background color */
+           color: rgb(0, 0, 0);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Intro video embedded from URL -->
+    <video id="intro-video" class="intro-video" autoplay playsinline>
+        <source src="https://stenoip.github.io/intro.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Skip button -->
+    <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Video</button>
+
+    <!-- Main content -->
+    <div id="main-content">
+        <div class="header">
+            <span class="menuItems"><a href="https://www.gmail.com">Gmail</a></span>
+            <span class="menuItems"><a href="gallery.html">Images</a></span>
+            <span class="menuItems menu">
+                <span class="menu">Apps</span>
+                <div class="dropdown-content">
+                    <!-- Google App Icons -->
+                    <div class="appLogo">
+                        <a href="#"><img class="menuItemLogo" src=""></a>
+                        <div class="caption">Search</div>
+                    </div>
+                    <div class="appLogo">
+                        <a href="#"><img class="menuItemLogo" src=""></a>
+                        <div class="caption">Maps</div>
+                    </div>
+                    <div class="appLogo">
+                        <a href="#"><img class="menuItemLogo" src=""></a>
+                        <div class="caption">Drive</div>
+                    </div>
+                    <div class="appLogo">
+                        <a href="#"><img class="menuItemLogo" src=""></a>
+                        <div class="caption">Calendar</div>
+                    </div>
+                </div>
+            </span>
+        </div>
+
+        <div class="container">
+            <img src="new_title.png" alt="Stenoip Logo">
+            <div class="search">
+                <input type="text" id="search-bar" placeholder="Search here..." onkeyup="filterSearch()">
+            </div>
+            <div id="search-results" class="search-results"></div>
+            <div>
+                      
+<button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
+    Learn Centre
+</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        Version 0.51 &copy; Stenoip Company
+    </div>
+
+    <script>
+        // Wait for the video to finish, then show the main content
+        document.getElementById('intro-video').addEventListener('ended', function() {
+            document.querySelector('.intro-video').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        });
+
+        // Skip the video when the button is clicked and stop sound
+        function skipVideo() {
+            const video = document.querySelector('.intro-video');
+            video.pause(); // Stop the video
+            video.currentTime = 0; // Reset the video time
+            video.style.display = 'none'; // Hide the video
+            document.getElementById('main-content').style.display = 'block'; // Show the main content
+            document.getElementById('skip-btn').style.display = 'none'; // Hide the skip button
+        }
+
+        // Search data
+        const searchItems = [
+            { name: 'Camera', url: 'https://stenoip.github.io/camera' },
+            { name: 'Clocker', url: 'https://stenoip.github.io/clocker' },
+            { name: 'Draw', url: 'https://stenoip.github.io/draw' },
+            { name: 'Games', url: 'https://stenoip.github.io/games' },
+            { name: '3D Maps', url: 'https://stenoip.github.io/maps' },
+            { name: 'Media', url: 'https://stenoip.github.io/media' },
+            { name: 'Minecraft 1.9', url: 'https://stenoip.github.io/mineraft1-9' },
+            { name: 'Pet', url: 'https://stenoip.github.io/pet' },
+            { name: 'Phone', url: 'https://stenoip.github.io/phone' },
+            { name: 'Sir Praterich', url: 'https://stenoip.github.io/sir praterich' },
+            { name: 'Space Map', url: 'https://stenoip.github.io/space-map' },
+            { name: 'Testing', url: 'https://stenoip.github.io/testing' },
+            { name: 'Typoe', url: 'https://stenoip.github.io/typoe' },
+            { name: 'Video', url: 'https://stenoip.github.io/video' },
+            { name: 'Quiz', url: 'https://stenoip.github.io/quiz' },
+            { name: 'FlappyBird', url: 'https://stenoip.github.io/flappybird' },
+            { name: 'Old Stenoip', url: 'https://stenoip.github.io/anniversary' },
+            { name: 'Javascript: Foram Dash', url: 'https://stenoip.github.io/p5/foramdash' },
+            { name: 'Javascript: Car', url: 'https://stenoip.github.io/p5/car' },
+            { name: 'Javascript:Draw It', url: 'https://stenoip.github.io/p5/drawing' },
+            { name: 'Javascript: Tomato', url: 'https://stenoip.github.io/p5/tomato' },
+            { name: 'Javascript: Tafeltennis', url: 'https://stenoip.github.io/p5/tafeltennis' },
+            { name: 'Function Plot', url: 'https://stenoip.github.io/kompmasine-functions' },
+            { name: 'Kompmasine Calculator', url: 'https://stenoip.github.io/kompmasine' },
+            { name: 'Boublok Coding', url: 'https://stenoip.github.io/boublok' },
+            { name: 'Tetris', url: 'https://stenoip.github.io/tetris' },
+            { name: 'Argora Store', url: 'https://stenoip.github.io/download' },
+            { name: 'Maps', url: 'https://stenoip.github.io/compass' },
+            { name: 'StenoSearch', url: 'https://stenoip.github.io/search' },
+            { name: 'PhET Gravity', url: 'https://stenoip.github.io/my-solar-system_en' },
+            { name: 'Super Komysk', url: 'https://stenoip.github.io/comic' },
+            { name: '2048 GAME', url: 'https://stenoip.github.io/2048' },
+            { name: 'TI- 84 Calculator', url: 'https://stenoip.github.io/calculator_ti84' },
+            { name: 'TI-30XIIS Calculator', url: 'https://stenoip.github.io/calculator_ti30xiis' }
+        ];
+
+        // Filter search results
+        function filterSearch() {
+            const query = document.getElementById('search-bar').value.toLowerCase();
+            const filteredItems = searchItems.filter(item => item.name.toLowerCase().includes(query));
+
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = ''; // Clear previous results
+
+            if (filteredItems.length > 0) {
+                resultsContainer.style.display = 'block'; // Show results container
+                filteredItems.forEach(item => {
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('result-item');
+                    resultItem.innerHTML = `<a href="${item.url}" target="_blank">${item.name}</a>`;
+                    resultsContainer.appendChild(resultItem);
+                });
+            } else {
+                resultsContainer.style.display = 'none'; // Hide results container if no matches
+            }
+        }
+    </script>
+</body>
+</html>
