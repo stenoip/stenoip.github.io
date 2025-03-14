@@ -133,9 +133,9 @@
     </style>
 </head>
 <body>
-    <!-- Intro video -->
+    <!-- Intro video embedded from URL -->
     <video class="intro-video" autoplay playsinline loop>
-        <source src="intro.mp4" type="video/mp4">
+        <source src="https://stenoip.github.io/intro.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
@@ -181,6 +181,7 @@
     </div>
 
     <script>
+        // Function to show the main content after the video ends
         function showMainContent() {
             document.querySelector('.intro-video').style.display = 'none'; // Hide the intro video
             document.getElementById('main-content').style.display = 'block'; // Display main content
