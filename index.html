@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="icon" href="new_swc.png" type="image/png">
- <title>Stenoip Wonder Computer</title>
- 
+    <title>Stenoip Wonder Computer</title>
+
     <style>
-   -     /* General Styles */
+        /* General Styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -23,6 +23,23 @@
             height: 100%;
             object-fit: cover;
             z-index: 10;
+        }
+
+        /* Green Screen for launch */
+        .launch-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: green;
+            color: white;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            z-index: 15;
         }
 
         /* Hide content initially */
@@ -201,30 +218,36 @@
                 padding: 100px 0;
             }
         }
-         /* Center-aligned footer */
+
+        /* Center-aligned footer */
         .footer {
             text-align: center;
             margin-top: auto;
             padding: 20px;
             font-size: 12px;
             color: rgb(95, 99, 104);
-           background-color: rgb(240, 191, 111); /* Footer background color */
+            background-color: rgb(240, 191, 111);
         }
 
         .footer a {
-           background-color: rgb(240, 191, 111); /* Footer background color */
-           color: rgb(0, 0, 0);
+            background-color: rgb(240, 191, 111);
+            color: rgb(0, 0, 0);
             text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <!-- Intro video embedded from URL -->
-<video id="intro-video" class="intro-video" autoplay playsinline>
-    <source src="https://stenoip.github.io/intro.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
 
+    <!-- Launch screen with green background -->
+    <div class="launch-screen" id="launch-screen">
+        Click to Launch
+    </div>
+
+    <!-- Intro video -->
+    <video id="intro-video" class="intro-video" autoplay playsinline muted>
+        <source src="https://stenoip.github.io/intro.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
     <!-- Skip button -->
     <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Video</button>
@@ -265,16 +288,15 @@
             </div>
             <div id="search-results" class="search-results"></div>
             <div>
-                <!-- Changed to Learn Centre button --><!-- Learn Centre Button -->
-<button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/help-centre';">
-    Learn Centre
-</button>
-
+                <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/help-centre';">
+                    Learn Centre
+                </button>
             </div>
         </div>
     </div>
+
     <div class="footer">
-        Version 0.54 &copy; Stenoip Company
+        Version 0.55 &copy; Stenoip Company
     </div>
 
     <script>
@@ -282,6 +304,7 @@
         document.getElementById('intro-video').addEventListener('ended', function() {
             document.querySelector('.intro-video').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
+            document.getElementById('launch-screen').style.display = 'none';
         });
 
         // Skip the video when the button is clicked and stop sound
@@ -292,66 +315,15 @@
             video.style.display = 'none'; // Hide the video
             document.getElementById('main-content').style.display = 'block'; // Show the main content
             document.getElementById('skip-btn').style.display = 'none'; // Hide the skip button
+            document.getElementById('launch-screen').style.display = 'none'; // Hide the launch screen
         }
 
-        // Search data
-        const searchItems = [
-            { name: 'Camera', url: 'https://stenoip.github.io/camera' },
-            { name: 'Clocker', url: 'https://stenoip.github.io/clocker' },
-            { name: 'Draw', url: 'https://stenoip.github.io/draw' },
-            { name: 'Games', url: 'https://stenoip.github.io/games' },
-            { name: '3D Maps', url: 'https://stenoip.github.io/maps' },
-            { name: 'Media', url: 'https://stenoip.github.io/media' },
-            { name: 'Minecraft 1.9', url: 'https://stenoip.github.io/mineraft1-9' },
-            { name: 'Pet', url: 'https://stenoip.github.io/pet' },
-            { name: 'Phone', url: 'https://stenoip.github.io/phone' },
-            { name: 'Sir Praterich', url: 'https://stenoip.github.io/sir praterich' },
-            { name: 'Space Map', url: 'https://stenoip.github.io/space-map' },
-            { name: 'Testing', url: 'https://stenoip.github.io/testing' },
-            { name: 'Typoe', url: 'https://stenoip.github.io/typoe' },
-            { name: 'Video', url: 'https://stenoip.github.io/video' },
-            { name: 'Quiz', url: 'https://stenoip.github.io/quiz' },
-            { name: 'FlappyBird', url: 'https://stenoip.github.io/flappybird' },
-            { name: 'Old Stenoip', url: 'https://stenoip.github.io/anniversary' },
-            { name: 'Javascript: Foram Dash', url: 'https://stenoip.github.io/p5/foramdash' },
-            { name: 'Javascript: Car', url: 'https://stenoip.github.io/p5/car' },
-            { name: 'Javascript:Draw It', url: 'https://stenoip.github.io/p5/drawing' },
-            { name: 'Javascript: Tomato', url: 'https://stenoip.github.io/p5/tomato' },
-            { name: 'Javascript: Tafeltennis', url: 'https://stenoip.github.io/p5/tafeltennis' },
-            { name: 'Function Plot', url: 'https://stenoip.github.io/kompmasine-functions' },
-            { name: 'Kompmasine Calculator', url: 'https://stenoip.github.io/kompmasine' },
-            { name: 'Boublok Coding', url: 'https://stenoip.github.io/boublok' },
-            { name: 'Tetris', url: 'https://stenoip.github.io/tetris' },
-            { name: 'Argora Store', url: 'https://stenoip.github.io/download' },
-            { name: 'Maps', url: 'https://stenoip.github.io/compass' },
-            { name: 'StenoSearch', url: 'https://stenoip.github.io/search' },
-            { name: 'PhET Gravity', url: 'https://stenoip.github.io/my-solar-system_en' },
-            { name: 'Super Komysk', url: 'https://stenoip.github.io/comic' },
-            { name: '2048 GAME', url: 'https://stenoip.github.io/2048' },
-            { name: 'TI- 84 Calculator', url: 'https://stenoip.github.io/calculator_ti84' },
-            { name: 'TI-30XIIS Calculator', url: 'https://stenoip.github.io/calculator_ti30xiis' }
-        ];
-
-        // Filter search results
-        function filterSearch() {
-            const query = document.getElementById('search-bar').value.toLowerCase();
-            const filteredItems = searchItems.filter(item => item.name.toLowerCase().includes(query));
-
-            const resultsContainer = document.getElementById('search-results');
-            resultsContainer.innerHTML = ''; // Clear previous results
-
-            if (filteredItems.length > 0) {
-                resultsContainer.style.display = 'block'; // Show results container
-                filteredItems.forEach(item => {
-                    const resultItem = document.createElement('div');
-                    resultItem.classList.add('result-item');
-                    resultItem.innerHTML = `<a href="${item.url}" target="_blank">${item.name}</a>`;
-                    resultsContainer.appendChild(resultItem);
-                });
-            } else {
-                resultsContainer.style.display = 'none'; // Hide results container if no matches
-            }
-        }
+        // Unmute the video and remove the green screen when the user clicks "Launch"
+        document.getElementById('launch-screen').addEventListener('click', function() {
+            document.getElementById('intro-video').muted = false;
+            document.getElementById('launch-screen').style.display = 'none';
+            document.getElementById('intro-video').style.display = 'block';
+        });
     </script>
 </body>
 </html>
