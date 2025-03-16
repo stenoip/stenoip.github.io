@@ -4,44 +4,326 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Video Intro</title>
+    <link rel="icon" href="new_swc.png" type="image/png">
+    <title>Stenoip Wonder Computer</title>
+
     <style>
-        /* Fullscreen video container */
-        body, html {
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            height: 100%;
-            background-color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
         }
 
-        video {
+        /* Fullscreen video styling */
+        .intro-video {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
+            z-index: 10;
+        }
+
+        /* Green Screen for launch */
+        .launch-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: green;
+            color: white;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            z-index: 15;
+        }
+
+        /* Hide content initially */
+        #main-content {
+            display: none;
+            background: rgb(240, 191, 111);
+        }
+
+        /* Header styles */
+        .header {
+            font-size: 13px;
+            text-align: right;
+            padding: 22px 10px;
+            background-color: rgb(240, 191, 111);
+        }
+
+        .menuItems {
+            font-size: 13px;
+            padding: 0 20px;
+            display: inline-block;
+        }
+
+        .header a {
+            text-decoration: none;
+            color: rgb(0, 0, 0);
+        }
+
+        .header a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dropdown styling */
+        .menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            width: 270px;
+            padding: 28px;
+            border: 1px solid rgb(220, 225, 229);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+            display: none;
+            position: absolute;
+            z-index: 1;
+            right: 0;
+            background-color: rgb(255, 255, 255);
+        }
+
+        .menuItems:hover .dropdown-content {
+            display: block;
+        }
+
+        .appLogo {
+            text-align: center;
+            display: inline-block;
+            width: 86px;
+            padding: 5px;
+        }
+
+        .menuItemLogo {
+            width: 50px;
+            height: 50px;
+        }
+
+        .caption {
+            text-align: center;
+        }
+
+        /* Search box styles */
+        .container {
+            text-align: center;
+            padding: 140px 0 160px;
+        }
+
+        .search {
+            font-size: 14px;
+            padding: 12px 20px;
+            width: 600px;
+            color: rgb(51, 51, 51);
+            border: 1px solid rgb(223, 225, 229);
+            border-radius: 24px;
+            outline: none;
+            background-color: rgb(241, 243, 244);
+            margin: 0 auto;
+            display: block;
+        }
+
+        .search:focus {
+            border-color: rgb(66, 133, 244);
+        }
+
+        /* Button styles */
+        .btns {
+            margin: 7px 0;
+            padding: 20px 40px;
+            font-size: 18px;
+            color: rgb(95, 99, 104);
+            background-color: rgb(248, 249, 250);
+            border: 1px solid rgb(223, 225, 229);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btns:hover {
+            background-color: rgb(241, 243, 244);
+        }
+
+        /* Learn Centre Button (larger and center-aligned) */
+        .learn-centre-btn {
+            margin: 20px 0;
+            padding: 20px 50px;
+            font-size: 22px;
+            background-color: rgb(66, 133, 244);
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        .learn-centre-btn:hover {
+            background-color: rgb(57, 103, 204);
+        }
+
+        /* Skip button styles */
+        .skip-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: rgb(66, 133, 244);
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .skip-btn:hover {
+            background-color: rgb(57, 103, 204);
+        }
+
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: rgb(255, 255, 255);
+            border: 1px solid rgb(223, 225, 229);
+            border-radius: 5px;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .result-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .result-item:hover {
+            background-color: rgb(241, 243, 244);
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .search {
+                width: 80%;
+            }
+
+            .container {
+                padding: 100px 0;
+            }
+        }
+
+        /* Center-aligned footer */
+        .footer {
+            text-align: center;
+            margin-top: auto;
+            padding: 20px;
+            font-size: 12px;
+            color: rgb(95, 99, 104);
+            background-color: rgb(240, 191, 111);
+        }
+
+        .footer a {
+            background-color: rgb(240, 191, 111);
+            color: rgb(0, 0, 0);
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- Video element -->
-    <video id="introVideo" autoplay>
+    <!-- Launch screen with green background -->
+    <div class="launch-screen" id="launch-screen">
+        Click to Launch
+    </div>
+
+    <!-- Intro video -->
+    <video id="intro-video" class="intro-video" autoplay playsinline muted>
         <source src="https://stenoip.github.io/intro.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
-    <script>
-        // Get the video element
-        const video = document.getElementById('introVideo');
+    <!-- Skip button -->
+    <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Video</button>
 
-        // Redirect to the main site when the video ends
-        video.addEventListener('ended', function() {
-            window.location.href = 'https://stenoip.github.io';
+    <!-- Main content -->
+    <div id="main-content">
+        <div class="header">
+            <span class="menuItems"><a href="https://www.gmail.com">Gmail</a></span>
+            <span class="menuItems"><a href="gallery.html">Images</a></span>
+            <span class="menuItems menu">
+                <span class="menu">Apps</span>
+                <div class="dropdown-content">
+                    <!-- Google App Icons -->
+                    <div class="appLogo">
+                        <a href="#"><img class="menuItemLogo" src="http://pluspng.com/img-png/google-logo-png-open-2000.png"></a>
+                        <div class="caption">Search</div>
+                    </div>
+                    <div class="appLogo">
+                        <a href="#"><img class="menuItemLogo" src="http://pluspng.com/img-png/google-maps-png-google-maps-icon-1600.png"></a>
+                        <div class="caption">Maps</div>
+                    </div>
+                    <div class="appLogo">
+                        <a href="#"><img class="menuItemLogo" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Google_Drive_logo.png"></a>
+                        <div class="caption">Drive</div>
+                    </div>
+                    <div class="appLogo">
+                        <a href="#"><img class="menuItemLogo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Google-calendar.svg/1024px-Google-calendar.svg.png"></a>
+                        <div class="caption">Calendar</div>
+                    </div>
+                </div>
+            </span>
+        </div>
+
+        <div class="container">
+            <img src="new_title.png" alt="Stenoip Logo">
+            <div class="search">
+                <input type="text" id="search-bar" placeholder="Search here..." onkeyup="filterSearch()">
+            </div>
+            <div id="search-results" class="search-results"></div>
+            <div>
+                <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/help-centre';">
+                    Learn Centre
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Version 0.54 &copy; Stenoip Company
+    </div>
+
+    <script>
+        // Wait for the video to finish, then show the main content
+        document.getElementById('intro-video').addEventListener('ended', function() {
+            document.querySelector('.intro-video').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('launch-screen').style.display = 'none';
+        });
+
+        // Skip the video when the button is clicked and stop sound
+        function skipVideo() {
+            const video = document.querySelector('.intro-video');
+            video.pause(); // Stop the video
+            video.currentTime = 0; // Reset the video time
+            video.style.display = 'none'; // Hide the video
+            document.getElementById('main-content').style.display = 'block'; // Show the main content
+            document.getElementById('skip-btn').style.display = 'none'; // Hide the skip button
+            document.getElementById('launch-screen').style.display = 'none'; // Hide the launch screen
+        }
+
+        // Unmute the video and remove the green screen when the user clicks "Launch"
+        document.getElementById('launch-screen').addEventListener('click', function() {
+            document.getElementById('intro-video').muted = false;
+            document.getElementById('launch-screen').style.display = 'none';
+            document.getElementById('intro-video').style.display = 'block';
         });
     </script>
-
 </body>
 </html>
