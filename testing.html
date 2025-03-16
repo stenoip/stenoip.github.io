@@ -4,188 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Stenoip Wonder Computer</title>
+    <title>Video Intro</title>
     <style>
-        /* General Styles */
-        body {
-            font-family: Arial, sans-serif;
+        /* Fullscreen video container */
+        body, html {
             margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
-        /* Fullscreen video styling */
-        .intro-video {
-            position: fixed;
-            top: 0;
-            left: 0;
+        video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 10;
-        }
-
-        /* Hide content initially */
-        #main-content {
-            display: none;
-        }
-
-        /* Header styles */
-        .header {
-            font-size: 13px;
-            text-align: right;
-            padding: 22px 10px;
-            background-color: white;
-        }
-
-        .menuItems {
-            font-size: 13px;
-            padding: 0 20px;
-            display: inline-block;
-        }
-
-        .header a {
-            text-decoration: none;
-            color: #000;
-        }
-
-        .header a:hover {
-            text-decoration: underline;
-        }
-
-        /* Dropdown styling */
-        .menu {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            width: 270px;
-            padding: 28px;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
-            display: none;
-            position: absolute;
-            z-index: 1;
-            right: 0;
-            background-color: white;
-        }
-
-        .menuItems:hover .dropdown-content {
-            display: block;
-        }
-
-        .appLogo {
-            text-align: center;
-            display: inline-block;
-            width: 86px;
-            padding: 5px;
-        }
-
-        .menuItemLogo {
-            width: 50px;
-            height: 50px;
-        }
-
-        /* Search box styles */
-        .container {
-            text-align: center;
-            padding: 140px 0 160px;
-        }
-
-        .search {
-            font-size: 13px;
-            padding: 14px;
-            width: 600px;
-            color: #222;
-            border: 1px solid #dfe1e5;
-            border-radius: 24px;
-        }
-
-        .btns {
-            margin: 7px 0;
-            padding: 10px 20px;
-            font-size: 14px;
-            color: #5F6368;
-            background-color: #f8f9fa;
-            border: 1px solid #dfe1e5;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .btns:hover {
-            background-color: #f1f3f4;
-        }
-
-        /* Media queries for responsiveness */
-        @media (max-width: 768px) {
-            .header {
-                font-size: 12px;
-                padding: 10px;
-            }
-
-            .search {
-                width: 80%;
-            }
-
-            .container {
-                padding: 100px 0;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Intro video embedded from URL -->
-    <video class="intro-video" autoplay playsinline loop>
+
+    <!-- Video element -->
+    <video id="introVideo" autoplay>
         <source src="https://stenoip.github.io/intro.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
-    <!-- Main content -->
-    <div id="main-content">
-        <div class="header">
-            <span class="menuItems"><a href="https://www.gmail.com">Gmail</a></span>
-            <span class="menuItems"><a href="#">Images</a></span>
-            <span class="menuItems menu">
-                <span class="menu">Apps</span>
-                <div class="dropdown-content">
-                    <!-- Google App Icons -->
-                    <div class="appLogo">
-                        <a href="#"><img class="menuItemLogo" src="http://pluspng.com/img-png/google-logo-png-open-2000.png"></a>
-                        <div class="caption">Search</div>
-                    </div>
-                    <div class="appLogo">
-                        <a href="#"><img class="menuItemLogo" src="http://pluspng.com/img-png/google-maps-png-google-maps-icon-1600.png"></a>
-                        <div class="caption">Maps</div>
-                    </div>
-                    <div class="appLogo">
-                        <a href="#"><img class="menuItemLogo" src="https://upload.wikimedia.org/wikipedia/commons/d/da/Google_Drive_logo.png"></a>
-                        <div class="caption">Drive</div>
-                    </div>
-                    <div class="appLogo">
-                        <a href="#"><img class="menuItemLogo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Google-calendar.svg/1024px-Google-calendar.svg.png"></a>
-                        <div class="caption">Calendar</div>
-                    </div>
-                </div>
-            </span>
-        </div>
-
-        <div class="container">
-            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Stenoip Logo">
-            <div class="search">
-                <input type="text" placeholder="Search here...">
-            </div>
-            <div>
-                <button class="btns">Google Search</button>
-                <button class="btns">I'm Feeling Lucky</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Function to show the main content after the video ends
-        function showMainContent() {
-            document.querySelector('.intro-video').style.display = 'none'; // Hide the intro video
-            document.getElementById('main-content').style.display = 'block'; // Display main content
-        }
+        // Get the video element
+        const video = document.getElementById('introVideo');
+
+        // Redirect to the main site when the video ends
+        video.addEventListener('ended', function() {
+            window.location.href = 'https://stenoip.github.io';
+        });
     </script>
+
 </body>
 </html>
