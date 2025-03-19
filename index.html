@@ -12,6 +12,8 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    background-color: rgb(240, 191, 111); /* Background color */
 }
 
 /* Fullscreen video styling */
@@ -21,7 +23,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* Ensure video scales properly */
     z-index: 10;
 }
 
@@ -45,7 +47,6 @@ body {
 /* Hide content initially */
 #main-content {
     display: none;
-    background-color: rgba(240, 191, 111, 255);
 }
 
 /* Header styles */
@@ -54,6 +55,8 @@ body {
     text-align: right;
     padding: 22px 10px;
     background-color: rgba(240, 191, 111, 255);
+    width: 100%; /* Ensure header is full width */
+    box-sizing: border-box;
 }
 
 .menuItems {
@@ -112,13 +115,14 @@ body {
 /* Search box styles */
 .container {
     text-align: center;
-    padding: 140px 0 160px;
+    padding: 140px 10px 160px;
 }
 
 .search {
     font-size: 14px;
     padding: 12px 20px;
-    width: 600px;
+    width: 90%;
+    max-width: 600px; /* Limit width for larger screens */
     color: rgb(51, 51, 51);
     border: 1px solid rgb(223, 225, 229);
     border-radius: 24px;
@@ -216,11 +220,7 @@ body {
     }
 
     .container {
-        padding: 80px 0;
-    }
-
-    .search-results {
-        max-height: 200px;
+        padding: 80px 10px;
     }
 
     .learn-centre-btn {
@@ -238,6 +238,13 @@ body {
     .footer {
         font-size: 10px;
         padding: 15px;
+    }
+
+    /* Remove any unwanted overflow */
+    body, html {
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
     }
 }
 
@@ -299,7 +306,7 @@ body {
         </div>
 
         <div class="container">
-            <img src="new_title.png" alt="Stenoip Logo">
+            <img src="new_title.png" alt="Stenoip Logo" style="max-width: 100%; height: auto;">
             <div class="search">
                 <input type="text" id="search-bar" placeholder="Search here..." onkeyup="filterSearch()">
             </div>
@@ -315,7 +322,7 @@ body {
     </div>
 
     <div class="footer">
-        Version 0.56 &copy; Stenoip Company
+        Version 0.57 &copy; Stenoip Company
     </div>
 
     <!-- JavaScript -->
