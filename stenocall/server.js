@@ -7,44 +7,44 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Serve static assets from the public folder
+// Serve static assets from the "public" folder
 app.use(express.static('public'));
 
-// Socket.IO signaling: handling room joins and relaying WebRTC signals.
+// When a client connects
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
-  // When the client joins a room
+  // Join room event: clients send their room ID.
   socket.on('join-room', (roomId) => {
     socket.join(roomId);
     console.log(`Socket ${socket.id} joined room ${roomId}`);
 
-    // Inform other clients in this room that a new user has connected
+    // Notify other clients in the room that a new user has connected.
     socket.to(roomId).emit('user-connected', socket.id);
   });
 
-  // Relay signaling data (offer, answer, ICE candidates) between peers
+  // Relay signaling data (offer, answer, ICE candidates)
   socket.on('signal', (data) => {
-    // data: { roomId, signal, target }
+    // Data format: { roomId, signal, target }
     io.to(data.target).emit('signal', {
       signal: data.signal,
-      sender: socket.id,
+      sender: socket.id
     });
   });
 
-  // Handle chat messages in the room
+  // Relay chat messages (optional)
   socket.on('chat-message', (data) => {
-    // data: { roomId, message }
+    // Data format: { roomId, message }
     io.to(data.roomId).emit('chat-message', data.message);
   });
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
-    // Here you could notify others that a user left the room
+    // Optionally notify other room members here.
   });
 });
 
-// Start the server on the provided PORT or 3000 by default
+// Start the server on port 3000 (or the PORT env variable)
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`StenoCall signaling server listening on port ${PORT}`);
