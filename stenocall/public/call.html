@@ -7,11 +7,19 @@
       body {
         font-family: Arial, sans-serif;
         text-align: center;
+        margin: 0;
+        padding: 0;
       }
       #roomInfo {
         margin: 10px;
         font-size: 1em;
         color: #333;
+      }
+      #startCallBtn {
+        margin: 20px;
+        padding: 10px 20px;
+        font-size: 1em;
+        cursor: pointer;
       }
       #videos {
         display: flex;
@@ -19,12 +27,29 @@
         align-items: center;
         margin: 10px;
       }
+      .video-container {
+        position: relative;
+        margin: 10px;
+      }
       video {
         width: 45%;
         max-width: 500px;
-        margin: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
+      }
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1em;
+        background: rgba(0, 0, 0, 0.5);
+        pointer-events: none;
       }
       #chat {
         border: 1px solid #ccc;
@@ -53,9 +78,20 @@
   <body>
     <h1>StenoCall - Advanced Video Conferencing</h1>
     <div id="roomInfo"></div>
+    <!-- New button to turn on camera and microphone -->
+    <button id="startCallBtn">Turn On Camera & Microphone</button>
+    
     <div id="videos">
-      <video id="localVideo" autoplay muted playsinline></video>
-      <video id="remoteVideo" autoplay playsinline></video>
+      <!-- Local Video Container -->
+      <div class="video-container">
+        <video id="localVideo" autoplay muted playsinline></video>
+        <div class="overlay">Local Video</div>
+      </div>
+      <!-- Remote Video Container -->
+      <div class="video-container">
+        <video id="remoteVideo" autoplay playsinline></video>
+        <div id="remotePlaceholder" class="overlay">Waiting for participant...</div>
+      </div>
     </div>
 
     <div id="chat"></div>
@@ -67,18 +103,16 @@
     <!-- Socket.IO library -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      // Determine the room from the URL; if missing, generate a new room ID and update the URL.
+      // Extract or create a room ID from the URL.
       const urlParams = new URLSearchParams(window.location.search);
       let roomId = urlParams.get("room");
       const roomInfoDiv = document.getElementById("roomInfo");
       if (!roomId) {
-        // Generate a random room id (8 characters long)
         roomId = Math.random().toString(36).substr(2, 8);
         const newURL = window.location.origin + window.location.pathname + "?room=" + roomId;
         window.history.replaceState({}, "", newURL);
         const infoPara = document.createElement("p");
-        infoPara.textContent =
-          "New call room created! Share this link to invite others: " + newURL;
+        infoPara.textContent = "New call room created! Share this link to invite others: " + newURL;
         roomInfoDiv.appendChild(infoPara);
       } else {
         const infoPara = document.createElement("p");
@@ -87,10 +121,13 @@
         roomInfoDiv.appendChild(infoPara);
       }
 
+      // Get a reference to the start button.
+      const startCallBtn = document.getElementById("startCallBtn");
+
       // Connect to the Socket.IO server
       const socket = io();
 
-      // WebRTC configuration using a public STUN server
+      // WebRTC ICE server configuration (using public STUN)
       const rtcConfig = {
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
       };
@@ -100,11 +137,17 @@
 
       const localVideo = document.getElementById("localVideo");
       const remoteVideo = document.getElementById("remoteVideo");
+      const remotePlaceholder = document.getElementById("remotePlaceholder");
       const chatDiv = document.getElementById("chat");
       const messageInput = document.getElementById("messageInput");
       const sendBtn = document.getElementById("sendBtn");
 
+      // Initialize media streams on demand.
       async function initMedia() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert("Your browser does not support accessing media devices.");
+          return;
+        }
         try {
           localStream = await navigator.mediaDevices.getUserMedia({
             video: true,
@@ -114,23 +157,27 @@
           setupPeerConnection();
         } catch (err) {
           console.error("Error accessing local media:", err);
+          alert("Failed to access camera/microphone. Please check your device settings and permissions.");
         }
       }
 
+      // Set up the RTCPeerConnection and signaling handling.
       function setupPeerConnection() {
         peerConnection = new RTCPeerConnection(rtcConfig);
 
-        // Add all local stream tracks to the peer connection
+        // Add local stream tracks to the connection.
         localStream.getTracks().forEach((track) => {
           peerConnection.addTrack(track, localStream);
         });
 
-        // When a remote track arrives, display it in the remote video element
+        // When receiving a remote track, display it and hide the placeholder.
         peerConnection.ontrack = (event) => {
+          console.log("Received remote stream.");
           remoteVideo.srcObject = event.streams[0];
+          remotePlaceholder.style.display = "none";
         };
 
-        // Send ICE candidates to remote peer via the signaling server
+        // Handle ICE candidate events.
         peerConnection.onicecandidate = (event) => {
           if (event.candidate && remoteSocketId) {
             socket.emit("signal", {
@@ -141,7 +188,7 @@
           }
         };
 
-        // When a new user connects, if our connection state is stable, create an offer
+        // When a new participant connects, initiate the offer if the state is stable.
         socket.on("user-connected", async (socketId) => {
           console.log("New user connected:", socketId);
           remoteSocketId = socketId;
@@ -161,7 +208,7 @@
         });
       }
 
-      // Handle incoming signaling data (offer, answer, and ICE candidates)
+      // Handle incoming signaling data.
       socket.on("signal", async (data) => {
         const { signal, sender } = data;
         remoteSocketId = sender;
@@ -194,7 +241,7 @@
         }
       });
 
-      // Chat functionality
+      // Chat functionality.
       sendBtn.addEventListener("click", () => {
         const message = messageInput.value.trim();
         if (message !== "") {
@@ -204,7 +251,6 @@
         }
       });
 
-      // Display incoming chat messages
       socket.on("chat-message", (message) => {
         addChatMessage("Remote", message);
       });
@@ -216,9 +262,12 @@
         chatDiv.scrollTop = chatDiv.scrollHeight;
       }
 
-      // Initialize local media and join the room
-      initMedia().then(() => {
-        socket.emit("join-room", roomId);
+      // Activate media and join the room when the button is clicked.
+      startCallBtn.addEventListener("click", () => {
+        initMedia().then(() => {
+          socket.emit("join-room", roomId);
+          startCallBtn.style.display = "none"; // Hide the button after activation.
+        });
       });
 
       socket.on("connect", () => {
