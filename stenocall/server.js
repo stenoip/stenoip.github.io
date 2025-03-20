@@ -13,14 +13,14 @@ app.use(express.static('public'));
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
-  // Watch for a client joining a room
+  // When a client joins a room, add them and notify the others.
   socket.on('join-room', (roomId) => {
     socket.join(roomId);
     console.log(`Socket ${socket.id} joined room ${roomId}`);
     socket.to(roomId).emit('user-connected', socket.id);
   });
 
-  // Relay signaling data (offer, answer, ICE candidates)
+  // Relay signaling messages: offer, answer, and ICE candidates.
   socket.on('signal', (data) => {
     // data: { roomId, signal, target }
     io.to(data.target).emit('signal', {
@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Relay chat messages (optional)
+  // Optional chat message relaying.
   socket.on('chat-message', (data) => {
     io.to(data.roomId).emit('chat-message', data.message);
   });
