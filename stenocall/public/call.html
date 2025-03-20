@@ -17,7 +17,6 @@
       }
       #statusMessage {
         margin: 10px;
-        color: red;
         font-weight: bold;
       }
       #buttons {
@@ -87,10 +86,10 @@
     <h1>StenoCall - Advanced Video Conferencing</h1>
     <div id="roomInfo"></div>
 
-    <!-- Status message area -->
+    <!-- Status message -->
     <div id="statusMessage"></div>
     
-    <!-- Separate buttons for enabling camera, microphone, and joining the call -->
+    <!-- Buttons for controlling devices and joining call -->
     <div id="buttons">
       <button id="startCameraBtn">Enable Camera</button>
       <button id="startMicBtn">Enable Microphone</button>
@@ -110,7 +109,7 @@
       </div>
     </div>
 
-    <!-- Chat Area -->
+    <!-- Chat area -->
     <div id="chat"></div>
     <div id="controls">
       <input type="text" id="messageInput" placeholder="Type your message here" />
@@ -120,7 +119,7 @@
     <!-- Socket.IO library -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      // Determine (or create) the room ID from the URL query string.
+      // Create (or get) a room based on the URL parameter.
       const urlParams = new URLSearchParams(window.location.search);
       let roomId = urlParams.get("room");
       const roomInfoDiv = document.getElementById("roomInfo");
@@ -134,7 +133,7 @@
           "You are in room: " + roomId + ". Share this link: " + window.location.href;
       }
 
-      // Get UI elements.
+      // UI elements.
       const statusMessage = document.getElementById("statusMessage");
       const startCameraBtn = document.getElementById("startCameraBtn");
       const startMicBtn = document.getElementById("startMicBtn");
@@ -143,7 +142,7 @@
       const remoteVideo = document.getElementById("remoteVideo");
       const remotePlaceholder = document.getElementById("remotePlaceholder");
 
-      // Connect to the signaling server.
+      // Connect to the Socket.IO signaling server.
       const socket = io();
 
       // WebRTC configuration.
@@ -151,75 +150,106 @@
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
       };
 
-      // Global variables to store streams.
+      // Global streams and connection.
       let cameraStream = null;
       let micStream = null;
-      let combinedStream = new MediaStream();
-      let peerConnection; // will be created when joining the call
+      const combinedStream = new MediaStream();
+      let peerConnection; // will be created when joining
       let remoteSocketId = null;
 
-      // Request video-only permissions.
-      async function initCamera() {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          cameraStream = stream;
-          stream.getVideoTracks().forEach(track => {
-            combinedStream.addTrack(track);
+      // Utility: update the local video element with combinedStream.
+      function updateLocalVideo() {
+        localVideo.srcObject = combinedStream;
+      }
+
+      // Toggle camera: get video tracks or turn them off.
+      async function toggleCamera() {
+        if (!cameraStream) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            cameraStream = stream;
+            stream.getVideoTracks().forEach(track => {
+              combinedStream.addTrack(track);
+            });
+            startCameraBtn.textContent = "Disable Camera";
+            statusMessage.textContent = "Camera enabled.";
+            statusMessage.style.color = "green";
+            updateLocalVideo();
+          } catch (err) {
+            console.error("Error enabling camera:", err);
+            statusMessage.textContent = "Error enabling camera: " + err.message;
+            statusMessage.style.color = "red";
+          }
+        } else {
+          // Disable camera: remove and stop video tracks.
+          cameraStream.getVideoTracks().forEach(track => {
+            combinedStream.removeTrack(track);
+            track.stop();
           });
-          localVideo.srcObject = combinedStream;
-          statusMessage.textContent = "Camera enabled.";
-          statusMessage.style.color = "green";
-        } catch (err) {
-          console.error("Error enabling camera: ", err);
-          statusMessage.textContent = "Error enabling camera: " + err.message;
-          statusMessage.style.color = "red";
+          cameraStream = null;
+          startCameraBtn.textContent = "Enable Camera";
+          statusMessage.textContent = "Camera disabled.";
+          updateLocalVideo();
         }
       }
 
-      // Request audio-only permissions.
-      async function initMic() {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          micStream = stream;
-          stream.getAudioTracks().forEach(track => {
-            combinedStream.addTrack(track);
+      // Toggle microphone: get audio tracks or turn them off.
+      async function toggleMic() {
+        if (!micStream) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            micStream = stream;
+            stream.getAudioTracks().forEach(track => {
+              combinedStream.addTrack(track);
+            });
+            startMicBtn.textContent = "Disable Microphone";
+            statusMessage.textContent = "Microphone enabled.";
+            statusMessage.style.color = "green";
+            updateLocalVideo();
+          } catch (err) {
+            console.error("Error enabling microphone:", err);
+            statusMessage.textContent = "Error enabling microphone: " + err.message;
+            statusMessage.style.color = "red";
+          }
+        } else {
+          // Disable microphone: remove and stop audio tracks.
+          micStream.getAudioTracks().forEach(track => {
+            combinedStream.removeTrack(track);
+            track.stop();
           });
-          localVideo.srcObject = combinedStream;
-          statusMessage.textContent = "Microphone enabled.";
-          statusMessage.style.color = "green";
-        } catch (err) {
-          console.error("Error enabling microphone: ", err);
-          statusMessage.textContent = "Error enabling microphone: " + err.message;
-          statusMessage.style.color = "red";
+          micStream = null;
+          startMicBtn.textContent = "Enable Microphone";
+          statusMessage.textContent = "Microphone disabled.";
+          updateLocalVideo();
         }
       }
 
-      // Set up the RTCPeerConnection by adding all tracks from combinedStream.
+      // Set up the RTCPeerConnection, adding all tracks from combinedStream.
       function setupPeerConnection() {
         peerConnection = new RTCPeerConnection(rtcConfig);
         combinedStream.getTracks().forEach(track => {
           peerConnection.addTrack(track, combinedStream);
         });
 
-        // When a remote track is received, display it.
+        // When remote media arrives, display it.
         peerConnection.ontrack = event => {
-          console.log("Received a remote track.");
+          console.log("Received remote track.");
           remoteVideo.srcObject = event.streams[0];
           remotePlaceholder.style.display = "none";
         };
 
-        // Relay ICE candidates to the remote peer.
+        // Relay ICE candidates via the signaling server.
         peerConnection.onicecandidate = event => {
           if (event.candidate && remoteSocketId) {
             socket.emit("signal", {
               roomId: roomId,
               signal: { type: "candidate", candidate: event.candidate },
-              target: remoteSocketId,
+              target: remoteSocketId
             });
           }
         };
 
-        // If another user connects, create an offer.
+        // When another user connects, create and send an offer.
         socket.on("user-connected", async socketId => {
           console.log("User connected:", socketId);
           remoteSocketId = socketId;
@@ -230,7 +260,7 @@
               socket.emit("signal", {
                 roomId: roomId,
                 signal: offer,
-                target: remoteSocketId,
+                target: remoteSocketId
               });
             } catch (err) {
               console.error("Error creating offer:", err);
@@ -251,7 +281,7 @@
             socket.emit("signal", {
               roomId: roomId,
               signal: answer,
-              target: remoteSocketId,
+              target: remoteSocketId
             });
           } catch (err) {
             console.error("Error handling offer:", err);
@@ -271,11 +301,10 @@
         }
       });
 
-      // Chat functionality.
+      // Chat functionality (optional).
       const chatDiv = document.getElementById("chat");
       const messageInput = document.getElementById("messageInput");
       const sendBtn = document.getElementById("sendBtn");
-
       sendBtn.addEventListener("click", () => {
         const message = messageInput.value.trim();
         if (message !== "") {
@@ -284,11 +313,9 @@
           messageInput.value = "";
         }
       });
-
       socket.on("chat-message", (message) => {
         addChatMessage("Remote", message);
       });
-
       function addChatMessage(sender, message) {
         const messageDiv = document.createElement("div");
         messageDiv.textContent = sender + ": " + message;
@@ -296,7 +323,7 @@
         chatDiv.scrollTop = chatDiv.scrollHeight;
       }
 
-      // Join the call. (Warn if no media is enabled.)
+      // Join the call. Verify at least one media track is active.
       function joinCall() {
         if (combinedStream.getTracks().length === 0) {
           statusMessage.textContent = "Please enable your camera or microphone before joining.";
@@ -312,9 +339,9 @@
         joinCallBtn.style.display = "none";
       }
 
-      // Button event listeners.
-      startCameraBtn.addEventListener("click", initCamera);
-      startMicBtn.addEventListener("click", initMic);
+      // Button event assignments.
+      startCameraBtn.addEventListener("click", toggleCamera);
+      startMicBtn.addEventListener("click", toggleMic);
       joinCallBtn.addEventListener("click", joinCall);
 
       socket.on("connect", () => {
