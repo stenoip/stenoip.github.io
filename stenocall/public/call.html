@@ -83,11 +83,11 @@
   <body>
     <h1>StenoCall - Advanced Video Conferencing</h1>
     <div id="roomInfo"></div>
-    
-    <!-- Status message for errors or info -->
+
+    <!-- Status message area -->
     <div id="statusMessage"></div>
     
-    <!-- New button to turn on camera and microphone -->
+    <!-- Button to explicitly turn on camera and microphone -->
     <button id="startCallBtn">Turn On Camera & Microphone</button>
     
     <div id="videos">
@@ -103,6 +103,7 @@
       </div>
     </div>
 
+    <!-- Chat Area -->
     <div id="chat"></div>
     <div id="controls">
       <input type="text" id="messageInput" placeholder="Type your message here" />
@@ -112,7 +113,7 @@
     <!-- Socket.IO library -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      // Determine room info from URL
+      // Determine or create a room from the URL query parameter.
       const urlParams = new URLSearchParams(window.location.search);
       let roomId = urlParams.get("room");
       const roomInfoDiv = document.getElementById("roomInfo");
@@ -125,14 +126,13 @@
         roomInfoDiv.textContent = "You are in room: " + roomId + ". Share this link to invite others: " + window.location.href;
       }
 
-      // Get status element and the start button
       const statusMessage = document.getElementById("statusMessage");
       const startCallBtn = document.getElementById("startCallBtn");
 
-      // Connect to the Socket.IO server
+      // Connect to the Socket.IO signaling server.
       const socket = io();
 
-      // WebRTC configuration (using Google's public STUN server)
+      // WebRTC configuration: Using Google's public STUN server.
       const rtcConfig = {
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
       };
@@ -147,8 +147,8 @@
       const messageInput = document.getElementById("messageInput");
       const sendBtn = document.getElementById("sendBtn");
 
+      // Function to request media (camera & mic) access.
       async function initMedia() {
-        // Clear previous status messages
         statusMessage.textContent = "";
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
           statusMessage.textContent = "Your browser does not support accessing media devices.";
@@ -159,29 +159,30 @@
           localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
           console.log("Media devices opened.");
           localVideo.srcObject = localStream;
-          // After getting local media, setup peer connection
           setupPeerConnection();
         } catch (err) {
           console.error("Error accessing local media:", err);
-          statusMessage.textContent = "Error accessing camera/microphone. Please ensure you have granted permission and are on a secure (HTTPS) connection.";
+          statusMessage.textContent =
+            "Error accessing camera/microphone. Please ensure you have granted permission and are using HTTPS.";
         }
       }
 
+      // Set up the RTCPeerConnection and add event handlers.
       function setupPeerConnection() {
         peerConnection = new RTCPeerConnection(rtcConfig);
-        // Add each media track to the connection
+        // Add local tracks (video and audio) to the connection.
         localStream.getTracks().forEach(track => {
           peerConnection.addTrack(track, localStream);
         });
 
-        // When a remote track is received, show it in the remote video element
+        // When receiving remote media, display it.
         peerConnection.ontrack = event => {
           console.log("Received remote track.");
           remoteVideo.srcObject = event.streams[0];
           remotePlaceholder.style.display = "none";
         };
 
-        // Send ICE candidates through Socket.IO
+        // Send ICE candidates to the remote peer via Socket.IO.
         peerConnection.onicecandidate = event => {
           if (event.candidate && remoteSocketId) {
             socket.emit("signal", {
@@ -192,7 +193,7 @@
           }
         };
 
-        // When another user joins, start the call by sending an offer
+        // When another user connects, send an offer if signaling state is stable.
         socket.on("user-connected", async socketId => {
           console.log("User connected:", socketId);
           remoteSocketId = socketId;
@@ -212,7 +213,7 @@
         });
       }
 
-      // Handle incoming signaling messages
+      // Handle incoming signaling messages.
       socket.on("signal", async data => {
         const { signal, sender } = data;
         remoteSocketId = sender;
@@ -244,7 +245,7 @@
         }
       });
 
-      // Chat functionality
+      // Basic chat functionality.
       sendBtn.addEventListener("click", () => {
         const message = messageInput.value.trim();
         if (message !== "") {
@@ -265,15 +266,13 @@
         chatDiv.scrollTop = chatDiv.scrollHeight;
       }
 
-      // When the start button is clicked, initialize media and join the room.
+      // When the "Turn On Camera & Microphone" button is clicked, initialize media and join the room.
       startCallBtn.addEventListener("click", () => {
         console.log("Start button clicked. Requesting media...");
         initMedia().then(() => {
-          // If media gets initialized successfully, join the room.
           if (localStream) {
             socket.emit("join-room", roomId);
-            // Hide the button once media is active.
-            startCallBtn.style.display = "none";
+            startCallBtn.style.display = "none"; // Hide the button after media is activated.
             statusMessage.style.color = "green";
             statusMessage.textContent = "Camera & Microphone activated.";
           }
