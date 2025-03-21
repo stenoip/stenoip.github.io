@@ -119,38 +119,40 @@
 
     <!-- Socket.IO library -->
     <script src="/socket.io/socket.io.js"></script>
-  <script>
-  // Establish room ID and socket connection
+ <script>
+  // Setup variables and elements
   const roomId = new URLSearchParams(window.location.search).get('room') || Math.random().toString(36).substr(2, 8);
   const socket = io();
 
   // UI Elements
+  const statusMessage = document.getElementById("statusMessage");
   const startCameraBtn = document.getElementById("startCameraBtn");
   const startMicBtn = document.getElementById("startMicBtn");
   const joinCallBtn = document.getElementById("joinCallBtn");
+  const localVideo = document.getElementById("localVideo");
+  const remoteVideo = document.getElementById("remoteVideo");
   const remotePlaceholder = document.getElementById("remotePlaceholder");
 
-  // WebRTC configuration and streams
+  // WebRTC streams and peer connection
   let cameraStream = null;
   let micStream = null;
   const combinedStream = new MediaStream();
   let peerConnection;
   let remoteSocketId = null;
 
-  // Utility: update local video
-  function updateLocalVideo() {
-    localVideo.srcObject = combinedStream;
-  }
+  // WebRTC Configuration
+  const rtcConfig = {
+    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+  };
 
-  // Toggle Camera
+  // Toggle Camera and Microphone functionality
   async function toggleCamera() {
     if (!cameraStream) {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       cameraStream = stream;
-      stream.getVideoTracks().forEach(track => {
-        combinedStream.addTrack(track);
-      });
+      stream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
       startCameraBtn.textContent = "Disable Camera";
+      updateLocalVideo();
     } else {
       cameraStream.getVideoTracks().forEach(track => {
         combinedStream.removeTrack(track);
@@ -158,19 +160,17 @@
       });
       cameraStream = null;
       startCameraBtn.textContent = "Enable Camera";
+      updateLocalVideo();
     }
-    updateLocalVideo();
   }
 
-  // Toggle Mic
   async function toggleMic() {
     if (!micStream) {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       micStream = stream;
-      stream.getAudioTracks().forEach(track => {
-        combinedStream.addTrack(track);
-      });
+      stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
       startMicBtn.textContent = "Disable Microphone";
+      updateLocalVideo();
     } else {
       micStream.getAudioTracks().forEach(track => {
         combinedStream.removeTrack(track);
@@ -178,13 +178,18 @@
       });
       micStream = null;
       startMicBtn.textContent = "Enable Microphone";
+      updateLocalVideo();
     }
-    updateLocalVideo();
   }
 
-  // Setup PeerConnection
+  function updateLocalVideo() {
+    localVideo.srcObject = combinedStream;
+  }
+
+  // Setting up PeerConnection
   function setupPeerConnection() {
-    peerConnection = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+    peerConnection = new RTCPeerConnection(rtcConfig);
+
     combinedStream.getTracks().forEach(track => {
       peerConnection.addTrack(track, combinedStream);
     });
@@ -205,24 +210,25 @@
     };
   }
 
-  // Handle incoming call
-  socket.on('incoming-call', (data) => {
-    if (confirm(`Incoming call from ${data.callerId}. Accept?`)) {
-      socket.emit('accept-call', { callerId: data.callerId, roomId: data.roomId });
-      setupPeerConnection();
-    } else {
-      socket.emit('reject-call', { callerId: data.callerId });
+  // Join Call - Emit join request
+  function joinCall() {
+    if (combinedStream.getTracks().length === 0) {
+      statusMessage.textContent = "Please enable your camera or microphone before joining.";
+      statusMessage.style.color = "red";
+      return;
     }
-  });
 
-  // Handle call accepted
-  socket.on('call-accepted', () => {
-    setupPeerConnection();
-    socket.emit('signal', { roomId: roomId, signal: peerConnection.localDescription, target: remoteSocketId });
-  });
+    socket.emit("join-room", roomId);
+    statusMessage.textContent = "Joined the call!";
+    statusMessage.style.color = "green";
 
-  // Handle signaling messages
-  socket.on('signal', async (data) => {
+    if (!peerConnection) {
+      setupPeerConnection();
+    }
+  }
+
+  // Handle incoming signaling messages
+  socket.on("signal", async (data) => {
     const { signal, sender } = data;
     remoteSocketId = sender;
 
@@ -238,26 +244,34 @@
     }
   });
 
-  // Join the call
-  function joinCall() {
-    if (combinedStream.getTracks().length === 0) {
-      alert("Please enable your camera or microphone before joining.");
-      return;
-    }
-    socket.emit('join-room', roomId);
-    statusMessage.textContent = "Joined the call!";
-  }
+  // Handle when a remote user connects
+  socket.on("user-connected", async (socketId) => {
+    console.log("User connected:", socketId);
+    remoteSocketId = socketId;
 
-  // Call a specific user
-  function callUser(targetId) {
-    socket.emit('initiate-call', { target: targetId, roomId: roomId });
-  }
+    if (peerConnection.signalingState === "stable") {
+      try {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        socket.emit("signal", { roomId: roomId, signal: offer, target: remoteSocketId });
+      } catch (err) {
+        console.error("Error creating offer:", err);
+      }
+    }
+  });
 
   // Button event listeners
   startCameraBtn.addEventListener("click", toggleCamera);
   startMicBtn.addEventListener("click", toggleMic);
   joinCallBtn.addEventListener("click", joinCall);
+
+  // Call when connected
+  socket.on("connect", () => {
+    console.log("Connected to signaling server with ID:", socket.id);
+  });
+
 </script>
+
 
   </body>
 </html>
