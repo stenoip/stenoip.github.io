@@ -13,23 +13,40 @@ app.use(express.static('public'));
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
-  // When a client joins a room, add them and notify the others.
+  // When a client joins a room, add them and notify others
   socket.on('join-room', (roomId) => {
     socket.join(roomId);
     console.log(`Socket ${socket.id} joined room ${roomId}`);
     socket.to(roomId).emit('user-connected', socket.id);
   });
 
-  // Relay signaling messages: offer, answer, and ICE candidates.
+  // When a user initiates a call, notify the target user
+  socket.on('initiate-call', (data) => {
+    io.to(data.target).emit('incoming-call', {
+      callerId: socket.id,
+      roomId: data.roomId
+    });
+  });
+
+  // Handle accepting an incoming call
+  socket.on('accept-call', (data) => {
+    io.to(data.callerId).emit('call-accepted', { roomId: data.roomId });
+  });
+
+  // Handle rejecting an incoming call
+  socket.on('reject-call', (data) => {
+    io.to(data.callerId).emit('call-rejected');
+  });
+
+  // Relay signaling messages: offer, answer, and ICE candidates
   socket.on('signal', (data) => {
-    // data: { roomId, signal, target }
     io.to(data.target).emit('signal', {
       signal: data.signal,
       sender: socket.id,
     });
   });
 
-  // Optional chat message relaying.
+  // Optional chat message relaying
   socket.on('chat-message', (data) => {
     io.to(data.roomId).emit('chat-message', data.message);
   });
