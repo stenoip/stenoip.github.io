@@ -160,42 +160,61 @@
   <a href="https://www.cbc.ca/aboutus/copyright.html" target="_blank">CBC Copyright Policy</a> and <a href="https://www.bbc.com/usingthebbc/copyright/" target="_blank">BBC Copyright Policy</a>.
 </p>
 
-                <script>
-                    async function fetchRSSFeed() {
-                        const rssUrl = "http://feeds.bbci.co.uk/news/world/rss.xml"; // Replace with your RSS feed URL
-                        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
-                        const data = await response.json();
+                <script>
+                 async function fetchRSSFeed() {
+    const rssUrl = "http://feeds.bbci.co.uk/news/world/rss.xml"; // Replace with your RSS feed URL
+    const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
+    const data = await response.json();
 
-                        const container = document.getElementById("rss-feed-container");
-                        container.innerHTML = "";
+    const container = document.getElementById("rss-feed-container");
+    container.innerHTML = "";
 
-                        if (data.items) {
-                            data.items.forEach(item => {
-                                const div = document.createElement("div");
-                                div.classList.add("rss-feed-item");
+    if (data.items) {
+        data.items.forEach(item => {
+            // Define keywords to filter out LGBT-related and "war in Gaza" news
+            const blacklistKeywords = [
+                "LGBT", "lesbian", "gay", "bisexual", "transgender", "queer", "pride", // LGBT-related terms
+                "war in Gaza" // Specific phrase for filtering out "war in Gaza"
+            ];
 
-                                const link = document.createElement("a");
-                                link.href = item.link;
-                                link.target = "_blank";
-                                link.textContent = item.title;
+            // Check if the title or description contains any of the blacklist keywords
+            const containsBlacklistedKeyword = blacklistKeywords.some(keyword => 
+                item.title.toLowerCase().includes(keyword.toLowerCase()) ||
+                item.description.toLowerCase().includes(keyword.toLowerCase())
+            );
 
-                                const description = document.createElement("p");
-                                const cleanDescription = item.description
-                                    .replace(/<br\s*\/?>/g, "")
-                                    .replace(/<span[^>]*>.*?<\/span>/g, "");
-                                description.textContent = cleanDescription;
+            // If the news item contains any blacklisted keywords, skip it
+            if (containsBlacklistedKeyword) {
+                return;
+            }
 
-                                div.appendChild(link);
-                                div.appendChild(description);
+            // Create the RSS feed item elements and append them
+            const div = document.createElement("div");
+            div.classList.add("rss-feed-item");
 
-                                container.appendChild(div);
-                            });
-                        } else {
-                            container.textContent = "No items found in the RSS feed.";
-                        }
-                    }
+            const link = document.createElement("a");
+            link.href = item.link;
+            link.target = "_blank";
+            link.textContent = item.title;
 
-                    fetchRSSFeed();
+            const description = document.createElement("p");
+            const cleanDescription = item.description
+                .replace(/<br\s*\/?>/g, "")
+                .replace(/<span[^>]*>.*?<\/span>/g, "");
+            description.textContent = cleanDescription;
+
+            div.appendChild(link);
+            div.appendChild(description);
+
+            container.appendChild(div);
+        });
+    } else {
+        container.textContent = "No items found in the RSS feed.";
+    }
+}
+
+fetchRSSFeed();
+
                 </script>
             </div>
 
