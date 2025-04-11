@@ -37,7 +37,6 @@
       const password = document.getElementById('password').value;
       const messageDiv = document.getElementById('loginMessage');
 
-      // Simulate logging in with the backend
       const response = await fetch('https://your-backend-server.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -48,7 +47,8 @@
 
       if (response.ok) {
         messageDiv.textContent = '✅ Logged in successfully!';
-        window.location.href = '/inbox.html'; // Or show inbox here
+        localStorage.setItem('email', email); // Store email for session
+        window.location.href = '/inbox.html'; // Redirect to inbox
       } else {
         messageDiv.textContent = '❌ Error: ' + result.error;
       }
