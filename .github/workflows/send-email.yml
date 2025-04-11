@@ -1,0 +1,54 @@
+name: Send Email on Form Submission
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow when there's a push to the 'main' branch
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'  # You can specify the Node.js version here
+
+    - name: Install dependencies
+      run: |
+        npm install nodemailer
+
+    - name: Send email using Nodemailer
+      env:
+        EMAIL_USER: ${{ secrets.EMAIL_USER }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+      run: |
+        node -e "
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
+
+        const mailOptions = {
+          from: process.env.EMAIL_USER,
+          to: 'recipient@example.com',  # Replace this with the form email address dynamically
+          subject: 'Test Email from GitHub Actions',
+          text: 'This email was sent from a GitHub Actions workflow!',
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.log('Error:', error);
+          } else {
+            console.log('Email sent:', info.response);
+          }
+        });
+        "
