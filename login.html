@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | MailSteno</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+    header { background: #1a73e8; color: white; padding: 20px; text-align: center; }
+    main { max-width: 500px; margin: 50px auto; padding: 30px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    button { background-color: #1a73e8; color: white; border: none; }
+    button:hover { background-color: #1558b0; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📧 MailSteno</h1>
+    <p>Log in to your @stenoip.github.io email</p>
+  </header>
+
+  <main>
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Enter your email" required />
+      <input type="password" id="password" placeholder="Enter your password" required />
+      <button type="submit">Log In</button>
+    </form>
+    <div id="loginMessage"></div>
+  </main>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const messageDiv = document.getElementById('loginMessage');
+
+      // Simulate logging in with the backend
+      const response = await fetch('https://your-backend-server.com/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        messageDiv.textContent = '✅ Logged in successfully!';
+        window.location.href = '/inbox.html'; // Or show inbox here
+      } else {
+        messageDiv.textContent = '❌ Error: ' + result.error;
+      }
+    });
+  </script>
+
+</body>
+</html>
