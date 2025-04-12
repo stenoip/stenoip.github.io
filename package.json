@@ -1,0 +1,13 @@
+{
+  "name": "mail-steno-backend",
+  "version": "1.0.0",
+  "description": "Backend for sending emails with MailSteno",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemailer": "^6.7.2"
+  }
+}
