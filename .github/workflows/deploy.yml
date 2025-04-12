@@ -1,0 +1,30 @@
+name: Deploy Node.js Backend to Fly.io
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment on push to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Deploy to Fly.io
+        run: |
+          flyctl auth login  # Log in to Fly.io (requires Fly.io API key in GitHub Secrets)
+          flyctl deploy  # Deploy your app to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}  # Fly.io API key stored as a secret in GitHub
