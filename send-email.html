@@ -22,9 +22,11 @@
   <main>
     <h2>Send New Email</h2>
     <form id="sendEmailForm">
-      <input type="email" id="toEmail" placeholder="Recipient's email" required />
-      <input type="text" id="subject" placeholder="Subject" required />
-      <textarea id="message" placeholder="Your message" rows="5" required></textarea>
+      <input type="email" id="fromEmail" name="fromEmail" placeholder="Your email" required />
+      <input type="password" id="fromPassword" name="fromPassword" placeholder="Your email password" required />
+      <input type="email" id="toEmail" name="toEmail" placeholder="Recipient's email" required />
+      <input type="text" id="subject" name="subject" placeholder="Subject" required />
+      <textarea id="message" name="message" placeholder="Your message" rows="5" required></textarea>
       <button type="submit">Send Email</button>
     </form>
     <div id="sendMessage"></div>
@@ -33,15 +35,20 @@
   <script>
     document.getElementById('sendEmailForm').addEventListener('submit', async function(e) {
       e.preventDefault();
+      
+      const fromEmail = document.getElementById('fromEmail').value;
+      const fromPassword = document.getElementById('fromPassword').value;
       const toEmail = document.getElementById('toEmail').value;
       const subject = document.getElementById('subject').value;
       const message = document.getElementById('message').value;
 
-      // Update this URL to your actual deployed backend endpoint (e.g., Heroku)
-      const response = await fetch('https://your-backend-service.com/api/send-email', {
+      // Sending the form data to the backend (server.js)
+      const response = await fetch('/send-email', {  // 'send-email' endpoint on the same server
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ toEmail, subject, message })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fromEmail, fromPassword, toEmail, subject, message })
       });
 
       const result = await response.json();
@@ -49,8 +56,6 @@
 
       if (response.ok) {
         messageDiv.textContent = '✅ Email sent successfully!';
-        // Optionally, redirect to inbox
-        setTimeout(() => { window.location.href = '/inbox.html'; }, 1500);
       } else {
         messageDiv.textContent = '❌ Error: ' + result.error;
       }
