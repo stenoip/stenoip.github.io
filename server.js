@@ -3,41 +3,44 @@ const nodemailer = require('nodemailer');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware to parse JSON requests
+// Middleware to parse incoming JSON data
 app.use(express.json());
 
-// Route to send email
-app.post('/api/send-email', async (req, res) => {
+// Route to handle email sending
+app.post('/send-email', async (req, res) => {
   const { fromEmail, fromPassword, toEmail, subject, message } = req.body;
 
-  // Validate required fields
+  // Validate that all required fields are provided
   if (!fromEmail || !fromPassword || !toEmail || !subject || !message) {
-    return res.status(400).json({ error: 'All fields are required' });
+    return res.status(400).json({ error: 'All fields are required.' });
   }
 
   try {
-    // Create transporter using user-provided email service
+    // Create the transporter using the user's provided email and password
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // Assuming Gmail. You could dynamically choose based on user input
+      service: 'gmail',  // Using Gmail as an example; modify as needed
       auth: {
-        user: fromEmail,
-        pass: fromPassword
+        user: fromEmail,    // The sender's email (from the form)
+        pass: fromPassword  // The sender's email password (from the form)
       }
     });
 
-    // Mail options
+    // Set up email options
     const mailOptions = {
-      from: fromEmail,  // Sender's email (from request)
-      to: toEmail,      // Recipient's email
-      subject: subject, // Email subject
-      text: message     // Email message
+      from: fromEmail,   // Sender's email
+      to: toEmail,       // Recipient's email
+      subject: subject,  // Email subject
+      text: message      // Email body
     };
 
     // Send the email
     await transporter.sendMail(mailOptions);
-    return res.status(200).json({ message: 'Email sent successfully!' });
+
+    // Respond to the client
+    return res.status(200).json({ message: '✅ Email sent successfully!' });
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to send email', details: error.message });
+    console.error('Error sending email:', error);
+    return res.status(500).json({ error: '❌ Failed to send email: ' + error.message });
   }
 });
 
