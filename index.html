@@ -544,31 +544,33 @@ body {
 
     <!-- JavaScript -->
     <script>
-    // Wait for the video to finish, then show the main content
+    // Wait for the video to finish, then show the main textContent
+    // Wait for the video to finish, then show the main content and hide the skip button
 document.getElementById('intro-video').addEventListener('ended', function() {
-    document.querySelector('.intro-video').style.display = 'none';
-    document.getElementById('main-content').style.display = 'block';
-    document.getElementById('launch-screen').style.display = 'none';
-    document.getElementById('skip-btn').style.display = 'none'; // Hide the skip button when the video ends
+    document.querySelector('.intro-video').style.display = 'none';  // Hide video
+    document.getElementById('main-content').style.display = 'block';  // Show main content
+    document.getElementById('launch-screen').style.display = 'none';  // Hide launch screen
+    document.getElementById('skip-btn').style.display = 'none';  // Hide skip button
 });
 
 // Skip the video when the button is clicked and stop sound
 function skipVideo() {
     const video = document.querySelector('.intro-video');
-    video.pause(); // Stop the video
-    video.currentTime = 0; // Reset the video time
-    video.style.display = 'none'; // Hide the video
-    document.getElementById('main-content').style.display = 'block'; // Show the main content
-    document.getElementById('skip-btn').style.display = 'none'; // Hide the skip button
-    document.getElementById('launch-screen').style.display = 'none'; // Hide the launch screen
+    video.pause();  // Stop the video
+    video.currentTime = 0;  // Reset the video time
+    video.style.display = 'none';  // Hide the video
+    document.getElementById('main-content').style.display = 'block';  // Show the main content
+    document.getElementById('launch-screen').style.display = 'none';  // Hide launch screen
+    document.getElementById('skip-btn').style.display = 'none';  // Hide the skip button
 }
 
 // Start video and unmute audio when user clicks "Launch"
 function startVideo() {
-    document.getElementById('intro-video').muted = false; // Unmute the video
-    document.getElementById('launch-screen').style.display = 'none'; // Hide launch screen
-    document.getElementById('intro-video').style.display = 'block'; // Show the video
+    document.getElementById('intro-video').muted = false;  // Unmute the video
+    document.getElementById('launch-screen').style.display = 'none';  // Hide launch screen
+    document.getElementById('intro-video').style.display = 'block';  // Show the video
 }
+
 
 // Filter search based on input
 function filterSearch() {
