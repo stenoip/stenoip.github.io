@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferkenne Map with Routing</title>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Cesium.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #cesiumContainer {
+            width: 100%;
+            height: 100vh;
+            display: block;
+        }
+        #controlsContainer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 5px;
+        }
+        #locationInput {
+            padding: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            width: 200px;
+        }
+        #submitBtn, #getRouteBtn {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        #submitBtn:hover, #getRouteBtn:hover {
+            background-color: #45a049;
+        }
+        #travelMode {
+            padding: 8px;
+            font-size: 14px;
+            width: 200px;
+            margin-bottom: 10px;
+        }
+        #routeInstructions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div id="cesiumContainer"></div>
+    <div id="controlsContainer">
+        <h2>Explore</h2>
+        <input type="text" id="locationInput" placeholder="Enter a location">
+        <button id="submitBtn">Go to Location</button>
+
+        <h3>Get Route</h3>
+        <input type="text" id="startLocationInput" placeholder="Enter start location">
+        <input type="text" id="endLocationInput" placeholder="Enter end location">
+        <select id="travelMode">
+            <option value="driving-car">Car</option>
+            <option value="walking">Walking</option>
+            <option value="foot-hiking">Hiking</option>
+            <option value="cycling-regular">Cycling</option>
+            <option value="public-transport">Transit</option>
+        </select>
+        <button id="getRouteBtn">Get Route</button>
+    </div>
+    <div id="routeInstructions"></div>
+
+    <script>
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MDQ0YmNjMy02NDI5LTRjYTItOWZhYS0wYmMxMWVkOGI5MjMiLCJpZCI6MjUyODUxLCJpYXQiOjE3MzA3NjM3MTB9.pi4kOnQvSmZxTAkOELqnouNQi7cVnvJAq7WUWfX-sek'; // Replace with your token
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            terrainProvider: Cesium.createWorldTerrain(),
+            locale: 'en-GB' // Set the locale to English UK
+        });
+
+        viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(-0.1278, 51.5074, 1500), // London, UK
+            orientation: {
+                heading: Cesium.Math.toRadians(0.0),
+                pitch: Cesium.Math.toRadians(-20.0),
+                roll: 0.0
+            }
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const location = document.getElementById('locationInput').value;
+            const geocoder = new Cesium.GeocoderService();
+            geocoder.geocode(location).then((results) => {
+                if (results.length > 0) {
+                    viewer.camera.flyTo({
+                        destination: results[0].destination,
+                        orientation: {
+                            heading: 0,
+                            pitch: Cesium.Math.toRadians(-90),
+                            roll: 0
+                        }
+                    });
+                } else {
+                    alert('Location not found');
+                }
+            }).catch((error) => {
+                console.error('Geocoding error:', error);
+                alert('Error geocoding location.');
+            });
+        });
+
+        document.getElementById('getRouteBtn').addEventListener('click', function() {
+            const startLocation = document.getElementById('startLocationInput').value;
+            const endLocation = document.getElementById('endLocationInput').value;
+            const travelMode = document.getElementById('travelMode').value;
+            const orsApiKey = '5b3ce3597851110001cf6248fd6c09a7da6740f4a155af5b0314ddc4'; // Replace with your actual key
+
+            // Remove any existing route
+            viewer.entities.removeAll();
+            viewer.entities.add(viewer.scene.primitives); // Re-add the globe
+
+            // Function to geocode a location using Cesium's Geocoder
+            function geocodeLocation(location) {
+                const geocoder = new Cesium.GeocoderService();
+                return geocoder.geocode(location).then(results => {
+                    if (results.length > 0 && results[0].destination) {
+                        const cartographic = Cesium.Cartographic.fromCartesian(results[0].destination);
+                        const longitude = Cesium.Math.toDegrees(cartographic.longitude);
+                        const latitude = Cesium.Math.toDegrees(cartographic.latitude);
+                        return [longitude, latitude];
+                    } else {
+                        alert(`Location "${location}" not found.`);
+                        return null;
+                    }
+                }).catch(error => {
+                    console.error('Geocoding error:', error);
+                    alert('Error geocoding location.');
+                    return null;
+                });
+            }
+
+            Promise.all([geocodeLocation(startLocation), geocodeLocation(endLocation)])
+                .then(coordinates => {
+                    if (coordinates[0] && coordinates[1]) {
+                        const startCoords = coordinates[0].join(',');
+                        const endCoords = coordinates[1].join(',');
+
+                        const orsDirectionsUrl = `https://api.openrouteservice.org/v2/directions/${travelMode}?api_key=${orsApiKey}&start=${startCoords}&end=${endCoords}`;
+
+                        fetch(orsDirectionsUrl)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.features && data.features.length > 0) {
+                                    const route = data.features[0].geometry.coordinates;
+                                    const routePositions = Cesium.Cartesian3.fromDegreesArray(route.flat());
+
+                                    // Add the route as a polyline to the Cesium viewer
+                                    viewer.entities.add({
+                                        polyline: {
+                                            positions: routePositions,
+                                            material: Cesium.Color.BLUE.withAlpha(0.7),
+                                            width: 5
+                                        }
+                                    });
+
+                                    // Optionally, display route instructions
+                                    let instructions = '<h3>Route Instructions:</h3><ol>';
+                                    if (data.features[0].properties && data.features[0].properties.segments) {
+                                        data.features[0].properties.segments.forEach(segment => {
+                                            segment.steps.forEach(step => {
+                                                instructions += `<li>${step.instruction} (${step.distance}m)</li>`;
+                                            });
+                                        });
+                                    } else {
+                                        instructions += '<li>No detailed instructions available.</li>';
+                                    }
+                                    instructions += '</ol>';
+                                    document.getElementById('routeInstructions').innerHTML = instructions;
+
+                                    // Fly the camera to the end point of the route
+                                    viewer.camera.flyTo({
+                                        destination: Cesium.Cartesian3.fromDegrees(coordinates[1][0], coordinates[1][1], 1000),
+                                        orientation: {
+                                            heading: 0,
+                                            pitch: Cesium.Math.toRadians(-45),
+                                            roll: 0
+                                        }
+                                    });
+
+                                } else {
+                                    alert('No route found for the given locations and travel mode.');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('ORS Directions API error:', error);
+                                alert('Error fetching route.');
+                            });
+                    }
+                });
+        });
+    </script>
+    <footer>
+        <p>&copy; <span id="year"></span> Stenoip Company. All rights reserved.</p>
+        <p>Powered by <a href="https://cesium.com/platform/cesiumjs/" target="_blank">CesiumJS</a> and <a href="https://www.stenoip.com/" target="_blank">Stenoip</a>.</p>
+    </footer>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
