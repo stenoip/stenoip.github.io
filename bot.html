@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Bot Learner</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { margin: 5px; }
+    #output { margin-top: 15px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🧠 Learning Bot</h1>
+
+  <label>Input (x): <input type="number" id="inputX" /></label><br>
+  <label>Output (y): <input type="number" id="inputY" /></label><br>
+  <button onclick="addTrainingPair()">Teach Bot</button>
+  <hr>
+  <label>Ask Bot: <input type="number" id="askX" /></label>
+  <button onclick="predict()">Predict</button>
+
+  <div id="output">Bot says: ?</div>
+
+  <script>
+  let model;
+let userInputs = [];
+let userOutputs = [];
+
+// Load data from localStorage
+function loadData() {
+  const savedInputs = localStorage.getItem('userInputs');
+  const savedOutputs = localStorage.getItem('userOutputs');
+  
+  if (savedInputs && savedOutputs) {
+    userInputs = JSON.parse(savedInputs);
+    userOutputs = JSON.parse(savedOutputs);
+  }
+}
+
+// Step 1: Create the model
+function createModel() {
+  model = tf.sequential();
+  model.add(tf.layers.dense({ units: 8, activation: 'relu', inputShape: [1] }));
+  model.add(tf.layers.dense({ units: 1 }));
+  model.compile({ optimizer: 'adam', loss: 'meanSquaredError' });
+}
+
+createModel();
+loadData();  // Load saved data when the page loads
+
+// Step 2: Add training data
+async function addTrainingPair() {
+  const xVal = parseFloat(document.getElementById("inputX").value);
+  const yVal = parseFloat(document.getElementById("inputY").value);
+
+  if (isNaN(xVal) || isNaN(yVal)) {
+    alert("Please enter valid numbers.");
+    return;
+  }
+
+  userInputs.push(xVal);
+  userOutputs.push(yVal);
+
+  // Save the data to localStorage
+  localStorage.setItem('userInputs', JSON.stringify(userInputs));
+  localStorage.setItem('userOutputs', JSON.stringify(userOutputs));
+
+  await trainModel();
+}
+
+// Step 3: Train the model
+async function trainModel() {
+  const xs = tf.tensor2d(userInputs, [userInputs.length, 1]);
+  const ys = tf.tensor2d(userOutputs, [userOutputs.length, 1]);
+
+  await model.fit(xs, ys, {
+    epochs: 20,
+    shuffle: true,
+    callbacks: {
+      onEpochEnd: (epoch, logs) => {
+        console.log(`Epoch ${epoch + 1}: loss = ${logs.loss}`);
+      }
+    }
+  });
+}
+
+// Step 4: Make a prediction
+function predict() {
+  const input = parseFloat(document.getElementById("askX").value);
+  if (isNaN(input)) {
+    alert("Please enter a valid number to ask the bot.");
+    return;
+  }
+
+  const inputTensor = tf.tensor2d([input], [1, 1]);
+  const outputTensor = model.predict(inputTensor);
+  outputTensor.array().then(predictions => {
+    document.getElementById("output").innerText =
+      `Bot says: ${predictions[0][0].toFixed(2)}`;
+  });
+}
+
+  </script>
+</body>
+</html>
