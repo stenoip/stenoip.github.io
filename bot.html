@@ -2,105 +2,110 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI Bot Learner</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
+  <title>Creative Learning Chatbot</title>
   <style>
     body { font-family: Arial; padding: 20px; }
-    input, button { margin: 5px; }
-    #output { margin-top: 15px; font-weight: bold; }
+    #chatbox { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; background: #f9f9f9; }
+    .bot { color: blue; margin: 5px 0; }
+    .user { color: green; margin: 5px 0; }
   </style>
 </head>
 <body>
-  <h1>🧠 Learning Bot</h1>
-
-  <label>Input (x): <input type="number" id="inputX" /></label><br>
-  <label>Output (y): <input type="number" id="inputY" /></label><br>
-  <button onclick="addTrainingPair()">Teach Bot</button>
-  <hr>
-  <label>Ask Bot: <input type="number" id="askX" /></label>
-  <button onclick="predict()">Predict</button>
-
-  <div id="output">Bot says: ?</div>
+  <h2> Creative Learning Chatbot</h2>
+  <div id="chatbox"></div>
+  <input type="text" id="userInput" placeholder="Say something..." size="50" />
+  <button onclick="handleInput()">Send</button>
 
   <script>
-  let model;
-let userInputs = [];
-let userOutputs = [];
+    let responses = {};
 
-// Load data from localStorage
-function loadData() {
-  const savedInputs = localStorage.getItem('userInputs');
-  const savedOutputs = localStorage.getItem('userOutputs');
-  
-  if (savedInputs && savedOutputs) {
-    userInputs = JSON.parse(savedInputs);
-    userOutputs = JSON.parse(savedOutputs);
-  }
-}
+    // Load learned responses
+    function loadLearnedData() {
+      const saved = localStorage.getItem("learnedResponses");
+      if (saved) responses = JSON.parse(saved);
+    }
 
-// Step 1: Create the model
-function createModel() {
-  model = tf.sequential();
-  model.add(tf.layers.dense({ units: 8, activation: 'relu', inputShape: [1] }));
-  model.add(tf.layers.dense({ units: 1 }));
-  model.compile({ optimizer: 'adam', loss: 'meanSquaredError' });
-}
+    // Save to localStorage
+    function saveLearnedData() {
+      localStorage.setItem("learnedResponses", JSON.stringify(responses));
+    }
 
-createModel();
-loadData();  // Load saved data when the page loads
+    function addMessage(text, sender) {
+      const chat = document.getElementById("chatbox");
+      const message = document.createElement("div");
+      message.className = sender;
+      message.textContent = `${sender === "user" ? "You" : "Bot"}: ${text}`;
+      chat.appendChild(message);
+      chat.scrollTop = chat.scrollHeight;
+    }
 
-// Step 2: Add training data
-async function addTrainingPair() {
-  const xVal = parseFloat(document.getElementById("inputX").value);
-  const yVal = parseFloat(document.getElementById("inputY").value);
+    function handleInput() {
+      const inputBox = document.getElementById("userInput");
+      const userText = inputBox.value.trim();
+      inputBox.value = "";
+      if (!userText) return;
 
-  if (isNaN(xVal) || isNaN(yVal)) {
-    alert("Please enter valid numbers.");
-    return;
-  }
+      addMessage(userText, "user");
 
-  userInputs.push(xVal);
-  userOutputs.push(yVal);
+      // Handle commands
+      const lower = userText.toLowerCase();
 
-  // Save the data to localStorage
-  localStorage.setItem('userInputs', JSON.stringify(userInputs));
-  localStorage.setItem('userOutputs', JSON.stringify(userOutputs));
+      if (lower.startsWith("learn:")) {
+        const parts = userText.slice(6).split("=");
+        if (parts.length === 2) {
+          const input = parts[0].trim().toLowerCase();
+          const output = parts[1].trim();
+          responses[input] = output;
+          saveLearnedData();
+          addMessage(`Got it! I'll remember that when you say "${input}".`, "bot");
+        } else {
+          addMessage("Use format: learn:input=output", "bot");
+        }
 
-  await trainModel();
-}
+      } else if (lower.startsWith("forget:")) {
+        const key = userText.slice(7).trim().toLowerCase();
+        if (responses[key]) {
+          delete responses[key];
+          saveLearnedData();
+          addMessage(`Forgot what "${key}" means.`, "bot");
+        } else {
+          addMessage(`I don't remember "${key}".`, "bot");
+        }
 
-// Step 3: Train the model
-async function trainModel() {
-  const xs = tf.tensor2d(userInputs, [userInputs.length, 1]);
-  const ys = tf.tensor2d(userOutputs, [userOutputs.length, 1]);
+      } else if (lower === "list") {
+        const keys = Object.keys(responses);
+        if (keys.length === 0) {
+          addMessage("I haven't learned anything yet.", "bot");
+        } else {
+          addMessage("Here's what I know: " + keys.join(", "), "bot");
+        }
 
-  await model.fit(xs, ys, {
-    epochs: 20,
-    shuffle: true,
-    callbacks: {
-      onEpochEnd: (epoch, logs) => {
-        console.log(`Epoch ${epoch + 1}: loss = ${logs.loss}`);
+      } else {
+        const cleanedInput = lower.trim();
+        if (responses[cleanedInput]) {
+          const creativeResponse = generateCreativeResponse(responses[cleanedInput]);
+          addMessage(creativeResponse, "bot");
+        } else {
+          addMessage("I don't know how to respond. Teach me using: learn:your input=your response", "bot");
+        }
       }
     }
-  });
-}
 
-// Step 4: Make a prediction
-function predict() {
-  const input = parseFloat(document.getElementById("askX").value);
-  if (isNaN(input)) {
-    alert("Please enter a valid number to ask the bot.");
-    return;
-  }
+    // Generate creative variations of a response
+    function generateCreativeResponse(original) {
+      const templates = [
+        r => r,
+        r => "You know, " + r,
+        r => "Some say that " + r.toLowerCase(),
+        r => "I'd say... " + r,
+        r => r + " 🙂",
+        r => "Interesting thought: " + r
+      ];
+      const index = Math.floor(Math.random() * templates.length);
+      return templates[index](original);
+    }
 
-  const inputTensor = tf.tensor2d([input], [1, 1]);
-  const outputTensor = model.predict(inputTensor);
-  outputTensor.array().then(predictions => {
-    document.getElementById("output").innerText =
-      `Bot says: ${predictions[0][0].toFixed(2)}`;
-  });
-}
-
+    loadLearnedData();
   </script>
 </body>
 </html>
