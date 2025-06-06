@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+   <link rel="icon" type="image/png" href="swc.png">
+
+    <title>Stenoip Wonder Computer (SWC)</title>
+</head>
+<body>
+  <style>
+        body {
+            background-color: rgb(255, 191, 0);
+        }
+        
+        .red {
+            background-color: rgb(255, 133, 133);
+        }
+        
+        .orange {
+            background-color: orange;
+        }
+        
+        .green {
+            background-color: #008900;
+         color: #CCCCCC;
+        }
+        
+        .red {
+            color: rgb(255, 0, 0);
+        }
+        
+        .orange {
+            color: rgb(255, 146, 36);
+        }
+        
+        .yellow {
+            color: yellow;
+        }
+        
+        .green {
+            color: #008000;
+        }
+        
+        .blue {
+            color: rgb(0, 0, 255);
+        }
+        
+        .indigo {
+            color: rgb(75, 0, 130);
+        }
+        
+        .violet {
+            color: rgb(148, 0, 211);
+        
+        }
+        
+        .story-title {
+            font-family: cursive;
+        }
+        
+        .story-subtitle {
+            font-family: , "Palatino", serif;
+        }
+        
+        code {
+            font-family: "Monaco", "Lucida Console", monospace;
+        }
+       
+        }}
+    </style>  
+    
+    <h1 class="story-title"> Stenoip Wonder Computer </h1>
+    
+   <img src="data:image/jpeg;base64,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"><img>
+   <h3>Games of the day:</h3>
+        
+    
+<iframe src="https://editor.p5js.org/stenoip/full/cPRKm8bEP" height="600px" width="600px"></iframe>.
+    
+   <h3>News:</h3>     
+    <a href="https://www.youtube.com/watch?v=fERHEN0LpxA">News of the week</a>. 
+    
+    
+    <h3>Amazing Tools:</h3>
+<li><a href="https://www.khanacademy.org/computer-programming/mapo/4830084721590272">Mapo </a> </li>   
+
+  
+    
+  <iframe src="https://editor.p5js.org/stenoip/full/zE65sSgIY" height="600px" width="600px"></iframe>  
+ 
+    <li><a href="https://www.euratlas.net/history/europe/2000/index.html">Europe history map(A.D 1 to A.D 2000)</a></li>
+    
+    <h3>Other:</h3>
+    <ul id="more-programmers">
+         
+    <a href="https://abc7ny.com/place/yonkers/">News of the week</a>. 
+        
+
+   
+    
+   <h3>Stenoip Encyclopædia </h3>
+    <!--Note! This did not exist in original. I added this for that this is what I wanted when I was younger.  -->
+  <input type="text" class="fillIn" spellcheck="true" id="searchInput" placeholder="Enter your query">
+      <button onclick="performSearch()">Go</button>
+
+   <script>
+  function performSearch() {
+    const query = document.getElementById('searchInput').value;
+    if (query) {
+      window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+    }
+  }
+
+  // Optional: Allow pressing Enter to search
+  document.getElementById('searchInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      performSearch();
+    }
+  });
+</script>
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   <h6>Trademark October 2023 (Stenoip Company) all rights reserved </h6>
+    </ul>
+</body>
+</html>
