@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Mapo</title>
+        <style>
+            #Earth {
+                position: absolute;
+                left: 0px;
+            }
+        
+           body {
+            background-color:rgb(20, 20, 20);
+        }
+        
+        .red {
+            background-color: rgb(25, 133, 133);
+        }
+        
+        .orange {
+            background-color: orange;
+        }
+        
+        .green {
+            background-color: #008900;
+         color: #CCCCCC;
+        }
+        
+        .red {
+            color: rgb(255, 0, 0);
+        }
+        
+        .orange {
+            color: rgb(255, 146, 36);
+        }
+        
+        .yellow {
+            color: yellow;
+        }
+        
+        .green {
+            color: #008000;
+        }
+        
+        .blue {
+            color: rgb(0, 0, 255);
+        }
+        
+        .indigo {
+            color: rgb(75, 0, 130);
+        }
+        
+        .violet {
+            color: rgb(148, 0, 211);
+        }} 
+        </style>
+    </head>
+    <body>
+    <h1>Mapo</h1>
+    
+    <h2>Welcome to Mapo the website that takes you to space.</h2>
+    
+    
+    
+    <div>
+        <img id="Earth" src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif">
+    </div>
+    
+
+
+
+
+
+
+
+
+  <script>
+  var EarthEl = document.getElementById("Earth");
+  
+  var startTime = new Date().getTime();
+  var Earthmove = function() {
+      var currTime = new Date().getTime();
+      var secondsElapsed = ((currTime - startTime)/1000);
+  };
+  Earthmove();
+  </script>
+
+    </body>
+</html>
