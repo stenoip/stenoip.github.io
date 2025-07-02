@@ -1,4 +1,532 @@
- self.new_tab_btn = QAction("➕", self) # Emoji
+from PyQt5.QtCore import (
+    QByteArray, QUrl, Qt, pyqtSignal, QTimer, QSize, QTranslator, QObject, QThread, QStandardPaths
+)
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QToolBar, QLineEdit,
+    QPushButton, QAction, QTabWidget, QVBoxLayout,
+    QWidget, QFileDialog, QSizePolicy, QMessageBox,
+    QStatusBar, QActionGroup, QInputDialog, QMenu
+)
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
+from PyQt5.QtGui import QIcon, QFont, QKeySequence
+
+import sys
+import os
+import json
+import re
+import math # For basic ranking (even if StenoSearchCore is left out)
+import socket # For internet check
+import base64 # For encoding HTML for data: URLs
+
+# Constants
+SUSPEND_TIMEOUT_MS = 60 * 1000  # 1 minute suspend timeout
+STENO_INDEX_FILE = "steno_search_index.json" # Where the index will be saved/loaded
+BOOKMARKS_FILE = "bookmarks.json" # File for storing bookmarks
+
+# --- StenoSearchCore Placeholder (as requested to leave out, but structure remains) ---
+# This class is included just for structural completeness based on your provided code,
+# but its methods will not be directly used or called in the MainWindow for actual search.
+class StenoSearchCore:
+    def __init__(self):
+        self.inverted_index = {}  # {word: {doc_id: [pos1, pos2, ...], ...}}
+        self.documents = {}        # {doc_id: {'path': '...', 'content': '...'}}
+        self.doc_id_counter = 0
+
+    def _tokenize(self, text):
+        # Simple tokenization: lowercase, remove punctuation, split by whitespace
+        text = text.lower()
+        text = re.sub(r'[^\w\s]', '', text) # Remove punctuation
+        return text.split()
+
+    def build_index(self, directory_path, status_callback=None):
+        if status_callback:
+            status_callback(f"StenoSearch: Indexing functionality is currently disabled.")
+        return False # Always return False as it's disabled
+
+    def save_index(self, file_path=STENO_INDEX_FILE, status_callback=None):
+        if status_callback:
+            status_callback(f"StenoSearch: Index saving functionality is currently disabled.")
+        return False
+
+    def load_index(self, file_path=STENO_INDEX_FILE, status_callback=None):
+        if status_callback:
+            status_callback(f"StenoSearch: Index loading functionality is currently disabled.")
+        return False
+
+    def search(self, query, num_results=10):
+        if query:
+            print(f"StenoSearch: Search for '{query}' functionality is currently disabled.")
+        return []
+
+    def _generate_snippet(self, content, query_tokens, doc_matches, snippet_length=200):
+        return "StenoSearch: No snippet available (search disabled)."
+
+# --- End StenoSearchCore Placeholder ---
+
+class IndexingThread(QThread):
+    status_update = pyqtSignal(str)
+    finished = pyqtSignal()
+
+    def __init__(self, steno_search_core, directory_path):
+        super().__init__()
+        self.steno_search_core = steno_search_core
+        self.directory_path = directory_path
+
+    def run(self):
+        self.status_update.emit(f"StenoSearch: Starting indexing of '{self.directory_path}'...")
+        # Since StenoSearchCore methods are effectively disabled, this will just show messages.
+        success = self.steno_search_core.build_index(self.directory_path, self.status_update.emit)
+        if success:
+            self.steno_search_core.save_index(status_callback=self.status_update.emit)
+        self.finished.emit()
+
+
+class CustomWebEngineView(QWebEngineView):
+    # Custom signal to emit when an error occurs that the view itself cannot handle
+    loadError = pyqtSignal(QUrl, int, str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.is_suspended = False
+        self._suspend_url = None
+        self.zoom_levels = {} # For future per-site zoom
+        print("DEBUG: CustomWebEngineView initialized.")
+
+    def suspend(self):
+        if self.is_suspended:
+            return
+        self.is_suspended = True
+        self._suspend_url = self.url()
+        self.stop() # Stop any loading
+        self.setUrl(QUrl("about:blank")) # Unload the page
+        print(f"Suspending: {self._suspend_url.toString()}")
+
+    def resume(self):
+        if not self.is_suspended:
+            return
+        self.is_suspended = False
+        if self._suspend_url:
+            print(f"Resuming: {self._suspend_url.toString()}")
+            self.setUrl(self._suspend_url)
+
+    def set_zoom_for_url(self, zoom_factor):
+        url_str = self.url().toString()
+        self.zoom_levels[url_str] = zoom_factor
+        self.setZoomFactor(zoom_factor)
+
+    def restore_zoom(self):
+        url_str = self.url().toString()
+        if url_str in self.zoom_levels:
+            self.setZoomFactor(self.zoom_levels[url_str])
+        else:
+            self.setZoomFactor(1.35)
+
+
+class CustomWebEnginePage(QWebEnginePage):
+    """
+    Subclass of QWebEnginePage to override virtual methods for custom behavior.
+    """
+    def __init__(self, main_window, parent=None):
+        super().__init__(parent)
+        # Store a reference to the main window to be able to create new tabs
+        self.main_window = main_window
+        print("DEBUG: CustomWebEnginePage initialized.")
+
+    def createWindow(self, window_type):
+        """
+        Overrides the virtual createWindow method to handle new tabs/windows.
+        This method MUST return a QWebEnginePage instance for the new content.
+        """
+        print(f"DEBUG: createWindow called for type: {window_type}")
+        try:
+            if window_type == QWebEnginePage.WebBrowserTab:
+                print("DEBUG: Creating a new CustomWebEngineView for a new tab.")
+                
+                # Create a new browser view.
+                new_browser = CustomWebEngineView()
+                
+                print("DEBUG: Creating a new CustomWebEnginePage for the new view.")
+                # The new browser needs a CustomWebEnginePage to handle its own new window requests.
+                # Pass 'new_browser' as the parent so the lifetime is managed correctly.
+                new_page = CustomWebEnginePage(self.main_window, parent=new_browser)
+                
+                print("DEBUG: Setting the new page on the new view.")
+                new_browser.setPage(new_page)
+                
+                print("DEBUG: Adding the new browser to the tab widget.")
+                # Add the new view to the tab widget and switch to it.
+                i = self.main_window.tabs.addTab(new_browser, "Loading...")
+                self.main_window.tabs.setCurrentIndex(i)
+                
+                print("DEBUG: Connecting signals for the new browser.")
+                # Connect the necessary signals for the new browser.
+                self.main_window.connect_browser_signals(new_browser)
+                
+                print("DEBUG: Returning the new page to Qt's web engine.")
+                return new_page
+            
+            elif window_type == QWebEnginePage.WebBrowserBackgroundTab:
+                print("DEBUG: Creating a new CustomWebEngineView for a background tab.")
+                new_browser = CustomWebEngineView()
+                new_page = CustomWebEnginePage(self.main_window, parent=new_browser)
+                new_browser.setPage(new_page)
+                
+                # Add the view to the tab widget without switching to it.
+                self.main_window.tabs.addTab(new_browser, "Loading...")
+                
+                print("DEBUG: Connecting signals for the new background browser.")
+                self.main_window.connect_browser_signals(new_browser)
+                
+                print("DEBUG: Returning the page for the new background tab.")
+                return new_page
+                
+            elif window_type == QWebEnginePage.WebBrowserWindow:
+                print("DEBUG: Creating a new top-level window (MainWindow instance).")
+                # Create a new instance of the MainWindow class.
+                # Its __init__ will automatically create a browser and add a tab.
+                new_window = MainWindow()
+                
+                # Get a handle on the browser created in the new window's default tab.
+                new_browser = new_window.current_browser()
+                
+                if new_browser:
+                    print("DEBUG: New browser found in new window. Creating a new page for it.")
+                    # Create a new page and set it on the new window's browser.
+                    # This page will be returned to Qt, which will then load the requested URL into it.
+                    new_page = CustomWebEnginePage(new_window, parent=new_browser)
+                    new_browser.setPage(new_page)
+                    
+                    # Show the new window.
+                    new_window.show()
+                    
+                    print("DEBUG: Returning the page for the new window to Qt.")
+                    return new_page
+                else:
+                    print("DEBUG: Failed to get the browser from the new window. Returning None.")
+                    return None # Something went wrong with the new window's setup
+            else:
+                # For other window types (e.g., pop-up windows, dialogs), return None to prevent them from opening.
+                print(f"DEBUG: Window type {window_type} not supported. Returning None.")
+                return None
+        except Exception as e:
+            print(f"DEBUG: An unexpected Python error occurred in createWindow: {e}")
+            import traceback
+            traceback.print_exc()
+            return None # Return None to prevent a crash if possible
+            
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Ringzauber Browser")
+        self.setWindowIcon(QIcon("ringzauber.ico"))
+
+        self.tabs = QTabWidget()
+        self.tabs.setDocumentMode(True)
+        self.tabs.setTabsClosable(True)
+        self.tabs.tabCloseRequested.connect(self.close_tab)
+        self.tabs.currentChanged.connect(self.on_tab_changed)
+        self.setCentralWidget(self.tabs)
+
+        self.status = QStatusBar()
+        self.setStatusBar(self.status)
+
+        self.navtb = QToolBar("Navigation")
+        self.navtb.setMovable(False)
+        self.navtb.setIconSize(QSize(28, 28))
+        self.addToolBar(self.navtb)
+
+        # --- Language Setup ---
+        self.current_language = "en"
+        self.translator = QTranslator(self)
+        self.web_translator = QTranslator(self)
+
+        self._lang_strings = {
+            "en": {
+                "back_tooltip": "Back",
+                "forward_tooltip": "Forward",
+                "reload_tooltip": "Reload",
+                "home_tooltip": "Home",
+                "urlbar_placeholder": "Search with Steno Search or enter URL...",
+                "stop_tooltip": "Stop loading",
+                "new_tab_tooltip": "New Tab",
+                "inspect_tooltip": "Toggle Inspect Element",
+                "theme_tooltip": "Toggle Theme",
+                "about_tooltip": "About",
+                "about_title": "About Ringzauber Browser",
+                "about_message": "Ringzauber Browser\n\nVersion 1.4.0004 (with Steno Search placeholder)\nLightweight & Themeable\nBuilt with PyQt5 & QtWebEngine.\n\nCopyright Stenoip Company",
+                "performance_status": "Tabs: {0} | Active: {1} | Ringzauber Browser",
+                "nav_toolbar_title": "Navigation",
+                "steno_search_menu": "Steno Search",
+                "build_index_action": "Build/Rebuild Index (Disabled)...",
+                "index_dialog_title": "Select Directory to Index (Disabled)",
+                "indexing_status": "Indexing Status (Disabled): {0}",
+                "no_query_message": "Please enter a search query in the URL bar.",
+                "no_results_message": "No results found for '{0}'.",
+                "search_results_title": "Steno Search Results for '{0}'",
+                "file_menu": "&File",
+                "new_window_action": "New &Window",
+                "close_tab_action": "Close Current &Tab",
+                "bookmarks_menu": "&Bookmarks",
+                "add_bookmark_action": "Add Current Page",
+                "show_bookmarks_action": "Show All Bookmarks",
+                "bookmark_added_status": "Bookmark added: {0}",
+                "bookmark_failed_status": "Failed to add bookmark.",
+                "bookmark_exists_status": "Bookmark already exists.",
+                "bookmark_input_title": "Add Bookmark",
+                "bookmark_input_label": "Bookmark Title:",
+                "no_bookmarks_message": "No bookmarks yet. Add some!",
+                "bookmarks_page_title": "Your Bookmarks"
+            },
+            "de": {
+                "back_tooltip": "Zurück",
+                "forward_tooltip": "Vorwärts",
+                "reload_tooltip": "Neu laden",
+                "home_tooltip": "Startseite",
+                "urlbar_placeholder": "Suche mit Steno Search oder URL eingeben...",
+                "stop_tooltip": "Ladevorgang stoppen",
+                "new_tab_tooltip": "Neuer Tab",
+                "inspect_tooltip": "Elementinspektor umschalten",
+                "theme_tooltip": "Design umschalten",
+                "about_tooltip": "Über",
+                "about_title": "Über Ringzauber Browser",
+                "about_message": "Ringzauber Browser\n\nFerzje 1.4.0004 (mei Steno Search placeholder)\nLjochtgewicht & Tema oanpasber\nBoud mei PyQt5 & QtWebEngine.\n\nCopyright Stenoip Company",
+                "performance_status": "Ljeppers: {0} | Aktyf: {1} | Ringzauber Browser",
+                "nav_toolbar_title": "Navigaasje",
+                "steno_search_menu": "Steno Sykjen",
+                "build_index_action": "Yndeks bouwe/op 'e nij bouwe (Utskeakele)...",
+                "index_dialog_title": "Selektearje map om te yndeksearjen (Utskeakele)",
+                "indexing_status": "Yndeksearje Status (Utskeakele): {0}",
+                "no_query_message": "Bitte geben Sie eine Suchanfrage in die URL-Leiste ein.",
+                "no_results_message": "Keine Ergebnisse gefunden für '{0}'.",
+                "search_results_title": "Steno Suchergebnisse für '{0}'",
+                "file_menu": "&Datei",
+                "new_window_action": "Neues &Fenster",
+                "close_tab_action": "Aktuellen &Tab schließen",
+                "bookmarks_menu": "&Lesezeichen",
+                "add_bookmark_action": "Aktuelle Seite hinzufügen",
+                "show_bookmarks_action": "Alle Lesezeichen anzeigen",
+                "bookmark_added_status": "Lesezeichen hinzugefügt: {0}",
+                "bookmark_failed_status": "Lesezeichen konnte nicht hinzugefügt werden.",
+                "bookmark_exists_status": "Lesezeichen existiert bereits.",
+                "bookmark_input_title": "Lesezeichen hinzufügen",
+                "bookmark_input_label": "Titel des Lesezeichens:",
+                "no_bookmarks_message": "Noch keine Lesezeichen. Fügen Sie welche hinzu!",
+                "bookmarks_page_title": "Ihre Lesezeichen"
+            },
+            # ... (other languages can be extended similarly)
+            "es": {
+                "back_tooltip": "Atrás",
+                "forward_tooltip": "Adelante",
+                "reload_tooltip": "Recargar",
+                "home_tooltip": "Inicio",
+                "urlbar_placeholder": "Buscar con Steno Search o introducir URL...",
+                "stop_tooltip": "Detener carga",
+                "new_tab_tooltip": "Nueva Pestaña",
+                "inspect_tooltip": "Alternar Inspector de Elementos",
+                "theme_tooltip": "Alternar Tema",
+                "about_tooltip": "Acerca de",
+                "about_title": "Acerca de Ringzauber Browser",
+                "about_message": "Navegador Ringzauber\n\nVersión 1.4.0004 (con marcador de posición de Steno Search)\nLigero y Tematizable\nConstruido con PyQt5 y QtWebEngine.\n\nCopyright Stenoip Company",
+                "performance_status": "Pestañas: {0} | Activa: {1} | Navegador Ringzauber",
+                "nav_toolbar_title": "Navegación",
+                "steno_search_menu": "Búsqueda Steno",
+                "build_index_action": "Construir/Reconstruir Índice (Deshabilitado)...",
+                "index_dialog_title": "Seleccionar Directorio para Indexar (Deshabilitado)",
+                "indexing_status": "Estado de Indexación (Deshabilitado): {0}",
+                "no_query_message": "Por favor, introduzca una consulta de búsqueda en la barra de URL.",
+                "no_results_message": "No se encontraron resultados para '{0}'.",
+                "search_results_title": "Resultados de Búsqueda Steno para '{0}'",
+                "file_menu": "&Archivo",
+                "new_window_action": "Nueva &Ventana",
+                "close_tab_action": "Cerrar Pestaña &Actual",
+                "bookmarks_menu": "&Marcadores",
+                "add_bookmark_action": "Añadir Página Actual",
+                "show_bookmarks_action": "Mostrar Todos los Marcadores",
+                "bookmark_added_status": "Marcador añadido: {0}",
+                "bookmark_failed_status": "No se pudo añadir el marcador.",
+                "bookmark_exists_status": "El marcador ya existe.",
+                "bookmark_input_title": "Añadir Marcador",
+                "bookmark_input_label": "Título del Marcador:",
+                "no_bookmarks_message": "Aún no hay marcadores. ¡Añade algunos!",
+                "bookmarks_page_title": "Sus Marcadores"
+            },
+            "zh": {
+                "back_tooltip": "后退",
+                "forward_tooltip": "前进",
+                "reload_tooltip": "重新加载",
+                "home_tooltip": "主页",
+                "urlbar_placeholder": "使用 Steno 搜索或输入网址...",
+                "stop_tooltip": "停止加载",
+                "new_tab_tooltip": "新建标签页",
+                "inspect_tooltip": "切换检查元素",
+                "theme_tooltip": "切换主题",
+                "about_tooltip": "关于",
+                "about_title": "关于 Ringzauber 浏览器",
+                "about_message": "Ringzauber 浏览器\n\n版本 1.4.0004 (含 Steno Search 占位符)\n轻量且可主题化\n使用 PyQt5 和 QtWebEngine 构建。\n\n版权所有 Stenoip 公司！",
+                "performance_status": "标签页: {0} | 活动: {1} | Ringzauber 浏览器",
+                "nav_toolbar_title": "导航",
+                "steno_search_menu": "Steno 搜索",
+                "build_index_action": "构建/重建索引 (已禁用)...",
+                "index_dialog_title": "选择要索引的目录 (已禁用)",
+                "indexing_status": "索引状态 (已禁用): {0}",
+                "no_query_message": "请在网址栏中输入搜索查询。",
+                "no_results_message": "未找到 '{0}' 的结果。",
+                "search_results_title": "Steno 搜索结果 '{0}'",
+                "file_menu": "&文件",
+                "new_window_action": "新建&窗口",
+                "close_tab_action": "关闭当前&标签页",
+                "bookmarks_menu": "&书签",
+                "add_bookmark_action": "添加当前页面",
+                "show_bookmarks_action": "显示所有书签",
+                "bookmark_added_status": "书签已添加: {0}",
+                "bookmark_failed_status": "添加书签失败。",
+                "bookmark_exists_status": "书签已存在。",
+                "bookmark_input_title": "添加书签",
+                "bookmark_input_label": "书签标题:",
+                "no_bookmarks_message": "暂无书签。添加一些吧！",
+                "bookmarks_page_title": "您的书签"
+            },
+            "fy": {
+                "back_tooltip": "Werom",
+                "forward_tooltip": "Foarút",
+                "reload_tooltip": "Op 'e nij lade",
+                "home_tooltip": "Thús",
+                "urlbar_placeholder": "Sykje mei Steno Search of fier URL yn...",
+                "stop_tooltip": "Laden stopje",
+                "new_tab_tooltip": "Nije Ljepper",
+                "inspect_tooltip": "Ynspektor-elemint wikselje",
+                "theme_tooltip": "Tema wikselje",
+                "about_tooltip": "Oer",
+                "about_title": "Oer Ringzauber Browser",
+                "about_message": "Ringzauber Browser\n\nFerzje 1.4.0004 (mei Steno Search placeholder)\nLjochtgewicht & Tema oanpasber\nBoud mei PyQt5 & QtWebEngine.\n\nAuteursrjocht Stenoip Bedriuw",
+                "performance_status": "Ljeppers: {0} | Aktyf: {1} | Ringzauber Browser",
+                "nav_toolbar_title": "Navigaasje",
+                "steno_search_menu": "Steno Sykjen",
+                "build_index_action": "Yndeks bouwe/op 'e nij bouwe (Utskeakele)...",
+                "index_dialog_title": "Selektearje map om te yndeksearjen (Utskeakele)",
+                "indexing_status": "Yndeksearje Status (Utskeakele): {0}",
+                "no_query_message": "Fier asjebleaft in sykopdracht yn de URL-balke yn.",
+                "no_results_message": "Gjin resultaten fûn foar '{0}'.",
+                "search_results_title": "Steno Sykresultaten foar '{0}'",
+                "file_menu": "&Triem",
+                "new_window_action": "Nij &Finster",
+                "close_tab_action": "Aktuele &Ljepper slute",
+                "bookmarks_menu": "&Blêdwizers",
+                "add_bookmark_action": "Hjoeddeistige side tafoegje",
+                "show_bookmarks_action": "Alle blêdwizers sjen litte",
+                "bookmark_added_status": "Blêdwizer tafoege: {0}",
+                "bookmark_failed_status": "Blêdwizer koe net tafoege wurde.",
+                "bookmark_exists_status": "Blêdwizer bestiet al.",
+                "bookmark_input_title": "Blêdwizer tafoegje",
+                "bookmark_input_label": "Titel blêdwizer:",
+                "no_bookmarks_message": "Noch gjin blêdwizers. Foegje wat ta!",
+                "bookmarks_page_title": "Jo blêdwizers"
+            },
+            "fr": {
+                "back_tooltip": "Retour",
+                "forward_tooltip": "Avancer",
+                "reload_tooltip": "Recharger",
+                "home_tooltip": "Accueil",
+                "urlbar_placeholder": "Rechercher avec Steno Search ou entrer l'URL...",
+                "stop_tooltip": "Arrêter le chargement",
+                "new_tab_tooltip": "Nouvel onglet",
+                "inspect_tooltip": "Basculer l'Inspecteur d'éléments",
+                "theme_tooltip": "Basculer le thème",
+                "about_tooltip": "À propos",
+                "about_title": "À propos du navigateur Ringzauber",
+                "about_message": "Navigateur Ringzauber\n\nVersion 1.4.0004 (avec emplacement réservé pour Steno Search)\nLéger et Thème personnalisable\nConstruit avec PyQt5 et QtWebEngine.\n\nCopyright Stenoip Company",
+                "performance_status": "Onglets: {0} | Actif: {1} | Navigateur Ringzauber",
+                "nav_toolbar_title": "Navigation",
+                "steno_search_menu": "Recherche Steno",
+                "build_index_action": "Construire/Reconstruire l'Index (Désactivé)...",
+                "index_dialog_title": "Sélectionner le répertoire à indexer (Désactivé)",
+                "indexing_status": "État de l'indexation (Désactivé): {0}",
+                "no_query_message": "Veuillez entrer une requête de recherche dans la barre d'URL.",
+                "no_results_message": "Aucun résultat trouvé pour '{0}'.",
+                "search_results_title": "Résultats de la recherche Steno pour '{0}'",
+                "file_menu": "&Fichier",
+                "new_window_action": "Nouvelle &Fenêtre",
+                "close_tab_action": "Fermer l'onglet &actuel",
+                "bookmarks_menu": "&Marque-pages",
+                "add_bookmark_action": "Ajouter la page actuelle",
+                "show_bookmarks_action": "Afficher tous les marque-pages",
+                "bookmark_added_status": "Marque-page ajouté : {0}",
+                "bookmark_failed_status": "Échec de l'ajout du marque-page.",
+                "bookmark_exists_status": "Le marque-page existe déjà.",
+                "bookmark_input_title": "Ajouter un marque-page",
+                "bookmark_input_label": "Titre du marque-page :",
+                "no_bookmarks_message": "Aucun marque-page pour l'instant. Ajoutez-en !",
+                "bookmarks_page_title": "Vos marque-pages"
+            },
+            "gaa": {
+                "back_tooltip": "Mli",
+                "forward_tooltip": "Hiɛ",
+                "reload_tooltip": "Gbɔmɔŋ",
+                "home_tooltip": "Shia",
+                "urlbar_placeholder": "Tsu Steno Search looŋ loo URL sɛŋ...",
+                "stop_tooltip": "Kaa shaa sane ni yɔɔ nɔ",
+                "new_tab_tooltip": "Lɛlɛ gbogbo ni akɛbaa",
+                "inspect_tooltip": "Kɛɛŋ ŋmãlɔ wolo ni akɛbaa",
+                "theme_tooltip": "Tsake gbɛ ni wɔŋɔŋ nɔ",
+                "about_tooltip": "Afa",
+                "about_title": "Afa Ringzauber Browser",
+                "about_message": "Ringzauber Browser\n\nGbɛi 1.4.0004 (kɛ Steno Search gbɛi ni yɔɔ nɔ)\nMiŋ miŋŋ kɛ gbɛi ni akɛbaa\nGbɛi ni akɛ gbɛi PyQt5 kɛ QtWebEngine egbáa nɔ.\n\nHegbɛ ni Stenoip nitsumɔhe lɛ yɔɔ",
+                "performance_status": "Lɛlɛi: {0} | Nyiɛŋ: {1} | Ringzauber Browser",
+                "nav_toolbar_title": "Gbɛfaŋ",
+                "steno_search_menu": "Steno Tsɔ",
+                "build_index_action": "Gbɛi ni akɛbaa / Gbɛi ni akɛbaa (Akaa nɔ)...",
+                "index_dialog_title": "Kɛŋ gbɛi ni akɛbaa (Akaa nɔ)",
+                "indexing_status": "Gbɛi ni akɛbaa (Akaa nɔ): {0}",
+                "no_query_message": "Hana gbɛi ni oŋɔŋ nɔ gbɛi yɛ URL bar lɛ mli.",
+                "no_results_message": "Gbɛi ni akɛbaa '{0}' akɛŋ nɔ.",
+                "search_results_title": "Steno Tsɔ hiŋmɛi loo '{0}'",
+                "file_menu": "&Wolo",
+                "new_window_action": "Lɛlɛŋ &Fenster",
+                "close_tab_action": "Kpãa Lɛlɛ ni nyiɛŋ nɔ",
+                "bookmarks_menu": "&Lɛlɛi",
+                "add_bookmark_action": "Kɛɛŋ lɛlɛ ni nyiɛŋ nɔ",
+                "show_bookmarks_action": "Kɛɛŋ lɛlɛi fɛɛ",
+                "bookmark_added_status": "Lɛlɛ ni akɛbaa: {0}",
+                "bookmark_failed_status": "Lɛlɛ ni akɛbaa akɛŋ nɔ.",
+                "bookmark_exists_status": "Lɛlɛ ni akɛbaa yɔɔ nɔ.",
+                "bookmark_input_title": "Kɛɛŋ lɛlɛ",
+                "bookmark_input_label": "Lɛlɛ gbɛi:",
+                "no_bookmarks_message": "Lɛlɛi babaoo yɛŋ nɔ. Kɛɛŋ nɔ!",
+                "bookmarks_page_title": "Lɛlɛi ni oŋɔŋ nɔ"
+            }
+        }
+        # --- End Language Setup ---
+
+        self.back_btn = QAction("◀️", self) # Emoji
+        self.back_btn.triggered.connect(lambda: self.current_browser().back() if self.current_browser() else None)
+        self.navtb.addAction(self.back_btn)
+
+        self.forward_btn = QAction("▶️", self) # Emoji
+        self.forward_btn.triggered.connect(lambda: self.current_browser().forward() if self.current_browser() else None)
+        self.navtb.addAction(self.forward_btn)
+
+        self.reload_btn = QAction("🔄", self) # Emoji
+        self.reload_btn.triggered.connect(lambda: self.current_browser().reload() if self.current_browser() else None)
+        self.navtb.addAction(self.reload_btn)
+
+        self.home_btn = QAction("🏠", self) # Emoji
+        self.home_btn.triggered.connect(lambda: self.current_browser().setUrl(QUrl("http://stenoip.github.io")) if self.current_browser() else None)
+        self.navtb.addAction(self.home_btn)
+
+        self.navtb.addSeparator()
+
+        self.urlbar = QLineEdit()
+        self.urlbar.returnPressed.connect(self.navigate_to_url)
+        self.urlbar.setFont(QFont("Segoe UI", 10)) # Set a clearer font
+        self.urlbar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.urlbar.setStyleSheet("QLineEdit { padding: 5px; border-radius: 8px; border: 1px solid #ccc; }")
+        self.navtb.addWidget(self.urlbar)
+
+        self.stop_btn = QAction("⏹️", self) # Emoji
+        self.stop_btn.triggered.connect(lambda: self.current_browser().stop() if self.current_browser() else None)
+        self.navtb.addAction(self.stop_btn)
+
+        self.new_tab_btn = QAction("➕", self) # Emoji
         self.new_tab_btn.triggered.connect(lambda: self.add_tab())
         self.navtb.addAction(self.new_tab_btn)
 
@@ -91,10 +619,7 @@
         self.steno_search_core.load_index(status_callback=self.status.showMessage)
 
         # Add the first tab with the new, more flexible `add_tab` method
-        if initial_url:
-            self.add_tab(initial_url)
-        else:
-            self.add_tab()
+        self.add_tab()
 
         self.is_dark_theme = False
         self.is_fiery_theme = False
@@ -233,14 +758,7 @@
     def open_new_browser_window(self):
         """Opens a new top-level browser window."""
         print("DEBUG: Opening new browser window (Ctrl+N).")
-        # Instantiate a new MainWindow without an initial URL, it will open default homepage
         new_window = MainWindow()
-        new_window.show()
-
-    def open_new_browser_window_with_url(self, url):
-        """Opens a new top-level browser window and loads a specific URL."""
-        print(f"DEBUG: Opening new browser window with URL: {url.toString()}")
-        new_window = MainWindow(initial_url=url) # Pass the URL to the new window
         new_window.show()
 
     def close_current_tab(self):
@@ -484,7 +1002,7 @@
                 QMenu { background-color: #e7e7e7; color: black; border: 1px solid #2980b9; }
                 QMenu::item:selected { background-color: #2980b9; color: white; }
                 QMenuBar { background-color: #e7e7e7; color: black; }
-                QMenuBar::item:selected { background-color: #2980b9; color: black; }
+                QMenuBar::item:selected { background-color: #2980b9; color: white; }
             """)
 
     def update_performance_stats(self):
@@ -616,15 +1134,12 @@
                 <div class="container">
                     <h1>{BOOKMARKS_PAGE_TITLE}</h1>
                     <ul id="bookmark-list">
-                        </ul>
-                    <div id="no-bookmarks" class="no-bookmarks" style="display: none;">
+                        {BOOKMARK_LIST_HTML}
+                    </ul>
+                    <div id="no-bookmarks" class="no-bookmarks" style="display: {NO_BOOKMARKS_DISPLAY};">
                         {NO_BOOKMARKS_MESSAGE}
                     </div>
                 </div>
-
-                <script>
-                    // Placeholder for future JS interaction if needed
-                </script>
             </body>
             </html>
             """
@@ -814,7 +1329,6 @@
         elif feature == QWebEnginePage.MediaAudioCapture or feature == QWebEnginePage.MediaVideoCapture:
             print(f"Permission requested for Media Capture by {origin.toString()}")
             # Deny permission for media capture by default
-            # A QMessageBox could be used here to ask the user.
             origin.setFeaturePermission(feature, QWebEnginePage.PermissionDeniedByUser)
         else:
             # Deny other unknown features
@@ -857,10 +1371,9 @@ if __name__ == '__main__':
                  with open(file_path, "w", encoding="utf-8") as f:
                     f.write("""<!DOCTYPE html><html><head><title>{BOOKMARKS_PAGE_TITLE}</title><style>body { font-family: sans-serif; background-color: #f7f7f7; color: #333; margin: 0; padding: 20px; }.container { max-width: 800px; margin: auto; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 30px; }h1 { color: #2980b9; text-align: center; margin-bottom: 30px; }ul { list-style: none; padding: 0; }li { margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }li:last-child { border-bottom: none; }a { color: #0066cc; text-decoration: none; font-size: 1.1em; }a:hover { text-decoration: underline; }.url { font-size: 0.9em; color: #666; word-break: break-all; }.no-bookmarks { text-align: center; color: #777; padding: 30px; }</style></head><body><div class="container"><h1>{BOOKMARKS_PAGE_TITLE}</h1><ul id="bookmark-list">{BOOKMARK_LIST_HTML}</ul><div id="no-bookmarks" class="no-bookmarks" style="display: {NO_BOOKMARKS_DISPLAY};">{NO_BOOKMARKS_MESSAGE}</div></div></body></html>""")
 
-
     app = QApplication(sys.argv)
     QApplication.setApplicationName("Ringzauber Browser")
-    QApplication.setApplicationVersion("1.4.0005") # Updated version
+    QApplication.setApplicationVersion("1.4.0004") # Updated version
     print(f"DEBUG: Application version is set to {QApplication.applicationVersion()}.")
 
     window = MainWindow()
