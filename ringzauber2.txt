@@ -1,0 +1,1051 @@
+import sys
+import os
+import json
+import re
+import math
+import socket
+import base64
+
+from PyQt5.QtCore import (
+    QByteArray, QUrl, Qt, pyqtSignal, QTimer, QSize, QTranslator, QObject, QThread, QStandardPaths
+)
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QToolBar, QLineEdit,
+    QPushButton, QAction, QTabWidget, QVBoxLayout,
+    QWidget, QFileDialog, QSizePolicy, QMessageBox,
+    QStatusBar, QActionGroup, QInputDialog, QMenu
+)
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage, QWebEngineProfile
+from PyQt5.QtGui import QIcon, QFont, QKeySequence
+
+# Constants
+SUSPEND_TIMEOUT_MS = 60 * 1000  # 1 minute suspend timeout
+STENO_INDEX_FILE = "steno_search_index.json"
+BOOKMARKS_FILE = "bookmarks.json"
+DEFAULT_HOMEPAGE = "http://stenoip.github.io" # New constant for homepage
+
+# --- StenoSearchCore Placeholder (as requested to leave out, but structure remains) ---
+class StenoSearchCore:
+    def __init__(self):
+        self.inverted_index = {}
+        self.documents = {}
+        self.doc_id_counter = 0
+
+    def _tokenize(self, text):
+        text = text.lower()
+        text = re.sub(r'[^\w\s]', '', text)
+        return text.split()
+
+    def build_index(self, directory_path, status_callback=None):
+        if status_callback:
+            status_callback(f"StenoSearch: Indexing functionality is currently disabled.")
+        return False
+
+    def save_index(self, file_path=STENO_INDEX_FILE, status_callback=None):
+        if status_callback:
+            status_callback(f"StenoSearch: Index saving functionality is currently disabled.")
+        return False
+
+    def load_index(self, file_path=STENO_INDEX_FILE, status_callback=None):
+        if status_callback:
+            status_callback(f"StenoSearch: Index loading functionality is currently disabled.")
+        return False
+
+    def search(self, query, num_results=10):
+        if query:
+            print(f"StenoSearch: Search for '{query}' functionality is currently disabled.")
+        return []
+
+    def _generate_snippet(self, content, query_tokens, doc_matches, snippet_length=200):
+        return "StenoSearch: No snippet available (search disabled)."
+# --- End StenoSearchCore Placeholder ---
+
+class IndexingThread(QThread):
+    status_update = pyqtSignal(str)
+    finished = pyqtSignal()
+
+    def __init__(self, steno_search_core, directory_path):
+        super().__init__()
+        self.steno_search_core = steno_search_core
+        self.directory_path = directory_path
+
+    def run(self):
+        self.status_update.emit(f"StenoSearch: Starting indexing of '{self.directory_path}'...")
+        success = self.steno_search_core.build_index(self.directory_path, self.status_update.emit)
+        if success:
+            self.steno_search_core.save_index(status_callback=self.status_update.emit)
+        self.finished.emit()
+
+
+class CustomWebEngineView(QWebEngineView):
+    loadError = pyqtSignal(QUrl, int, str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.is_suspended = False
+        self._suspend_url = None
+        self.zoom_levels = {}
+        print("DEBUG: CustomWebEngineView initialized.")
+
+    def suspend(self):
+        if self.is_suspended:
+            return
+        self.is_suspended = True
+        self._suspend_url = self.url()
+        self.stop()
+        self.setUrl(QUrl("about:blank"))
+        print(f"Suspending: {self._suspend_url.toString()}")
+
+    def resume(self):
+        if not self.is_suspended:
+            return
+        self.is_suspended = False
+        if self._suspend_url:
+            print(f"Resuming: {self._suspend_url.toString()}")
+            self.setUrl(self._suspend_url)
+
+    def set_zoom_for_url(self, zoom_factor):
+        url_str = self.url().toString()
+        self.zoom_levels[url_str] = zoom_factor
+        self.setZoomFactor(zoom_factor)
+
+    def restore_zoom(self):
+        url_str = self.url().toString()
+        if url_str in self.zoom_levels:
+            self.setZoomFactor(self.zoom_levels[url_str])
+        else:
+            self.setZoomFactor(1.35)
+
+
+class CustomWebEnginePage(QWebEnginePage):
+    """
+    Subclass of QWebEnginePage to override virtual methods for custom behavior.
+    """
+    def __init__(self, main_window, parent=None):
+        super().__init__(parent)
+        self.main_window = main_window
+        print("DEBUG: CustomWebEnginePage initialized.")
+
+    def createWindow(self, window_type):
+        """
+        Overrides the virtual createWindow method to handle new tabs/windows.
+        This method MUST return a QWebEnginePage instance for the new content.
+        """
+        print(f"DEBUG: createWindow called for type: {window_type}")
+        try:
+            if window_type == QWebEnginePage.WebBrowserTab:
+                print("DEBUG: Creating a new CustomWebEngineView for a new tab.")
+                new_browser = CustomWebEngineView()
+                print("DEBUG: Creating a new CustomWebEnginePage for the new view.")
+                new_page = CustomWebEnginePage(self.main_window, parent=new_browser)
+                new_browser.setPage(new_page)
+                print("DEBUG: Setting the new page on the new view.")
+                print("DEBUG: Adding the new browser to the tab widget.")
+                i = self.main_window.tabs.addTab(new_browser, "Loading...")
+                self.main_window.tabs.setCurrentIndex(i)
+                print("DEBUG: Connecting signals for the new browser.")
+                self.main_window.connect_browser_signals(new_browser)
+                print("DEBUG: Returning the new page to Qt's web engine.")
+                return new_page
+
+            elif window_type == QWebEnginePage.WebBrowserBackgroundTab:
+                print("DEBUG: Creating a new CustomWebEngineView for a background tab.")
+                new_browser = CustomWebEngineView()
+                new_page = CustomWebEnginePage(self.main_window, parent=new_browser)
+                new_browser.setPage(new_page)
+                self.main_window.tabs.addTab(new_browser, "Loading...")
+                print("DEBUG: Connecting signals for the new background browser.")
+                self.main_window.connect_browser_signals(new_browser)
+                print("DEBUG: Returning the page for the new background tab.")
+                return new_page
+
+            elif window_type == QWebEnginePage.WebBrowserWindow:
+                print("DEBUG: Creating a new top-level window (MainWindow instance).")
+                new_window = MainWindow()
+                new_browser = new_window.current_browser()
+                if new_browser:
+                    print("DEBUG: New browser found in new window. Creating a new page for it.")
+                    new_page = CustomWebEnginePage(new_window, parent=new_browser)
+                    new_browser.setPage(new_page)
+                    new_window.show()
+                    print("DEBUG: Returning the page for the new window to Qt.")
+                    return new_page
+                else:
+                    print("DEBUG: Failed to get the browser from the new window. Returning None.")
+                    return None
+            else:
+                print(f"DEBUG: Window type {window_type} not supported. Returning None.")
+                return None
+        except Exception as e:
+            print(f"DEBUG: An unexpected Python error occurred in createWindow: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Ringzauber Browser")
+        self.setWindowIcon(QIcon("ringzauber.ico")) # Placeholder, as emojis are for actions
+
+        self.tabs = QTabWidget()
+        self.tabs.setDocumentMode(True)
+        self.tabs.setTabsClosable(True)
+        self.tabs.tabCloseRequested.connect(self.close_tab)
+        self.tabs.currentChanged.connect(self.on_tab_changed)
+        self.setCentralWidget(self.tabs)
+
+        self.status = QStatusBar()
+        self.setStatusBar(self.status)
+
+        self.navtb = QToolBar("Navigation")
+        self.navtb.setMovable(False)
+        self.navtb.setIconSize(QSize(28, 28))
+        self.addToolBar(self.navtb)
+
+        # --- Language Setup ---
+        self.current_language = "en"
+        self.translator = QTranslator(self)
+        self.web_translator = QTranslator(self)
+
+        self._lang_strings = {
+            "en": {
+                "back_tooltip": "Back", "forward_tooltip": "Forward", "reload_tooltip": "Reload",
+                "home_tooltip": "Home", "urlbar_placeholder": "Search with Steno Search or enter URL...",
+                "stop_tooltip": "Stop loading", "new_tab_tooltip": "New Tab",
+                "inspect_tooltip": "Toggle Inspect Element", "theme_tooltip": "Toggle Theme",
+                "about_tooltip": "About", "about_title": "About Ringzauber Browser",
+                "about_message": "Ringzauber Browser\n\nVersion 1.4.0004 (with Steno Search placeholder)\nLightweight & Themeable\nBuilt with PyQt5 & QtWebEngine.\n\nCopyright Stenoip Company",
+                "performance_status": "Tabs: {0} | Active: {1} | Ringzauber Browser",
+                "nav_toolbar_title": "Navigation", "steno_search_menu": "Steno Search",
+                "build_index_action": "Build/Rebuild Index (Disabled)...",
+                "index_dialog_title": "Select Directory to Index (Disabled)",
+                "indexing_status": "Indexing Status (Disabled): {0}",
+                "no_query_message": "Please enter a search query in the URL bar.",
+                "no_results_message": "No results found for '{0}'.",
+                "search_results_title": "Steno Search Results for '{0}'",
+                "file_menu": "&File", "new_window_action": "New &Window",
+                "close_tab_action": "Close Current &Tab",
+                "open_html_file_action": "Open &HTML File...", # New translation string
+                "bookmarks_menu": "&Bookmarks", "add_bookmark_action": "Add Current Page",
+                "show_bookmarks_action": "Show All Bookmarks", "bookmark_added_status": "Bookmark added: {0}",
+                "bookmark_failed_status": "Failed to add bookmark.", "bookmark_exists_status": "Bookmark already exists.",
+                "bookmark_input_title": "Add Bookmark", "bookmark_input_label": "Bookmark Title:",
+                "no_bookmarks_message": "No bookmarks yet. Add some!", "bookmarks_page_title": "Your Bookmarks"
+            },
+            "de": {
+                "back_tooltip": "Zurück", "forward_tooltip": "Vorwärts", "reload_tooltip": "Neu laden",
+                "home_tooltip": "Startseite", "urlbar_placeholder": "Suche mit Steno Search oder URL eingeben...",
+                "stop_tooltip": "Ladevorgang stoppen", "new_tab_tooltip": "Neuer Tab",
+                "inspect_tooltip": "Elementinspektor umschalten", "theme_tooltip": "Design umschalten",
+                "about_tooltip": "Über", "about_title": "Über Ringzauber Browser",
+                "about_message": "Ringzauber Browser\n\nFerzje 1.4.0004 (mei Steno Search placeholder)\nLjochtgewicht & Tema oanpasber\nBoud mei PyQt5 & QtWebEngine.\n\nCopyright Stenoip Company",
+                "performance_status": "Ljeppers: {0} | Aktyf: {1} | Ringzauber Browser",
+                "nav_toolbar_title": "Navigaasje", "steno_search_menu": "Steno Sykjen",
+                "build_index_action": "Yndeks bouwe/op 'e nij bouwe (Utskeakele)...",
+                "index_dialog_title": "Selektearje map om te yndeksearjen (Utskeakele)",
+                "indexing_status": "Yndeksearje Status (Utskeakele): {0}",
+                "no_query_message": "Bitte geben Sie eine Suchanfrage in die URL-Leiste ein.",
+                "no_results_message": "Keine Ergebnisse gefunden für '{0}'.",
+                "search_results_title": "Steno Suchergebnisse für '{0}'",
+                "file_menu": "&Datei", "new_window_action": "Neues &Fenster",
+                "close_tab_action": "Aktuellen &Tab schließen",
+                "open_html_file_action": "HTML-Datei &öffnen...", # New translation string
+                "bookmarks_menu": "&Lesezeichen", "add_bookmark_action": "Aktuelle Seite hinzufügen",
+                "show_bookmarks_action": "Alle Lesezeichen anzeigen", "bookmark_added_status": "Lesezeichen hinzugefügt: {0}",
+                "bookmark_failed_status": "Lesezeichen konnte nicht hinzugefügt werden.",
+                "bookmark_exists_status": "Lesezeichen existiert bereits.",
+                "bookmark_input_title": "Lesezeichen hinzufügen", "bookmark_input_label": "Titel des Lesezeichens:",
+                "no_bookmarks_message": "Noch keine Lesezeichen. Fügen Sie welche hinzu!", "bookmarks_page_title": "Ihre Lesezeichen"
+            },
+            # ... (other languages can be extended similarly)
+            "es": {
+                "back_tooltip": "Atrás", "forward_tooltip": "Adelante", "reload_tooltip": "Recargar",
+                "home_tooltip": "Inicio", "urlbar_placeholder": "Buscar con Steno Search o introducir URL...",
+                "stop_tooltip": "Detener carga", "new_tab_tooltip": "Nueva Pestaña",
+                "inspect_tooltip": "Alternar Inspector de Elementos", "theme_tooltip": "Alternar Tema",
+                "about_tooltip": "Acerca de", "about_title": "Acerca de Ringzauber Browser",
+                "about_message": "Navegador Ringzauber\n\nVersión 1.4.0004 (con marcador de posición de Steno Search)\nLigero y Tematizable\nConstruido con PyQt5 y QtWebEngine.\n\nCopyright Stenoip Company",
+                "performance_status": "Pestañas: {0} | Activa: {1} | Navegador Ringzauber",
+                "nav_toolbar_title": "Navegación", "steno_search_menu": "Búsqueda Steno",
+                "build_index_action": "Construir/Reconstruir Índice (Deshabilitado)...",
+                "index_dialog_title": "Seleccionar Directorio para Indexar (Deshabilitado)",
+                "indexing_status": "Estado de Indexación (Deshabilitado): {0}",
+                "no_query_message": "Por favor, introduzca una consulta de búsqueda en la barra de URL.",
+                "no_results_message": "No se encontraron resultados para '{0}'.",
+                "search_results_title": "Resultados de Búsqueda Steno para '{0}'",
+                "file_menu": "&Archivo", "new_window_action": "Nueva &Ventana",
+                "close_tab_action": "Cerrar Pestaña &Actual",
+                "open_html_file_action": "Abrir archivo &HTML...", # New translation string
+                "bookmarks_menu": "&Marcadores", "add_bookmark_action": "Añadir Página Actual",
+                "show_bookmarks_action": "Mostrar Todos los Marcadores", "bookmark_added_status": "Marcador añadido: {0}",
+                "bookmark_failed_status": "No se pudo añadir el marcador.", "bookmark_exists_status": "El marcador ya existe.",
+                "bookmark_input_title": "Añadir Marcador", "bookmark_input_label": "Título del Marcador:",
+                "no_bookmarks_message": "Aún no hay marcadores. ¡Añade algunos!", "bookmarks_page_title": "Sus Marcadores"
+            },
+            "zh": {
+                "back_tooltip": "后退", "forward_tooltip": "前进", "reload_tooltip": "重新加载",
+                "home_tooltip": "主页", "urlbar_placeholder": "使用 Steno 搜索或输入网址...",
+                "stop_tooltip": "停止加载", "new_tab_tooltip": "新建标签页",
+                "inspect_tooltip": "切换检查元素", "theme_tooltip": "切换主题",
+                "about_tooltip": "关于", "about_title": "关于 Ringzauber 浏览器",
+                "about_message": "Ringzauber 浏览器\n\n版本 1.4.0004 (含 Steno Search 占位符)\n轻量且可主题化\n使用 PyQt5 和 QtWebEngine 构建。\n\n版权所有 Stenoip 公司！",
+                "performance_status": "标签页: {0} | 活动: {1} | Ringzauber 浏览器",
+                "nav_toolbar_title": "导航", "steno_search_menu": "Steno 搜索",
+                "build_index_action": "构建/重建索引 (已禁用)...",
+                "index_dialog_title": "选择要索引的目录 (已禁用)", "indexing_status": "索引状态 (已禁用): {0}",
+                "no_query_message": "请在网址栏中输入搜索查询。", "no_results_message": "未找到 '{0}' 的结果。",
+                "search_results_title": "Steno 搜索结果 '{0}'",
+                "file_menu": "&文件", "new_window_action": "新建&窗口",
+                "close_tab_action": "关闭当前&标签页",
+                "open_html_file_action": "打开 &HTML 文件...", # New translation string
+                "bookmarks_menu": "&书签", "add_bookmark_action": "添加当前页面",
+                "show_bookmarks_action": "显示所有书签", "bookmark_added_status": "书签已添加: {0}",
+                "bookmark_failed_status": "添加书签失败。", "bookmark_exists_status": "书签已存在。",
+                "bookmark_input_title": "添加书签", "bookmark_input_label": "书签标题:",
+                "no_bookmarks_message": "暂无书签。添加一些吧！", "bookmarks_page_title": "您的书签"
+            },
+            "fy": {
+                "back_tooltip": "Werom", "forward_tooltip": "Foarút", "reload_tooltip": "Op 'e nij lade",
+                "home_tooltip": "Thús", "urlbar_placeholder": "Sykje mei Steno Search of fier URL yn...",
+                "stop_tooltip": "Laden stopje", "new_tab_tooltip": "Nije Ljepper",
+                "inspect_tooltip": "Ynspektor-elemint wikselje", "theme_tooltip": "Tema wikselje",
+                "about_tooltip": "Oer", "about_title": "Oer Ringzauber Browser",
+                "about_message": "Ringzauber Browser\n\nFerzje 1.4.0004 (mei Steno Search placeholder)\nLjochtgewicht & Tema oanpasber\nBoud mei PyQt5 & QtWebEngine.\n\nAuteursrjocht Stenoip Bedriuw",
+                "performance_status": "Ljeppers: {0} | Aktyf: {1} | Ringzauber Browser",
+                "nav_toolbar_title": "Navigaasje", "steno_search_menu": "Steno Sykjen",
+                "build_index_action": "Yndeks bouwe/op 'e nij bouwe (Utskeakele)...",
+                "index_dialog_title": "Selektearje map om te yndeksearjen (Utskeakele)",
+                "indexing_status": "Yndeksearje Status (Utskeakele): {0}",
+                "no_query_message": "Fier asjebleaft in sykopdracht yn de URL-balke yn.",
+                "no_results_message": "Gjin resultaten fûn foar '{0}'.",
+                "search_results_title": "Steno Sykresultaten foar '{0}'",
+                "file_menu": "&Triem", "new_window_action": "Nij &Finster",
+                "close_tab_action": "Aktuele &Ljepper slute",
+                "open_html_file_action": "Iepenje &HTML-bestân...", # New translation string
+                "bookmarks_menu": "&Blêdwizers", "add_bookmark_action": "Hjoeddeistige side tafoegje",
+                "show_bookmarks_action": "Alle blêdwizers sjen litte", "bookmark_added_status": "Blêdwizer tafoege: {0}",
+                "bookmark_failed_status": "Blêdwizer koe net tafoege wurde.", "bookmark_exists_status": "Blêdwizer bestiet al.",
+                "bookmark_input_title": "Blêdwizer tafoegje", "bookmark_input_label": "Titel blêdwizer:",
+                "no_bookmarks_message": "Noch gjin blêdwizers. Foegje wat ta!", "bookmarks_page_title": "Jo blêdwizers"
+            },
+            "fr": {
+                "back_tooltip": "Retour", "forward_tooltip": "Avancer", "reload_tooltip": "Recharger",
+                "home_tooltip": "Accueil", "urlbar_placeholder": "Rechercher avec Steno Search ou entrer l'URL...",
+                "stop_tooltip": "Arrêter le chargement", "new_tab_tooltip": "Nouvel onglet",
+                "inspect_tooltip": "Basculer l'Inspecteur d'éléments", "theme_tooltip": "Basculer le thème",
+                "about_tooltip": "À propos", "about_title": "À propos du navigateur Ringzauber",
+                "about_message": "Navigateur Ringzauber\n\nVersion 1.4.0004 (avec emplacement réservé pour Steno Search)\nLéger et Thème personnalisable\nConstruit avec PyQt5 et QtWebEngine.\n\nCopyright Stenoip Company",
+                "performance_status": "Onglets: {0} | Actif: {1} | Navigateur Ringzauber",
+                "nav_toolbar_title": "Navigation", "steno_search_menu": "Recherche Steno",
+                "build_index_action": "Construire/Reconstruire l'Index (Désactivé)...",
+                "index_dialog_title": "Sélectionner le répertoire à indexer (Désactivé)",
+                "indexing_status": "État de l'indexation (Désactivé): {0}",
+                "no_query_message": "Veuillez entrer une requête de recherche dans la barre d'URL.",
+                "no_results_message": "Aucun résultat trouvé pour '{0}'.",
+                "search_results_title": "Résultats de la recherche Steno pour '{0}'",
+                "file_menu": "&Fichier", "new_window_action": "Nouvelle &Fenêtre",
+                "close_tab_action": "Fermer l'onglet &actuel",
+                "open_html_file_action": "Ouvrir fichier &HTML...", # New translation string
+                "bookmarks_menu": "&Marque-pages", "add_bookmark_action": "Ajouter la page actuelle",
+                "show_bookmarks_action": "Afficher tous les marque-pages", "bookmark_added_status": "Marque-page ajouté : {0}",
+                "bookmark_failed_status": "Échec de l'ajout du marque-page.", "bookmark_exists_status": "Le marque-page existe déjà.",
+                "bookmark_input_title": "Ajouter un marque-page", "bookmark_input_label": "Titre du marque-page :",
+                "no_bookmarks_message": "Aucun marque-page pour l'instant. Ajoutez-en !", "bookmarks_page_title": "Vos marque-pages"
+            },
+            "gaa": {
+                "back_tooltip": "Mli", "forward_tooltip": "Hiɛ", "reload_tooltip": "Gbɔmɔŋ",
+                "home_tooltip": "Shia", "urlbar_placeholder": "Tsu Steno Search looŋ loo URL sɛŋ...",
+                "stop_tooltip": "Kaa shaa sane ni yɔɔ nɔ", "new_tab_tooltip": "Lɛlɛ gbogbo ni akɛbaa",
+                "inspect_tooltip": "Kɛɛŋ ŋmãlɔ wolo ni akɛbaa", "theme_tooltip": "Tsake gbɛ ni wɔŋɔŋ nɔ",
+                "about_tooltip": "Afa", "about_title": "Afa Ringzauber Browser",
+                "about_message": "Ringzauber Browser\n\nGbɛi 1.4.0004 (kɛ Steno Search gbɛi ni yɔɔ nɔ)\nMiŋ miŋŋ kɛ gbɛi ni akɛbaa\nGbɛi ni akɛ gbɛi PyQt5 kɛ QtWebEngine egbáa nɔ.\n\nHegbɛ ni Stenoip nitsumɔhe lɛ yɔɔ",
+                "performance_status": "Lɛlɛi: {0} | Nyiɛŋ: {1} | Ringzauber Browser",
+                "nav_toolbar_title": "Gbɛfaŋ", "steno_search_menu": "Steno Tsɔ",
+                "build_index_action": "Gbɛi ni akɛbaa / Gbɛi ni akɛbaa (Akaa nɔ)...",
+                "index_dialog_title": "Kɛŋ gbɛi ni akɛbaa (Akaa nɔ)",
+                "indexing_status": "Gbɛi ni akɛbaa (Akaa nɔ): {0}",
+                "no_query_message": "Hana gbɛi ni oŋɔŋ nɔ gbɛi yɛ URL bar lɛ mli.",
+                "no_results_message": "Gbɛi ni akɛbaa '{0}' akɛŋ nɔ.",
+                "search_results_title": "Steno Tsɔ hiŋmɛi loo '{0}'",
+                "file_menu": "&Wolo", "new_window_action": "Lɛlɛŋ &Fenster",
+                "close_tab_action": "Kpãa Lɛlɛ ni nyiɛŋ nɔ",
+                "open_html_file_action": "Kɛŋ &HTML wolo...", # New translation string
+                "bookmarks_menu": "&Lɛlɛi", "add_bookmark_action": "Kɛɛŋ lɛlɛ ni nyiɛŋ nɔ",
+                "show_bookmarks_action": "Kɛɛŋ lɛlɛi fɛɛ", "bookmark_added_status": "Lɛlɛ ni akɛbaa: {0}",
+                "bookmark_failed_status": "Lɛlɛ ni akɛbaa akɛŋ nɔ.", "bookmark_exists_status": "Lɛlɛ ni akɛbaa yɔɔ nɔ.",
+                "bookmark_input_title": "Kɛɛŋ lɛlɛ", "bookmark_input_label": "Lɛlɛ gbɛi:",
+                "no_bookmarks_message": "Lɛlɛi babaoo yɛŋ nɔ. Kɛɛŋ nɔ!", "bookmarks_page_title": "Lɛlɛi ni oŋɔŋ nɔ"
+            }
+        }
+        # --- End Language Setup ---
+
+        self.back_btn = QAction("◀️", self)
+        self.back_btn.triggered.connect(lambda: self.current_browser().back() if self.current_browser() else None)
+        self.navtb.addAction(self.back_btn)
+
+        self.forward_btn = QAction("▶️", self)
+        self.forward_btn.triggered.connect(lambda: self.current_browser().forward() if self.current_browser() else None)
+        self.navtb.addAction(self.forward_btn)
+
+        self.reload_btn = QAction("🔄", self)
+        self.reload_btn.triggered.connect(lambda: self.current_browser().reload() if self.current_browser() else None)
+        self.navtb.addAction(self.reload_btn)
+
+        self.home_btn = QAction("🏠", self)
+        self.home_btn.triggered.connect(lambda: self.current_browser().setUrl(QUrl(DEFAULT_HOMEPAGE)) if self.current_browser() else None)
+        self.navtb.addAction(self.home_btn)
+
+        self.navtb.addSeparator()
+
+        self.urlbar = QLineEdit()
+        self.urlbar.returnPressed.connect(self.navigate_to_url)
+        self.urlbar.setFont(QFont("Segoe UI", 10))
+        self.urlbar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.urlbar.setStyleSheet("QLineEdit { padding: 5px; border-radius: 8px; border: 1px solid #ccc; }")
+        self.navtb.addWidget(self.urlbar)
+
+        self.stop_btn = QAction("⏹️", self)
+        self.stop_btn.triggered.connect(lambda: self.current_browser().stop() if self.current_browser() else None)
+        self.navtb.addAction(self.stop_btn)
+
+        self.new_tab_btn = QAction("➕", self)
+        self.new_tab_btn.triggered.connect(lambda: self.add_tab())
+        self.navtb.addAction(self.new_tab_btn)
+
+        self.inspect_btn = QAction("🛠️", self)
+        self.inspect_btn.triggered.connect(self.toggle_inspector)
+        self.navtb.addAction(self.inspect_btn)
+
+        self.theme_toggle_btn = QAction("🎨", self)
+        self.theme_toggle_btn.triggered.connect(self.toggle_theme)
+        self.navtb.addAction(self.theme_toggle_btn)
+
+        self.about_btn = QAction("ℹ️", self)
+        self.about_btn.triggered.connect(self.show_about)
+        self.navtb.addAction(self.about_btn)
+
+        # --- Menu Bar Setup ---
+        main_menu = self.menuBar()
+
+        # File Menu
+        file_menu = main_menu.addMenu(self._T("file_menu"))
+
+        new_window_action = QAction(self._T("new_window_action"), self)
+        new_window_action.setShortcut(QKeySequence("Ctrl+N"))
+        new_window_action.triggered.connect(self.open_new_browser_window)
+        file_menu.addAction(new_window_action)
+
+        open_html_file_action = QAction(self._T("open_html_file_action"), self) # New action
+        open_html_file_action.setShortcut(QKeySequence("Ctrl+O"))
+        open_html_file_action.triggered.connect(self.open_local_html_file)
+        file_menu.addAction(open_html_file_action)
+
+        file_menu.addSeparator()
+
+        close_tab_action = QAction(self._T("close_tab_action"), self)
+        close_tab_action.setShortcut(QKeySequence("Ctrl+D"))
+        close_tab_action.triggered.connect(self.close_current_tab)
+        file_menu.addAction(close_tab_action)
+
+        # Bookmarks Menu
+        self.bookmarks_menu = main_menu.addMenu(self._T("bookmarks_menu"))
+
+        self.add_bookmark_action = QAction(self._T("add_bookmark_action"), self)
+        self.add_bookmark_action.setShortcut(QKeySequence("Ctrl+B"))
+        self.add_bookmark_action.triggered.connect(self.add_bookmark)
+        self.bookmarks_menu.addAction(self.add_bookmark_action)
+
+        self.show_bookmarks_action = QAction(self._T("show_bookmarks_action"), self)
+        self.show_bookmarks_action.triggered.connect(self.show_all_bookmarks)
+        self.bookmarks_menu.addAction(self.show_bookmarks_action)
+        self.bookmarks_menu.addSeparator()
+
+        # Language Menu
+        language_menu = main_menu.addMenu("Language")
+
+        self.lang_group = QActionGroup(self)
+        self.lang_group.setExclusive(True)
+
+        languages = {
+            "English": "en", "Deutsch": "de", "Español": "es",
+            "普通话 (Mandarin)": "zh", "Frysk": "fy", "Français": "fr", "Ga (Ghana)": "gaa"
+        }
+
+        for lang_name, lang_code in languages.items():
+            action = QAction(lang_name, self)
+            action.setCheckable(True)
+            action.triggered.connect(lambda checked, code=lang_code: self._set_language(code))
+            language_menu.addAction(action)
+            self.lang_group.addAction(action)
+            if lang_code == self.current_language:
+                action.setChecked(True)
+        # --- End Language Menu ---
+
+        # --- Steno Search Menu (Placeholder actions due to 'leave out stenosearch') ---
+        steno_search_menu = main_menu.addMenu(self._T("steno_search_menu"))
+        self.build_index_action = QAction(self._T("build_index_action"), self)
+        self.build_index_action.triggered.connect(self.build_steno_index)
+        steno_search_menu.addAction(self.build_index_action)
+        # --- End Steno Search Menu ---
+
+        # --- Download Manager Setup ---
+        # Connect to the default profile's downloadRequested signal
+        QWebEngineProfile.defaultProfile().downloadRequested.connect(self.handle_download_requested)
+        # --- End Download Manager Setup ---
+
+        self.tab_suspend_timers = {}
+        self.history = []
+        self.bookmarks = []
+        self._load_bookmarks()
+
+        self.steno_search_core = StenoSearchCore()
+        self.steno_search_core.load_index(status_callback=self.status.showMessage)
+
+        self.add_tab()
+
+        self.is_dark_theme = False
+        self.is_fiery_theme = False
+        self.apply_theme()
+
+        self.performance_timer = QTimer(self)
+        self.performance_timer.setInterval(5000)
+        self.performance_timer.timeout.connect(self.update_performance_stats)
+        self.performance_timer.start()
+
+        self._apply_translations()
+
+        self.show()
+
+    def _set_language(self, lang_code):
+        if self.current_language == lang_code:
+            return
+
+        self.current_language = lang_code
+        print(f"Switching language to: {lang_code}")
+        self._apply_translations()
+
+    def _get_translated_string(self, key):
+        return self._lang_strings.get(self.current_language, self._lang_strings["en"]).get(key, key)
+
+    _T = _get_translated_string
+
+    def _apply_translations(self):
+        self.navtb.setWindowTitle(self._T("nav_toolbar_title"))
+        self.back_btn.setToolTip(self._T("back_tooltip"))
+        self.forward_btn.setToolTip(self._T("forward_tooltip"))
+        self.reload_btn.setToolTip(self._T("reload_tooltip"))
+        self.home_btn.setToolTip(self._T("home_tooltip"))
+        self.urlbar.setPlaceholderText(self._T("urlbar_placeholder"))
+        self.stop_btn.setToolTip(self._T("stop_tooltip"))
+        self.new_tab_btn.setToolTip(self._T("new_tab_tooltip"))
+        self.inspect_btn.setToolTip(self._T("inspect_tooltip"))
+        self.theme_toggle_btn.setToolTip(self._T("theme_tooltip"))
+        self.about_btn.setToolTip(self._T("about_tooltip"))
+
+        main_menu = self.menuBar()
+        for action in main_menu.actions():
+            if action.menu():
+                menu = action.menu()
+                if menu.title().endswith(self._lang_strings["en"]["file_menu"].replace("&", "")):
+                    menu.setTitle(self._T("file_menu"))
+                    for sub_action in menu.actions():
+                        if sub_action.shortcut().matches(QKeySequence("Ctrl+N")) == QKeySequence.ExactMatch:
+                            sub_action.setText(self._T("new_window_action"))
+                        elif sub_action.shortcut().matches(QKeySequence("Ctrl+D")) == QKeySequence.ExactMatch:
+                            sub_action.setText(self._T("close_tab_action"))
+                        elif sub_action.shortcut().matches(QKeySequence("Ctrl+O")) == QKeySequence.ExactMatch: # New action
+                            sub_action.setText(self._T("open_html_file_action"))
+                elif menu.title().endswith(self._lang_strings["en"]["bookmarks_menu"].replace("&", "")):
+                    menu.setTitle(self._T("bookmarks_menu"))
+                    for sub_action in menu.actions():
+                        if sub_action.shortcut().matches(QKeySequence("Ctrl+B")) == QKeySequence.ExactMatch:
+                            sub_action.setText(self._T("add_bookmark_action"))
+                        elif sub_action == self.show_bookmarks_action:
+                            sub_action.setText(self._T("show_bookmarks_action"))
+                elif menu.title().endswith(self._lang_strings["en"]["steno_search_menu"]):
+                    menu.setTitle(self._T("steno_search_menu"))
+                    for sub_action in menu.actions():
+                        if sub_action == self.build_index_action:
+                            sub_action.setText(self._T("build_index_action"))
+
+        self.update_performance_stats()
+        current_browser = self.current_browser()
+        if current_browser:
+            self.update_title(current_browser)
+        else:
+            self.setWindowTitle(f"Ringzauber Browser")
+        self._populate_bookmarks_menu()
+
+    def connect_browser_signals(self, browser):
+        """Helper function to connect all necessary signals for a browser view."""
+        print(f"DEBUG: Attempting to connect signals for browser: {browser}")
+        try:
+            browser.urlChanged.connect(lambda new_url, b=browser: self.update_urlbar_for_browser(b, new_url) if b else None)
+            print("DEBUG: Signal 'urlChanged' connected.")
+            browser.loadFinished.connect(lambda ok, b=browser: self.on_load_finished(ok, b) if b else None)
+            print("DEBUG: Signal 'loadFinished' connected.")
+            browser.page().titleChanged.connect(lambda title, b=browser: self.update_title_on_change(b, title) if b else None)
+            print("DEBUG: Signal 'titleChanged' connected.")
+            browser.page().iconChanged.connect(lambda icon, b=browser: self.update_tab_icon(b, icon) if b else None)
+            print("DEBUG: Signal 'iconChanged' connected.")
+            browser.page().featurePermissionRequested.connect(self.handle_feature_permission_requested)
+            print("DEBUG: Signal 'featurePermissionRequested' connected.")
+            print("DEBUG: All signals connected successfully.")
+        except Exception as e:
+            print(f"DEBUG: CRITICAL - Could not connect signals for browser {browser}: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def add_tab(self, url=None, label=None):
+        """ Adds a new tab to the browser.
+        :param url: The URL to load. Defaults to the homepage.
+        :param label: The initial label for the tab.
+        """
+        print("DEBUG: add_tab called.")
+        browser = CustomWebEngineView()
+        browser.setZoomFactor(1.35)
+
+        custom_page = CustomWebEnginePage(self, browser)
+        browser.setPage(custom_page)
+
+        self.connect_browser_signals(browser)
+        if url is None:
+            url = QUrl(DEFAULT_HOMEPAGE)
+        elif not isinstance(url, QUrl):
+            url = QUrl(url)
+        browser.setUrl(url)
+
+        if label is None:
+            label = self._T("new_tab_tooltip")
+        i = self.tabs.addTab(browser, label)
+        self.tabs.setCurrentIndex(i)
+        print("DEBUG: Tab added and set as current.")
+        return browser
+
+    def current_browser(self):
+        """Returns the QWebEngineView of the currently active tab."""
+        return self.tabs.currentWidget()
+
+    def navigate_to_url(self):
+        q = self.urlbar.text()
+        if not q:
+            return
+
+        # Check if it's a URL
+        if not re.match(r"^[a-zA-Z]+://", q):
+            if "." in q and "/" not in q: # Simple heuristic for domains without schema
+                q = "http://" + q
+            else: # Not a URL, treat as search query
+                q = "https://www.google.com/search?q=" + q
+
+        url = QUrl(q)
+        if url.isValid():
+            self.current_browser().setUrl(url)
+        else:
+            QMessageBox.warning(self, "Invalid URL", f"The entered URL is invalid: {q}")
+
+    def toggle_inspector(self):
+        browser = self.current_browser()
+        if not browser:
+            return
+
+        current_url = browser.url().toString()
+        # Disable inspector if "sirpraterich" is in the URL
+        if "sirpraterich" in current_url:
+            QMessageBox.information(self, "Access Denied", "Source inspection is disabled for this site.")
+            browser.page().webChannel().deregisterObject(browser.page()) # Attempt to disable webchannel as a workaround
+            browser.page().settings().setAttribute(QWebEngineSettings.DeveloperToolsEnabled, False)
+        else:
+            # Toggle developer tools for other sites
+            settings = browser.page().settings()
+            is_enabled = settings.testAttribute(QWebEngineSettings.DeveloperToolsEnabled)
+            settings.setAttribute(QWebEngineSettings.DeveloperToolsEnabled, not is_enabled)
+            if not is_enabled:
+                browser.page().triggerAction(QWebEnginePage.InspectElement)
+            else:
+                # No direct action to close, toggling again usually closes it.
+                # A more robust solution might involve managing the inspector window directly.
+                pass # The next toggle will turn it off
+
+    def open_new_browser_window(self):
+        """Opens a new top-level browser window."""
+        print("DEBUG: Opening new browser window (Ctrl+N).")
+        new_window = MainWindow()
+        new_window.show()
+
+    def close_current_tab(self):
+        """Closes the currently active tab."""
+        current_index = self.tabs.currentIndex()
+        if current_index != -1:
+            print(f"DEBUG: Closing current tab at index {current_index} (Ctrl+D).")
+            self.tabs.tabCloseRequested.emit(current_index)
+
+    def open_local_html_file(self):
+        """Allows the user to open a local HTML file in the current browser tab."""
+        file_dialog = QFileDialog(self)
+        file_path, _ = file_dialog.getOpenFileName(self, self._T("open_html_file_action"), "", "HTML Files (*.html *.htm);;All Files (*)")
+        if file_path:
+            url = QUrl.fromLocalFile(file_path)
+            if url.isValid():
+                self.current_browser().setUrl(url)
+            else:
+                QMessageBox.warning(self, "Invalid File", f"Could not open selected file: {file_path}")
+
+    def handle_download_requested(self, download_item):
+        """Handles download requests from the browser."""
+        print(f"Download requested: {download_item.url().toDisplayString()}")
+        default_filename = download_item.url().fileName()
+        if not default_filename:
+            default_filename = "downloaded_file"
+
+        save_path, _ = QFileDialog.getSaveFileName(self, "Save File", default_filename)
+
+        if save_path:
+            download_item.setPath(save_path)
+            download_item.accept()
+            download_item.stateChanged.connect(
+                lambda state: self.on_download_state_changed(download_item, state)
+            )
+            print(f"Download accepted to: {save_path}")
+        else:
+            download_item.cancel()
+            print("Download cancelled by user.")
+
+    def on_download_state_changed(self, download_item, state):
+        """Updates status bar with download progress."""
+        if state == QWebEngineDownloadItem.DownloadProgress:
+            if download_item.totalBytes() > 0:
+                progress = (download_item.receivedBytes() / download_item.totalBytes()) * 100
+                self.status.showMessage(f"Downloading {download_item.fileName()}: {progress:.1f}%")
+            else:
+                self.status.showMessage(f"Downloading {download_item.fileName()}...")
+        elif state == QWebEngineDownloadItem.DownloadFinished:
+            if download_item.isSuccessful():
+                self.status.showMessage(f"Download finished: {download_item.fileName()}")
+            else:
+                self.status.showMessage(f"Download failed: {download_item.fileName()} - {download_item.interruptReason()}")
+            QTimer.singleShot(5000, lambda: self.status.clearMessage()) # Clear message after 5 seconds
+        elif state == QWebEngineDownloadItem.DownloadCancelled:
+            self.status.showMessage(f"Download cancelled: {download_item.fileName()}")
+            QTimer.singleShot(5000, lambda: self.status.clearMessage())
+        elif state == QWebEngineDownloadItem.DownloadInterrupted:
+            self.status.showMessage(f"Download interrupted: {download_item.fileName()} - {download_item.interruptReason()}")
+            QTimer.singleShot(5000, lambda: self.status.clearMessage())
+
+    def start_suspend_timer(self, browser):
+        if not browser:
+            return
+        timer = self.tab_suspend_timers.get(browser)
+        if timer:
+            timer.stop()
+        timer = QTimer(self)
+        timer.setSingleShot(True)
+        timer.setInterval(SUSPEND_TIMEOUT_MS)
+        timer.timeout.connect(lambda b=browser: self.suspend_tab(b))
+        timer.start()
+        self.tab_suspend_timers[browser] = timer
+
+    def suspend_tab(self, browser):
+        if browser == self.current_browser() or not browser:
+            return
+        if isinstance(browser, CustomWebEngineView) and not browser.is_suspended:
+            browser.suspend()
+
+    def resume_tab(self, browser):
+        if browser and isinstance(browser, CustomWebEngineView) and browser.is_suspended:
+            browser.resume()
+
+    def close_tab(self, index):
+        if index < 0 or index >= self.tabs.count():
+            return
+
+        # Get the browser instance associated with the tab
+        browser_to_close = self.tabs.widget(index)
+        if browser_to_close in self.tab_suspend_timers:
+            self.tab_suspend_timers[browser_to_close].stop()
+            del self.tab_suspend_timers[browser_to_close]
+
+        browser_to_close.deleteLater() # Ensure widget is properly deleted
+        self.tabs.removeTab(index)
+        print(f"DEBUG: Tab at index {index} closed.")
+
+        if self.tabs.count() == 0:
+            self.add_tab(QUrl(DEFAULT_HOMEPAGE), "New Tab") # Open a new tab if last one closed
+
+    def on_tab_changed(self, index):
+        if index == -1: # No tabs left
+            self.urlbar.clear()
+            self.setWindowTitle("Ringzauber Browser")
+            return
+
+        current_browser = self.tabs.widget(index)
+        if current_browser:
+            self.urlbar.setText(current_browser.url().toString())
+            self.update_title(current_browser)
+            current_browser.restore_zoom() # Restore zoom when tab becomes active
+            self.resume_tab(current_browser) # Resume if suspended
+            # Stop timer for currently active tab
+            if current_browser in self.tab_suspend_timers:
+                self.tab_suspend_timers[current_browser].stop()
+
+        # Start suspend timers for all other non-active tabs
+        for i in range(self.tabs.count()):
+            browser = self.tabs.widget(i)
+            if browser != current_browser:
+                self.start_suspend_timer(browser)
+
+        self.update_performance_stats()
+
+
+    def update_urlbar_for_browser(self, browser, qurl):
+        if browser == self.current_browser():
+            self.urlbar.setText(qurl.toString())
+            self.urlbar.setCursorPosition(0) # Reset cursor to the beginning
+        # Add to history
+        url_str = qurl.toString()
+        if not self.history or self.history[-1] != url_str:
+            self.history.append(url_str)
+            # Optionally limit history size
+            if len(self.history) > 100:
+                self.history.pop(0)
+
+    def on_load_finished(self, ok, browser):
+        if not browser:
+            return
+
+        if ok:
+            print(f"DEBUG: Load finished successfully for {browser.url().toString()}")
+        else:
+            print(f"DEBUG: Load failed for {browser.url().toString()}")
+            # Emit a custom signal or handle error here
+            browser.loadError.emit(browser.url(), -1, "Loading failed.") # -1 for generic error code
+
+        self.update_title(browser) # Update title once loading is complete
+        browser.restore_zoom() # Ensure zoom is correct after load
+
+    def update_title_on_change(self, browser, title):
+        if not browser:
+            return
+
+        tab_index = self.tabs.indexOf(browser)
+        if tab_index != -1:
+            self.tabs.setTabText(tab_index, title)
+            if browser == self.current_browser():
+                self.setWindowTitle(f"{title} - Ringzauber Browser")
+
+    def update_tab_icon(self, browser, icon):
+        if not browser:
+            return
+        tab_index = self.tabs.indexOf(browser)
+        if tab_index != -1:
+            self.tabs.setTabIcon(tab_index, icon)
+
+    def update_performance_stats(self):
+        active_tabs = 0
+        for i in range(self.tabs.count()):
+            browser = self.tabs.widget(i)
+            if not isinstance(browser, CustomWebEngineView) or not browser.is_suspended:
+                active_tabs += 1
+        self.status.showMessage(self._T("performance_status").format(self.tabs.count(), active_tabs))
+
+    def handle_feature_permission_requested(self, origin, feature):
+        # Auto-accept geolocation, microphone, camera for simplicity, or show a prompt
+        # For a real browser, you'd want to prompt the user.
+        if feature in (QWebEnginePage.Geolocation, QWebEnginePage.MediaAudioCapture, QWebEnginePage.MediaVideoCapture):
+            self.sender().setFeaturePermission(origin, feature, QWebEnginePage.PermissionGrantedByUser)
+        else:
+            self.sender().setFeaturePermission(origin, feature, QWebEnginePage.PermissionDeniedByUser)
+
+    def toggle_theme(self):
+        # This is a placeholder for theme toggling logic
+        # You'd apply different stylesheets here
+        if not self.is_dark_theme and not self.is_fiery_theme:
+            self.is_dark_theme = True
+            self.apply_theme()
+        elif self.is_dark_theme:
+            self.is_dark_theme = False
+            self.is_fiery_theme = True
+            self.apply_theme()
+        else: # is_fiery_theme is True
+            self.is_fiery_theme = False
+            self.apply_theme() # Revert to default light theme
+
+    def apply_theme(self):
+        # Simplified theme application via stylesheet
+        if self.is_dark_theme:
+            self.setStyleSheet("""
+                QMainWindow { background-color: #2e2e2e; color: #f0f0f0; }
+                QToolBar { background-color: #3a3a3a; border: none; }
+                QLineEdit { background-color: #4a4a4a; color: #f0f0f0; border: 1px solid #555; }
+                QTabWidget::pane { border: 1px solid #444; background-color: #2e2e2e; }
+                QTabBar::tab { background: #3a3a3a; color: #f0f0f0; border: 1px solid #444; border-bottom-color: #3a3a3a; border-top-left-radius: 4px; border-top-right-radius: 4px; padding: 5px; }
+                QTabBar::tab:selected { background: #2e2e2e; border-bottom-color: #2e2e2e; }
+                QTabBar::tab:hover { background: #505050; }
+                QMenu { background-color: #3a3a3a; color: #f0f0f0; border: 1px solid #555; }
+                QMenu::item:hover { background-color: #505050; }
+                QStatusBar { background-color: #3a3a3a; color: #f0f0f0; }
+                QAction { color: #f0f0f0; }
+            """)
+        elif self.is_fiery_theme:
+            self.setStyleSheet("""
+                QMainWindow { background-color: #4B0000; color: #FFD700; } /* Dark Red / Gold */
+                QToolBar { background-color: #8B0000; border: none; } /* Darker Red */
+                QLineEdit { background-color: #A00000; color: #FFD700; border: 1px solid #FF4500; } /* Red / Orange-Red */
+                QTabWidget::pane { border: 1px solid #FF4500; background-color: #4B0000; }
+                QTabBar::tab { background: #8B0000; color: #FFD700; border: 1px solid #FF4500; border-bottom-color: #8B0000; border-top-left-radius: 4px; border-top-right-radius: 4px; padding: 5px; }
+                QTabBar::tab:selected { background: #4B0000; border-bottom-color: #4B0000; }
+                QTabBar::tab:hover { background: #CD5C5C; } /* Indian Red */
+                QMenu { background-color: #8B0000; color: #FFD700; border: 1px solid #FF4500; }
+                QMenu::item:hover { background-color: #CD5C5C; }
+                QStatusBar { background-color: #8B0000; color: #FFD700; }
+                QAction { color: #FFD700; }
+            """)
+        else: # Default Light Theme
+            self.setStyleSheet("") # Clear stylesheet
+
+    def show_about(self):
+        QMessageBox.about(self, self._T("about_title"), self._T("about_message"))
+
+    def build_steno_index(self):
+        # Placeholder for Steno Search index building.
+        # As per the request, this functionality is disabled.
+        self.status.showMessage(self._T("indexing_status").format("Functionality Disabled"))
+
+    # --- Bookmark Management ---
+    def _save_bookmarks(self):
+        try:
+            with open(BOOKMARKS_FILE, 'w', encoding='utf-8') as f:
+                json.dump(self.bookmarks, f, indent=4)
+        except Exception as e:
+            print(f"Error saving bookmarks: {e}")
+
+    def _load_bookmarks(self):
+        if os.path.exists(BOOKMARKS_FILE):
+            try:
+                with open(BOOKMARKS_FILE, 'r', encoding='utf-8') as f:
+                    self.bookmarks = json.load(f)
+            except json.JSONDecodeError as e:
+                print(f"Error loading bookmarks (JSON decode error): {e}")
+                self.bookmarks = []
+            except Exception as e:
+                print(f"Error loading bookmarks: {e}")
+                self.bookmarks = []
+        else:
+            self.bookmarks = []
+
+    def add_bookmark(self):
+        current_browser = self.current_browser()
+        if not current_browser:
+            return
+
+        current_url = current_browser.url().toString()
+        current_title = current_browser.page().title() or "Untitled"
+
+        # Check if bookmark already exists
+        if any(b['url'] == current_url for b in self.bookmarks):
+            self.status.showMessage(self._T("bookmark_exists_status"))
+            return
+
+        # Prompt for bookmark title
+        title, ok = QInputDialog.getText(self, self._T("bookmark_input_title"),
+                                         self._T("bookmark_input_label"),
+                                         QLineEdit.Normal, current_title)
+        if ok and title:
+            self.bookmarks.append({"title": title, "url": current_url})
+            self._save_bookmarks()
+            self._populate_bookmarks_menu()
+            self.status.showMessage(self._T("bookmark_added_status").format(title))
+        elif ok and not title:
+            self.status.showMessage(self._T("bookmark_failed_status"))
+        else:
+            self.status.showMessage(self._T("bookmark_failed_status"))
+
+    def show_all_bookmarks(self):
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>{self._T("bookmarks_page_title")}</title>
+            <style>
+                body {{ font-family: sans-serif; background-color: #f7f7f7; color: #333; margin: 0; padding: 20px; }}
+                .container {{ max-width: 800px; margin: auto; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 30px; }}
+                h1 {{ color: #2980b9; text-align: center; margin-bottom: 30px; }}
+                ul {{ list-style: none; padding: 0; }}
+                li {{ margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }}
+                li:last-child {{ border-bottom: none; }}
+                a {{ color: #0066cc; text-decoration: none; font-size: 1.1em; }}
+                a:hover {{ text-decoration: underline; }}
+                .url {{ font-size: 0.9em; color: #666; word-break: break-all; }}
+                .no-bookmarks {{ text-align: center; color: #777; padding: 30px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>{self._T("bookmarks_page_title")}</h1>
+                <ul id="bookmark-list">
+        """
+
+        if not self.bookmarks:
+            html_content += f'<p class="no-bookmarks">{self._T("no_bookmarks_message")}</p>'
+        else:
+            for bookmark in self.bookmarks:
+                title = bookmark.get('title', 'Untitled')
+                url = bookmark.get('url', '#')
+                html_content += f"""
+                    <li>
+                        <a href="{url}">{title}</a><br>
+                        <span class="url">{url}</span>
+                    </li>
+                """
+        html_content += """
+                </ul>
+            </div>
+        </body>
+        </html>
+        """
+        # Create a data URL to load the HTML content
+        encoded_html = base64.b64encode(html_content.encode('utf-8')).decode('utf-8')
+        data_url = f"data:text/html;charset=utf-8;base64,{encoded_html}"
+
+        self.add_tab(QUrl(data_url), self._T("bookmarks_page_title"))
+
+    def _populate_bookmarks_menu(self):
+        # Clear existing dynamic bookmarks
+        for action in list(self.bookmarks_menu.actions()):
+            if action not in [self.add_bookmark_action, self.show_bookmarks_action, self.bookmarks_menu.actions()[2]]: # Preserve the top 3 actions and the separator
+                self.bookmarks_menu.removeAction(action)
+                action.deleteLater() # Ensure proper cleanup
+
+        # Add bookmarks dynamically
+        for bookmark in self.bookmarks:
+            action = QAction(bookmark["title"], self)
+            action.triggered.connect(lambda checked, url=bookmark["url"]: self.current_browser().setUrl(QUrl(url)))
+            self.bookmarks_menu.addAction(action)
+
+    # --- End Bookmark Management ---
+
+    def update_title(self, browser):
+        # This helper function ensures the window title and tab title are consistent.
+        if browser == self.current_browser():
+            title = browser.page().title() or "Loading..."
+            self.setWindowTitle(f"{title} - Ringzauber Browser")
+        tab_index = self.tabs.indexOf(browser)
+        if tab_index != -1:
+            self.tabs.setTabText(tab_index, browser.page().title() or "Loading...")
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    QApplication.setApplicationName("Ringzauber Browser")
+    QApplication.setApplicationVersion("1.4.0004")
+
+    # Set up cache and user data paths to be isolated from other QtWebEngine apps
+    # This prevents issues with shared cache/cookies if other Qt apps use WebEngine
+    data_path = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppLocalDataLocation), "RingzauberBrowser")
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
+    QWebEngineProfile.defaultProfile().setPersistentStoragePath(data_path)
+    QWebEngineProfile.defaultProfile().setCachePath(os.path.join(data_path, "cache"))
+
+    window = MainWindow()
+    sys.exit(app.exec_())
