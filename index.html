@@ -122,7 +122,7 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
     border-radius: 10px;
-   
+
 }
 
 
@@ -395,25 +395,26 @@ body {
   </div>
 
   <!-- Intro video -->
-<video id="intro-video" class="intro-video" autoplay playsinline muted style="display: none;">
-  <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+  <video id="intro-video" class="intro-video" autoplay playsinline muted>
+    <source src="https://stenoip.github.io/intro_ringzauber.mp4" type="video/mp4" />
+    <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
   <!-- Skip button -->
   <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
   <!-- Main content container (previously missing) -->
   <div id="main-content" style="display: none;">
-    
-    
-    
+
+
+
       <div class="header">
         <h1>Stenoip Wonder Computer</h1>
       </div>
       <div class="search-bar">
         <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search..." />
-        
+
         <button onclick="search()">Search</button>
         <div class="suggestions" id="suggestions" style="display: none;"></div>
       </div>
