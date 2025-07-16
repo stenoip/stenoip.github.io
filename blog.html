@@ -1,117 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-* {
-  box-sizing: border-box;
-}
-
-/* Add a gray background color with some padding */
-body {
-  font-family: Arial;
-  padding: 20px;
-  background: #f1f1f1;
-}
-
-/* Header/Blog Title */
-.header {
-  padding: 30px;
-  font-size: 40px;
-  text-align: center;
-  background: white;
-}
-
-/* Create two unequal columns that floats next to each other */
-/* Left column */
-.leftcolumn {   
-  float: left;
-  width: 75%;
-}
-
-/* Right column */
-.rightcolumn {
-  float: left;
-  width: 25%;
-  padding-left: 20px;
-}
-
-/* Fake image */
-.fakeimg {
-  background-color: #aaa;
-  width: 100%;
-  padding: 20px;
-}
-
-/* Add a card effect for articles */
-.card {
-   background-color: white;
-   padding: 20px;
-   margin-top: 20px;
-}
-
-/* Clear floats after the columns */
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/* Footer */
-.footer {
-  padding: 20px;
-  text-align: center;
-  background: #ddd;
-  margin-top: 20px;
-}
-
-/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
-@media screen and (max-width: 800px) {
-  .leftcolumn, .rightcolumn {   
-    width: 100%;
-    padding: 0;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        .post-preview {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+        }
+        .post-preview h2 {
+            margin-top: 0;
+        }
+        .post-preview a {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-
-<div class="header">
-  <h2>StenoBlogs</h2>
-</div>
-
-<div class="row">
-  <div class="leftcolumn">
-    <div class="card">
-      <h2>Hey grads!</h2>
-      <h5>Long time no see, 12th July 2025</h5>
-      <div class="fakeimg" style="height:200px;">Image</div>
-     
-      <p>Thank you for receiving those "Farwell Cards". This is my site. What is it for? I don't know ... yet! I am thinking it should be a Search Engine called <a href = "https://www.google.com/search?q=define+oodles&rlz=1C1CHBF_enUS1168US1168&oq=define+oodles&gs_lcrp=EgZjaHJvbWUyDggAEEUYORhGGPkBGIAEMggIARAAGBYYHjINCAIQABiGAxiABBiKBTINCAMQABiGAxiABBiKBTINCAQQABiGAxiABBiKBTINCAUQABiGAxiABBiKBdIBCDIzMTdqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8">Oodles</a>! Anyways, be sure to check this site every month. I post new things! Don't miss out! And good luck in... err. I can't tell the grade level school we are going to. Because, it's the internet!</p>
-  
+    <h1>StenoBlogs</h1>
+<p>Public Library,reports and opinion.</p>
+    <div class="post-preview">
+        <h2><a href="blog/first.html">If you got a "Farwell Card", see this!</a></h2>
+        <p>One last goodbye.</p>
     </div>
 
-    <div class="card">
-      <h2>About Me</h2>
-      <div class="fakeimg" style="height:100px;">Image</div>
-      <p>Obiviously, I can't tell about me. It's the Internet!</p>
+    <div class="post-preview">
+        <h2><a href="blog/rignzauber_new_update.html">Ringzauber is fixed, for now.</a></h2>
+        <p>Too many errors in the last one!</p>
     </div>
-    <div class="card">
-      <h3>Popular Post</h3>
-      <div class="fakeimg">Image</div><br>
-      <div class="fakeimg">Image</div><br>
-      <div class="fakeimg">Image</div>
-    </div>
-    <div class="card">
-      <h3>Follow Me</h3>
-      <p>I don't use Social Media! It TRACKS you!</p>
-    </div>
-  </div>
-</div>
 
-<div class="footer">
-  <h2>Footer</h2>
-</div>
+   
 
 </body>
 </html>
