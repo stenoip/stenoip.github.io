@@ -385,6 +385,10 @@ body {
             background-color: #005ba1;
             transform: translateY(-3px);
             }
+   /*Design of top bar*/ 
+    body {
+            font-family: "Inter", sans-serif;
+        }
   </style>
 </head>
 <body>
@@ -407,7 +411,37 @@ body {
   <!-- Main content container (previously missing) -->
   <div id="main-content" style="display: none;">
 
-
+  <nav class="w-full max-w-4xl bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg">
+        <ul class="flex flex-col sm:flex-row justify-around items-center space-y-3 sm:space-y-0 sm:space-x-4">
+            <!-- Home Button -->
+            <li>
+                <a href="#" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
+                    Home
+                </a>
+            </li>
+            <!-- Other Links -->
+            <li>
+                <a href="#" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    About
+                </a>
+            </li>
+            <li>
+                <a href="#" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    Services
+                </a>
+            </li>
+            <li>
+                <a href="#" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    Contact
+                </a>
+            </li>
+            <li>
+                <a href="#" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    Blog
+                </a>
+            </li>
+        </ul>
+    </nav>
 
       <div class="header">
         <h1>Stenoip Wonder Computer</h1>
