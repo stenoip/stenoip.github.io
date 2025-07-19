@@ -663,7 +663,8 @@ introToggle.addEventListener('change', function() {
 document.addEventListener('DOMContentLoaded', function() {
     // If the intro is off by default or was set off by the user, show main content directly.
     // This happens immediately when the page content is loaded.
-    if (!introToggle.checked) {
+   
+  if (!introToggle.checked) {
         showMainContent();
     } else {
         // If intro is enabled, show the "Click to Launch" screen initially.
