@@ -1,556 +1,665 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sir Praterich|Gemini API </title>
-  <!-- Linking Google Fonts For Icons -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="icon" href="new-swc.png" type="image/png" />
+  <title>Stenoip Wonder Computer</title>
+   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Import Google Font - Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-}
-
-:root {
-  /* Dark mode colors */
-  --text-color: #E3E3E3;
-  --subheading-color: #828282;
-  --placeholder-color: #A6A6A6;
-  --primary-color: #242424;
-  --secondary-color: #383838;
-  --secondary-hover-color: #444;
-}
-
-.light_mode {
-  /* Light mode colors */
-  --text-color: #222;
-  --subheading-color: #A0A0A0;
-  --placeholder-color: #6C6C6C;
-  --primary-color: #FFF;
-  --secondary-color: #E9EEF6;
-  --secondary-hover-color: #DBE1EA;
-}
-
+       /* General Styles */
 body {
-  background: var(--primary-color);
+    font-family: 'Google Sans', sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    overflow-x: hidden; /* Prevent horizontal scroll only */
+
+
 }
 
-.header, .chat-list .message, .typing-form {
-  margin: 0 auto;
-  max-width: 980px;
+/* Fullscreen video styling */
+.intro-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure video scales properly */
+    z-index: 10;
 }
 
+/* Green Screen for launch */
+.launch-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: green;
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    z-index: 15;
+}
+
+/* Hide content initially */
+#main-content {
+    display: none;
+}
+
+/* Header styles */
 .header {
-  margin-top: 6vh;
-  padding: 1rem;
-  overflow-x: hidden;
+    font-size: 13px;
+    text-align: right;
+    padding: 22px 10px;
+    background-color: rgba(240, 191, 111, 255);
+    width: 100%; /* Ensure header is full width */
+    box-sizing: border-box;
 }
 
-body.hide-header .header {
-  margin: 0;
-  display: none;
+.menuItems {
+    font-size: 13px;
+    padding: 0 20px;
+    display: inline-block;
 }
 
-.header :where(.title, .subtitle) {
-  color: var(--text-color);
-  font-weight: 500;
-  line-height: 4rem;
+.header a {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
 }
 
-.header .title {
-  width: fit-content;
-  font-size: 3rem;
-  background-clip: text;
-  background: linear-gradient(to right, #4285f4, #d96570);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.header a:hover {
+    text-decoration: underline;
 }
 
-.header .subtitle {
-  font-size: 2.6rem;
-  color: var(--subheading-color);
+/* Dropdown styling */
+.menu {
+    position: relative;
+    display: inline-block;
 }
 
-.suggestion-list {
-  width: 100%;
-  list-style: none;
-  display: flex;
-  gap: 1.25rem;
-  margin-top: 9.5vh;
-  overflow: hidden;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
+.dropdown-content {
+    width: 270px;
+    padding: 28px;
+    border: 1px solid rgb(220, 225, 229);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+    display: none;
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    background-color: rgb(255, 255, 255);
 }
 
-.suggestion-list .suggestion {
-  cursor: pointer;
-  padding: 1.25rem;
-  width: 222px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  border-radius: 0.75rem;
-  justify-content: space-between;
-  background: var(--secondary-color);
-  transition: 0.2s ease;
+.menuItems:hover .dropdown-content {
+    display: block;
 }
 
-.suggestion-list .suggestion:hover {
-  background: var(--secondary-hover-color);
+.appLogo {
+    text-align: center;
+    display: inline-block;
+    width: 86px;
+    padding: 5px;
 }
 
-.suggestion-list .suggestion :where(.text, .icon) {
-  font-weight: 400;
-  color: var(--text-color);
-}
-
-.suggestion-list .suggestion .icon {
-  width: 42px;
-  height: 42px;
-  display: flex;
-  font-size: 1.3rem;
-  margin-top: 2.5rem;
-  align-self: flex-end;
-  align-items: center;
-  border-radius: 50%;
-  justify-content: center;
-  color: var(--text-color);
-  background: var(--primary-color);
-}
-
-.chat-list {
-  padding: 2rem 1rem 12rem;
-  max-height: 100vh;
-  overflow-y: auto;
-  scrollbar-color: #999 transparent;
-}
-
-.chat-list .message.incoming {
-  margin-top: 1.5rem;
-}
-
-.chat-list .message .message-content {
-  display: flex;
-  gap: 1.5rem;
-  width: 100%;
-  align-items: center;
-}
-
-.chat-list .message .text {
-  color: var(--text-color);
-  white-space: pre-wrap;
-}
-
-.chat-list .message.error .text {
-  color: #e55865;
-}
-
-.chat-list .message.loading .text {
-  display: none;
-}
-
-.chat-list .message .avatar {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 50%;
-  align-self: flex-start;
-}
-
-.chat-list .message.loading .avatar {
-  animation: rotate 3s linear infinite;
-}
-
-@keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.chat-list .message .icon {
-  color: var(--text-color);
-  cursor: pointer;
-  height: 35px;
-  width: 35px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  font-size: 1.25rem;
-  margin-left: 3.5rem;
-  visibility: hidden;
-}
-
-.chat-list .message .icon.hide {
-  visibility: hidden;
-}
-
-.chat-list .message:not(.loading, .error):hover .icon:not(.hide){
-  visibility: visible;
-}
-
-.chat-list .message .icon:hover {
-  background: var(--secondary-hover-color);
-}
-
-.chat-list .message .loading-indicator {
-  display: none;
-  gap: 0.8rem;
-  width: 100%;
-  flex-direction: column;
-}
-
-.chat-list .message.loading .loading-indicator {
-  display: flex;
-}
-
-.chat-list .message .loading-indicator .loading-bar {
-  height: 11px;
-  width: 100%;
-  border-radius: 0.135rem;
-  background-position: -800px 0;
-  background: linear-gradient(to right, #4285f4, var(--primary-color), #4285f4);
-  animation: loading 3s linear infinite;
-}
-
-.chat-list .message .loading-indicator .loading-bar:last-child {
-  width: 70%;
-}
-
-@keyframes loading {
-  0% {
-    background-position: -800px 0;
-  }
-
-  100% {
-    background-position: 800px 0;
-  }
-}
-
-.typing-area {
-  position: fixed;
-  width: 100%;
-  left: 0;
-  bottom: 0;
-  padding: 1rem;
-  background: var(--primary-color);
-}
-
-.typing-area :where(.typing-form, .action-buttons) {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.typing-form .input-wrapper {
-  width: 100%;
-  height: 56px;
-  display: flex;
-  position: relative;
-}
-
-.typing-form .typing-input {
-  height: 100%;
-  width: 100%;
-  border: none;
-  outline: none;
-  resize: none;
-  font-size: 1rem;
-  color: var(--text-color);
-  padding: 1.1rem 4rem 1.1rem 1.5rem;
-  border-radius: 100px;
-  background: var(--secondary-color);
-}
-
-.typing-form .typing-input:focus {
-  background: var(--secondary-hover-color);
-}
-
-.typing-form .typing-input::placeholder {
-  color: var(--placeholder-color);
-}
-
-.typing-area .icon {
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-  cursor: pointer;
-  border-radius: 50%;
-  display: flex;
-  font-size: 1.4rem;
-  color: var(--text-color);
-  align-items: center;
-  justify-content: center;
-  background: var(--secondary-color);
-  transition: 0.2s ease;
-}
-
-.typing-area .icon:hover {
-  background: var(--secondary-hover-color);
-}
-
-.typing-form #send-message-button {
-  position: absolute;
-  right: 0;
-  outline: none;
-  border: none;
-  transform: scale(0);
-  background: transparent;
-  transition: transform 0.2s ease;
-}
-
-.typing-form .typing-input:valid ~ #send-message-button {
-  transform: scale(1);
-}
-
-.typing-area .disclaimer-text {
-  text-align: center;
-  font-size: 0.85rem;
-  margin-top: 1rem;
-  color: var(--placeholder-color);
-}
-
-/* Responsive media query code for small screen */
-@media (max-width: 768px) {
-  .header :is(.title, .subtitle) {
-    font-size: 2rem;
-    line-height: 2.6rem;
-  }
-
-  .header .subtitle {
-    font-size: 1.7rem;
-  }
-
-  .typing-area :where(.typing-form, .action-buttons) {
-    gap: 0.4rem;
-  }
-
-  .typing-form .input-wrapper {
-    height: 50px;
-  }
-
-  .typing-form .typing-input {
-    padding: 1.1rem 3.5rem 1.1rem 1.2rem;
-  }
-
-  .typing-area .icon {
-    height: 50px;
+.menuItemLogo {
     width: 50px;
-  }
-
-  .typing-area .disclaimer-text {
-    font-size: 0.75rem;
-    margin-top: 0.5rem;
-  }
+    height: 50px;
 }
+
+.caption {
+    text-align: center;
+}
+
+.container {
+    width: 80%;
+    max-width: 1200px;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    border-radius: 10px;
+
+}
+
+
+.search {
+    font-size: 14px;
+    padding: 12px 20px;
+    width: 90%;
+    max-width: 600px; /* Limit width for larger screens */
+    color: rgb(51, 51, 51);
+    border: 1px solid rgb(223, 225, 229);
+    border-radius: 24px;
+    outline: none;
+    background-color: rgb(241, 243, 244);
+    margin: 0 auto;
+    display: block;
+}
+
+.search:focus {
+    border-color: rgb(66, 133, 244);
+}
+
+.search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(223, 225, 229);
+    border-radius: 5px;
+    display: none;
+    margin-top: 10px;
+}
+
+.result-item {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.result-item:hover {
+    background-color: rgb(241, 243, 244);
+}
+
+/* Button styles */
+.btns {
+    margin: 7px 0;
+    padding: 20px 40px;
+    font-size: 18px;
+    color: rgb(95, 99, 104);
+    background-color: rgb(248, 249, 250);
+    border: 1px solid rgb(223, 225, 229);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btns:hover {
+    background-color: rgb(241, 243, 244);
+}
+
+/* Learn Centre Button (larger and center-aligned) */
+.learn-centre-btn {
+    margin: 20px 0;
+    padding: 20px 50px;
+    font-size: 22px;
+    background-color: rgb(66, 133, 244);
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.learn-centre-btn:hover {
+    background-color: rgb(57, 103, 204);
+}
+
+/* Skip button styles */
+.skip-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background-color: rgb(66, 133, 244);
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 20;
+}
+
+.skip-btn:hover {
+    background-color: rgb(57, 103, 204);
+}
+
+/* Intro Toggle Switch Styles */
+.intro-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align to the right in the header */
+    gap: 10px;
+    padding: 10px;
+    font-size: 14px;
+    color: black;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+    .header {
+        font-size: 12px;
+        padding: 10px;
+    }
+
+    .search {
+        width: 90%;
+        font-size: 16px;
+    }
+
+    .container {
+        padding: 80px 10px;
+    }
+
+    .learn-centre-btn {
+        padding: 18px 40px;
+        font-size: 18px;
+    }
+
+    .skip-btn {
+        bottom: 10px;
+        left: 10px;
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+
+    .footer {
+        font-size: 10px;
+        padding: 15px;
+    }
+
+    /* Remove any unwanted overflow */
+    body, html {
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+    }
+
+    .intro-toggle-container {
+        justify-content: center; /* Center on smaller screens */
+    }
+}
+
+/* Landscape and other larger screens adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .search {
+        width: 70%;
+    }
+
+    .learn-centre-btn {
+        padding: 20px 45px;
+        font-size: 20px;
+    }
+}
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
+        body {
+            font-family: 'Google Sans', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 70%;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .search-bar button {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            background-color: #0078d4;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-bar button:hover {
+            background-color: #005ba1;
+        }
+        .suggestions {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 70%;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1;
+        }
+        .suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+        .news {
+            margin-bottom: 20px;
+        }
+        .news h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #0078d4;
+        }
+        .news iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 10px;
+        }
+        .ads {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .ads img {
+            width: 48%;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        .ads img:hover {
+            transform: scale(1.05);
+        }
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .links button {
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #0078d4;
+            color: white;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .links button:hover {
+            background-color: #005ba1;
+            transform: translateY(-3px);
+            }
+
   </style>
 </head>
 <body>
-  <header class="header">
-    <!-- Header Greetings -->
-    <h1 class="title">Hello, I am Sir Praterich </h1>
-    <p class="subtitle">How can I help you today?</p>
 
-    <iframe src="https://briaai-bria-2-3-fast.hf.space" width="100%" height="600" scrolling="yes" class="iframe-class" frameborder="0"></iframe>
-    <!-- Suggestion list -->
-    <ul class="suggestion-list">
-      <li class="suggestion">
-        <h4 class="text">Help me plan a game night with my 5 best friends for under $100.</h4>
-        <span class="icon material-symbols-rounded">draw</span>
-      </li>
-      <li class="suggestion">
-        <h4 class="text">What are the best tips to improve my public speaking skills?</h4>
-        <span class="icon material-symbols-rounded">lightbulb</span>
-      </li>
-      <li class="suggestion">
-        <h4 class="text">Can you help me find the latest news on web development?</h4>
-        <span class="icon material-symbols-rounded">explore</span>
-      </li>
-      <li class="suggestion">
-        <h4 class="text">Write JavaScript code to sum all elements in an array.</h4>
-        <span class="icon material-symbols-rounded">code</span>
-      </li>
-    </ul>
-  </header>
-
-  <!-- Chat List / Container -->
-  <div class="chat-list"></div>
-
-  <!-- Typing Area -->
-  <div class="typing-area">
-    <form action="#" class="typing-form">
-      <div class="input-wrapper">
-        <input type="text" placeholder="Enter a prompt here" class="typing-input" required />
-        <button id="send-message-button" class="icon material-symbols-rounded">send</button>
-      </div>
-      <div class="action-buttons">
-        <span id="theme-toggle-button" class="icon material-symbols-rounded">light_mode</span>
-        <span id="delete-chat-button" class="icon material-symbols-rounded">delete</span>
-      </div>
-    </form>
-    <p class="disclaimer-text">
-      Sir Praterich  may display inaccurate info, including about people, so double-check its responses. Copyright Stenoip Company
-    </p>
+  <div class="launch-screen" id="launch-screen" onclick="startExperience()">
+    Click to Launch
   </div>
 
- <script>
-const typingForm = document.querySelector(".typing-form");
-const chatContainer = document.querySelector(".chat-list");
-const suggestions = document.querySelectorAll(".suggestion");
-const toggleThemeButton = document.querySelector("#theme-toggle-button");
-const deleteChatButton = document.querySelector("#delete-chat-button");
+  <video id="intro-video" class="intro-video" autoplay playsinline muted>
+    <source src="https://stenoip.github.io/intro.mp4" type="video/mp4" />
+    <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
-let userMessage = null;
-let isResponseGenerating = false;
+  <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
-// Glitch backend URL (replace with your actual Glitch project URL)
-const API_URL = "https://your-glitch-project.glitch.me/generate-content";
+  <div id="main-content" style="display: none;">
 
-const loadDataFromLocalstorage = () => {
-  const savedChats = localStorage.getItem("saved-chats");
-  const isLightMode = (localStorage.getItem("themeColor") === "light_mode");
+  <nav class="w-full max-w-4xl bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg">
+        <ul class="flex flex-col sm:flex-row justify-around items-center space-y-3 sm:space-y-0 sm:space-x-4">
+            <li>
+                <a href="index.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
+                    Home
+                </a>
+            </li>
+            <li>
+                <a href="about.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    About
+                </a>
+            </li>
+            <li>
+                <a href="terms.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    Terms
+                </a>
+            </li>
+            <li>
+                <a href="contact.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    Contact
+                </a>
+            </li>
+            <li>
+                <a href="blog.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    Blog
+                </a>
+            </li>
+        </ul>
+    </nav>
+<br>
+      <div class="header">
+        <h1 class="block px-10 py-10 text-black font-bold">Stenoip Wonder Computer</h1>
+        <div class="intro-toggle-container">
+            <span>Intro Video:</span>
+            <label class="switch">
+                <input type="checkbox" id="introToggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search..." />
 
-  document.body.classList.toggle("light_mode", isLightMode);
-  toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode";
+        <button onclick="search()">Search</button>
+        <div class="suggestions" id="suggestions" style="display: none;"></div>
+      </div>
+<script async src="https://cse.google.com/cse.js?cx=63de7b7e7f71042d6"></script>
+        <div class="gcse-search"></div>
+      <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
+        Learn Center
+      </button>
 
-  chatContainer.innerHTML = savedChats || '';
-  document.body.classList.toggle("hide-header", savedChats);
+      <div class="footer">
+        <p>Version 0.76 &copy; Stenoip Company</p>
+      </div>
+<p>New update for Ringzauber! <a href="download.html">Version 1.4</a></p>
 
-  chatContainer.scrollTo(0, chatContainer.scrollHeight);
-}
+      <div class="tomorrow" data-location-id="122795,052149,064500,050388,072102,015101"
+        data-language="EN" data-unit-system="METRIC" data-skin="light" data-widget-type="aqi6"
+        style="padding-bottom:22px;position:relative;">
+        <a href="https://www.tomorrow.io/weather-api/" target="_blank" style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;">
+          <img src="https://weather-website-client.tomorrow.io/img/powered-by.svg" width="250" height="18" alt="Powered by Tomorrow.io">
+        </a>
+      </div>
 
-const createMessageElement = (content, ...classes) => {
-  const div = document.createElement("div");
-  div.classList.add("message", ...classes);
-  div.innerHTML = content;
-  return div;
-}
+      <div class="tomorrow" data-location-id="122795" data-language="EN" data-unit-system="METRIC"
+        data-skin="light" data-widget-type="upcoming" style="padding-bottom:22px;position:relative;">
+        <a href="https://www.tomorrow.io/weather-api/" target="_blank" style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;">
+          <img src="https://weather-website-client.tomorrow.io/img/powered-by.svg" width="250" height="18" alt="Powered by Tomorrow.io">
+        </a>
+      </div>
+    </div>
 
-const showTypingEffect = (text, textElement, incomingMessageDiv) => {
-  const words = text.split(' ');
-  let currentWordIndex = 0;
+  <script>
+    // Links used for search suggestions
+    const links = [
+      { name: '2048', url: '2048.html' },
+      { name: 'Anniversary', url: 'anniversary.html' },
+      { name: 'Boublok Coding', url: 'boublok.html' },
+      { name: 'TI 30XS', url: 'calculator_ti30xiis.html' },
+      { name: 'TI 84', url: 'calculator_ti84.html' },
+      { name: 'Camera', url: 'camera.html' },
+      { name: 'Clocker', url: 'clocker.html' },
+      { name: 'Comics!', url: 'comic.html' },
+      { name: 'The Data Store(Datenspeicher)', url: 'download.html' },
+      { name: 'MailSteno(WIP)', url: 'email.html' },
+      { name: 'Flappy Bird', url: 'flappybird.html' },
+      { name: 'StenoipToanielstik(Games)', url: 'game.html' },
+      { name: 'Gravity Simulation', url: 'gravity.html' },
+      { name: 'StenoVids', url: 'video.html' },
+      { name: 'Tetris', url: 'tetris.html' }
+    ];
 
-  const typingInterval = setInterval(() => {
-    textElement.innerText += (currentWordIndex === 0 ? '' : ' ') + words[currentWordIndex++];
-    incomingMessageDiv.querySelector(".icon").classList.add("hide");
-
-    if (currentWordIndex === words.length) {
-      clearInterval(typingInterval);
-      isResponseGenerating = false;
-      incomingMessageDiv.querySelector(".icon").classList.remove("hide");
-      localStorage.setItem("saved-chats", chatContainer.innerHTML);
+    // Search navigation
+    function search() {
+      const query = document.getElementById('search-input').value;
+      const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
+      if (matchedLink) {
+        window.location.href = matchedLink.url + '?q=' + encodeURIComponent(query);
+      }
     }
-    chatContainer.scrollTo(0, chatContainer.scrollHeight);
-  }, 75);
+
+    // Search suggestions
+    function showSuggestions() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const suggestionsContainer = document.getElementById('suggestions');
+      suggestionsContainer.innerHTML = '';
+      const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
+      filteredLinks.forEach(link => {
+        const suggestion = document.createElement('div');
+        suggestion.textContent = link.name;
+        suggestion.onclick = () => {
+          document.getElementById('search-input').value = link.name;
+          search();
+        };
+        suggestionsContainer.appendChild(suggestion);
+      });
+      suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
+    }
+
+    // Function to show main content and hide intro elements
+    function showMainContent() {
+        document.getElementById('intro-video').style.display = 'none';
+        document.getElementById('launch-screen').style.display = 'none';
+        document.getElementById('skip-btn').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        document.body.style.overflow = 'auto'; // Enable scrolling
+    }
+
+    // Start video or directly show content based on toggle
+    function startExperience() {
+        const introToggle = document.getElementById('introToggle');
+        document.getElementById('launch-screen').style.display = 'none'; // Hide "Click to Launch" immediately
+
+        if (introToggle.checked) { // If switch is ON (intro enabled)
+            const video = document.getElementById('intro-video');
+            video.muted = false;
+            video.style.display = 'block';
+            document.getElementById('skip-btn').style.display = 'block'; // Show skip button
+        } else { // If switch is OFF (intro disabled)
+            showMainContent();
+        }
+    }
+
+    // Skip video (same as before, but now calls showMainContent)
+   function skipVideo() {
+    const video = document.getElementById('intro-video');
+    video.pause();
+    video.currentTime = 0;
+    showMainContent();
 }
 
-const generateAPIResponse = async (incomingMessageDiv) => {
-  const textElement = incomingMessageDiv.querySelector(".text");
+// Event listener for when video ends (same as before, calls showMainContent)
+document.getElementById('intro-video').addEventListener('ended', function () {
+    showMainContent();
+});
 
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userMessage: userMessage }),
+    // Handle the intro toggle switch state
+    const introToggle = document.getElementById('introToggle');
+
+    // Load saved state from localStorage (default to OFF if not found)
+    const savedIntroState = localStorage.getItem('introVideoEnabled');
+    if (savedIntroState === null) {
+        introToggle.checked = false; // Default to OFF
+    } else {
+        introToggle.checked = (savedIntroState === 'true');
+    }
+
+    // Save state when toggle changes
+    introToggle.addEventListener('change', function() {
+        localStorage.setItem('introVideoEnabled', this.checked);
     });
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "API error");
-
-    const apiResponse = data?.candidates[0]?.content?.parts[0]?.text?.replace(/\*\*(.*?)\*\*/g, '$1') || "No response";
-    showTypingEffect(apiResponse, textElement, incomingMessageDiv);
-  } catch (error) {
-    isResponseGenerating = false;
-    textElement.innerText = error.message || "Something went wrong";
-    textElement.parentElement.closest(".message").classList.add("error");
-  } finally {
-    incomingMessageDiv.classList.remove("loading");
-  }
-}
-
-const showLoadingAnimation = () => {
-  const html = `<div class="message-content">
-                  <img class="avatar" src="images/gemini.svg" alt="Gemini avatar">
-                  <p class="text"></p>
-                  <div class="loading-indicator">
-                    <div class="loading-bar"></div>
-                    <div class="loading-bar"></div>
-                    <div class="loading-bar"></div>
-                  </div>
-                </div>
-                <span onClick="copyMessage(this)" class="icon material-symbols-rounded">content_copy</span>`;
-
-  const incomingMessageDiv = createMessageElement(html, "incoming", "loading");
-  chatContainer.appendChild(incomingMessageDiv);
-
-  chatContainer.scrollTo(0, chatContainer.scrollHeight);
-  generateAPIResponse(incomingMessageDiv);
-}
-
-const copyMessage = (copyButton) => {
-  const messageText = copyButton.parentElement.querySelector(".text").innerText;
-  navigator.clipboard.writeText(messageText);
-  copyButton.innerText = "done";
-  setTimeout(() => copyButton.innerText = "content_copy", 1000);
-}
-
-const handleOutgoingChat = () => {
-  userMessage = typingForm.querySelector(".typing-input").value.trim() || userMessage;
-  if (!userMessage || isResponseGenerating) return;
-
-  isResponseGenerating = true;
-
-  const html = `<div class="message-content">
-                  <img class="avatar" src="images/user.jpg" alt="User avatar">
-                  <p class="text"></p>
-                </div>`;
-
-  const outgoingMessageDiv = createMessageElement(html, "outgoing");
-  outgoingMessageDiv.querySelector(".text").innerText = userMessage;
-  chatContainer.appendChild(outgoingMessageDiv);
-
-  typingForm.reset();
-  document.body.classList.add("hide-header");
-  chatContainer.scrollTo(0, chatContainer.scrollHeight);
-  setTimeout(showLoadingAnimation, 500);
-}
-
-toggleThemeButton.addEventListener("click", () => {
-  const isLightMode = document.body.classList.toggle("light_mode");
-  localStorage.setItem("themeColor", isLightMode ? "light_mode" : "dark_mode");
-  toggleThemeButton.innerText = isLightMode ? "dark_mode" : "light_mode";
-});
-
-deleteChatButton.addEventListener("click", () => {
-  if (confirm("Are you sure you want to delete all the chats?")) {
-    localStorage.removeItem("saved-chats");
-    loadDataFromLocalstorage();
-  }
-});
-
-suggestions.forEach(suggestion => {
-  suggestion.addEventListener("click", () => {
-    userMessage = suggestion.querySelector(".text").innerText;
-    handleOutgoingChat();
-  });
-});
-
-typingForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  handleOutgoingChat();
-});
-
-loadDataFromLocalstorage();
-</script>
-
+    // Load Tomorrow.io widget
+    (function (d, s, id) {
+      if (d.getElementById(id)) {
+        if (window.__TOMORROW__) {
+          window.__TOMORROW__.renderWidget();
+        }
+        return;
+      }
+      const fjs = d.getElementsByTagName(s)[0];
+      const js = d.createElement(s);
+      js.id = id;
+      js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    })(document, 'script', 'tomorrow-sdk');
+  </script>
 </body>
 </html>
