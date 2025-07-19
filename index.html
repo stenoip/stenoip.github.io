@@ -215,6 +215,71 @@ body {
     background-color: rgb(57, 103, 204);
 }
 
+/* Intro Toggle Switch Styles */
+.intro-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align to the right in the header */
+    gap: 10px;
+    padding: 10px;
+    font-size: 14px;
+    color: black;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
     .header {
@@ -253,6 +318,10 @@ body {
         width: 100%;
         height: 100%;
         overflow-x: hidden;
+    }
+
+    .intro-toggle-container {
+        justify-content: center; /* Center on smaller screens */
     }
 }
 
@@ -390,33 +459,27 @@ body {
 </head>
 <body>
 
-  <!-- Launch screen -->
-  <div class="launch-screen" id="launch-screen" onclick="startVideo()">
+  <div class="launch-screen" id="launch-screen" onclick="startExperience()">
     Click to Launch
   </div>
 
-  <!-- Intro video -->
   <video id="intro-video" class="intro-video" autoplay playsinline muted>
     <source src="https://stenoip.github.io/intro.mp4" type="video/mp4" />
     <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 
-  <!-- Skip button -->
   <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
-  <!-- Main content container (previously missing) -->
   <div id="main-content" style="display: none;">
 
   <nav class="w-full max-w-4xl bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg">
         <ul class="flex flex-col sm:flex-row justify-around items-center space-y-3 sm:space-y-0 sm:space-x-4">
-            <!-- Home Button -->
             <li>
                 <a href="index.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
                     Home
                 </a>
             </li>
-            <!-- Other Links -->
             <li>
                 <a href="about.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
                     About
@@ -442,6 +505,13 @@ body {
 <br>
       <div class="header">
         <h1 class="block px-10 py-10 text-black font-bold">Stenoip Wonder Computer</h1>
+        <div class="intro-toggle-container">
+            <span>Intro Video:</span>
+            <label class="switch">
+                <input type="checkbox" id="introToggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
       </div>
       <div class="search-bar">
         <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search..." />
@@ -456,7 +526,7 @@ body {
       </button>
 
       <div class="footer">
-        <p>Version 0.76 &copy; Stenoip Company</p>
+        <p>Version 0.77 &copy; Stenoip Company</p>
       </div>
 <p>New update for Ringzauber! <a href="download.html">Version 1.4</a></p>
 
@@ -476,7 +546,6 @@ body {
       </div>
     </div>
 
-  <!-- Scripts -->
   <script>
     // Links used for search suggestions
     const links = [
@@ -524,34 +593,58 @@ body {
       suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
     }
 
-    // Start video
-    function startVideo() {
-      const video = document.getElementById('intro-video');
-      video.muted = false;
-      document.getElementById('launch-screen').style.display = 'none';
-      video.style.display = 'block';
+    // Function to show main content and hide intro elements
+    function showMainContent() {
+        document.getElementById('intro-video').style.display = 'none';
+        document.getElementById('launch-screen').style.display = 'none';
+        document.getElementById('skip-btn').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        document.body.style.overflow = 'auto'; // Enable scrolling
     }
 
-    // Skip video
+    // Start video or directly show content based on toggle
+    function startExperience() {
+        const introToggle = document.getElementById('introToggle');
+        document.getElementById('launch-screen').style.display = 'none'; // Hide "Click to Launch" immediately
+
+        if (introToggle.checked) { // If switch is ON (intro enabled)
+            const video = document.getElementById('intro-video');
+            video.muted = false;
+            video.style.display = 'block';
+            document.getElementById('skip-btn').style.display = 'block'; // Show skip button
+        } else { // If switch is OFF (intro disabled)
+            showMainContent();
+        }
+    }
+
+    // Skip video (same as before, but now calls showMainContent)
    function skipVideo() {
     const video = document.getElementById('intro-video');
     video.pause();
     video.currentTime = 0;
-    video.style.display = 'none';
-    document.getElementById('main-content').style.display = 'block';
-    document.getElementById('launch-screen').style.display = 'none';
-    document.getElementById('skip-btn').style.display = 'none';
-    document.body.style.overflow = 'auto'; // ✅ enable scrolling
+    showMainContent();
 }
 
+// Event listener for when video ends (same as before, calls showMainContent)
 document.getElementById('intro-video').addEventListener('ended', function () {
-    document.getElementById('intro-video').style.display = 'none';
-    document.getElementById('main-content').style.display = 'block';
-    document.getElementById('launch-screen').style.display = 'none';
-    document.getElementById('skip-btn').style.display = 'none';
-    document.body.style.overflow = 'auto'; // ✅ enable scrolling
+    showMainContent();
 });
 
+    // Handle the intro toggle switch state
+    const introToggle = document.getElementById('introToggle');
+
+    // Load saved state from localStorage (default to OFF if not found)
+    const savedIntroState = localStorage.getItem('introVideoEnabled');
+    if (savedIntroState === null) {
+        introToggle.checked = false; // Default to OFF
+    } else {
+        introToggle.checked = (savedIntroState === 'true');
+    }
+
+    // Save state when toggle changes
+    introToggle.addEventListener('change', function() {
+        localStorage.setItem('introVideoEnabled', this.checked);
+    });
 
     // Load Tomorrow.io widget
     (function (d, s, id) {
