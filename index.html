@@ -526,7 +526,7 @@ input:checked + .slider:before {
       </button>
 
       <div class="footer">
-        <p>Version 0.77 &copy; Stenoip Company</p>
+        <p>Version 0.79 &copy; Stenoip Company</p>
       </div>
 <p>New update for Ringzauber! <a href="download.html">Version 1.4</a></p>
 
@@ -547,7 +547,7 @@ input:checked + .slider:before {
     </div>
 
   <script>
-    // Links used for search suggestions
+// Links used for search suggestions
     const links = [
       { name: '2048', url: '2048.html' },
       { name: 'Anniversary', url: 'anniversary.html' },
@@ -602,22 +602,23 @@ input:checked + .slider:before {
         document.body.style.overflow = 'auto'; // Enable scrolling
     }
 
-    // Start video or directly show content based on toggle
+    // This function is still used when "Click to Launch" is pressed manually.
     function startExperience() {
         const introToggle = document.getElementById('introToggle');
-        document.getElementById('launch-screen').style.display = 'none'; // Hide "Click to Launch" immediately
+        document.getElementById('launch-screen').style.display = 'none';
 
         if (introToggle.checked) { // If switch is ON (intro enabled)
             const video = document.getElementById('intro-video');
-            video.muted = false;
+            video.muted = false; // Unmute if the user is explicitly starting the video
             video.style.display = 'block';
+            video.play(); // Make sure the video plays
             document.getElementById('skip-btn').style.display = 'block'; // Show skip button
         } else { // If switch is OFF (intro disabled)
             showMainContent();
         }
     }
 
-    // Skip video (same as before, but now calls showMainContent)
+    // Skip video
    function skipVideo() {
     const video = document.getElementById('intro-video');
     video.pause();
@@ -625,26 +626,55 @@ input:checked + .slider:before {
     showMainContent();
 }
 
-// Event listener for when video ends (same as before, calls showMainContent)
+// Event listener for when video ends
 document.getElementById('intro-video').addEventListener('ended', function () {
     showMainContent();
 });
 
-    // Handle the intro toggle switch state
-    const introToggle = document.getElementById('introToggle');
+// Handle the intro toggle switch state
+const introToggle = document.getElementById('introToggle');
 
-    // Load saved state from localStorage (default to OFF if not found)
-    const savedIntroState = localStorage.getItem('introVideoEnabled');
-    if (savedIntroState === null) {
-        introToggle.checked = false; // Default to OFF
-    } else {
-        introToggle.checked = (savedIntroState === 'true');
+// Load saved state from localStorage (default to OFF if not found)
+const savedIntroState = localStorage.getItem('introVideoEnabled');
+if (savedIntroState === null) {
+    introToggle.checked = false; // Default to OFF if no state is saved
+} else {
+    introToggle.checked = (savedIntroState === 'true');
+}
+
+// Save state when toggle changes
+introToggle.addEventListener('change', function() {
+    localStorage.setItem('introVideoEnabled', this.checked);
+    // If the user turns the toggle OFF while the video is playing, stop it and show content
+    if (!this.checked && document.getElementById('intro-video').style.display === 'block') {
+        skipVideo();
+    } else if (this.checked && document.getElementById('main-content').style.display === 'block') {
+        // If the user turns the toggle ON after main content is shown, hide main content and prepare video
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('intro-video').style.display = 'block';
+        document.getElementById('skip-btn').style.display = 'block';
+        document.getElementById('intro-video').load(); // Reload video to ensure it's at the start
+        document.getElementById('intro-video').muted = true; // Keep muted until user explicitly plays or un-mutes
     }
+});
 
-    // Save state when toggle changes
-    introToggle.addEventListener('change', function() {
-        localStorage.setItem('introVideoEnabled', this.checked);
-    });
+// --- NEW/MODIFIED LOGIC FOR IMMEDIATE DISPLAY ON LOAD ---
+// This part ensures that if the intro is toggled off, the main content shows immediately on page load.
+document.addEventListener('DOMContentLoaded', function() {
+    // If the intro is off by default or was set off by the user, show main content directly.
+    // This happens immediately when the page content is loaded.
+    if (!introToggle.checked) {
+        showMainContent();
+    } else {
+        // If intro is enabled, show the "Click to Launch" screen initially.
+        // The user will then click it to start the video.
+        document.getElementById('launch-screen').style.display = 'flex';
+        // Make sure video is hidden and muted until launched
+        document.getElementById('intro-video').style.display = 'none';
+        document.getElementById('intro-video').muted = true;
+    }
+});
+
 
     // Load Tomorrow.io widget
     (function (d, s, id) {
