@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,16 +9,14 @@
   <title>Stenoip Wonder Computer</title>
    <script src="https://cdn.tailwindcss.com"></script>
   <style>
-       /* General Styles */
+/* General Styles */
 body {
     font-family: 'Google Sans', sans-serif;
     background-color: #f0f0f0;
     margin: 0;
     overflow-x: hidden; /* Prevent horizontal scroll only */
 
-
 }
-
 /* Fullscreen video styling */
 .intro-video {
     position: fixed;
@@ -28,7 +27,6 @@ body {
     object-fit: cover; /* Ensure video scales properly */
     z-index: 10;
 }
-
 /* Green Screen for launch */
 .launch-screen {
     position: fixed;
@@ -45,12 +43,10 @@ body {
     font-size: 24px;
     z-index: 15;
 }
-
 /* Hide content initially */
 #main-content {
     display: none;
 }
-
 /* Header styles */
 .header {
     font-size: 13px;
@@ -60,28 +56,23 @@ body {
     width: 100%; /* Ensure header is full width */
     box-sizing: border-box;
 }
-
 .menuItems {
     font-size: 13px;
     padding: 0 20px;
     display: inline-block;
 }
-
 .header a {
     text-decoration: none;
     color: rgb(0, 0, 0);
 }
-
 .header a:hover {
     text-decoration: underline;
 }
-
 /* Dropdown styling */
 .menu {
     position: relative;
     display: inline-block;
 }
-
 .dropdown-content {
     width: 270px;
     padding: 28px;
@@ -93,27 +84,22 @@ body {
     right: 0;
     background-color: rgb(255, 255, 255);
 }
-
 .menuItems:hover .dropdown-content {
     display: block;
 }
-
 .appLogo {
     text-align: center;
     display: inline-block;
     width: 86px;
     padding: 5px;
 }
-
 .menuItemLogo {
     width: 50px;
     height: 50px;
 }
-
 .caption {
     text-align: center;
 }
-
 .container {
     width: 80%;
     max-width: 1200px;
@@ -124,7 +110,6 @@ body {
     border-radius: 10px;
 
 }
-
 
 .search {
     font-size: 14px;
@@ -139,11 +124,9 @@ body {
     margin: 0 auto;
     display: block;
 }
-
 .search:focus {
     border-color: rgb(66, 133, 244);
 }
-
 .search-results {
     max-height: 300px;
     overflow-y: auto;
@@ -154,16 +137,13 @@ body {
     display: none;
     margin-top: 10px;
 }
-
 .result-item {
     padding: 8px;
     cursor: pointer;
 }
-
 .result-item:hover {
     background-color: rgb(241, 243, 244);
 }
-
 /* Button styles */
 .btns {
     margin: 7px 0;
@@ -175,11 +155,9 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
-
 .btns:hover {
     background-color: rgb(241, 243, 244);
 }
-
 /* Learn Centre Button (larger and center-aligned) */
 .learn-centre-btn {
     margin: 20px 0;
@@ -191,11 +169,9 @@ body {
     border-radius: 30px;
     cursor: pointer;
 }
-
 .learn-centre-btn:hover {
     background-color: rgb(57, 103, 204);
 }
-
 /* Skip button styles */
 .skip-btn {
     position: fixed;
@@ -210,11 +186,9 @@ body {
     cursor: pointer;
     z-index: 20;
 }
-
 .skip-btn:hover {
     background-color: rgb(57, 103, 204);
 }
-
 /* Intro Toggle Switch Styles */
 .intro-toggle-container {
     display: flex;
@@ -225,20 +199,17 @@ body {
     font-size: 14px;
     color: black;
 }
-
 .switch {
   position: relative;
   display: inline-block;
   width: 40px;
   height: 20px;
 }
-
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
-
 .slider {
   position: absolute;
   cursor: pointer;
@@ -251,7 +222,6 @@ body {
   transition: .4s;
   border-radius: 20px;
 }
-
 .slider:before {
   position: absolute;
   content: "";
@@ -264,21 +234,17 @@ body {
   transition: .4s;
   border-radius: 50%;
 }
-
 input:checked + .slider {
   background-color: #2196F3;
 }
-
 input:focus + .slider {
   box-shadow: 0 0 1px #2196F3;
 }
-
 input:checked + .slider:before {
   -webkit-transform: translateX(20px);
   -ms-transform: translateX(20px);
   transform: translateX(20px);
 }
-
 
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
@@ -291,170 +257,203 @@ input:checked + .slider:before {
         width: 90%;
         font-size: 16px;
     }
-
     .container {
         padding: 80px 10px;
     }
-
     .learn-centre-btn {
         padding: 18px 40px;
         font-size: 18px;
     }
-
     .skip-btn {
         bottom: 10px;
         left: 10px;
         padding: 8px 15px;
         font-size: 14px;
     }
-
     .footer {
         font-size: 10px;
         padding: 15px;
     }
-
     /* Remove any unwanted overflow */
     body, html {
         width: 100%;
         height: 100%;
         overflow-x: hidden;
     }
-
     .intro-toggle-container {
         justify-content: center; /* Center on smaller screens */
     }
 }
-
 /* Landscape and other larger screens adjustments */
 @media (max-width: 1024px) and (min-width: 769px) {
     .search {
         width: 70%;
     }
-
     .learn-centre-btn {
         padding: 20px 45px;
         font-size: 20px;
     }
 }
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
-        body {
-            font-family: 'Google Sans', sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            margin-top: 20px;
-            border-radius: 10px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .search-bar {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .search-bar input {
-            padding: 10px;
-            width: 70%;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-        .search-bar button {
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            background-color: #0078d4;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .search-bar button:hover {
-            background-color: #005ba1;
-        }
-        .suggestions {
-            position: absolute;
-            top: 40px;
-            left: 0;
-            width: 70%;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1;
-        }
-        .suggestions div {
-            padding: 10px;
-            cursor: pointer;
-        }
-        .suggestions div:hover {
-            background-color: #f0f0f0;
-        }
-        .news {
-            margin-bottom: 20px;
-        }
-        .news h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #0078d4;
-        }
-        .news iframe {
-            width: 100%;
-            height: 400px;
-            border: none;
-            border-radius: 10px;
-        }
-        .ads {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .ads img {
-            width: 48%;
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-        .ads img:hover {
-            transform: scale(1.05);
-        }
-        .links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-        }
-        .links button {
-            padding: 15px 30px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            background-color: #0078d4;
-            color: white;
-            border-radius: 5px;
-            margin: 5px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        .links button:hover {
-            background-color: #005ba1;
-            transform: translateY(-3px);
-            }
+body {
+    font-family: 'Google Sans', sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+.container {
+    width: 80%;
+    max-width: 1200px;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    margin-top: 20px;
+    border-radius: 10px;
+}
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.header h1 { /* Targeting the h1 specifically within the header (the site title) */
+    font-size: 48px; /* Made the font size larger */
+}
 
+/* Updated CSS to style all heading tags (h1-h6) and p tags distinctly */
+#main-content h1 {
+    font-size: 32px; /* Large heading */
+    margin-bottom: 15px;
+}
+
+#main-content h2 {
+    font-size: 28px; /* Slightly smaller than h1 */
+    margin-bottom: 12px;
+}
+
+#main-content h3 {
+    font-size: 24px; /* Smaller than h2 */
+    margin-bottom: 10px;
+}
+
+#main-content h4 {
+    font-size: 20px; /* Smaller than h3 */
+    margin-bottom: 8px;
+}
+
+#main-content h5 {
+    font-size: 18px; /* Smaller than h4 */
+    margin-bottom: 6px;
+}
+
+#main-content h6 {
+    font-size: 16px; /* Smallest heading */
+    margin-bottom: 4px;
+}
+
+#main-content p {
+    font-size: 14px; /* Standard paragraph text, smaller than all headings */
+    line-height: 1.6; /* Improved readability for paragraphs */
+    margin-bottom: 1em; /* Space between paragraphs */
+}
+
+
+.search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+.search-bar input {
+    padding: 10px;
+    width: 70%;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+.search-bar button {
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    background-color: #0078d4;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.search-bar button:hover {
+    background-color: #005ba1;
+}
+.suggestions {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 70%;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1;
+}
+.suggestions div {
+    padding: 10px;
+    cursor: pointer;
+}
+.suggestions div:hover {
+    background-color: #f0f0f0;
+}
+.news {
+    margin-bottom: 20px;
+}
+.news h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #0078d4;
+}
+.news iframe {
+    width: 100%;
+    height: 400px;
+    border: none;
+    border-radius: 10px;
+}
+.ads {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.ads img {
+    width: 48%;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+.ads img:hover {
+    transform: scale(1.05);
+}
+.links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+.links button {
+    padding: 15px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: #0078d4;
+    color: white;
+    border-radius: 5px;
+    margin: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+.links button:hover {
+    background-color: #005ba1;
+    transform: translateY(-3px);
+}
   </style>
 </head>
 <body>
@@ -514,37 +513,43 @@ input:checked + .slider:before {
         </div>
       </div>
       <div class="search-bar">
-        <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search..." />
+        <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search our website..." />
 
         <button onclick="search()">Search</button>
         <div class="suggestions" id="suggestions" style="display: none;"></div>
       </div>
-<script async src="https://cse.google.com/cse.js?cx=63de7b7e7f71042d6"></script>
-        <div class="gcse-search"></div>
-      <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
+
+<h1>Use the Internet without being tracked!</h1>
+<h2>Big Corporations like Microsoft, Google and Apple track your Info all the time!</h2>
+<p>Stenoip Wonder Computer provides the latest advanced tech for free without any of your history being known.<br> These Large Companies will:</p>
+<ul>
+<li>a) cause data breaches</li>
+<li>b) not comply with Privacy Regulations(like GDPR and CCPA)</li>
+<li>c) create detailed customer profiles, which may lead to discriminatory practices.</li>
+<li>d) crushing their competition.</li>
+<ul>
+ <br>
+ <p>Stenoip Wonder Computer does not do this. We are commited to make a safe and private environment for users. Did we mention we have entertainment?</p>
+<br>
+<img src="https://stenoip.github.io/2025_07_19_0wi_Kleki.png">
+<h2>We offer many products!</h2>
+<br>
+<a href ="ringzauber.html">Visit here to view the All new Ringzauber and SearXNG.</a>
+<br>
+ <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
         Learn Center
       </button>
-
-      <div class="footer">
-        <p>Version 0.81 &copy; Stenoip Company</p>
-      </div>
-<p>New update for Ringzauber! <a href="download.html">Version 1.4</a></p>
-
-      <div class="tomorrow" data-location-id="122795,052149,064500,050388,072102,015101"
-        data-language="EN" data-unit-system="METRIC" data-skin="light" data-widget-type="aqi6"
-        style="padding-bottom:22px;position:relative;">
-        <a href="https://www.tomorrow.io/weather-api/" target="_blank" style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;">
-          <img src="https://weather-website-client.tomorrow.io/img/powered-by.svg" width="250" height="18" alt="Powered by Tomorrow.io">
-        </a>
+      <br>
+      <p>Visit the Learn Center for the News and Weather</p>
+<div class="footer">
+       <br>
+       <p>Version 0.80 &copy; Stenoip Company</p>
+       <a href ="copyright.html">View our terms.</a>
       </div>
 
-      <div class="tomorrow" data-location-id="122795" data-language="EN" data-unit-system="METRIC"
-        data-skin="light" data-widget-type="upcoming" style="padding-bottom:22px;position:relative;">
-        <a href="https://www.tomorrow.io/weather-api/" target="_blank" style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;">
-          <img src="https://weather-website-client.tomorrow.io/img/powered-by.svg" width="250" height="18" alt="Powered by Tomorrow.io">
-        </a>
-      </div>
-    </div>
+
+   
+    
 
   <script>
 // Links used for search suggestions
@@ -663,8 +668,7 @@ introToggle.addEventListener('change', function() {
 document.addEventListener('DOMContentLoaded', function() {
     // If the intro is off by default or was set off by the user, show main content directly.
     // This happens immediately when the page content is loaded.
-   
-  if (!introToggle.checked) {
+    if (!introToggle.checked) {
         showMainContent();
     } else {
         // If intro is enabled, show the "Click to Launch" screen initially.
