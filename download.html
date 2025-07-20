@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="swc.png">
+
+    <title>StenoipArgora</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+        header {
+            background-color: #007bff;
+            padding: 15px;
+            text-align: center;
+            color: #fff;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #0056b3;
+            padding: 10px;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            padding: 20px;
+        }
+        .carousel {
+            display: flex;
+            overflow-x: scroll;
+            margin-bottom: 20px;
+        }
+        .carousel img {
+            width: 200px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+        .section {
+            margin-bottom: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .button {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            background-color: #007bff;
+            text-align: center;
+            padding: 10px;
+            color: #fff;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            width: calc(100% - 45px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
+        .sorting-options {
+            margin-bottom: 20px;
+        }
+        .sorting-options label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .reviews {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .review {
+            margin-bottom: 10px;
+        }
+        .review h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .review p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>The Datenspeicher</h1>
+    </header>
+    <nav>
+        <a href="#apps">Apps</a>
+        <a href="#html-files">HTML Files</a>
+        <a href="#zips">ZIP Files</a>
+        <a href="#windows">Windows(and Ringzauber)</a>
+        <a href="#apple">Apple</a>
+        <a href="#chromebooks">Chromebooks</a>
+    </nav>
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" placeholder="Search...">
+            <button>Search</button>
+        </div>
+        <div class="sorting-options">
+            <label for="sort">Sort by:</label>
+            <select id="sort">
+                <option value="name">Name</option>
+                <option value="date">Date</option>
+                <option value="size">Size</option>
+            </select>
+        </div>
+        <div class="carousel">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmw1KCF-eDPdfPD1CqX8W3xQhsWcOJZKkhYage8aKsKegGq-RtuQ&s=10&ec=72992915" alt="Photo of Ringzauber Logo">
+           <p>Ringzauber</p>
+            <img src="https://via.placeholder.com/200x150" alt="Featured 2">
+            <img src="https://via.placeholder.com/200x150" alt="Featured 3">
+        </div>
+        <div class="section" id="apps">
+            <h2>Apps</h2>
+            <a href="https://example.com/download_app1" class="button">Ringzauber Kaffee(Coming Soon)</a>
+            <a href="https://example.com/download_app2" class="button">Lytze the Fuzbal(Coming Soon)</a>
+        </div>
+        <div class="section" id="html-files">
+            <h2>HTML Files</h2>
+            <a href="https://example.com/download_html1" class="button"></a>
+            <a href="https://example.com/download_html2" class="button"></a>
+        </div>
+        <div class="section" id="zips">
+            <h2>ZIP Files</h2>
+            <a href="https://drive.google.com/file/d/12-KwA7SAvBEfSKVEp2sNOKtxyaXocU5L/view?usp=drive_link" class="button">Stenoip Wonder Computer OLD(Less Megabytes)</a>
+            <a href="https://example.com/download_zip2" class="button">Stenoip Wonder Computer Version 0.62</a>
+        </div>
+        <div class="section" id="windows">
+            <h2>Windows</h2>
+            <a href="https://drive.google.com/file/d/17sKOFRWVStOIb-Q8AUL7_5BBbzP5h0Zw/view?usp=sharing" class="button">Ringzauber Browser(Less space but older)</a>
+            <a href="https://drive.google.com/file/d/1kGswsvTJjdyueLFhQ4EkSCLPKy1i3rha/view?usp=sharing" class="button">Ringzauber Browser version 1.4(NEW)</a>
+        </div>
+        <div class="section" id="apple">
+            <h2>Apple</h2>
+            <a href="https://example.com/download_apple1" class="button"></a>
+            <a href="https://example.com/download_apple2" class="button"></a>
+        </div>
+        <div class="section" id="chromebooks">
+            <h2>Chromebooks</h2>
+            <a href="https://example.com/download_chromebook1" class="button"></a>
+            <a href="https://example.com/download_chromebook2" class="button"></a>
+        </div>
+        <div class="section" id="reviews">
+            <h2>User Reviews</h2>
+            <div class="reviews">
+                <div class="review">
+                    <h3>Gerald Topps</h3>
+                    <p>Great platform! Really easy to use and find what I need.</p>
+                </div>
+                <div class="review">
+                    <h3>Abby K. Roberts</h3>
+                    <p>Amazing collection of apps and resources. Highly recommended!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        &copy; 2024 Stenoip Company. All rights reserved.
+    </footer>
+</body>
+</html>
