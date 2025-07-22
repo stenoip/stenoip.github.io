@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="swc.png">
+
+    <title>Ringzauber</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #34eb40;
+           
+        }
+        header {
+            background-color: #3a34eb;
+            padding: 15px;
+            text-align: center;
+            color: #fff;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #0056b3;
+            padding: 10px;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            padding: 20px;
+        }
+        .carousel {
+            display: flex;
+            overflow-x: scroll;
+            margin-bottom: 20px;
+        }
+        .carousel img {
+            width: 200px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+        .section {
+            margin-bottom: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .button {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            background-color: #3a34eb;
+            text-align: center;
+            padding: 10px;
+            color: #fff;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            width: calc(100% - 45px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
+        .sorting-options {
+            margin-bottom: 20px;
+        }
+        .sorting-options label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .reviews {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .review {
+            margin-bottom: 10px;
+        }
+        .review h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .review p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ringzauber</h1>
+    </header>
+    
+    <div class="container">
+    <p>Ringzauber is a private browser made by Python that does not save your history. It is easy use by anyone and aviable to use on Windows 7, 8.1 and 10 and 11.</p>
+        </div>
+       
+        <div class="carousel">
+            <img src="https://stenoip.github.io/ringzauber.png" alt="Photo of Ringzauber Logo">
+           <p>Ringzauber Logo</p>
+         
+        </div>
+       
+       <div class = "container">
+       <p>
+       Best used with <a href = "https://github.com/searxng/searxng">SearXNG</a>(note, we did not create this)! Download SearXNG in your terminal:<br>
+      
+      <p> Copy this line: sudo apt update<br>
+sudo apt install -y git python3 python3-venv python3-pip build-essential libxslt-dev zlib1g-dev libffi-dev libssl-dev
+</p>
+<br>
+<p> Paste this in next:git clone https://github.com/searxng/searxng.git
+cd searxng
+</p>
+<br>
+<p>Next:python3 -m venv venv
+source venv/bin/activate
+</p>
+<br>
+<p>
+Next:pip install --upgrade pip setuptools wheel<br>
+pip install --use-pep517 --no-build-isolation -e .
+
+<p>
+<br>
+<p>
+Finally: enter this:python searx/webapp.py
+
+</p>
+<br> 
+<p>
+Open this url in Ringzauber:http://127.0.0.1:8888
+
+</p>
+
+       </p>
+       
+       </div>
+       
+       
+    
+        <div class="section" id="reviews">
+            <h2>User Reviews</h2>
+            <div class="reviews">
+                <div class="review">
+                    <h3>Gerald Topps</h3>
+                    <p>Great platform! Really easy to use and find what I need.</p>
+                </div>
+                <div class="review">
+                    <h3>Abby K. Roberts</h3>
+                    <p>Amazing collection of apps and resources. Highly recommended!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+   <div class="section" id="reviews">
+            <h2>Help</h2>
+            <div class="reviews">
+                <div class="review">
+                    <h3>Ringzauber says that file might be dangerous</h3>
+                    <p>As said as before RIngzauber is in its beta stages. We have not made the step to tell you computer that it is safe</p>
+                </div>
+                <div class="review">
+                    <h3>The Inspect tag does not work</h3>
+                    <p>A glitch in the code caused this. It will be fixed in the next update.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+  
+  
+  
+  
+  
+  <footer>
+        &copy; 2025 Stenoip Company. All rights reserved.
+    </footer>
+</body>
+</html>
