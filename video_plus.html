@@ -3,160 +3,201 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StenoVids Plus(Private Youtube Watcher)</title>
+  <title>StenoVids Plus (Private YouTube Watcher)</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background: #ffffff;
-      color: #000000;
+      background: #fff;
+      color: #000;
     }
-    header {
-      padding: 1rem;
+
+    header, footer {
       background: #f5f5f5;
       text-align: center;
-      border-bottom: 1px solid #ddd;
+      padding: 1rem;
+      border: 1px solid #ddd;
     }
-    input {
-      width: 300px;
+
+    header input, select, button {
+      margin: 0.3rem;
       padding: 0.5rem;
-      margin-right: 0.5rem;
     }
+
     button {
-      padding: 0.5rem 1rem;
       background: #e62117;
       color: white;
       border: none;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
+
     button:hover {
       background: #c7110c;
     }
+
     main {
-      padding: 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 2rem;
     }
-    #video-player iframe {
-      width: 100%;
-      max-width: 800px;
-      height: 450px;
-      margin-bottom: 2rem;
-      border: none;
-      animation: slideIn 0.6s ease forwards;
-    }
+
     #results {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 1rem;
-      width: 100%;
       max-width: 1000px;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeGrid 0.6s ease forwards;
+      width: 100%;
     }
+
     .video-card {
       background: #f9f9f9;
       border: 1px solid #ccc;
       padding: 1rem;
       cursor: pointer;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 0.6s ease forwards;
+      transition: all 0.3s ease;
     }
+
     .video-card:hover {
       background: #efefef;
       transform: translateY(-5px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+
     .video-card img {
       width: 100%;
     }
+
     .video-card h3 {
       margin-top: 0.5rem;
       font-size: 1rem;
     }
 
-    footer {
-      background: #f5f5f5;
-      text-align: center;
-      padding: 1rem;
-      border-top: 1px solid #ddd;
+    #fullscreen-player {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.4s ease;
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    #fullscreen-player button {
+      margin-top: 1rem;
     }
-    @keyframes fadeGrid {
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
 <body>
   <header>
-    <h2>StenoVids Plus(Private Youtube Watcher)</h2>
+    <h2>StenoVids Plus (Private YouTube Watcher)</h2>
     <input type="text" id="search" placeholder="Search videos..." />
-    <button onclick="searchVideos()">Search</button>
+    <select id="sortOrder">
+      <option value="relevance">Relevance</option>
+      <option value="date">Newest</option>
+      <option value="viewCount">Most Viewed</option>
+      <option value="rating">Top Rated</option>
+    </select>
+    <button onclick="searchVideos()">Search</button><br/>
+    <input type="text" id="videoURL" placeholder="Paste YouTube URL..." />
+    <button onclick="loadFromURL()">Play</button>
   </header>
+
   <main>
     <section id="video-player"></section>
     <section id="results"></section>
   </main>
-  <footer>Copyright 2025, Stenoip Company. All rights reserved.
+
+  <footer>
+    Copyright 2025, Stenoip Company. All rights reserved.
   </footer>
+
   <script>
     const apiKey = "AIzaSyBJ9awb9K-MM8WdCXKehSfA49Id4CGyFiA";
+    let nextPageToken = "";
+    let currentQuery = "";
+    let currentOrder = "";
 
-    async function searchVideos() {
+    async function searchVideos(isLoadMore = false) {
       const query = document.getElementById("search").value.trim();
-      if (!query) return;
+      const order = document.getElementById("sortOrder").value;
 
-      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(query)}&maxResults=50&key=${apiKey}`;
+      if (!isLoadMore) {
+        currentQuery = query;
+        currentOrder = order;
+        nextPageToken = "";
+        document.getElementById("results").innerHTML = "";
+      }
+
+      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(currentQuery)}&maxResults=20&order=${currentOrder}&key=${apiKey}&pageToken=${nextPageToken}`;
 
       try {
         const res = await fetch(url);
         const data = await res.json();
+        nextPageToken = data.nextPageToken || "";
 
-        const results = document.getElementById("results");
-        results.innerHTML = "";
-        data.items.forEach((item, i) => {
+        data.items.forEach(item => {
           const videoId = item.id.videoId;
           const title = item.snippet.title;
           const thumbnail = item.snippet.thumbnails.medium.url;
 
           const card = document.createElement("div");
           card.className = "video-card";
-          card.style.animationDelay = `${i * 0.05}s`; // stagger effect
-          card.innerHTML = `
-            <img src="${thumbnail}" alt="${title}" />
-            <h3>${title}</h3>
-          `;
+          card.innerHTML = `<img src="${thumbnail}" alt="${title}" /><h3>${title}</h3>`;
           card.onclick = () => playVideo(videoId);
-          results.appendChild(card);
+          document.getElementById("results").appendChild(card);
         });
       } catch (err) {
+        alert("Failed to fetch videos.");
         console.error("API error:", err);
+      }
+    }
+
+    function loadFromURL() {
+      const url = document.getElementById("videoURL").value;
+      const match = url.match(/(?:youtu\.be\/|v=)([A-Za-z0-9_-]{11})/);
+      if (match && match[1]) {
+        playVideo(match[1]);
+      } else {
+        alert("Invalid URL!");
       }
     }
 
     function playVideo(videoId) {
       const player = document.getElementById("video-player");
       player.innerHTML = `
-        <iframe 
-          src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0" 
-          allow="autoplay; encrypted-media" 
-          allowfullscreen>
-        </iframe>
+        <div id="fullscreen-player">
+          <iframe 
+            src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0" 
+            allow="autoplay; encrypted-media" 
+            allowfullscreen
+            style="width:80%; height:70%; border:none;">
+          </iframe>
+          <button onclick="closeFullscreen()">Back</button>
+        </div>
       `;
-      window.scrollTo({ top: player.offsetTop, behavior: "smooth" });
     }
+
+    function closeFullscreen() {
+      const elem = document.getElementById("fullscreen-player");
+      if (elem) elem.remove();
+    }
+
+    // Infinite scroll
+    window.addEventListener("scroll", () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && nextPageToken) {
+        searchVideos(true);
+      }
+    });
   </script>
 </body>
 </html>
