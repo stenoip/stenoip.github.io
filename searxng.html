@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Instructions to download SearXNG</title>
+</head>
+<body>
+
+<h1>Make sure you’ve installed:</h1>
+
+<li>Git for Windows</li>
+
+<li>Python 3 (during installation, check “Add Python to PATH”)</li>
+
+<li>Microsoft C++ Build Tools (for compiling dependencies)</li>
+
+<h1> Installation Steps in Windows Terminal or PowerShell</h1>
+
+<h2>Step 1: Install required Python packages and build tools
+ (Make sure pip is working after installing Python)</h2>
+
+<p>pip install --upgrade pip setuptools wheel<br>
+pip install httpx</p>
+
+Step 2: Clone SearXNG repo
+git clone https://github.com/searxng/searxng.git
+cd searxng
+
+# Step 3: Create and activate a virtual environment
+python -m venv venv
+venv\Scripts\activate
+
+# Step 4: Install SearXNG dependencies
+pip install --use-pep517 --no-build-isolation -e .
+
+# Step 5: Launch the server
+python searx\webapp.py
+ Accessing the Local Server
+Once it’s running, open your browser and visit:
+
+http://127.0.0.1:8888
+
+</body>
+</html>
+
