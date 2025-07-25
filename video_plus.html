@@ -5,42 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>StenoVids Plus (Private YouTube Watcher)</title>
   <style>
-    body {
-      margin: 0;
-      background: #fff;
-      color: #000;
-    }
-
+    body { margin: 0; background: #fff; color: #000; }
     header, footer {
       background: #f5f5f5;
       text-align: center;
       padding: 1rem;
       border: 1px solid #ddd;
     }
-
     header input, select, button {
       margin: 0.3rem;
       padding: 0.5rem;
     }
-
     button {
       background: #e62117;
       color: white;
       border: none;
       cursor: pointer;
     }
-
-    button:hover {
-      background: #c7110c;
-    }
-
+    button:hover { background: #c7110c; }
     main {
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 2rem;
     }
-
     #results {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -48,7 +36,6 @@
       max-width: 1000px;
       width: 100%;
     }
-
     .video-card {
       background: #f9f9f9;
       border: 1px solid #ccc;
@@ -56,22 +43,16 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-
     .video-card:hover {
       background: #efefef;
       transform: translateY(-5px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-
-    .video-card img {
-      width: 100%;
-    }
-
+    .video-card img { width: 100%; }
     .video-card h3 {
       margin-top: 0.5rem;
       font-size: 1rem;
     }
-
     #fullscreen-player {
       position: fixed;
       top: 0;
@@ -86,11 +67,9 @@
       align-items: center;
       animation: fadeIn 0.4s ease;
     }
-
     #fullscreen-player button {
       margin-top: 1rem;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
@@ -99,17 +78,22 @@
 </head>
 <body>
   <header>
-    <h2>StenoVids Plus (Private YouTube Watcher)</h2>
+    <h2>StenoVids Plus</h2>
+    <p>Watch videos online that are private and appropriate for people under 18.</p>
     <input type="text" id="search" placeholder="Search videos..." />
     <select id="sortOrder">
       <option value="relevance">Relevance</option>
       <option value="date">Newest</option>
       <option value="viewCount">Most Viewed</option>
+      <option value="oldest">Oldest</option>
       <option value="rating">Top Rated</option>
     </select>
     <button onclick="searchVideos()">Search</button><br/>
     <input type="text" id="videoURL" placeholder="Paste YouTube URL..." />
     <button onclick="loadFromURL()">Play</button>
+    <small style="font-style:italic; color:#555;">
+      Tip: Leave search blank to explore trending or historical videos safely.
+    </small>
   </header>
 
   <main>
@@ -128,28 +112,61 @@
     let currentOrder = "";
 
     async function searchVideos(isLoadMore = false) {
-      const query = document.getElementById("search").value.trim();
-      const order = document.getElementById("sortOrder").value;
+      const queryInput = document.getElementById("search").value.trim();
+      const sortOrder = document.getElementById("sortOrder").value;
 
       if (!isLoadMore) {
-        currentQuery = query;
-        currentOrder = order;
+        currentQuery = queryInput;
+        currentOrder = sortOrder;
         nextPageToken = "";
         document.getElementById("results").innerHTML = "";
       }
 
-      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(currentQuery)}&maxResults=20&order=${currentOrder}&key=${apiKey}&pageToken=${nextPageToken}`;
+      let searchQuery = queryInput;
+      if (!searchQuery) {
+        switch (sortOrder) {
+          case "date": searchQuery = "latest"; break;
+          case "oldest": searchQuery = "history"; break;
+          case "viewCount": searchQuery = "viral"; break;
+          case "rating": searchQuery = "top videos"; break;
+          default: searchQuery = "trending";
+        }
+      }
+
+      const apiOrder = sortOrder === "oldest" ? "date" : sortOrder;
+      const apiURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(searchQuery)}&maxResults=20&order=${apiOrder}&key=${apiKey}&pageToken=${nextPageToken}&safeSearch=strict&videoEmbeddable=true`;
 
       try {
-        const res = await fetch(url);
+        const res = await fetch(apiURL);
         const data = await res.json();
         nextPageToken = data.nextPageToken || "";
 
-        data.items.forEach(item => {
+        let items = data.items;
+        if (sortOrder === "oldest") items = items.reverse();
+
+        const videoIDs = items.map(item => item.id.videoId).join(",");
+
+        // Fetch video details to get durations
+        const detailURL = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIDs}&key=${apiKey}`;
+        const detailsRes = await fetch(detailURL);
+        const detailsData = await detailsRes.json();
+
+        const allowedIDs = detailsData.items
+          .filter(video => {
+            const dur = video.contentDetails.duration;
+            const match = dur.match(/PT(\d+M)?(\d+S)?/);
+            const minutes = match?.[1] ? parseInt(match[1]) : 0;
+            const seconds = match?.[2] ? parseInt(match[2]) : 0;
+            return minutes >= 1 || seconds >= 60; // Exclude Shorts
+          })
+          .map(video => video.id);
+
+        items.forEach(item => {
           const videoId = item.id.videoId;
+          if (!allowedIDs.includes(videoId)) return;
+
           const title = item.snippet.title;
           const thumbnail = item.snippet.thumbnails.medium.url;
-
           const card = document.createElement("div");
           card.className = "video-card";
           card.innerHTML = `<img src="${thumbnail}" alt="${title}" /><h3>${title}</h3>`;
@@ -192,7 +209,6 @@
       if (elem) elem.remove();
     }
 
-    // Infinite scroll
     window.addEventListener("scroll", () => {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && nextPageToken) {
         searchVideos(true);
