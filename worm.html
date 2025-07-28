@@ -1,1 +1,231 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>Worm/title> <style> body { background-color: #222; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; /* Disable scroll */ } canvas { background-color: #111; border: 2px solid #fff; touch-action: manipulation; /* Improves responsiveness */ } #scoreboard { margin: 10px 0; font-size: 1.2em; } button { padding: 8px 16px; background-color: #444; border: none; color: white; cursor: pointer; margin: 5px; } button:hover { background-color: #666; } #controls { display: flex; flex-direction: column; align-items: center; margin-top: 10px; } .mobile-controls { display: grid; grid-template-columns: repeat(3, 60px); gap: 10px; margin-top: 10px; } .mobile-controls button { height: 60px; font-size: 1.5em; } </style> </head> <body> <canvas id="game" width="400" height="400"></canvas> <div id="scoreboard">Score: 0 | High Score: 0</div> <div id="controls"> <button id="togglePause">Pause</button> <div class="mobile-controls"> <div></div><button id="up">↑</button><div></div> <button id="left">←</button><button id="down">↓</button><button id="right">→</button> </div> </div> <script> const canvas = document.getElementById("game"); const ctx = canvas.getContext("2d"); const scoreboard = document.getElementById("scoreboard"); const pauseBtn = document.getElementById("togglePause"); const upBtn = document.getElementById("up"); const downBtn = document.getElementById("down"); const leftBtn = document.getElementById("left"); const rightBtn = document.getElementById("right"); const scale = 20; const rows = canvas.height / scale; const columns = canvas.width / scale; let snake; let fruit; let direction = { x: 1, y: 0 }; let gameInterval; let score = 0; let highScore = localStorage.getItem("snakeHighScore") || 0; let isPaused = false; class Snake { constructor() { this.body = [{ x: 5, y: 5 }]; this.length = 1; } move() { const head = { x: this.body[0].x + direction.x, y: this.body[0].y + direction.y }; this.body.unshift(head); if (head.x === fruit.x && head.y === fruit.y) { score++; generateFruit(); } else { this.body.pop(); } } checkCollision() { const head = this.body[0]; if ( head.x < 0 || head.y < 0 || head.x >= columns || head.y >= rows || this.body.slice(1).some(segment => segment.x === head.x && segment.y === head.y) ) { resetGame(); } } draw() { ctx.fillStyle = "#0f0"; this.body.forEach(segment => { ctx.fillRect(segment.x * scale, segment.y * scale, scale - 2, scale - 2); }); } } function generateFruit() { fruit = { x: Math.floor(Math.random() * columns), y: Math.floor(Math.random() * rows) }; } function drawFruit() { ctx.fillStyle = "#f00"; ctx.fillRect(fruit.x * scale, fruit.y * scale, scale, scale); } function updateScoreboard() { scoreboard.innerText = `Score: ${score} | High Score: ${highScore}`; } function resetGame() { alert("Game over!"); if (score > highScore) { highScore = score; localStorage.setItem("snakeHighScore", highScore); } score = 0; snake = new Snake(); direction = { x: 1, y: 0 }; generateFruit(); updateScoreboard(); } function gameLoop() { if (!isPaused) { ctx.clearRect(0, 0, canvas.width, canvas.height); snake.move(); snake.checkCollision(); snake.draw(); drawFruit(); updateScoreboard(); } } function startGame() { snake = new Snake(); generateFruit(); updateScoreboard(); gameInterval = setInterval(gameLoop, 100); } window.addEventListener("keydown", e => { switch (e.key) { case "ArrowUp": if (direction.y === 0) direction = { x: 0, y: -1 }; break; case "ArrowDown": if (direction.y === 0) direction = { x: 0, y: 1 }; break; case "ArrowLeft": if (direction.x === 0) direction = { x: -1, y: 0 }; break; case "ArrowRight": if (direction.x === 0) direction = { x: 1, y: 0 }; break; case " ": togglePause(); break; } }); pauseBtn.addEventListener("click", togglePause); upBtn.addEventListener("click", () => { if (direction.y === 0) direction = { x: 0, y: -1 }; }); downBtn.addEventListener("click", () => { if (direction.y === 0) direction = { x: 0, y: 1 }; }); leftBtn.addEventListener("click", () => { if (direction.x === 0) direction = { x: -1, y: 0 }; }); rightBtn.addEventListener("click", () => { if (direction.x === 0) direction = { x: 1, y: 0 }; }); function togglePause() { isPaused = !isPaused; pauseBtn.innerText = isPaused ? "Resume" : "Pause"; } startGame(); </script> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Worm</title>
+  <style>
+    body {
+      background-color: #222;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden; /* Disable scroll */
+    }
+
+    canvas {
+      background-color: #111;
+      border: 2px solid #fff;
+      touch-action: manipulation; /* Improves responsiveness */
+    }
+
+    #scoreboard {
+      margin: 10px 0;
+      font-size: 1.2em;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #444;
+      border: none;
+      color: white;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    button:hover {
+      background-color: #666;
+    }
+
+    #controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .mobile-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .mobile-controls button {
+      height: 60px;
+      font-size: 1.5em;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="400" height="400"></canvas>
+  <div id="scoreboard">Score: 0 | High Score: 0</div>
+  <div id="controls">
+    <button id="togglePause">Pause</button>
+    <div class="mobile-controls">
+      <div></div>
+      <button id="up">↑</button>
+      <div></div>
+      <button id="left">←</button>
+      <button id="down">↓</button>
+      <button id="right">→</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreboard = document.getElementById("scoreboard");
+    const pauseBtn = document.getElementById("togglePause");
+    const upBtn = document.getElementById("up");
+    const downBtn = document.getElementById("down");
+    const leftBtn = document.getElementById("left");
+    const rightBtn = document.getElementById("right");
+
+    const scale = 20;
+    const rows = canvas.height / scale;
+    const columns = canvas.width / scale;
+
+    let snake;
+    let fruit;
+    let direction = { x: 1, y: 0 };
+    let gameInterval;
+    let score = 0;
+    let highScore = localStorage.getItem("snakeHighScore") || 0;
+    let isPaused = false;
+
+    class Snake {
+      constructor() {
+        this.body = [{ x: 5, y: 5 }];
+        this.length = 1;
+      }
+
+      move() {
+        const head = {
+          x: this.body[0].x + direction.x,
+          y: this.body[0].y + direction.y
+        };
+        this.body.unshift(head);
+
+        if (head.x === fruit.x && head.y === fruit.y) {
+          score++;
+          generateFruit();
+        } else {
+          this.body.pop();
+        }
+      }
+
+      checkCollision() {
+        const head = this.body[0];
+        if (
+          head.x < 0 || head.y < 0 ||
+          head.x >= columns || head.y >= rows ||
+          this.body.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
+        ) {
+          resetGame();
+        }
+      }
+
+      draw() {
+        ctx.fillStyle = "#0f0";
+        this.body.forEach(segment => {
+          ctx.fillRect(segment.x * scale, segment.y * scale, scale - 2, scale - 2);
+        });
+      }
+    }
+
+    function generateFruit() {
+      fruit = {
+        x: Math.floor(Math.random() * columns),
+        y: Math.floor(Math.random() * rows)
+      };
+    }
+
+    function drawFruit() {
+      ctx.fillStyle = "#f00";
+      ctx.fillRect(fruit.x * scale, fruit.y * scale, scale, scale);
+    }
+
+    function updateScoreboard() {
+      scoreboard.innerText = `Score: ${score} | High Score: ${highScore}`;
+    }
+
+    function resetGame() {
+      alert("Game over!");
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("snakeHighScore", highScore);
+      }
+      score = 0;
+      snake = new Snake();
+      direction = { x: 1, y: 0 };
+      generateFruit();
+      updateScoreboard();
+    }
+
+    function gameLoop() {
+      if (!isPaused) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        snake.move();
+        snake.checkCollision();
+        snake.draw();
+        drawFruit();
+        updateScoreboard();
+      }
+    }
+
+    function startGame() {
+      snake = new Snake();
+      generateFruit();
+      updateScoreboard();
+      gameInterval = setInterval(gameLoop, 100);
+    }
+
+    window.addEventListener("keydown", e => {
+      switch (e.key) {
+        case "ArrowUp":
+          if (direction.y === 0) direction = { x: 0, y: -1 };
+          break;
+        case "ArrowDown":
+          if (direction.y === 0) direction = { x: 0, y: 1 };
+          break;
+        case "ArrowLeft":
+          if (direction.x === 0) direction = { x: -1, y: 0 };
+          break;
+        case "ArrowRight":
+          if (direction.x === 0) direction = { x: 1, y: 0 };
+          break;
+        case " ":
+          togglePause();
+          break;
+      }
+    });
+
+    pauseBtn.addEventListener("click", togglePause);
+    upBtn.addEventListener("click", () => {
+      if (direction.y === 0) direction = { x: 0, y: -1 };
+    });
+    downBtn.addEventListener("click", () => {
+      if (direction.y === 0) direction = { x: 0, y: 1 };
+    });
+    leftBtn.addEventListener("click", () => {
+      if (direction.x === 0) direction = { x: -1, y: 0 };
+    });
+    rightBtn.addEventListener("click", () => {
+      if (direction.x === 0) direction = { x: 1, y: 0 };
+    });
+
+    function togglePause() {
+      isPaused = !isPaused;
+      pauseBtn.innerText = isPaused ? "Resume" : "Pause";
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
