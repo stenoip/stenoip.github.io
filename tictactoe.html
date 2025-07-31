@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title> Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .game-container {
+      text-align: center;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+      margin: 20px auto;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      font-size: 2em;
+      background: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    .cell:hover {
+      background: #d0d0d0;
+    }
+    .status {
+      margin: 10px;
+      font-weight: bold;
+    }
+    .scoreboard {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 10px;
+    }
+    .winning-cell {
+      background: #90ee90 !important;
+    }
+    select, button {
+      margin: 5px;
+      padding: 8px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Tic Tac Toe</h1>
+    <div>
+      <label>Mode:</label>
+      <select id="mode">
+        <option value="ai">Player vs AI</option>
+        <option value="pvp">Player vs Player</option>
+      </select>
+      <label>Difficulty:</label>
+      <select id="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+    <div class="scoreboard">
+      <span>Player X: <span id="x-score">0</span></span>
+      <span>Player O: <span id="o-score">0</span></span>
+    </div>
+    <div id="board" class="board"></div>
+    <div class="status" id="status">Choose mode and start playing</div>
+    <button id="reset">Reset Game</button>
+  </div>
+
+  <script>
+    const board = document.getElementById("board");
+    const status = document.getElementById("status");
+    const resetBtn = document.getElementById("reset");
+    const modeSelect = document.getElementById("mode");
+    const difficultySelect = document.getElementById("difficulty");
+    const xScoreEl = document.getElementById("x-score");
+    const oScoreEl = document.getElementById("o-score");
+
+    let cells = Array(9).fill("");
+    let currentPlayer = "X";
+    let gameOver = false;
+    let xScore = 0;
+    let oScore = 0;
+
+    function renderBoard() {
+      board.innerHTML = "";
+      cells.forEach((cell, i) => {
+        const div = document.createElement("div");
+        div.classList.add("cell");
+        div.dataset.index = i;
+        div.textContent = cell;
+        div.addEventListener("click", handleMove);
+        board.appendChild(div);
+      });
+    }
+
+    function handleMove(e) {
+      const index = e.target.dataset.index;
+      if (cells[index] || gameOver) return;
+
+      cells[index] = currentPlayer;
+      renderBoard();
+
+      if (checkWin(currentPlayer)) {
+        status.textContent = `${currentPlayer} wins!`;
+        updateScore(currentPlayer);
+        highlightWin(currentPlayer);
+        gameOver = true;
+        return;
+      }
+
+      if (isDraw()) {
+        status.textContent = "Draw!";
+        gameOver = true;
+        return;
+      }
+
+      if (modeSelect.value === "ai" && currentPlayer === "X") {
+        status.textContent = "AI's turn";
+        setTimeout(() => {
+          aiMove();
+          renderBoard();
+          if (checkWin("O")) {
+            status.textContent = "AI wins!";
+            updateScore("O");
+            highlightWin("O");
+            gameOver = true;
+          } else if (isDraw()) {
+            status.textContent = "Draw!";
+            gameOver = true;
+          } else {
+            status.textContent = "Your turn";
+          }
+        }, 500);
+      } else {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        status.textContent = `${currentPlayer}'s turn`;
+      }
+    }
+
+    function aiMove() {
+      const difficulty = difficultySelect.value;
+      let index;
+      if (difficulty === "easy") {
+        const empty = cells.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+        index = empty[Math.floor(Math.random() * empty.length)];
+      } else if (difficulty === "medium") {
+        index = mediumAI();
+      } else {
+        index = minimax(cells, "O").index;
+      }
+      cells[index] = "O";
+    }
+
+    function mediumAI() {
+      const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (let pattern of winPatterns) {
+        const [a,b,c] = pattern;
+        const line = [cells[a], cells[b], cells[c]];
+        if (line.filter(x => x === "O").length === 2 && line.includes("")) {
+          return pattern[line.indexOf("")];
+        }
+      }
+      for (let pattern of winPatterns) {
+        const [a,b,c] = pattern;
+        const line = [cells[a], cells[b], cells[c]];
+        if (line.filter(x => x === "X").length === 2 && line.includes("")) {
+          return pattern[line.indexOf("")];
+        }
+      }
+      const empty = cells.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+      return empty[Math.floor(Math.random() * empty.length)];
+    }
+
+    function minimax(newBoard, playerTurn) {
+      const availSpots = newBoard.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+
+      if (checkWin("X")) return { score: -10 };
+      if (checkWin("O")) return { score: 10 };
+      if (availSpots.length === 0) return { score: 0 };
+
+      const moves = [];
+
+      for (let i = 0; i < availSpots.length; i++) {
+        const move = {};
+        move.index = availSpots[i];
+        newBoard[availSpots[i]] = playerTurn;
+
+        if (playerTurn === "O") {
+          const result = minimax(newBoard, "X");
+          move.score = result.score;
+        } else {
+          const result = minimax(newBoard, "O");
+          move.score = result.score;
+        }
+
+        newBoard[availSpots[i]] = "";
+        moves.push(move);
+      }
+
+      let bestMove;
+      if (playerTurn === "O") {
+        let bestScore = -Infinity;
+        moves.forEach((m, i) => {
+          if (m.score > bestScore) {
+            bestScore = m.score;
+            bestMove = i;
+          }
+        });
+      } else {
+        let bestScore = Infinity;
+        moves.forEach((m, i) => {
+          if (m.score < bestScore) {
+            bestScore = m.score;
+            bestMove = i;
+          }
+        });
+      }
+      
+      return winPatterns.some(pattern =>
+        pattern.every(i => cells[i] === playerSymbol)
+      );
+    }
+
+    function highlightWin(playerSymbol) {
+      const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      winPatterns.forEach(pattern => {
+        if (pattern.every(i => cells[i] === playerSymbol)) {
+          pattern.forEach(i => {
+            board.children[i].classList.add("winning-cell");
+          });
+        }
+      });
+    }
+
+    function isDraw() {
+      return cells.every(cell => cell !== "");
+    }
+
+    function updateScore(winner) {
+      if (winner === "X") {
+        xScore++;
+        xScoreEl.textContent = xScore;
+      } else {
+        oScore++;
+        oScoreEl.textContent = oScore;
+      }
+    }
+
+    resetBtn.addEventListener("click", () => {
+      cells = Array(9).fill("");
+      currentPlayer = "X";
+      gameOver = false;
+      status.textContent = modeSelect.value === "ai" ? "Your turn" : "X's turn";
+      renderBoard();
+    });
+
+    renderBoard();
+    status.textContent = "X's turn";
+  </script>
+</body>
+</html>
