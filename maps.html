@@ -17,42 +17,36 @@
             height: 100vh;
             display: block;
         }
-        #locationInput {
+        #searchContainer {
             position: absolute;
             top: 10px;
             left: 10px;
             z-index: 1;
+            display: flex;
+        }
+        #locationInput {
             padding: 5px;
             font-size: 14px;
         }
-    #submitBtn { position: absolute; top: 10px; left: 180px; z-index: 1; padding: 5px 10px; font-size: 14px; 
-     { padding: 15px 30px; /* Increase padding for a bigger button */ font-size: 18px; /* Increase font size */ background-color: #4CAF50; /* Green background */ color: white; /* White text */ border: none; /* No border */ border-radius: 5px; /* Rounded corners */ cursor: pointer; /* Pointer cursor on hover */ }
-    
-    }
     </style>
 </head>
 <body>
     <div id="cesiumContainer"></div>
-  <h2>Ferkenne</h2>
-    <button id="submitBtn">Ferkenne by Stenoip and Cesium</button>
+
+    <h2>Ferkenne Maps</h2>
+    <footer>
+        <p>&copy; <span id="year"></span> Stenoip Company. All rights reserved.</p>
+        <p>Powered by <a href="https://cesium.com/platform/cesiumjs/" target="_blank">CesiumJS</a> and <a href="https://www.stenoip.com/" target="_blank">Stenoip</a>.</p>
+    </footer>
     <script>
-        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MDQ0YmNjMy02NDI5LTRjYTItOWZhYS0wYmMxMWVkOGI5MjMiLCJpZCI6MjUyODUxLCJpYXQiOjE3MzA3NjM3MTB9.pi4kOnQvSmZxTAkOELqnouNQi7cVnvJAq7WUWfX-sek'; // Replace with your token
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MDQ0YmNjMy02NDI5LTRjYTItOWZhYS0wYmMxMWVkOGI5MjMiLCJpZCI6MjUyODUxLCJpYXQiOjE3MzA3NjM3MTB9.pi4kOnQvSmZxTAkOELqnouNQi7cVnvJAq7WUWfX-sek';
+
         const viewer = new Cesium.Viewer('cesiumContainer', {
             terrainProvider: Cesium.createWorldTerrain(),
-            locale: 'en-GB' // Set the locale to English UK
+            locale: 'en-GB'
         });
 
-        viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(-122.4175, 37.655, 400),
-            orientation: {
-                heading: Cesium.Math.toRadians(0.0),
-                pitch: Cesium.Math.toRadians(-15.0),
-                roll: 0.0
-            }
-        });
-
-        document.getElementById('submitBtn').addEventListener('click', function() {
-            const location = document.getElementById('locationInput').value;
+        const geocodeLocation = (location) => {
             const geocoder = new Cesium.GeocoderService();
             geocoder.geocode(location).then((result) => {
                 if (result.length > 0) {
@@ -67,13 +61,25 @@
             }).catch((error) => {
                 console.error('Geocoding error:', error);
             });
+        };
+
+        // Check for a location in the URL on page load
+        const urlParams = new URLSearchParams(window.location.search);
+        const locationFromUrl = urlParams.get('location');
+        if (locationFromUrl) {
+            document.getElementById('locationInput').value = locationFromUrl;
+            geocodeLocation(locationFromUrl);
+        }
+
+        // Handle search form submission
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const location = document.getElementById('locationInput').value;
+            if (location) {
+                geocodeLocation(location);
+            }
         });
-    </script>
-    <footer>
-        <p>&copy; <span id="year"></span> Stenoip Company. All rights reserved.</p>
-        <p>Powered by <a href="https://cesium.com/platform/cesiumjs/" target="_blank">CesiumJS</a> and <a href="https://www.stenoip.com/" target="_blank">Stenoip</a>.</p>
-    </footer>
-    <script>
+
         document.getElementById('year').textContent = new Date().getFullYear();
     </script>
 </body>
