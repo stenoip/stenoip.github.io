@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lûddiel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1em;
+      margin: 0;
+      background: #f9f9f9;
+    }
+    h1 { text-align: center; }
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5em;
+      margin-bottom: 2em;
+    }
+    input, button {
+      font-size: 1em;
+      padding: 0.5em;
+      width: 90%;
+      max-width: 400px;
+    }
+    .audio-post {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1em;
+      margin: 1em auto;
+      max-width: 400px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .meta {
+      font-size: 0.9em;
+      color: #555;
+      margin-bottom: 0.5em;
+    }
+    audio { width: 100%; }
+    .status { text-align:center; color:#666; margin: 0.5em 0 1em; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>Lûddiel</h1>
+
+  <div class="status" id="status"></div>
+
+  <form id="uploadForm">
+    <input type="text" name="sender" placeholder="Your name" required />
+    <input type="file" name="audio" accept="audio/*" />
+    <button type="submit">Upload</button>
+  </form>
+
+  <div style="text-align:center;">
+    <button id="recordBtn">Start Recording</button>
+    <button id="stopBtn" disabled>Stop Recording</button>
+    <audio id="recordedAudio" controls style="display:none;"></audio>
+  </div>
+
+  <div id="feed"></div>
+
+  <p style="text-align:center;">&copy; Stenoip Company (2025)</p>
+
+  <script>
+    // Point this to your Codespaces backend
+    const API_BASE = 'https://studious-space-engine-694w59x5p7r9354xv-3000.app.github.dev';
+
+    const form = document.getElementById('uploadForm');
+    const feed = document.getElementById('feed');
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const recordedAudio = document.getElementById('recordedAudio');
+    const statusEl = document.getElementById('status');
+
+    let mediaRecorder;
+    let recordedChunks = [];
+
+    function setStatus(msg, isError = false) {
+      statusEl.textContent = msg || '';
+      statusEl.className = 'status' + (isError ? ' error' : '');
+    }
+
+    function resolveFileUrl(file) {
+      // If backend returns a relative path (e.g., /uploads/xxx), prefix with API_BASE
+      // If it ever returns absolute URLs, use as-is.
+      return /^https?:\/\//i.test(file) ? file : `${API_BASE}${file}`;
+    }
+
+    async function loadAudioList() {
+      setStatus('Loading posts...');
+      try {
+        const res = await fetch(`${API_BASE}/list`, { method: 'GET' });
+        if (!res.ok) throw new Error(`List failed: ${res.status}`);
+        const posts = await res.json();
+        feed.innerHTML = '';
+        if (!posts.length) {
+          feed.innerHTML = '<p style="text-align:center;color:#666;">No audio yet—be the first to post.</p>';
+        }
+        posts.forEach(post => {
+          const container = document.createElement('div');
+          container.className = 'audio-post';
+
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.textContent = `${post.sender} — ${post.timestamp}`;
+
+          const audio = document.createElement('audio');
+          audio.controls = true;
+          audio.src = resolveFileUrl(post.file);
+
+          container.appendChild(meta);
+          container.appendChild(audio);
+          feed.appendChild(container);
+        });
+        setStatus('');
+      } catch (err) {
+        console.error(err);
+        setStatus('Failed to load posts. Check if the backend is running and public.', true);
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setStatus('Uploading...');
+      const senderInput = form.querySelector('input[name="sender"]');
+      const fileInput = form.querySelector('input[type="file"]');
+      const formData = new FormData();
+      formData.append('sender', senderInput.value);
+
+      if (fileInput.files.length > 0) {
+        formData.append('audio', fileInput.files[0]);
+      } else if (recordedChunks.length > 0) {
+        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+        formData.append('audio', blob, 'recording.webm');
+      } else {
+        setStatus('Please select or record an audio file.', true);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+        await res.json();
+        form.reset();
+        recordedChunks = [];
+        recordedAudio.style.display = 'none';
+        await loadAudioList();
+        setStatus('Uploaded!');
+        setTimeout(() => setStatus(''), 1000);
+      } catch (err) {
+        console.error(err);
+        setStatus('Upload failed. Ensure the backend is public and CORS allows this origin.', true);
+      }
+    });
+
+    recordBtn.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        recordedChunks = [];
+
+        mediaRecorder.ondataavailable = e => {
+          if (e.data.size > 0) recordedChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+          recordedAudio.src = URL.createObjectURL(blob);
+          recordedAudio.style.display = 'block';
+        };
+
+        mediaRecorder.start();
+        recordBtn.disabled = true;
+        stopBtn.disabled = false;
+      } catch (err) {
+        console.error(err);
+        setStatus('Microphone unavailable. Use a file upload instead.', true);
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      recordBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
+
+    window.addEventListener('DOMContentLoaded', loadAudioList);
+  </script>
+</body>
+</html>
