@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typoe - An Advanced Word Processor</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+            color: #333;
+        }
+        .ribbon-menu {
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            padding: 5px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .tabs-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .tabs {
+            display: flex;
+        }
+        .tab-button {
+            background-color: transparent;
+            border: none;
+            padding: 10px 15px;
+            font-size: 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            color: #555;
+            font-weight: 500;
+        }
+        .tab-button:hover {
+            background-color: #f0f0f0;
+        }
+        .tab-button.active {
+            border-color: #0078d7;
+            color: #0078d7;
+        }
+        .tell-me {
+            display: flex;
+            align-items: center;
+        }
+        .tell-me input {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 250px;
+            transition: all 0.2s;
+        }
+        .tell-me input:focus {
+            outline: none;
+            border-color: #0078d7;
+            box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.2);
+        }
+        .tab-panel {
+            display: none;
+            padding: 10px 0;
+            margin-top: 5px;
+        }
+        .tab-panel.active {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .ribbon-group {
+            padding: 0 15px;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+        }
+        .ribbon-group:last-child {
+            border-right: none;
+        }
+        .ribbon-group-title {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .ribbon-group-items {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .ribbon-item {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f9f9f9;
+            font-size: 14px;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+        }
+        .ribbon-item:hover {
+            background-color: #e9e9e9;
+        }
+        .ribbon-item:active {
+            transform: scale(0.98);
+        }
+        .ribbon-item.active {
+            background-color: #d1e2f6;
+            border-color: #0078d7;
+        }
+        .document-container {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: calc(100vh - 100px);
+        }
+        #editor {
+            width: 8.5in;
+            min-height: 11in;
+            padding: 1in;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            outline: none;
+            line-height: 1.6;
+            font-size: 16px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            position: relative;
+        }
+        #drawing-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            pointer-events: none; /* Prevents drawing by default */
+        }
+        .drawing-canvas-active {
+            cursor: crosshair;
+            pointer-events: auto !important;
+        }
+        .spellcheck-highlight {
+            background-color: #fce8e8;
+            border-bottom: 2px solid #ff4d4d;
+        }
+        .theme-select {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/spellcheck-js@1.0.1/dist/spellcheck-js.min.js"></script>
+</head>
+<body>
+    <header class="ribbon-menu">
+        <div class="tabs-container">
+            <nav class="tabs">
+                <button class="tab-button" data-tab="file">File</button>
+                <button class="tab-button active" data-tab="home">Home</button>
+                <button class="tab-button" data-tab="insert">Insert</button>
+                <button class="tab-button" data-tab="draw">Draw</button>
+                <button class="tab-button" data-tab="design">Design</button>
+                <button class="tab-button" data-tab="layout">Layout</button>
+                <button class="tab-button" data-tab="references">References</button>
+                <button class="tab-button" data-tab="review">Review</button>
+                <button class="tab-button" data-tab="view">View</button>
+            </nav>
+            <div class="tell-me">
+                <input type="text" placeholder="Tell me what you want to do...">
+            </div>
+        </div>
+        
+        <div id="file-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="openFileBtn">Open .docx</button>
+                    <input type="file" id="fileInput" accept=".docx" style="display: none;">
+                    <button class="ribbon-item" id="saveTxtBtn">Save as .txt</button>
+                    <button class="ribbon-item" id="saveDocxBtn">Save as .docx</button>
+                    <button class="ribbon-item" id="savePdfBtn">Save as .pdf</button>
+                </div>
+                <div class="ribbon-group-title">Document</div>
+            </div>
+        </div>
+        <div id="home-panel" class="tab-panel active">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" data-command="cut">Cut</button>
+                    <button class="ribbon-item" data-command="copy">Copy</button>
+                    <button class="ribbon-item" data-command="paste">Paste</button>
+                </div>
+                <div class="ribbon-group-title">Clipboard</div>
+            </div>
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <select class="ribbon-item" data-command="fontName">
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    <select class="ribbon-item" data-command="fontSize">
+                        <option value="1">8</option>
+                        <option value="2">10</option>
+                        <option value="3" selected>12</option>
+                        <option value="4">14</option>
+                        <option value="5">18</option>
+                        <option value="6">24</option>
+                        <option value="7">36</option>
+                    </select>
+                    <button class="ribbon-item" data-command="bold"><b>B</b></button>
+                    <button class="ribbon-item" data-command="italic"><i>I</i></button>
+                    <button class="ribbon-item" data-command="underline"><u>U</u></button>
+                </div>
+                <div class="ribbon-group-title">Font</div>
+            </div>
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" data-command="justifyleft">Left</button>
+                    <button class="ribbon-item" data-command="justifycenter">Center</button>
+                    <button class="ribbon-item" data-command="justifyright">Right</button>
+                    <button class="ribbon-item" data-command="justifyfull">Justify</button>
+                </div>
+                <div class="ribbon-group-title">Paragraph</div>
+            </div>
+        </div>
+        <div id="insert-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" data-command="insertHTML" data-value="<hr>">Horizontal Line</button>
+                    <button class="ribbon-item" data-command="createLink">Link</button>
+                    <button class="ribbon-item" id="insertImageBtn">Picture</button>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <button class="ribbon-item" id="insertVideoBtn">Video</button>
+                    <input type="file" id="videoInput" accept="video/*" style="display: none;">
+                    <button class="ribbon-item" data-command="insertHTML" data-value="<table border='1'><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Cell 3</td><td>Cell 4</td></tr></table>">Table</button>
+                </div>
+                <div class="ribbon-group-title">Insertions</div>
+            </div>
+        </div>
+        <div id="draw-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="penBtn">Pen</button>
+                    <button class="ribbon-item" id="eraserBtn">Eraser</button>
+                    <button class="ribbon-item" id="cursorBtn">Cursor</button>
+                </div>
+                <div class="ribbon-group-title">Tools</div>
+            </div>
+        </div>
+        <div id="design-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <select class="ribbon-item theme-select" id="themeSelect">
+                        <option value="light">Light Theme</option>
+                        <option value="dark">Dark Theme</option>
+                        <option value="blue">Blue Theme</option>
+                    </select>
+                </div>
+                <div class="ribbon-group-title">Themes</div>
+            </div>
+        </div>
+        <div id="layout-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <select class="ribbon-item" id="marginSelect">
+                        <option value="normal">Normal</option>
+                        <option value="narrow">Narrow</option>
+                        <option value="wide">Wide</option>
+                    </select>
+                </div>
+                <div class="ribbon-group-title">Margins</div>
+            </div>
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="orientationBtn">Orientation</button>
+                </div>
+                <div class="ribbon-group-title">Page Setup</div>
+            </div>
+        </div>
+        <div id="references-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="tocBtn">Table of Contents</button>
+                </div>
+                <div class="ribbon-group-title">Table of Contents</div>
+            </div>
+        </div>
+        <div id="review-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="spellCheckBtn">Spelling & Grammar</button>
+                </div>
+                <div class="ribbon-group-title">Proofing</div>
+            </div>
+        </div>
+        <div id="view-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="readModeBtn">Read Mode</button>
+                    <button class="ribbon-item" id="printLayoutBtn">Print Layout</button>
+                </div>
+                <div class="ribbon-group-title">Views</div>
+            </div>
+        </div>
+    </header>
+    <main class="document-container">
+        <div id="editor" contenteditable="true">
+            <h1>Welcome to **Typoe**!</h1>
+            <p>Start typing here to create your document.</p>
+        </div>
+        <canvas id="drawing-canvas"></canvas>
+    </main>
+    <script>
+       document.addEventListener('DOMContentLoaded', () => {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    const editor = document.getElementById('editor');
+    const fileInput = document.getElementById('fileInput');
+    const openFileBtn = document.getElementById('openFileBtn');
+    const saveTxtBtn = document.getElementById('saveTxtBtn');
+    const saveDocxBtn = document.getElementById('saveDocxBtn');
+    const savePdfBtn = document.getElementById('savePdfBtn');
+    const insertImageBtn = document.getElementById('insertImageBtn');
+    const imageInput = document.getElementById('imageInput');
+    const insertVideoBtn = document.getElementById('insertVideoBtn');
+    const videoInput = document.getElementById('videoInput');
+    const penBtn = document.getElementById('penBtn');
+    const eraserBtn = document.getElementById('eraserBtn');
+    const cursorBtn = document.getElementById('cursorBtn');
+    const drawingCanvas = document.getElementById('drawing-canvas');
+    const themeSelect = document.getElementById('themeSelect');
+    const marginSelect = document.getElementById('marginSelect');
+    const orientationBtn = document.getElementById('orientationBtn');
+    const tocBtn = document.getElementById('tocBtn');
+    const spellCheckBtn = document.getElementById('spellCheckBtn');
+    const readModeBtn = document.getElementById('readModeBtn');
+    const printLayoutBtn = document.getElementById('printLayoutBtn');
+
+    // Tab functionality
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanels.forEach(panel => panel.classList.remove('active'));
+            button.classList.add('active');
+            const targetPanel = document.getElementById(`${button.dataset.tab}-panel`);
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+            }
+        });
+    });
+
+    // Home Tab Functionality
+    const ribbonMenu = document.querySelector('.ribbon-menu');
+    ribbonMenu.addEventListener('click', (event) => {
+        const target = event.target.closest('.ribbon-item');
+        if (!target || !target.dataset.command) return;
+        const command = target.dataset.command;
+        const value = target.value || target.dataset.value;
+        document.execCommand(command, false, value);
+    });
+
+    // File Tab Functionality
+    openFileBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const arrayBuffer = e.target.result;
+                mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+                    .then((result) => {
+                        editor.innerHTML = result.value;
+                    })
+                    .catch((error) => {
+                        console.error('Error converting DOCX to HTML:', error);
+                        alert('Failed to convert DOCX file.');
+                    });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    });
+    saveTxtBtn.addEventListener('click', () => {
+        const textContent = editor.innerText;
+        const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+        saveAs(blob, 'document.txt');
+    });
+
+    // --- NEW DOCX SAVE FUNCTIONALITY ---
+    saveDocxBtn.addEventListener('click', () => {
+        // Create a new div to hold the content to be converted
+        const cleanedContent = document.createElement('div');
+        // Copy the editor's inner HTML
+        cleanedContent.innerHTML = editor.innerHTML;
+
+        // Remove any script tags, style tags, and event listeners that might cause issues
+        cleanedContent.querySelectorAll('script, style').forEach(el => el.remove());
+
+        // Get the cleaned up HTML
+        const contentHtml = cleanedContent.innerHTML;
+
+        // The html-docx-js library expects a well-formed HTML document structure.
+        // Wrap the content in a basic HTML structure.
+        const content = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${contentHtml}</body></html>`;
+
+        // Convert the cleaned HTML to a DOCX Blob
+        const converted = htmlDocx.asBlob(content);
+        // Save the file
+        saveAs(converted, 'document.docx');
+    });
+    // --- END NEW DOCX SAVE FUNCTIONALITY ---
+
+    savePdfBtn.addEventListener('click', () => {
+        html2canvas(editor).then(canvas => {
+            const { jsPDF } = window.jspdf;
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 210;
+            const pageHeight = 295;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            pdf.save('document.pdf');
+        });
+    });
+
+    // Insert Tab Functionality
+    insertImageBtn.addEventListener('click', () => imageInput.click());
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const img = document.createElement('img');
+                img.src = reader.result;
+                img.style.maxWidth = '100%';
+                document.execCommand('insertHTML', false, img.outerHTML);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    insertVideoBtn.addEventListener('click', () => videoInput.click());
+    videoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const video = document.createElement('video');
+                video.src = reader.result;
+                video.controls = true;
+                video.style.maxWidth = '100%';
+                document.execCommand('insertHTML', false, video.outerHTML);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Draw Tab Functionality
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let mode = 'pen';
+    let ctx = drawingCanvas.getContext('2d');
+    const resizeCanvas = () => {
+        drawingCanvas.width = editor.clientWidth;
+        drawingCanvas.height = editor.clientHeight;
+        ctx.lineWidth = 5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    drawingCanvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        const rect = drawingCanvas.getBoundingClientRect();
+        [lastX, lastY] = [e.clientX - rect.left, e.clientY - rect.top];
+    });
+    drawingCanvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const rect = drawingCanvas.getBoundingClientRect();
+        const [newX, newY] = [e.clientX - rect.left, e.clientY - rect.top];
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(newX, newY);
+        if (mode === 'pen') {
+            ctx.strokeStyle = '#000';
+            ctx.globalCompositeOperation = 'source-over';
+        } else if (mode === 'eraser') {
+            ctx.strokeStyle = '#fff';
+            ctx.globalCompositeOperation = 'destination-out';
+        }
+        ctx.stroke();
+        [lastX, lastY] = [newX, newY];
+    });
+    drawingCanvas.addEventListener('mouseup', () => isDrawing = false);
+    drawingCanvas.addEventListener('mouseout', () => isDrawing = false);
+
+    penBtn.addEventListener('click', () => {
+        mode = 'pen';
+        drawingCanvas.classList.add('drawing-canvas-active');
+    });
+    eraserBtn.addEventListener('click', () => {
+        mode = 'eraser';
+        drawingCanvas.classList.add('drawing-canvas-active');
+    });
+    cursorBtn.addEventListener('click', () => {
+        drawingCanvas.classList.remove('drawing-canvas-active');
+    });
+
+    // Design Tab Functionality
+    themeSelect.addEventListener('change', (e) => {
+        const theme = e.target.value;
+        document.body.className = '';
+        if (theme === 'dark') {
+            document.body.style.backgroundColor = '#333';
+            document.body.style.color = '#f3f3f3';
+        } else if (theme === 'blue') {
+            document.body.style.backgroundColor = '#f0f8ff';
+            document.body.style.color = '#00008b';
+        } else {
+            document.body.style.backgroundColor = '#f3f3f3';
+            document.body.style.color = '#333';
+        }
+    });
+
+    // Layout Tab Functionality
+    marginSelect.addEventListener('change', (e) => {
+        const margin = e.target.value;
+        if (margin === 'normal') {
+            editor.style.padding = '1in';
+        } else if (margin === 'narrow') {
+            editor.style.padding = '0.5in';
+        } else if (margin === 'wide') {
+            editor.style.padding = '2in';
+        }
+    });
+    orientationBtn.addEventListener('click', () => {
+        if (editor.style.width === '11in') {
+            editor.style.width = '8.5in';
+            editor.style.minHeight = '11in';
+        } else {
+            editor.style.width = '11in';
+            editor.style.minHeight = '8.5in';
+        }
+    });
+
+    // References Tab Functionality
+    tocBtn.addEventListener('click', () => {
+        const headings = editor.querySelectorAll('h1, h2, h3');
+        let tocHtml = '<h2>Table of Contents</h2><ul>';
+        headings.forEach(h => {
+            const id = h.innerText.replace(/\s+/g, '-').toLowerCase();
+            h.id = id;
+            tocHtml += `<li><a href="#${id}">${h.innerText}</a></li>`;
+        });
+        tocHtml += '</ul>';
+        document.execCommand('insertHTML', false, tocHtml);
+    });
+
+    // Review Tab Functionality
+    spellCheckBtn.addEventListener('click', () => {
+        const text = editor.innerText;
+        const speller = new SpellCheck();
+        const misspelled = speller.check(text).misspelled;
+        if (misspelled.length > 0) {
+            let newHtml = editor.innerHTML;
+            misspelled.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'g');
+                newHtml = newHtml.replace(regex, `<span class="spellcheck-highlight">${word}</span>`);
+            });
+            editor.innerHTML = newHtml;
+            alert(`Found ${misspelled.length} misspelled words. They are highlighted in red.`);
+        } else {
+            alert('No misspelled words found!');
+        }
+    });
+
+    // View Tab Functionality
+    readModeBtn.addEventListener('click', () => {
+        if (editor.contentEditable === 'true') {
+            editor.contentEditable = 'false';
+            editor.style.backgroundColor = '#f5f5f5';
+            editor.style.boxShadow = 'none';
+            editor.style.border = 'none';
+        } else {
+            editor.contentEditable = 'true';
+            editor.style.backgroundColor = 'white';
+            editor.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+            editor.style.border = '1px solid #ccc';
+        }
+    });
+    printLayoutBtn.addEventListener('click', () => window.print());
+
+    // Update font/size selects to reflect current selection
+    editor.addEventListener('mouseup', () => {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const currentFont = document.queryCommandValue('fontName');
+            const currentSize = document.queryCommandValue('fontSize');
+            const fontFamilySelect = document.querySelector('[data-command="fontName"]');
+            if (fontFamilySelect) {
+                fontFamilySelect.value = currentFont;
+            }
+            const fontSizeSelect = document.querySelector('[data-command="fontSize"]');
+            if (fontSizeSelect) {
+                fontSizeSelect.value = currentSize;
+            }
+        }
+    });
+});
+    </script>
+</body>
+</html>
