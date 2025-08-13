@@ -1,42 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>VA Financial Assistance Calculator</title>
+  <title>S:US Housing Tracker</title>
   <style>
     body { font-family: Arial; margin: 20px; }
-    label, input, select { display: block; margin: 10px 0; }
-    #result { margin-top: 20px; font-weight: bold; }
+    input, select, button { margin: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
   </style>
 </head>
 <body>
-  <h2>Veteran Financial Assistance Calculator</h2>
-  <label>Monthly Income ($): <input type="number" id="income"></label>
-  <label>Number of Dependents: <input type="number" id="dependents"></label>
-  <label>Housing Status:
-    <select id="housing">
-      <option value="unsheltered">Unsheltered</option>
-      <option value="temporary">Temporary</option>
-      <option value="permanent">Permanent</option>
-    </select>
-  </label>
-  <button onclick="calculateAssistance()">Calculate</button>
-  <div id="result"></div>
+  <h2>S:US Housing Needs Tracker</h2>
+  <input type="text" id="name" placeholder="Client Name">
+  <select id="status">
+    <option value="Unsheltered">Unsheltered</option>
+    <option value="Temporary">Temporary</option>
+    <option value="Permanent">Permanent</option>
+    <option value="Pending">Pending</option>
+  </select>
+  <input type="text" id="caseManager" placeholder="Case Manager">
+  <button onclick="addClient()">Add Client</button>
+
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Status</th><th>Case Manager</th></tr>
+    </thead>
+    <tbody id="clientTable"></tbody>
+  </table>
 
   <script>
-    function calculateAssistance() {
-      const income = parseFloat(document.getElementById('income').value);
-      const dependents = parseInt(document.getElementById('dependents').value);
-      const housing = document.getElementById('housing').value;
+    function addClient() {
+      const name = document.getElementById('name').value;
+      const status = document.getElementById('status').value;
+      const caseManager = document.getElementById('caseManager').value;
 
-      let base = 1000;
-      if (income < 1500) base += 500;
-      base += dependents * 200;
+      if (!name || !caseManager) return alert("Please fill all fields.");
 
-      if (housing === 'unsheltered') base += 300;
-      else if (housing === 'temporary') base += 150;
+      const table = document.getElementById('clientTable');
+      const row = table.insertRow();
+      row.insertCell(0).innerText = name;
+      row.insertCell(1).innerText = status;
+      row.insertCell(2).innerText = caseManager;
 
-      document.getElementById('result').innerText = 
-        `Estimated Monthly Assistance: $${base.toFixed(2)}`;
+      document.getElementById('name').value = '';
+      document.getElementById('caseManager').value = '';
     }
   </script>
 </body>
