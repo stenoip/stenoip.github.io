@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StenoRésumé | Resume Formatter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+    }
+    form {
+      flex: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #preview {
+      flex: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    #preview h2 {
+      margin-top: 0;
+    }
+    .btn {
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: #0078D4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #005a9e;
+    }
+  </style>
+</head>
+<body>
+  <h1>StenoRésumé | Resume & Profile Formatter</h1>
+  <div class="container">
+    <form id="resumeForm">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" required />
+
+      <label for="role">Job Title</label>
+      <input type="text" id="role" required />
+
+      <label for="experience">Experience</label>
+      <textarea id="experience" rows="4"></textarea>
+
+      <label for="skills">Skills (comma-separated)</label>
+      <input type="text" id="skills" />
+
+      <button type="button" class="btn" onclick="updatePreview()">Update Preview</button>
+      <button type="button" class="btn" onclick="downloadPDF()">Download PDF</button>
+    </form>
+
+    <div id="preview">
+      <h2 id="previewName">Your Name</h2>
+      <h4 id="previewRole">Your Role</h4>
+      <p><strong>Experience:</strong></p>
+      <p id="previewExperience">Your experience will appear here.</p>
+      <p><strong>Skills:</strong></p>
+      <ul id="previewSkills"></ul>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    function updatePreview() {
+      document.getElementById('previewName').textContent = document.getElementById('name').value;
+      document.getElementById('previewRole').textContent = document.getElementById('role').value;
+      document.getElementById('previewExperience').textContent = document.getElementById('experience').value;
+
+      const skills = document.getElementById('skills').value.split(',');
+      const skillsList = document.getElementById('previewSkills');
+      skillsList.innerHTML = '';
+      skills.forEach(skill => {
+        if (skill.trim()) {
+          const li = document.createElement('li');
+          li.textContent = skill.trim();
+          skillsList.appendChild(li);
+        }
+      });
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById('preview');
+      html2pdf().from(element).save('resume.pdf');
+    }
+  </script>
+</body>
+</html>
