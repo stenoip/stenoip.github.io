@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VA Financial Assistance Calculator</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    label, input, select { display: block; margin: 10px 0; }
+    #result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Veteran Financial Assistance Calculator</h2>
+  <label>Monthly Income ($): <input type="number" id="income"></label>
+  <label>Number of Dependents: <input type="number" id="dependents"></label>
+  <label>Housing Status:
+    <select id="housing">
+      <option value="unsheltered">Unsheltered</option>
+      <option value="temporary">Temporary</option>
+      <option value="permanent">Permanent</option>
+    </select>
+  </label>
+  <button onclick="calculateAssistance()">Calculate</button>
+  <div id="result"></div>
+
+  <script>
+    function calculateAssistance() {
+      const income = parseFloat(document.getElementById('income').value);
+      const dependents = parseInt(document.getElementById('dependents').value);
+      const housing = document.getElementById('housing').value;
+
+      let base = 1000;
+      if (income < 1500) base += 500;
+      base += dependents * 200;
+
+      if (housing === 'unsheltered') base += 300;
+      else if (housing === 'temporary') base += 150;
+
+      document.getElementById('result').innerText = 
+        `Estimated Monthly Assistance: $${base.toFixed(2)}`;
+    }
+  </script>
+</body>
+</html>
