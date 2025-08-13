@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StenoBulk | Bulk File Renamer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f0f2f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .btn {
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: #0078D4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #005a9e;
+    }
+    ul {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>StenoBulk | Bulk File Renamer</h1>
+  <div class="container">
+    <label for="files">Select Files</label>
+    <input type="file" id="files" multiple />
+
+    <label for="prefix">Prefix</label>
+    <input type="text" id="prefix" placeholder="e.g. Project_" />
+
+    <label for="suffix">Suffix</label>
+    <input type="text" id="suffix" placeholder="e.g. _2025" />
+
+    <button class="btn" onclick="renameFiles()">Rename & Download</button>
+
+    <ul id="outputList"></ul>
+  </div>
+
+  <script>
+    function renameFiles() {
+      const files = document.getElementById('files').files;
+      const prefix = document.getElementById('prefix').value;
+      const suffix = document.getElementById('suffix').value;
+      const outputList = document.getElementById('outputList');
+      outputList.innerHTML = '';
+
+      Array.from(files).forEach((file, index) => {
+        const ext = file.name.split('.').pop();
+        const newName = `${prefix}${index + 1}${suffix}.${ext}`;
+
+        const li = document.createElement('li');
+        li.textContent = `Renamed: ${newName}`;
+        outputList.appendChild(li);
+
+        // Simulate download with dummy content
+        const blob = new Blob([`Dummy content for ${newName}`], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = newName;
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
