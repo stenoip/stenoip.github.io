@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StenoReceipt</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f0f2f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+    .btn {
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: #0078D4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #005a9e;
+    }
+    .totals {
+      margin-top: 20px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <h1>StenoReceipt | Receipt/Invoice Generator</h1>
+  <div class="container" id="invoiceContainer">
+    <table id="invoiceTable">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Price ($)</th>
+          <th>Total ($)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn" onclick="addRow()">Add Item</button>
+
+    <div class="totals">
+      <p>Subtotal: $<span id="subtotal">0.00</span></p>
+      <p>Tax (10%): $<span id="tax">0.00</span></p>
+      <p><strong>Total: $<span id="total">0.00</span></strong></p>
+    </div>
+
+    <button class="btn" onclick="downloadPDF()">Download Invoice</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    function addRow() {
+      const tbody = document.querySelector('#invoiceTable tbody');
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+        <td><input type="text" placeholder="Item name" /></td>
+        <td><input type="number" value="1" min="1" onchange="updateTotals()" /></td>
+        <td><input type="number" value="0" min="0" step="0.01" onchange="updateTotals()" /></td>
+        <td class="item-total">0.00</td>
+        <td><button onclick="removeRow(this)">Remove</button></td>
+      `;
+
+      tbody.appendChild(row);
+      updateTotals();
+    }
+
+    function removeRow(button) {
+      button.closest('tr').remove();
+      updateTotals();
+    }
+
+    function updateTotals() {
+      let subtotal = 0;
+      const rows = document.querySelectorAll('#invoiceTable tbody tr');
+
+      rows.forEach(row => {
+        const qty = parseFloat(row.cells[1].querySelector('input').value) || 0;
+        const price = parseFloat(row.cells[2].querySelector('input').value) || 0;
+        const total = qty * price;
+        row.cells[3].textContent = total.toFixed(2);
+        subtotal += total;
+      });
+
+      const tax = subtotal * 0.10;
+      const grandTotal = subtotal + tax;
+
+      document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+      document.getElementById('tax').textContent = tax.toFixed(2);
+      document.getElementById('total').textContent = grandTotal.toFixed(2);
+    }
+
+    function downloadPDF() {
+      html2pdf().from(document.getElementById('invoiceContainer')).save('invoice.pdf');
+    }
+
+    // Initialize with one row
+    addRow();
+  </script>
+</body>
+</html>
