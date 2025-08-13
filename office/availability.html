@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StenoAvailable | Availability Scheduler</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #eef2f7;
+    }
+    h1 {
+      text-align: center;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 5px;
+      margin-top: 20px;
+    }
+    .grid div {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grid .header {
+      background: #0078D4;
+      color: white;
+      font-weight: bold;
+      cursor: default;
+    }
+    .selected {
+      background: #cce5ff !important;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background: #0078D4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #005a9e;
+    }
+  </style>
+</head>
+<body>
+  <h1>StenoAvailable | Weekly Availability Scheduler</h1>
+  <div class="grid" id="scheduleGrid"></div>
+  <button class="btn" onclick="exportPDF()">Export as PDF</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    const days = ['Time', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const times = ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM'];
+    const grid = document.getElementById('scheduleGrid');
+
+    function buildGrid() {
+      grid.innerHTML = '';
+      days.forEach(day => {
+        const cell = document.createElement('div');
+        cell.textContent = day;
+        cell.classList.add('header');
+        grid.appendChild(cell);
+      });
+
+      times.forEach(time => {
+        for (let i = 0; i < days.length; i++) {
+          const cell = document.createElement('div');
+          cell.dataset.time = time;
+          cell.dataset.day = days[i];
+          cell.textContent = i === 0 ? time : '';
+          if (i !== 0) {
+            cell.addEventListener('click', () => {
+              cell.classList.toggle('selected');
+              saveGrid();
+            });
+          } else {
+            cell.classList.add('header');
+          }
+          grid.appendChild(cell);
+        }
+      });
+    }
+
+    function saveGrid() {
+      const selected = Array.from(document.querySelectorAll('.selected')).map(cell => ({
+        day: cell.dataset.day,
+        time: cell.dataset.time
+      }));
+      localStorage.setItem('availability', JSON.stringify(selected));
+    }
+
+    function loadGrid() {
+      const saved = JSON.parse(localStorage.getItem('availability') || '[]');
+      document.querySelectorAll('.grid div').forEach(cell => {
+        if (cell.dataset.day && cell.dataset.time) {
+          const match = saved.find(s => s.day === cell.dataset.day && s.time === cell.dataset.time);
+          if (match) cell.classList.add('selected');
+        }
+      });
+    }
+
+    function exportPDF() {
+      html2pdf().from(grid).save('availability.pdf');
+    }
+
+    buildGrid();
+    loadGrid();
+  </script>
+</body>
+</html>
