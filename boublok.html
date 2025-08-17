@@ -1,150 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="swc.png">
-
-    <title>Boublok - HTML & PJS Editor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        .editor-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .editor-buttons {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-        }
-
-        .editor-buttons button {
-            padding: 10px 20px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-
-        .editor-buttons button:hover {
-            background-color: #0056b3;
-        }
-
-        .editor {
-            flex: 1;
-            display: flex;
-        }
-
-        textarea {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            resize: none;
-            font-family: monospace;
-            font-size: 16px;
-        }
-
-        iframe {
-            flex: 1;
-            border: none;
-            margin: 0;
-        }
-
-        .note {
-            padding: 10px;
-            font-size: 14px;
-            color: #555;
-            background-color: #fff;
-            border-top: 1px solid #ddd;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/png" href="swc.png" />
+<title>Boublok - HTML & p5.js Editor</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  .editor-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .editor-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+  }
+  .editor-buttons button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+  .editor-buttons button:hover {
+    background-color: #0056b3;
+  }
+  .editor {
+    flex: 1;
+    display: flex;
+    gap: 1px;
+    background: #ddd;
+  }
+  textarea {
+    flex: 1;
+    padding: 12px 14px;
+    border: none;
+    resize: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    tab-size: 2;
+    outline: none;
+  }
+  iframe {
+    flex: 1;
+    border: none;
+    margin: 0;
+  }
+  .note {
+    padding: 10px;
+    font-size: 14px;
+    color: #555;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+  }
+</style>
 </head>
 <body>
-    <div class="editor-buttons">
-        <button onclick="runCode()">Run</button>
-        <button onclick="saveCode()">Save</button>
-        <button onclick="switchEditor()">Switch to PJS</button>
+  <div class="editor-buttons">
+    <button onclick="runCode()">Run</button>
+    <button onclick="saveCode()">Save</button>
+    <button id="switch-btn" onclick="switchEditor()">Switch to p5.js</button>
+  </div>
+  <div class="editor-container">
+    <div id="html-editor" class="editor">
+      <textarea id="html-code" placeholder="Type HTML/CSS/JS code here..."></textarea>
+      <iframe id="output" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer" title="HTML preview"></iframe>
     </div>
-    <div class="editor-container">
-        <div id="html-editor" class="editor">
-            <textarea id="html-code" placeholder="Type HTML/CSS/JS code here..."></textarea>
-            <iframe id="output"></iframe>
-        </div>
-        <div id="pjs-editor" class="editor" style="display: none;">
-            <textarea id="pjs-code" placeholder="NOTE! Does not work. Work in Progess."></textarea>
-            <iframe id="pjs-output" src="about:blank"></iframe>
-        </div>
+    <div id="p5-editor" class="editor" style="display: none;">
+      <textarea id="p5-code" placeholder="p5.js code here (global mode)"></textarea>
+      <iframe id="p5-output" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer" title="p5 preview"></iframe>
     </div>
-    <div class="note">
-        Note: For the HTML editor, you can write HTML, CSS, and JavaScript. For the Processing JavaScript editor, use the Processing.js syntax. Make sure to use explicit multiplication (*) when needed.
-    </div>
-    <script>
-        function runCode() {
-            const isHtmlEditor = document.getElementById('html-editor').style.display !== 'none';
-            const code = isHtmlEditor ? document.getElementById('html-code').value : document.getElementById('pjs-code').value;
-            const output = isHtmlEditor ? document.getElementById('output') : document.getElementById('pjs-output');
+  </div>
+  <div class="note">
+    Note: HTML editor supports HTML, CSS, JavaScript.  
+    p5.js editor supports normal p5 global mode (`setup()` & `draw()`).
+  </div>
 
-            if (isHtmlEditor) {
-                output.contentDocument.open();
-                output.contentDocument.write(code);
-                output.contentDocument.close();
-            } else {
-                const pjsScript = `
-                    <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"><\/script>
-                    <canvas id="processing-canvas"></canvas>
-                    <script>
-                        const canvas = document.getElementById('processing-canvas');
-                        const pjs = new Processing(canvas, function(p) {
-                            ${code}
-                        });
-                    <\/script>
-                `;
-                output.contentDocument.open();
-                output.contentDocument.write(`<html><body>${pjsScript}</body></html>`);
-                output.contentDocument.close();
-            }
-        }
+<script>
+  // Load saved code
+  const htmlTA = document.getElementById('html-code');
+  const p5TA = document.getElementById('p5-code');
+  htmlTA.value = localStorage.getItem('html-code') || '';
+  p5TA.value = localStorage.getItem('p5-code') || '';
+  htmlTA.addEventListener('input', () => localStorage.setItem('html-code', htmlTA.value));
+  p5TA.addEventListener('input', () => localStorage.setItem('p5-code', p5TA.value));
 
-        function saveCode() {
-            const isHtmlEditor = document.getElementById('html-editor').style.display !== 'none';
-            const code = isHtmlEditor ? document.getElementById('html-code').value : document.getElementById('pjs-code').value;
-            const blob = new Blob([code], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = isHtmlEditor ? 'code.html' : 'code.pjs';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+  function runCode() {
+    const isHtmlEditor = document.getElementById('html-editor').style.display !== 'none';
 
-        function switchEditor() {
-            const htmlEditor = document.getElementById('html-editor');
-            const pjsEditor = document.getElementById('pjs-editor');
-            const button = document.querySelector('.editor-buttons button:nth-child(3)');
-            
-            if (htmlEditor.style.display === 'none') {
-                htmlEditor.style.display = 'flex';
-                pjsEditor.style.display = 'none';
-                button.textContent = 'Switch to PJS';
-            } else {
-                htmlEditor.style.display = 'none';
-                pjsEditor.style.display = 'flex';
-                button.textContent = 'Switch to HTML';
-            }
-        }
-    </script>
+    if (isHtmlEditor) {
+      const code = htmlTA.value;
+      document.getElementById('output').srcdoc = code;
+    } else {
+      const code = p5TA.value;
+      const html = `
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html,body{margin:0;padding:0;}</style>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"><\/script>
+</head>
+<body>
+<script>
+${code}
+<\/script>
+</body>
+</html>`;
+      document.getElementById('p5-output').srcdoc = html;
+    }
+  }
+
+  function saveCode() {
+    const isHtmlEditor = document.getElementById('html-editor').style.display !== 'none';
+    if (isHtmlEditor) {
+      download('code.html', htmlTA.value, 'text/html');
+    } else {
+      const code = p5TA.value;
+      const html = `
+<!doctype html>
+<html><head><meta charset="utf-8">
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"><\/script>
+</head><body>
+<script>
+${code}
+<\/script>
+</body></html>`;
+      download('code-p5.html', html, 'text/html');
+    }
+  }
+
+  function download(filename, content, type) {
+    const blob = new Blob([content], { type });
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: filename
+    });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 0);
+  }
+
+  function switchEditor() {
+    const htmlEditor = document.getElementById('html-editor');
+    const p5Editor = document.getElementById('p5-editor');
+    const button = document.getElementById('switch-btn');
+
+    const htmlVisible = htmlEditor.style.display !== 'none';
+    htmlEditor.style.display = htmlVisible ? 'none' : 'flex';
+    p5Editor.style.display = htmlVisible ? 'flex' : 'none';
+    button.textContent = htmlVisible ? 'Switch to HTML' : 'Switch to p5.js';
+  }
+
+  // Ctrl/Cmd + Enter runs code
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      runCode();
+    }
+  });
+</script>
 </body>
 </html>
