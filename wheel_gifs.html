@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background-color: black;
+    }
+    img {
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    const gifUrls = [
+      "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+      "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+      "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif",
+      "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+      "https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif",
+      "https://media.giphy.com/media/3o6ZsYzD0Z8lZzrsuU/giphy.gif"
+    ];
+
+    const randomIndex = Math.floor(Math.random() * gifUrls.length);
+    const selectedGif = gifUrls[randomIndex];
+
+    const img = document.createElement("img");
+    img.src = selectedGif;
+    document.body.appendChild(img);
+  </script>
+</body>
+</html>
