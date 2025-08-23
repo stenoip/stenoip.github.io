@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="icon" type="image/png" href="swc.png">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     body {
       background-color: #111;
       color: #fff;
@@ -15,7 +16,6 @@
       margin: 0;
       overflow-x: hidden;
     }
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     .header {
       background: linear-gradient(to right, #ff00cc, #3333ff);
       padding: 20px;
@@ -47,39 +47,25 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
       transition: transform 0.2s;
       background: #222;
-      padding: 10px;
+      padding: 20px;
       border-radius: 10px;
-      overflow: hidden;
+      width: 300px;
     }
     .game:hover {
       transform: scale(1.05);
     }
-    iframe {
-      border: none;
-      width: 100%;
-      height: 450px;
-      border-radius: 5px;
-    }
-    .fullscreen {
-      margin-top: 10px;
+    .play-link {
+      display: inline-block;
+      margin-top: 15px;
       padding: 10px 20px;
       background-color: #e60000;
       color: #fff;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.2s;
+      text-decoration: none;
       border-radius: 5px;
+      transition: background-color 0.2s;
     }
-    .fullscreen:hover {
+    .play-link:hover {
       background-color: #ff0000;
-    }
-    @media (max-width: 768px) {
-      iframe {
-        height: 300px;
-      }
-      .fullscreen {
-        padding: 8px 16px;
-      }
     }
   </style>
 </head>
@@ -91,44 +77,25 @@
   <div class="container">
     <div class="game">
       <h2>Super Car Racer</h2>
-     <iframe src="https://editor.p5js.org/stenoip/full/w3eyrRJ1r" allowfullscreen></iframe>
-      <button class="fullscreen" onclick="toggleFullScreen(this.previousElementSibling)">Fullscreen</button>
+      <a href="https://editor.p5js.org/stenoip/full/w3eyrRJ1r" target="_blank" class="play-link">Play Game</a>
     </div>
     <div class="game">
       <h2>106 Puzzle</h2>
-     <iframe src="https://editor.p5js.org/stenoip/full/cPRKm8bEP" allowfullscreen></iframe>
-      <button class="fullscreen" onclick="toggleFullScreen(this.previousElementSibling)">Fullscreen</button>
+      <a href="https://editor.p5js.org/stenoip/full/cPRKm8bEP" target="_blank" class="play-link">Play Game</a>
     </div>
     <div class="game">
-      <h2>Lytze the Fuzbal (Simple)</h2>
-      <iframe src="https://editor.p5js.org/stenoip/full/Mx5FJ6UmG"  allowfullscreen></iframe>
-      <button class="fullscreen" onclick="toggleFullScreen(this.previousElementSibling)">Fullscreen</button>
-    
-  </div>
+      <h2>Word It!| Word Search and Prizes</h2>
+      <a href="https://stenoip.github.io/games/word" target="_blank" class="play-link">Play Game</a>
+    </div>
     <div class="game">
-      <h2>You vs Bot(Rock, Paper, Scissors)</h2>
-     <iframe src="https://editor.p5js.org/stenoip/full/zcDTOPR4S" allowfullscreen></iframe>
-      <button class="fullscreen" onclick="toggleFullScreen(this.previousElementSibling)">Fullscreen</button>
-  </div>
+      <h2>You vs Bot (Rock, Paper, Scissors)</h2>
+      <a href="https://editor.p5js.org/stenoip/full/zcDTOPR4S" target="_blank" class="play-link">Play Game</a>
+    </div>
     <div class="game">
       <h2>Tilt Pong</h2>
-     <a href="https://editor.p5js.org/stenoip/full/4X27mOrBn">View Game</a>
+      <a href="https://editor.p5js.org/stenoip/full/4X27mOrBn" target="_blank" class="play-link">Play Game</a>
+    </div>
   </div>
-    
-    
-  </div>
-    
-  <script>
-    function toggleFullScreen(iframe) {
-      if (!document.fullscreenElement) {
-        iframe.requestFullscreen().catch(err => {
-          alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-        });
-      } else {
-        document.exitFullscreen();
-      }
-    }
-  </script>
 </body>
 
 </html>
