@@ -84,7 +84,8 @@
   <button id="downloadBtn" style="display:none;">📤 Download Score</button>
 <p>&copy; Stenoip Company</p>
   <a href="/index.html">Return to Homepage</a>
-  <script>
+       
+      <script>
     const gridSize = 20;
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
@@ -100,17 +101,8 @@
     let timer;
     const today = new Date().toISOString().split('T')[0];
 
-    async function fetchWords() {
-      const response = await fetch('https://api.datamuse.com/words?sp=?????&max=1000');
-      const data = await response.json();
-      const words = data.map(item => item.word.toUpperCase()).filter(w => /^[A-Z]{5,10}$/.test(w));
-      const selected = [];
-      while (selected.length < 20) {
-        const word = words[Math.floor(Math.random() * words.length)];
-        if (!selected.includes(word)) selected.push(word);
-      }
-      return selected;
-    }
+    // A large list of common words to pull from
+    const masterWordList = ["WHILE", "ABOUT", "AFTER", "AGAIN", "LATER", "BELOW", "BETTER", "BUILD", "CARRY", "CAUSE", "CHIEF", "CRAFT", "EIGHT", "EVERY", "FRONT", "GREAT", "GROUP", "HEARD", "HEART", "HEAVY", "HOUSE", "LARGE", "LEARN", "LEAVE", "LIGHT", "LITTLE", "LIVING", "MAJOR", "MAKER", "MARCH", "MIGHT", "MONEY", "MOUNT", "MOUSE", "MOVIE", "NIGHT", "OTHER", "OUGHT", "OWNER", "PAPER", "PARTY", "PLACE", "PLANT", "POINT", "POWER", "PRESS", "PRINT", "PUPIL", "QUICK", "QUIET", "QUITE", "RIVER", "ROUND", "SAWDUST", "SCHOOL", "SENTENCE", "SHAPE", "SHEET", "SHORT", "SISTER", "SKETCH", "SLEEP", "SLOWLY", "SMILE", "SOMETIMES", "SOUND", "SPOKE", "SPRING", "SQUARE", "STAMP", "START", "STATE", "STILL", "STONE", "STORE", "STORY", "STREAM", "STREET", "STRONG", "STUDY", "SUBTRACT", "SUDDEN", "SUNLIGHT", "SURPRISE", "SWEEP", "SWEET", "SWIMMER", "SYLLABLE", "TABLE", "TALKED", "TEACHER", "THEN", "THERE", "THESE", "THINK", "THIRD", "THIS", "THOSE", "THOUGH", "THOUSAND", "THROUGH", "TIGER", "TIME", "TODAY", "TOGETHER", "TOLD", "TOMORROW", "TONGUE", "TOWN", "TRAVEL", "TROPICAL", "TROUBLE", "TRULY", "TRUNK", "TRUTH", "TUBE", "TURTLE", "TWENTY", "TYPED", "UNDER", "UNIT", "UNTIL", "UPON", "USUALLY", "VALLEY", "VARIOUS", "VERB", "VISIT", "VOICE", "WALKED", "WANTED", "WARM", "WATCH", "WATER", "WAVE", "WEIGH", "WEIGHT", "WELCOME", "WENT", "WERE", "WEST", "WETLAND", "WHAT", "WHEAT", "WHEEL", "WHEN", "WHERE", "WHICH", "WHILE", "WHITE", "WHOLE", "WHOSE", "WHY", "WILDLIFE", "WILL", "WIND", "WINTER", "WISH", "WITHIN", "WITHOUT", "WOMAN", "WOMEN", "WONDER", "WOODEN", "WORLD", "WOULD", "WRITE", "YARD", "YELLOW", "YOURSELF", "ZEBRA", "ZOO"];
 
     function notifyUser(message) {
       if (Notification.permission === 'granted') {
@@ -128,6 +120,26 @@
       const score = Math.max(1000 - time, 0);
       document.getElementById('score').textContent = `⏱️ Time: ${time}s | Score: ${score}`;
     }
+
+    // New, deterministic word selection function
+    function selectDailyWords() {
+        const date = new Date(today);
+        let seed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+        
+        function seededRandom() {
+            seed = (seed * 9301 + 49297) % 233280;
+            return seed / 233280;
+        }
+
+        const shuffledWords = [...masterWordList];
+        for (let i = shuffledWords.length - 1; i > 0; i--) {
+            const j = Math.floor(seededRandom() * (i + 1));
+            [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
+        }
+        
+        return shuffledWords.slice(0, 20);
+    }
+
 
     function placeWords() {
       wordList.forEach(word => {
@@ -236,10 +248,10 @@
       let storedWords = JSON.parse(localStorage.getItem('wordItWords'));
 
       if (storedDate !== today || !storedWords) {
-        wordList = await fetchWords();
+        wordList = selectDailyWords(); // Use the new function
         localStorage.setItem('wordItDate', today);
         localStorage.setItem('wordItWords', JSON.stringify(wordList));
-                notifyUser("Stenoip Wonder Computer- A new WordIt! puzzle is ready! Beat your last score!");
+        notifyUser("Stenoip Wonder Computer- A new WordIt! puzzle is ready! Beat your last score!");
       } else {
         wordList = storedWords;
       }
@@ -255,6 +267,6 @@
     }
 
     startGame();
-  </script>
+</script>
 </body>
 </html>
