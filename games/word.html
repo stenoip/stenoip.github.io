@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WordIt! © Stenoip Company</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background-color: #007BFF;
+      color: #FFD700;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(20, 30px);
+      grid-template-rows: repeat(20, 30px);
+      gap: 3px;
+      justify-content: center;
+      margin: 30px auto;
+    }
+    .cell {
+      background-color: #fff;
+      color: #007BFF;
+      font-weight: bold;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .selected {
+      background-color: #FFD700;
+      color: #000;
+    }
+    .found {
+      background-color: #28a745;
+      color: #fff;
+    }
+    #score {
+      font-size: 1.2em;
+      margin-top: 20px;
+    }
+    #downloadBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #FFD700;
+      color: #007BFF;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(10, 32px);
+        grid-template-rows: repeat(10, 32px);
+        gap: 2px;
+      }
+      .cell {
+        font-size: 0.9em;
+        touch-action: manipulation;
+      }
+      h1 {
+        font-size: 1.6em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>WordIt!</h1>
+  <p>Find all hidden words. No hints. The faster you finish, the higher your score!</p>
+  <div id="score">⏱️ Time: 0s | Score: 1000</div>
+  <div class="grid" id="grid"></div>
+  <button id="downloadBtn" style="display:none;">📤 Download Score</button>
+<p>&copy; Stenoip Company</p>
+  <a href="index.html">Return to Homepage</a>
+  <script>
+    const gridSize = 20;
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
+    const directions = [
+      [0, 1], [1, 0], [1, 1], [-1, 1],
+      [0, -1], [-1, 0], [-1, -1], [1, -1]
+    ];
+
+    let wordList = [];
+    let foundWords = new Set();
+    let selectedCells = [];
+    let time = 0;
+    let timer;
+    const today = new Date().toISOString().split('T')[0];
+
+    async function fetchWords() {
+      const response = await fetch('https://api.datamuse.com/words?sp=?????&max=1000');
+      const data = await response.json();
+      const words = data.map(item => item.word.toUpperCase()).filter(w => /^[A-Z]{5,10}$/.test(w));
+      const selected = [];
+      while (selected.length < 20) {
+        const word = words[Math.floor(Math.random() * words.length)];
+        if (!selected.includes(word)) selected.push(word);
+      }
+      return selected;
+    }
+
+    function notifyUser(message) {
+      if (Notification.permission === 'granted') {
+        new Notification('WordIt!', { body: message });
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            new Notification('WordIt!', { body: message });
+          }
+        });
+      }
+    }
+
+    function updateScore() {
+      const score = Math.max(1000 - time, 0);
+      document.getElementById('score').textContent = `⏱️ Time: ${time}s | Score: ${score}`;
+    }
+
+    function placeWords() {
+      wordList.forEach(word => {
+        let placed = false;
+        while (!placed) {
+          const dir = directions[Math.floor(Math.random() * directions.length)];
+          const row = Math.floor(Math.random() * gridSize);
+          const col = Math.floor(Math.random() * gridSize);
+          let fits = true;
+          for (let i = 0; i < word.length; i++) {
+            const r = row + dir[0] * i;
+            const c = col + dir[1] * i;
+            if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || (grid[r][c] && grid[r][c] !== word[i])) {
+              fits = false;
+              break;
+            }
+          }
+          if (fits) {
+            for (let i = 0; i < word.length; i++) {
+              const r = row + dir[0] * i;
+              const c = col + dir[1] * i;
+              grid[r][c] = word[i];
+            }
+            placed = true;
+          }
+        }
+      });
+    }
+
+    function fillGrid() {
+      for (let r = 0; r < gridSize; r++) {
+        for (let c = 0; c < gridSize; c++) {
+          if (!grid[r][c]) {
+            grid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+          }
+        }
+      }
+    }
+
+    function renderGrid() {
+      const gridContainer = document.getElementById('grid');
+      gridContainer.innerHTML = '';
+      for (let r = 0; r < gridSize; r++) {
+        for (let c = 0; c < gridSize; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.textContent = grid[r][c];
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.addEventListener('click', handleClick);
+          gridContainer.appendChild(cell);
+        }
+      }
+    }
+
+    function handleClick(e) {
+      const cell = e.target;
+      if (cell.classList.contains('found')) return;
+
+      if (cell.classList.contains('selected')) {
+        cell.classList.remove('selected');
+        selectedCells = selectedCells.filter(c => c !== cell);
+      } else {
+        cell.classList.add('selected');
+        selectedCells.push(cell);
+      }
+
+      checkWord();
+    }
+
+    function checkWord() {
+      const selectedWord = selectedCells.map(c => c.textContent).join('');
+      const reversed = selectedWord.split('').reverse().join('');
+      const match = wordList.find(w => w === selectedWord || w === reversed);
+      if (match && !foundWords.has(match)) {
+        selectedCells.forEach(c => {
+          c.classList.remove('selected');
+          c.classList.add('found');
+        });
+        foundWords.add(match);
+        selectedCells = [];
+
+        if (foundWords.size === wordList.length) {
+          clearInterval(timer);
+          const finalScore = Math.max(1000 - time, 0);
+          alert(`🎉 You found all words in ${time}s! Final Score: ${finalScore}`);
+          notifyUser(`🎉 Puzzle complete! Final Score: ${finalScore}`);
+          document.getElementById('downloadBtn').style.display = 'inline-block';
+          document.getElementById('downloadBtn').onclick = () => downloadScore(finalScore, time);
+        }
+      }
+    }
+
+    function downloadScore(score, time) {
+      const content = `WordIt! Score\nDate: ${today}\nTime: ${time}s\nScore: ${score}\n`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `WordIt_Score_${today}.txt`;
+      link.click();
+    }
+
+    async function startGame() {
+      Notification.requestPermission();
+      let storedDate = localStorage.getItem('wordItDate');
+      let storedWords = JSON.parse(localStorage.getItem('wordItWords'));
+
+      if (storedDate !== today || !storedWords) {
+        wordList = await fetchWords();
+        localStorage.setItem('wordItDate', today);
+        localStorage.setItem('wordItWords', JSON.stringify(wordList));
+                notifyUser("Stenoip Wonder Computer- A new WordIt! puzzle is ready! Beat your last score!");
+      } else {
+        wordList = storedWords;
+      }
+
+      placeWords();
+      fillGrid();
+      renderGrid();
+
+      timer = setInterval(() => {
+        time++;
+        updateScore();
+      }, 1000);
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
