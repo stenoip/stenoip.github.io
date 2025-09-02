@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StenoCopynPaste</title>
+  <link rel="icon" href="new-swc.png" type="image/png" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+    header {
+      background-color: #1b5e20;
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      margin: 0;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    }
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    h2 {
+      color: #1b5e20;
+    }
+    .card {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #ecf0f1;
+      font-size: 0.9rem;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #43a047;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    button:hover {
+      background-color: #2e7d32;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+      textarea {
+        height: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>StenoCopynPaste</h1>
+    <p>Quickly copy and paste text snippets</p>
+  </header>
+  <main>
+    <div class="card">
+      <textarea placeholder="Type or paste your text here..."></textarea>
+      <button>Copy to Clipboard</button>
+    </div>
+  </main>
+  <footer>
+    &copy; 2025 Stenoip Company. All rights reserved.
+  </footer>
+</body>
+</html>
