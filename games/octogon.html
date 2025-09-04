@@ -4,7 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Octogon Match</title>
-
 <style>
   :root {
     --bg: #0f1220;
@@ -16,7 +15,6 @@
     --bad: #ff6b6b;
     --warn: #ffb020;
   }
-
   html, body {
     margin: 0;
     height: 100%;
@@ -24,8 +22,6 @@
     color: var(--ink);
     font: 15px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   }
-
-  /* HUD */
   #hud {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -52,8 +48,6 @@
   }
   .pill b { font-weight: 800; color: var(--ink); }
   .muted { color: var(--muted); }
-
-  /* Layout */
   #wrap {
     display: grid;
     grid-template-columns: 320px 1fr;
@@ -63,8 +57,6 @@
   @media (max-width: 980px) {
     #wrap { grid-template-columns: 1fr; }
   }
-
-  /* Map panel */
   #mapPanel {
     background: var(--panel);
     border: 1px solid rgba(255,255,255,0.08);
@@ -120,8 +112,6 @@
     background: var(--good);
   }
   .level-node.locked .dot { display: none; }
-
-  /* Game panel */
   #gamePanel {
     background: var(--panel);
     border: 1px solid rgba(255,255,255,0.08);
@@ -145,7 +135,6 @@
   }
   .pbtn.active { outline: 2px solid var(--accent); }
   .pcount { background: rgba(255,255,255,0.12); padding: 2px 6px; border-radius: 999px; font-weight: 700; }
-
   #boardWrap { display: grid; place-items: center; padding: 8px; }
   #board { display: grid; gap: 8px; touch-action: manipulation; }
   .cell { width: 56px; height: 56px; display: grid; place-items: center; }
@@ -166,12 +155,9 @@
   .tile.c5 { background: #b287ff; }
   .tile.c6 { background: #5ee6e6; }
   .tile.c7 { background: #ffb86b; }
-
   #gameBottom {
     display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
   }
-
-  /* Toasts */
   #toasts {
     position: fixed;
     right: 16px; bottom: 16px;
@@ -186,8 +172,6 @@
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.35);
   }
-
-  /* Modals */
   .modal {
     position: fixed; inset: 0;
     display: none; place-items: center;
@@ -205,8 +189,6 @@
   }
   .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .modal-body { max-height: 60vh; overflow:auto; }
-
-  /* Footer */
   footer {
     text-align: center;
     color: var(--muted);
@@ -216,7 +198,6 @@
 </head>
 <body>
 
-<!-- HUD -->
 <div id="hud">
   <div class="left">
     <div class="pill"><span class="muted">Level</span> <b id="hudLevel">1</b></div>
@@ -239,23 +220,18 @@
 </div>
 
 <div id="wrap">
-  <!-- Map Panel -->
   <section id="mapPanel">
     <div id="mapHeader">
       <button class="btn" id="prevPage">◀ Prev</button>
       <div class="muted">Select Level (infinite)</div>
       <button class="btn" id="nextPage">Next ▶</button>
     </div>
-
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
       <button class="btn" id="watchAdEnergy">Watch ad: +1 Energy</button>
       <button class="btn" id="watchAdPower">Watch ad: +1 Random Powerup</button>
     </div>
-
     <div id="mapGrid"></div>
   </section>
-
-  <!-- Game Panel -->
   <section id="gamePanel">
     <div id="gameTop">
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -267,18 +243,15 @@
         <button class="btn" id="btnShuffle">Shuffle (-1 move)</button>
       </div>
     </div>
-
     <div id="powerups">
       <button class="pbtn" id="pHammer"><span>Hammer</span><span class="pcount" id="cntHammer">0</span></button>
       <button class="pbtn" id="pCross"><span>Cross Blast</span><span class="pcount" id="cntCross">0</span></button>
       <button class="pbtn" id="pColor"><span>Color Nuke</span><span class="pcount" id="cntColor">0</span></button>
       <span class="muted">Select a powerup, then click a tile to use it. Powerups don't cost moves.</span>
     </div>
-
     <div id="boardWrap">
       <div id="board"></div>
     </div>
-
     <div id="gameBottom">
       <div class="muted">Swap adjacent octagons to match 3+. 4-in-a-row grants Cross Blast. 5+ grants Color Nuke.</div>
       <div style="display:flex; gap:8px;">
@@ -287,12 +260,9 @@
     </div>
   </section>
 </div>
-
 <div id="toasts"></div>
-
 <footer>© Stenoip Company</footer>
 
-<!-- Credits modal -->
 <div class="modal" id="creditsModal">
   <div class="modal-card">
     <div class="modal-head">
@@ -313,7 +283,6 @@
   </div>
 </div>
 
-<!-- Ad/reward modal -->
 <div class="modal" id="rewardModal">
   <div class="modal-card">
     <div class="modal-head">
@@ -337,19 +306,16 @@
 </div>
 
 <script>
-/* =========================
-   Persistent meta systems
-   ========================= */
 var maxEnergy = 5;
 var energy = maxEnergy;
-var energyRefillMs = 10 * 60 * 1000; // 10 minutes
+var energyRefillMs = 10 * 60 * 1000;
 var lastEnergyTimestamp = Date.now();
 
 var currentLevel = 1;
 var highestLevel = 1;
 var score = 0;
 
-var mapWindowStart = 1; // pagination start
+var mapWindowStart = 1;
 var mapWindowSize = 20;
 
 var invHammer = 0;
@@ -358,7 +324,6 @@ var invColor = 0;
 
 var musicEnabled = false;
 
-/* Save / Load */
 function saveProgress() {
   try {
     localStorage.setItem("octogonSaveV2", JSON.stringify({
@@ -420,9 +385,6 @@ function updateEnergyTick() {
 }
 setInterval(updateEnergyTick, 1000);
 
-/* ==============
-   Simple music (WebAudio loop)
-   ============== */
 var audioCtx = null;
 var musicNodes = null;
 
@@ -430,13 +392,30 @@ function startMusic() {
   if (audioCtx) return;
   try {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    musicNodes = makeSimpleLoop(audioCtx);
-  } catch(e){}
+    var url = "calming-shapes-125459.mp3";
+    fetch(url)
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+      .then(audioBuffer => {
+        var source = audioCtx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.loop = true;
+        var gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.06;
+        source.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        source.start();
+        window._musicSource = source;
+      });
+  } catch(e) {}
 }
 function stopMusic() {
   if (!audioCtx) return;
   try {
-    if (musicNodes && musicNodes.stop) musicNodes.stop();
+    if (window._musicSource) {
+      window._musicSource.stop();
+      window._musicSource = null;
+    }
     audioCtx.close();
   } catch(e){}
   musicNodes = null;
@@ -449,7 +428,7 @@ function toggleMusic() {
   if (musicEnabled) startMusic(); else stopMusic();
   saveProgress();
 }
-document.getElementById("musicToggle").onclick = function(){
+document.getElementById("musicToggle").onclick = function() {
   toggleMusic();
 };
 function initMusicOnLoad() {
@@ -457,52 +436,9 @@ function initMusicOnLoad() {
   btn.textContent = "Music: " + (musicEnabled ? "On" : "Off");
 }
 
-/* Procedural loop: two detuned sines + soft filter LFO */
-function makeSimpleLoop(ctx) {
-  var out = ctx.createGain();
-  out.gain.value = 0.06;
-  out.connect(ctx.destination);
-
-  var osc1 = ctx.createOscillator();
-  var osc2 = ctx.createOscillator();
-  var lfo = ctx.createOscillator();
-  var lfoGain = ctx.createGain();
-  var filt = ctx.createBiquadFilter();
-
-  filt.type = "lowpass";
-  filt.frequency.value = 900;
-  filt.Q.value = 0.7;
-
-  lfo.frequency.value = 0.08;
-  lfoGain.gain.value = 400;
-
-  osc1.type = "sine";
-  osc2.type = "sine";
-  osc1.frequency.value = 220; // A3
-  osc2.frequency.value = 220 * Math.pow(2, 3/12);
-  osc2.detune.value = 3;
-
-  lfo.connect(lfoGain);
-  lfoGain.connect(filt.frequency);
-
-  osc1.connect(filt);
-  osc2.connect(filt);
-  filt.connect(out);
-
-  osc1.start();
-  osc2.start();
-  lfo.start();
-
-  return {
-    stop: function(){
-      try { osc1.stop(); osc2.stop(); lfo.stop(); } catch(e){}
-    }
-  };
-}
-
-/* ==============
+/* =========================
    Toasts
-   ============== */
+   ========================= */
 function toast(msg) {
   var box = document.getElementById("toasts");
   var t = document.createElement("div");
@@ -514,11 +450,11 @@ function toast(msg) {
 }
 
 /* =========================
-   Level map (infinite)
+   Map & Level functions
    ========================= */
 function clampMapWindow() {
   if (highestLevel >= mapWindowStart + mapWindowSize - 1) {
-    mapWindowStart = highestLevel - mapWindowSize + 1;
+    mapWindowStart = Math.max(1, highestLevel - mapWindowSize + 1);
   }
   if (mapWindowStart < 1) mapWindowStart = 1;
 }
@@ -547,13 +483,9 @@ function renderMap() {
     })(lv);
     grid.appendChild(node);
   }
-
   document.getElementById("prevPage").disabled = (mapWindowStart === 1);
 }
 
-/* =========================
-   Octogon Match core
-   ========================= */
 var board = [];
 var rows = 8;
 var cols = 8;
@@ -564,8 +496,7 @@ var chainScoreBase = 10;
 
 var selR = -1, selC = -1;
 var isResolving = false;
-
-var activePowerup = null; // "hammer" | "cross" | "color" | null
+var activePowerup = null;
 
 function setHUD() {
   document.getElementById("hudLevel").textContent = currentLevel;
@@ -579,11 +510,11 @@ function setHUD() {
 }
 
 function paramsForLevel(lv) {
-  var baseRows = 7 + Math.min(3, Math.floor((lv-1)/7)); // 7..10
+  var baseRows = 7 + Math.min(3, Math.floor((lv-1)/7));
   var baseCols = baseRows;
-  var colorN = 5 + Math.min(2, Math.floor((lv-1)/5));   // 5..7
-  var mv = 18 + Math.min(10, Math.floor(lv/3));         // 18..28
-  var tgt = 600 + Math.floor(Math.pow(lv, 1.15) * 60);  // ramping
+  var colorN = 5 + Math.min(2, Math.floor((lv-1)/5));
+  var mv = 18 + Math.min(10, Math.floor(lv/3));
+  var tgt = 600 + Math.floor(Math.pow(lv, 1.15) * 60);
   return { rows: baseRows, cols: baseCols, colors: colorN, moves: mv, target: tgt };
 }
 
@@ -597,15 +528,17 @@ function tryStartLevel(lv) {
 
 function startLevel(lv) {
   currentLevel = lv;
-  score = 0; // Reset score when starting a new level
+  score = 0;
   var p = paramsForLevel(lv);
-  rows = p.rows; cols = p.cols; colorsCount = p.colors; moves = p.moves; targetScore = p.target;
-
-  selR = selC = -1;
-  isResolving = false;
+  rows = p.rows; 
+  cols = p.cols; 
+  colorsCount = p.colors; 
+  moves = p.moves; 
+  targetScore = p.target;
+  selR = -1; selC = -1; 
+  isResolving = false; 
   activePowerup = null; 
   updatePowerupButtons();
-
   buildEmptyBoard();
   fillBoardNoInitialMatches();
   renderBoard();
@@ -613,8 +546,6 @@ function startLevel(lv) {
   toast("Starting Level " + lv);
   saveProgress();
 }
-
-
 
 function buildEmptyBoard() {
   board = new Array(rows);
@@ -644,19 +575,16 @@ function renderBoard() {
   grid.style.gridTemplateColumns = "repeat(" + cols + ", 56px)";
   grid.style.gridTemplateRows = "repeat(" + rows + ", 56px)";
   grid.innerHTML = "";
-
   for (var r=0; r<rows; r++) {
     for (var c=0; c<cols; c++) {
       var cell = document.createElement("div");
       cell.className = "cell";
       cell.dataset.r = r;
       cell.dataset.c = c;
-
       var tile = document.createElement("div");
       tile.className = "tile c" + (board[r][c]+1);
       tile.dataset.r = r;
       tile.dataset.c = c;
-
       cell.appendChild(tile);
       grid.appendChild(cell);
     }
@@ -670,58 +598,44 @@ function hookTileEvents() {
     var t = e.target;
     if (!t.classList.contains("tile")) return;
     var r = parseInt(t.dataset.r,10), c = parseInt(t.dataset.c,10);
-
     if (activePowerup) {
       usePowerupOn(r, c);
       return;
     }
-
     onTileClick(r, c);
   };
 }
 
 function onTileClick(r, c) {
   if (isResolving) return;
-
   if (selR === -1) {
     selR = r; selC = c;
     highlightSelection(true);
     return;
   }
-
   if (r === selR && c === selC) {
     highlightSelection(false);
     selR = selC = -1;
     return;
   }
-
   if (!adjacent(selR, selC, r, c)) {
     highlightSelection(false);
     selR = r; selC = c;
     highlightSelection(true);
     return;
   }
-
-  // Try swap
   swap(selR, selC, r, c);
   var detail = findMatchesDetailed();
   if (detail.cells.length === 0) {
-    // invalid move: swap back
     swap(selR, selC, r, c);
     wiggle(selR, selC); wiggle(r, c);
     highlightSelection(false);
     selR = selC = -1;
     return;
   }
-
-  // Valid move: consume a move when at least one match happens
   moves = Math.max(0, moves - 1);
   setHUD();
-
-  // Grant powerups based on groups (4 => Cross, 5+ => Color)
   grantPowerupsFrom(detail.groups);
-
-  // Resolve chain
   highlightSelection(false);
   selR = selC = -1;
   isResolving = true;
@@ -767,12 +681,9 @@ function wiggle(r, c) {
   setTimeout(function(){ t.style.transform = ""; }, 120);
 }
 
-/* Match detection with groups */
 function findMatchesDetailed() {
   var cells = [];
   var groups = [];
-
-  // rows
   for (var r=0; r<rows; r++) {
     var runLen = 1;
     for (var c=1; c<=cols; c++) {
@@ -789,7 +700,6 @@ function findMatchesDetailed() {
       }
     }
   }
-  // cols
   for (var c=0; c<cols; c++) {
     var runv = 1;
     for (var r=1; r<=rows; r++) {
@@ -806,8 +716,6 @@ function findMatchesDetailed() {
       }
     }
   }
-
-  // Dedup cells
   var seen = {};
   var uniq = [];
   for (var i=0; i<cells.length; i++) {
@@ -832,26 +740,20 @@ function grantPowerupsFrom(groups) {
 }
 
 function resolveChain(matchCells, chain, done) {
-  // Visual clear
   for (var i=0; i<matchCells.length; i++) {
     var rc = matchCells[i];
     var t = tileAt(rc.r, rc.c);
     if (t) t.classList.add("clearing");
   }
-
-  // Score: bonus for chain depth
   var gained = matchCells.length * (chainScoreBase + Math.floor(chainScoreBase * 0.25 * (chain-1)));
   score += gained;
   setHUD();
-
   setTimeout(function() {
-    // Remove and collapse
     for (var i=0; i<matchCells.length; i++) {
       var rc = matchCells[i];
       board[rc.r][rc.c] = -1;
     }
     collapseAndRefill(function(){
-      // Next chain?
       var next = findMatchesDetailed();
       if (next.cells.length > 0) {
         resolveChain(next.cells, chain+1, done);
@@ -863,7 +765,6 @@ function resolveChain(matchCells, chain, done) {
 }
 
 function collapseAndRefill(cb) {
-  // Collapse columns
   for (var c=0; c<cols; c++) {
     var write = rows - 1;
     for (var r=rows-1; r>=0; r--) {
@@ -874,7 +775,6 @@ function collapseAndRefill(cb) {
     }
     for (var r=write; r>=0; r--) board[r][c] = -1;
   }
-  // Update DOM for collapse
   for (var r=0; r<rows; r++) {
     for (var c=0; c<cols; c++) {
       var t = tileAt(r, c);
@@ -885,9 +785,7 @@ function collapseAndRefill(cb) {
       }
     }
   }
-
-  // Refill new tiles
-  setTimeout(function(){
+  setTimeout(function() {
     for (var c=0; c<cols; c++) {
       for (var r=0; r<rows; r++) {
         if (board[r][c] === -1) {
@@ -922,7 +820,6 @@ function onWin() {
   if (nextLevel > highestLevel) highestLevel = nextLevel;
   currentLevel = nextLevel;
   saveProgress();
-  // Notify user about level progression
   setTimeout(function() {
     toast("Proceeding to Level " + nextLevel);
     renderMap();
@@ -939,31 +836,27 @@ function onLose() {
   renderMap();
 }
 
-/* ==============
-   Powerups
-   ============== */
 function updatePowerupButtons() {
-  var ids = ["pHammer","pCross","pColor"];
-  for (var i=0;i<ids.length;i++){
-    var el = document.getElementById(ids[i]);
-    el.classList.remove("active");
+  var ids=["pHammer","pCross","pColor"];
+  for (var i=0;i<ids.length;i++) {
+    document.getElementById(ids[i]).classList.remove("active");
   }
-  if (activePowerup === "hammer") document.getElementById("pHammer").classList.add("active");
-  if (activePowerup === "cross") document.getElementById("pCross").classList.add("active");
-  if (activePowerup === "color") document.getElementById("pColor").classList.add("active");
+  if (activePowerup==="hammer") document.getElementById("pHammer").classList.add("active");
+  if (activePowerup==="cross") document.getElementById("pCross").classList.add("active");
+  if (activePowerup==="color") document.getElementById("pColor").classList.add("active");
 }
 
-document.getElementById("pHammer").onclick = function(){
+document.getElementById("pHammer").onclick = function() {
   if (invHammer<=0) { toast("No Hammer available"); return; }
   activePowerup = (activePowerup==="hammer"? null : "hammer");
   updatePowerupButtons();
 };
-document.getElementById("pCross").onclick = function(){
+document.getElementById("pCross").onclick = function() {
   if (invCross<=0) { toast("No Cross Blast available"); return; }
   activePowerup = (activePowerup==="cross"? null : "cross");
   updatePowerupButtons();
 };
-document.getElementById("pColor").onclick = function(){
+document.getElementById("pColor").onclick = function() {
   if (invColor<=0) { toast("No Color Nuke available"); return; }
   activePowerup = (activePowerup==="color"? null : "color");
   updatePowerupButtons();
@@ -971,56 +864,43 @@ document.getElementById("pColor").onclick = function(){
 
 function usePowerupOn(r, c) {
   if (isResolving) return;
-
-  if (activePowerup === "hammer" && invHammer>0) {
-    invHammer--;
-    setHUD(); saveProgress();
-    // remove single tile
+  if (activePowerup==="hammer" && invHammer>0) {
+    invHammer--; setHUD(); saveProgress();
     var cells = [{r:r,c:c}];
-    isResolving = true;
-    resolveChain(cells, 1, function(){ isResolving=false; checkEndConditions(); });
+    isResolving=true;
+    resolveChain(cells,1,function(){isResolving=false; checkEndConditions();});
     toast("Hammer used");
-  } else if (activePowerup === "cross" && invCross>0) {
-    invCross--;
-    setHUD(); saveProgress();
-    // clear cross shape: full row and column
-    var cells = [];
+  } else if (activePowerup==="cross" && invCross>0) {
+    invCross--; setHUD(); saveProgress();
+    var cells=[];
     for (var cc=0; cc<cols; cc++) cells.push({r:r,c:cc});
     for (var rr=0; rr<rows; rr++) cells.push({r:rr,c:c});
-    // dedup
     var seen={}, uniq=[];
-    for (var i=0;i<cells.length;i++){ var k=cells[i].r+"_"+cells[i].c; if(!seen[k]){seen[k]=1; uniq.push(cells[i]);}}
-    isResolving = true;
-    resolveChain(uniq, 1, function(){ isResolving=false; checkEndConditions(); });
+    for (var i=0;i<cells.length;i++){ var k=cells[i].r+"_"+cells[i].c; if(!seen[k]){seen[k]=1;uniq.push(cells[i]);}}
+    isResolving=true;
+    resolveChain(uniq,1,function(){isResolving=false; checkEndConditions();});
     toast("Cross Blast used");
-  } else if (activePowerup === "color" && invColor>0) {
-    invColor--;
-    setHUD(); saveProgress();
-    // remove all tiles of this color
-    var color = board[r][c];
-    var cells = [];
+  } else if (activePowerup==="color" && invColor>0) {
+    invColor--; setHUD(); saveProgress();
+    var color=board[r][c];
+    var cells=[];
     for (var rr=0; rr<rows; rr++) for (var cc=0; cc<cols; cc++) if (board[rr][cc]===color) cells.push({r:rr,c:cc});
-    isResolving = true;
-    resolveChain(cells, 1, function(){ isResolving=false; checkEndConditions(); });
+    isResolving=true;
+    resolveChain(cells,1,function(){isResolving=false; checkEndConditions();});
     toast("Color Nuke used");
   }
-
-  activePowerup = null;
-  updatePowerupButtons();
+  activePowerup=null; updatePowerupButtons();
 }
 
-/* ==============
-   Hints
-   ============== */
-document.getElementById("freeHint").onclick = function(){
+document.getElementById("freeHint").onclick = function() {
   if (isResolving) return;
   var move = findAnyGoodMove();
   if (!move) { toast("No hint found. Try shuffle."); return; }
-  var a = tileAt(move.a.r, move.a.c);
-  var b = tileAt(move.b.r, move.b.c);
+  var a=tileAt(move.a.r, move.a.c);
+  var b=tileAt(move.b.r, move.b.c);
   if (a) a.classList.add("sel");
   if (b) b.classList.add("sel");
-  setTimeout(function(){ if(a) a.classList.remove("sel"); if(b) b.classList.remove("sel"); }, 900);
+  setTimeout(function(){ if(a) a.classList.remove("sel"); if(b) b.classList.remove("sel"); },900);
 };
 
 function findAnyGoodMove() {
@@ -1040,9 +920,6 @@ function findAnyGoodMove() {
   return null;
 }
 
-/* ==============
-   Controls
-   ============== */
 document.getElementById("prevPage").onclick = function() {
   if (mapWindowStart > 1) {
     mapWindowStart = Math.max(1, mapWindowStart - mapWindowSize);
@@ -1075,90 +952,76 @@ document.getElementById("btnShuffle").onclick = function() {
     var j = Math.floor(Math.random() * (i+1));
     var t = flat[i]; flat[i] = flat[j]; flat[j] = t;
   }
-  var k = 0;
-  for (var rr=0; rr<rows; rr++) for (var cc=0; cc<cols; cc++) board[rr][cc] = flat[k++];
+  var k=0;
+  for (var rr=0; rr<rows; rr++) for (var cc=0; cc<cols; cc++) board[rr][cc]=flat[k++];
   renderBoard();
   setHUD();
-  var d = findMatchesDetailed();
-  if (d.cells.length > 0) {
-    isResolving = true;
-    resolveChain(d.cells, 1, function(){
-      isResolving = false;
-      checkEndConditions();
-    });
+  var d=findMatchesDetailed();
+  if (d.cells.length>0) {
+    isResolving=true;
+    resolveChain(d.cells,1,function(){isResolving=false; checkEndConditions();});
   } else {
     checkEndConditions();
   }
 };
 
-/* ==============
-   Credits modal
-   ============== */
-document.getElementById("creditsBtn").onclick = function(){
+document.getElementById("creditsBtn").onclick = function() {
   document.getElementById("creditsModal").classList.add("open");
 };
-document.getElementById("creditsClose").onclick = function(){
+document.getElementById("creditsClose").onclick = function() {
   document.getElementById("creditsModal").classList.remove("open");
 };
 
-/* ==============
-   Rewarded ad simulation
-   ============== */
-var pendingReward = null; // "energy" | "power"
-document.getElementById("watchAdEnergy").onclick = function(){
+var pendingReward = null;
+document.getElementById("watchAdEnergy").onclick = function() {
   if (energy >= maxEnergy) { toast("Energy already full"); return; }
   openReward("energy");
 };
-document.getElementById("watchAdPower").onclick = function(){
+document.getElementById("watchAdPower").onclick = function() {
   openReward("power");
 };
 
 function openReward(kind) {
-  pendingReward = kind;
+  pendingReward=kind;
   document.getElementById("rewardModal").classList.add("open");
-  startRewardCountdown(15); // 15-sec countdown
+  startRewardCountdown(15);
 }
-document.getElementById("rewardClose").onclick = function(){
+document.getElementById("rewardClose").onclick = function() {
   document.getElementById("rewardModal").classList.remove("open");
-  pendingReward = null;
+  pendingReward=null;
 };
-document.getElementById("btnClaimReward").onclick = function(){
+document.getElementById("btnClaimReward").onclick = function() {
   if (!pendingReward) return;
-  if (pendingReward === "energy") {
-    energy = Math.min(maxEnergy, energy + 1);
-    toast("+1 Energy earned");
-  } else if (pendingReward === "power") {
-    var roll = Math.random();
-    if (roll < 0.34) { invHammer++; toast("+1 Hammer"); }
-    else if (roll < 0.67) { invCross++; toast("+1 Cross Blast"); }
+  if (pendingReward==="energy") {
+    energy=Math.min(maxEnergy, energy+1);
+    toast("+1 Energy");
+  } else if (pendingReward==="power") {
+    var roll=Math.random();
+    if (roll<0.34) { invHammer++; toast("+1 Hammer"); }
+    else if (roll<0.67) { invCross++; toast("+1 Cross"); }
     else { invColor++; toast("+1 Color Nuke"); }
   }
   setHUD(); saveProgress(); updateEnergyTick();
-  pendingReward = null;
+  pendingReward=null;
   document.getElementById("rewardModal").classList.remove("open");
 };
-
-function startRewardCountdown(seconds) {
-  var t = seconds;
-  var timerEl = document.getElementById("rewardTimer");
-  var claimBtn = document.getElementById("btnClaimReward");
-  claimBtn.disabled = true;
-  timerEl.textContent = t + "s";
-  var intv = setInterval(function(){
-    t--;
-    if (t<=0) {
+function startRewardCountdown(t) {
+  var seconds=t;
+  var timerEl=document.getElementById("rewardTimer");
+  var claimBtn=document.getElementById("btnClaimReward");
+  claimBtn.disabled=true;
+  timerEl.textContent=seconds+"s";
+  var intv=setInterval(function(){
+    seconds--;
+    if (seconds<=0) {
       clearInterval(intv);
-      timerEl.textContent = "Done";
-      claimBtn.disabled = false;
+      timerEl.textContent="Done"; claimBtn.disabled=false;
     } else {
-      timerEl.textContent = t + "s";
+      timerEl.textContent=seconds+"s";
     }
-  }, 1000);
+  },1000);
 }
 
-/* ==============
-   Init
-   ============== */
 function initUI() {
   initMusicOnLoad();
   renderMap();
@@ -1169,7 +1032,6 @@ loadProgress();
 updateEnergyTick();
 setHUD();
 initUI();
-
 
 </script>
 </body>
