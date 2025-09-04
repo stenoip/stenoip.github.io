@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Octogon Match</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0f1220;
+      --panel:#171b2e;
+      --accent:#6ae2ff;
+      --good:#51f5a4;
+      --warn:#ffb86b;
+      --bad:#ff6b7a;
+      --tile-size:64px;
+      --gap:8px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+      color:#e8ebff;
+      background:
+        radial-gradient(1200px 800px at 80% -20%, #1a1f3b 0%, rgba(26,31,59,0) 60%),
+        radial-gradient(1000px 700px at -10% 110%, #16233d 0%, rgba(22,35,61,0) 55%),
+        var(--bg);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    .shell{
+      display:grid;
+      grid-template-columns: 300px 1fr;
+      gap:16px;
+      max-width:1200px;
+      width:100%;
+    }
+    .panel{
+      background:linear-gradient(180deg, #1a2140, #141a2d);
+      border:1px solid #242a48;
+      border-radius:16px;
+      padding:16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+    .title{
+      font-weight:800;
+      font-size:28px;
+      letter-spacing:.5px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .octo-badge{
+      width:24px;height:24px;
+      background:conic-gradient(from 0deg, #6ae2ff, #9b7bff, #6ae2ff);
+      clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+      filter: drop-shadow(0 0 6px rgba(106,226,255,.5));
+    }
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    .card{
+      background:#10162a;
+      border:1px solid #20284a;
+      padding:12px;
+      border-radius:12px;
+    }
+    .card h3{margin:0 0 6px 0;font-size:12px;letter-spacing:.6px;color:#9fb0ff;text-transform:uppercase}
+    .big{font-size:24px;font-weight:700}
+    .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    button{
+      background:#162147;
+      color:#e8ebff;
+      border:1px solid #253160;
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:600;
+      transition:transform .05s ease, background .2s ease, border-color .2s ease;
+    }
+    button:hover{background:#1a2754}
+    button:active{transform:translateY(1px)}
+    button.primary{background:linear-gradient(180deg,#2a66ff,#2b49d4);border-color:#3a64ff}
+    .hint{opacity:.8;font-size:12px;margin-top:8px;color:#a9b7ff}
+    .board-wrap{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .board{
+      display:grid;
+      gap:var(--gap);
+      padding:16px;
+      background:linear-gradient(180deg, #12172b, #0e1324);
+      border:1px solid #22284a;
+      border-radius:16px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02), 0 12px 30px rgba(0,0,0,.35);
+      position:relative;
+      user-select:none;
+      touch-action:manipulation;
+    }
+
+    /* Tile styles */
+    .tile{
+      width:var(--tile-size);
+      height:var(--tile-size);
+      position:relative;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+      clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+      box-shadow: inset 0 -6px 10px rgba(0,0,0,.35), 0 6px 14px rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .tile::after{
+      content:"";
+      position:absolute;inset:0;
+      background:radial-gradient(120% 100% at 50% -20%, rgba(255,255,255,.18), rgba(255,255,255,0) 40%);
+      clip-path: inherit;
+      pointer-events:none;
+    }
+    .tile.selected{outline:3px solid #ffd64c; filter:brightness(1.05); transform:scale(1.04)}
+    .tile.removing{animation: pop .25s ease forwards}
+    .tile.spawn{animation: drop .18s ease}
+    .tile.bomb{border-color:#ffd64c; box-shadow: inset 0 -6px 10px rgba(0,0,0,.35), 0 0 18px rgba(255,214,76,.55)}
+    @keyframes pop{to{transform:scale(0);opacity:0}}
+    @keyframes drop{from{transform:translateY(-20px);opacity:.6} to{transform:none;opacity:1}}
+
+    /* Colors */
+    .c0{background:linear-gradient(180deg,#ff7f6a,#ff4b5c)}
+    .c1{background:linear-gradient(180deg,#7bd77e,#2aba6e)}
+    .c2{background:linear-gradient(180deg,#6ae2ff,#2aa7ff)}
+    .c3{background:linear-gradient(180deg,#ffcc6a,#ffa62a)}
+    .c4{background:linear-gradient(180deg,#c89bff,#8f6aff)}
+    .c5{background:linear-gradient(180deg,#8be6d6,#39c7b0)}
+
+    /* Toasts */
+    .toasts{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      z-index:999;
+      pointer-events:none;
+    }
+    .toast{
+      background:#111933;
+      border:1px solid #25305a;
+      padding:10px 12px;
+      border-radius:10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.35);
+      min-width:220px;
+      max-width:320px;
+      pointer-events:auto;
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+      animation: slideIn .18s ease;
+    }
+    .toast.good{border-color:#2bda9a}
+    .toast.warn{border-color:#ffb86b}
+    .toast.bad{border-color:#ff6b7a}
+    .toast .dot{width:10px;height:10px;border-radius:50%}
+    .toast.good .dot{background:var(--good)}
+    .toast.warn .dot{background:var(--warn)}
+    .toast.bad .dot{background:var(--bad)}
+    .toast .t-title{font-weight:700}
+    .toast .t-body{opacity:.9}
+    .toast .close{margin-left:auto;opacity:.7;cursor:pointer}
+    @keyframes slideIn{
+      from{transform:translateY(8px);opacity:0}
+      to{transform:none;opacity:1}
+    }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .shell{grid-template-columns: 1fr}
+      :root{ --tile-size:56px; --gap:6px }
+    }
+    @media (max-width: 520px){
+      :root{ --tile-size:48px; --gap:6px }
+      .title{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="panel">
+      <div class="title"><span class="octo-badge"></span> Octogon Match</div>
+
+      <div class="stats">
+        <div class="card">
+          <h3>Level</h3>
+          <div class="big" id="level">1</div>
+        </div>
+        <div class="card">
+          <h3>Score</h3>
+          <div class="big" id="score">0</div>
+        </div>
+        <div class="card">
+          <h3>Moves left</h3>
+          <div class="big" id="moves">0</div>
+        </div>
+        <div class="card">
+          <h3>Target</h3>
+          <div class="big" id="target">0</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="primary" id="newGameBtn">New game</button>
+        <button id="reshuffleBtn">Reshuffle</button>
+        <button id="notifBtn">Enable notifications</button>
+        <button id="hintBtn">Hint</button>
+      </div>
+      <div class="hint">Swap adjacent octogons to make lines or columns of 4+. Matches of 5+ create a bomb. Beat the target before you run out of moves to advance indefinitely.</div>
+    </div>
+
+    <div class="panel board-wrap">
+      <div id="board" class="board"></div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+
+  <script>
+    // Game configuration
+    var ROWS_START = 8;
+    var COLS_START = 8;
+    var COLORS = 6; // number of regular tile types
+    var MOVES_START = 30;
+    var MOVES_DECAY = 2; // fewer moves each level to add challenge (min 10)
+    var SCORE_PER_TILE = 10;
+    var TARGET_BASE = 500;
+    var TARGET_GROWTH = 1.25; // exponential growth per level for infinite play
+    var BOMB_THRESHOLD = 5; // 5+ in a line creates a bomb
+    var MAX_SHUFFLES_PER_LEVEL = 3;
+
+    // Game state
+    var rows, cols, grid, selected, isBusy, score, level, movesLeft, targetScore, shufflesLeft;
+
+    // DOM
+    var boardEl = document.getElementById('board');
+    var scoreEl = document.getElementById('score');
+    var levelEl = document.getElementById('level');
+    var movesEl = document.getElementById('moves');
+    var targetEl = document.getElementById('target');
+    var newGameBtn = document.getElementById('newGameBtn');
+    var reshuffleBtn = document.getElementById('reshuffleBtn');
+    var notifBtn = document.getElementById('notifBtn');
+    var hintBtn = document.getElementById('hintBtn');
+    var toastsEl = document.getElementById('toasts');
+
+    // Utility: notifications + toasts
+    function toast(kind, title, body, timeout){
+      var t = document.createElement('div');
+      t.className = 'toast ' + (kind || '');
+      t.innerHTML = '<div class="dot"></div><div><div class="t-title">'+(title||'')+'</div><div class="t-body">'+(body||'')+'</div></div><div class="close">✕</div>';
+      toastsEl.appendChild(t);
+      var closer = t.querySelector('.close');
+      closer.onclick = function(){ toastsEl.removeChild(t) };
+      if(timeout !== 0){
+        setTimeout(function(){
+          if(t.parentNode){ toastsEl.removeChild(t) }
+        }, timeout || 3500);
+      }
+    }
+    function notifySystem(title, body){
+      try{
+        if(Notification && Notification.permission === 'granted'){
+          var n = new Notification(title, { body: body || '', icon: '' });
+          setTimeout(function(){ if(n && n.close) n.close() }, 4000);
+        }
+      }catch(e){}
+    }
+    function notify(kind, title, body, timeout){
+      toast(kind, title, body, timeout);
+      notifySystem(title, body);
+    }
+
+    // Board helpers
+    function idx(r,c){ return r*cols + c }
+    function inBounds(r,c){ return r>=0 && r<rows && c>=0 && c<cols }
+
+    // Tile factory
+    function makeTile(type, isBomb){
+      return { t: type, b: !!isBomb, id: Math.random().toString(36).slice(2) };
+    }
+    function randomType(){ return Math.floor(Math.random()*COLORS) }
+
+    // Initialize a fresh board with no starting matches and at least one possible 4+ move
+    function initBoard(){
+      grid = new Array(rows*cols);
+      var r,c;
+      for(r=0;r<rows;r++){
+        for(c=0;c<cols;c++){
+          var tries=0, tile;
+          do{
+            tile = makeTile(randomType(), false);
+            grid[idx(r,c)] = tile;
+            tries++;
+          }while((createsImmediateMatch(r,c) || tries<1) && tries<20); // avoid simple 4+ lines at spawn
+        }
+      }
+      // Ensure a valid move exists
+      var safety=0;
+      while(!hasPossibleMove() && safety<30){
+        shuffleBoard();
+        safety++;
+      }
+    }
+
+    function createsImmediateMatch(r,c){
+      // Check if placing grid[r,c] creates a line >=4 by duplication horizontally or vertically
+      var t = grid[idx(r,c)].t;
+      var run = 1, i;
+      // Horizontal check
+      i = 1; while(c-i>=0 && grid[idx(r,c-i)] && grid[idx(r,c-i)].t===t){ run++; i++ }
+      i = 1; while(c+i<cols && grid[idx(r,c+i)] && grid[idx(r,c+i)].t===t){ run++; i++ }
+      if(run>=4) return true;
+      // Vertical check
+      run = 1;
+      i = 1; while(r-i>=0 && grid[idx(r-i,c)] && grid[idx(r-i,c)].t===t){ run++; i++ }
+      i = 1; while(r+i<rows && grid[idx(r+i,c)] && grid[idx(r+i,c)].t===t){ run++; i++ }
+      return run>=4;
+    }
+
+    function renderBoard(){
+      boardEl.style.gridTemplateColumns = 'repeat(' + cols + ', var(--tile-size))';
+      boardEl.style.gridTemplateRows = 'repeat(' + rows + ', var(--tile-size))';
+      boardEl.innerHTML = '';
+      var r,c;
+      for(r=0;r<rows;r++){
+        for(c=0;c<cols;c++){
+          var tile = grid[idx(r,c)];
+          var div = document.createElement('div');
+          div.className = 'tile spawn c' + tile.t + (tile.b ? ' bomb' : '');
+          div.dataset.r = r;
+          div.dataset.c = c;
+          div.dataset.id = tile.id;
+          div.addEventListener('click', onTileClick);
+          if(tile.b){
+            var star = document.createElement('div');
+            star.style.position='absolute';
+            star.style.inset='0';
+            star.style.display='grid';
+            star.style.placeItems='center';
+            star.style.fontSize='22px';
+            star.style.textShadow='0 2px 8px rgba(0,0,0,.45)';
+            star.textContent='★';
+            div.appendChild(star);
+          }
+          boardEl.appendChild(div);
+        }
+      }
+      updateHUD();
+    }
+
+    function updateTileClass(r,c){
+      var tile = grid[idx(r,c)];
+      var el = boardEl.querySelector('.tile[data-r="'+r+'"][data-c="'+c+'"]');
+      if(!el) return;
+      el.className = 'tile c' + tile.t + (tile.b ? ' bomb' : '');
+    }
+
+    function updateHUD(){
+      scoreEl.textContent = score;
+      levelEl.textContent = level;
+      movesEl.textContent = movesLeft;
+      targetEl.textContent = targetScore;
+    }
+
+    // Input handling
+    function onTileClick(e){
+      if(isBusy || movesLeft<=0) return;
+      var r = parseInt(e.currentTarget.dataset.r,10);
+      var c = parseInt(e.currentTarget.dataset.c,10);
+      var current = { r:r, c:c };
+      if(selected && selected.r===r && selected.c===c){
+        clearSelection();
+        return;
+      }
+      if(selected){
+        // second click: attempt swap if adjacent
+        if(isAdjacent(selected, current)){
+          swapAndResolve(selected, current);
+        }else{
+          clearSelection();
+          select(current);
+        }
+      }else{
+        select(current);
+      }
+    }
+
+    function isAdjacent(a,b){
+      var dr = Math.abs(a.r - b.r);
+      var dc = Math.abs(a.c - b.c);
+      return dr + dc === 1;
+    }
+
+    function select(pos){
+      selected = pos;
+      var el = getEl(pos);
+      if(el) el.classList.add('selected');
+    }
+
+    function clearSelection(){
+      if(!selected) return;
+      var el = getEl(selected);
+      if(el) el.classList.remove('selected');
+      selected = null;
+    }
+
+    function getEl(pos){
+      return boardEl.querySelector('.tile[data-r="'+pos.r+'"][data-c="'+pos.c+'"]');
+    }
+
+    function swap(a,b){
+      var t = grid[idx(a.r,a.c)];
+      grid[idx(a.r,a.c)] = grid[idx(b.r,b.c)];
+      grid[idx(b.r,b.c)] = t;
+    }
+
+    function swapAndResolve(a,b){
+      isBusy = true;
+      clearSelection();
+
+      // Visual quick swap
+      var elA = getEl(a), elB = getEl(b);
+      if(!elA || !elB){ isBusy=false; return }
+      // Swap in data
+      swap(a,b);
+
+      // Update DOM coords for next queries
+      renderBoard();
+
+      // Check matches (only 4+ count)
+      var matches = findMatches();
+      if(matches.total.length === 0){
+        // Revert swap
+        swap(a,b);
+        renderBoard();
+        isBusy = false;
+        return;
+      }
+
+      // Count a move
+      movesLeft--;
+      updateHUD();
+
+      // Resolve cascades
+      resolveBoard(matches, function(){
+        // After resolution, check level progression
+        if(score >= targetScore){
+          levelUp();
+        }else if(movesLeft<=0){
+          gameOver();
+        }else{
+          // If board has no moves, reshuffle
+          if(!hasPossibleMove()){
+            if(shufflesLeft>0){
+              shufflesLeft--;
+              shuffleBoard();
+              renderBoard();
+              notify('warn','No moves','Board reshuffled. Shuffles left: '+shufflesLeft);
+            }else{
+              gameOver('No moves left to make.');
+            }
+          }
+        }
+        isBusy = false;
+      });
+    }
+
+    // Match detection: returns { total: [positions], groups: [{positions, isRow, length}], createdBombs: [pos] }
+    function findMatches(){
+      var positions = new Set();
+      var groups = [];
+      var bombs = [];
+
+      // Rows
+      var r,c,runStart,runType,runLen;
+      for(r=0;r<rows;r++){
+        runStart = 0; runType = grid[idx(r,0)].t; runLen = 1;
+        for(c=1;c<=cols;c++){
+          var t = c<cols ? grid[idx(r,c)].t : -1;
+          if(t===runType){
+            runLen++;
+          }else{
+            if(runLen>=4){
+              var g = [];
+              var i;
+              for(i=runStart;i<runStart+runLen;i++){
+                positions.add(idx(r,i));
+                g.push({r:r,c:i});
+              }
+              groups.push({ positions:g, isRow:true, length:runLen });
+              if(runLen>=BOMB_THRESHOLD){
+                bombs.push({ r:r, c:runStart + Math.floor(runLen/2) });
+              }
+            }
+            runStart = c;
+            runType = t;
+            runLen = 1;
+          }
+        }
+      }
+
+      // Columns
+      var rr;
+      for(c=0;c<cols;c++){
+        runStart = 0; runType = grid[idx(0,c)].t; runLen = 1;
+        for(r=1;r<=rows;r++){
+          var tt = r<rows ? grid[idx(r,c)].t : -1;
+          if(tt===runType){
+            runLen++;
+          }else{
+            if(runLen>=4){
+              var gg = [];
+              for(rr=runStart; rr<runStart+runLen; rr++){
+                positions.add(idx(rr,c));
+                gg.push({r:rr,c:c});
+              }
+              groups.push({ positions:gg, isRow:false, length:runLen });
+              if(runLen>=BOMB_THRESHOLD){
+                bombs.push({ r: runStart + Math.floor(runLen/2), c:c });
+              }
+            }
+            runStart = r;
+            runType = tt;
+            runLen = 1;
+          }
+        }
+      }
+
+      // convert positions back to array of {r,c}
+      var total = [];
+      positions.forEach(function(p){
+        total.push({ r: Math.floor(p/cols), c: p%cols });
+      });
+
+      return { total: total, groups: groups, createdBombs: bombs };
+    }
+
+    function resolveBoard(matches, done){
+      // Award score
+      var tilesCleared = matches.total.length;
+      var gained = tilesCleared * SCORE_PER_TILE;
+      // small cascade multiplier later
+      var cascadeMultiplier = 1;
+
+      function stepResolution(iter){
+        // create bombs at matched centers (prefer converting one of the matched tiles)
+        var k;
+        for(k=0;k<matches.createdBombs.length;k++){
+          var p = matches.createdBombs[k];
+          var cell = grid[idx(p.r,p.c)];
+          if(cell){ grid[idx(p.r,p.c)] = makeTile(cell.t, true) }
+        }
+
+        // Animate removals
+        var i;
+        for(i=0;i<matches.total.length;i++){
+          var pos = matches.total[i];
+          var el = getEl(pos);
+          if(el) el.classList.add('removing');
+        }
+
+        setTimeout(function(){
+          // Remove matched tiles (set null)
+          var j;
+          for(j=0;j<matches.total.length;j++){
+            var pos2 = matches.total[j];
+            grid[idx(pos2.r,pos2.c)] = null;
+          }
+
+          // Drop tiles
+          var c,rw, writeRow, readRow;
+          for(c=0;c<cols;c++){
+            writeRow = rows-1;
+            for(rw=rows-1; rw>=0; rw--){
+              var cell = grid[idx(rw,c)];
+              if(cell){
+                grid[idx(writeRow,c)] = cell;
+                writeRow--;
+              }
+            }
+            // fill empty with new tiles
+            for(readRow=writeRow; readRow>=0; readRow--){
+              grid[idx(readRow,c)] = makeTile(randomType(), false);
+            }
+          }
+
+          renderBoard();
+
+          // Next cascade
+          var next = findMatches();
+          if(next.total.length>0){
+            cascadeMultiplier += 0.25;
+            tilesCleared += next.total.length;
+            matches = next;
+            stepResolution(iter+1);
+          }else{
+            // Finalize scoring
+            var finalGain = Math.floor(gained * (1 + (cascadeMultiplier-1)));
+            score += finalGain;
+            updateHUD();
+
+            if(tilesCleared>=10){
+              notify('good','Sweet cascade!','You cleared '+tilesCleared+' tiles in one go.');
+            }
+
+            if(done) done();
+          }
+        }, 220);
+      }
+
+      stepResolution(0);
+    }
+
+    // Bomb activation: swap a bomb into a match or click a bomb + neighbor to trigger?
+    // Simplicity: If a bomb is part of a swap that leads to a match OR is in any match, on removal it explodes a plus pattern.
+    function explodeAt(r,c){
+      var affected = [];
+      var dr = [-2,-1,0,1,2]; // cross shape reach
+      var dc = [-2,-1,0,1,2];
+      var i;
+      for(i=0;i<dr.length;i++){
+        var rr = r + dr[i];
+        if(inBounds(rr,c)) affected.push({r:rr,c:c});
+        var cc = c + dc[i];
+        if(inBounds(r,cc)) affected.push({r:r,c:cc});
+      }
+      // unique
+      var seen = {};
+      var uniq = [];
+      for(i=0;i<affected.length;i++){
+        var key = affected[i].r+','+affected[i].c;
+        if(!seen[key]){ seen[key]=1; uniq.push(affected[i]) }
+      }
+      return uniq;
+    }
+
+    // Integrate bombs into match removal by expanding matches where bomb cells exist
+    function expandMatchesForBombs(matches){
+      var additional = [];
+      var i;
+      for(i=0;i<matches.total.length;i++){
+        var p = matches.total[i];
+        var tile = grid[idx(p.r,p.c)];
+        if(tile && tile.b){
+          additional = additional.concat(explodeAt(p.r,p.c));
+        }
+      }
+      // merge
+      var posSet = {};
+      var merged = matches.total.slice();
+      for(i=0;i<merged.length;i++){ posSet[merged[i].r+','+merged[i].c]=1 }
+      for(i=0;i<additional.length;i++){
+        var key = additional[i].r+','+additional[i].c;
+        if(!posSet[key]){ posSet[key]=1; merged.push(additional[i]) }
+      }
+      return { total: merged, groups: matches.groups, createdBombs: matches.createdBombs };
+    }
+
+    // Check for possible move resulting in a 4+ match
+    function hasPossibleMove(){
+      var r,c;
+      for(r=0;r<rows;r++){
+        for(c=0;c<cols;c++){
+          var here = { r:r, c:c };
+          var neighbors = [ {r:r, c:c+1}, {r:r+1, c:c} ];
+          var n;
+          for(n=0;n<neighbors.length;n++){
+            var nb = neighbors[n];
+            if(!inBounds(nb.r, nb.c)) continue;
+            // swap
+            swap(here, nb);
+            var matches = findMatches();
+            // include bomb expansion
+            matches = expandMatchesForBombs(matches);
+            var ok = matches.total.length>0;
+            // swap back
+            swap(here, nb);
+            if(ok) return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function shuffleBoard(){
+      var flat = grid.slice();
+      // Fisher-Yates
+      var i = flat.length-1;
+      for(; i>0; i--){
+        var j = Math.floor(Math.random()*(i+1));
+        var t = flat[i]; flat[i] = flat[j]; flat[j] = t;
+      }
+      grid = flat;
+    }
+
+    // Level flow
+    function computeTargetForLevel(lv){
+      return Math.floor(TARGET_BASE * Math.pow(TARGET_GROWTH, lv-1));
+    }
+    function computeMovesForLevel(lv){
+      var m = MOVES_START - (lv-1)*MOVES_DECAY;
+      return Math.max(10, m);
+    }
+
+    function levelUp(){
+      level++;
+      var prevTarget = targetScore;
+      targetScore = computeTargetForLevel(level);
+      movesLeft = computeMovesForLevel(level);
+      shufflesLeft = MAX_SHUFFLES_PER_LEVEL;
+      notify('good','Level up!','Welcome to Level '+level+'. Target: '+targetScore);
+      notifySystem('Octogon Match — Level '+level,'New target: '+targetScore);
+      // optional: grow board every few levels
+      if(level % 3 === 0 && rows<10 && cols<10){
+        rows++; cols++;
+        notify('warn','Board expanded','Grid is now '+rows+'×'+cols+'.');
+      }
+      // rebuild board for new level
+      initBoard();
+      renderBoard();
+    }
+
+    function gameOver(reason){
+      notify('bad','Game over', reason ? reason : 'Out of moves. Final score: '+score, 0);
+      notifySystem('Octogon Match — Game over','Score: '+score);
+      isBusy = true;
+    }
+
+    function newGame(){
+      rows = ROWS_START;
+      cols = COLS_START;
+      score = 0;
+      level = 1;
+      targetScore = computeTargetForLevel(level);
+      movesLeft = computeMovesForLevel(level);
+      shufflesLeft = MAX_SHUFFLES_PER_LEVEL;
+      isBusy = false;
+      selected = null;
+      initBoard();
+      renderBoard();
+      notify('good','New game','Reach '+targetScore+' before you run out of moves.');
+    }
+
+    // Buttons
+    newGameBtn.onclick = function(){ newGame() };
+    reshuffleBtn.onclick = function(){
+      if(isBusy) return;
+      if(shufflesLeft<=0){ notify('bad','No reshuffles left','Try making a move.'); return; }
+      shufflesLeft--;
+      shuffleBoard();
+      renderBoard();
+      notify('warn','Board reshuffled','Shuffles left: '+shufflesLeft);
+    };
+    notifBtn.onclick = function(){
+      try{
+        if(!('Notification' in window)){
+          notify('bad','Not supported','Your browser does not support notifications.');
+          return;
+        }
+        if(Notification.permission === 'granted'){
+          notify('good','Notifications enabled','You will get level-up alerts.');
+        }else if(Notification.permission !== 'denied'){
+          Notification.requestPermission().then(function(p){
+            if(p==='granted'){
+              notify('good','Notifications enabled','You will get level-up alerts.');
+              notifySystem('Octogon Match','Thanks for enabling notifications!');
+            }else{
+              notify('warn','Notifications blocked','We will use in-game toasts instead.');
+            }
+          });
+        }else{
+          notify('warn','Notifications blocked','We will use in-game toasts instead.');
+        }
+      }catch(e){
+        notify('warn','Notifications','Could not change permission.');
+      }
+    };
+    hintBtn.onclick = function(){
+      if(isBusy) return;
+      var move = findAnyMove();
+      if(move){
+        // briefly highlight suggested pair
+        var aEl = getEl(move.a), bEl = getEl(move.b);
+        if(aEl) aEl.classList.add('selected');
+        if(bEl) bEl.classList.add('selected');
+        notify('good','Hint','Try swapping highlighted octogons.');
+        setTimeout(function(){
+          if(aEl) aEl.classList.remove('selected');
+          if(bEl) bEl.classList.remove('selected');
+        }, 900);
+      }else{
+        notify('warn','No hint available','Reshuffling the board.');
+        shuffleBoard();
+        renderBoard();
+      }
+    };
+
+    function findAnyMove(){
+      var r,c;
+      for(r=0;r<rows;r++){
+        for(c=0;c<cols;c++){
+          var here = { r:r, c:c };
+          var neighbors = [ {r:r, c:c+1}, {r:r+1, c:c} ];
+          var n;
+          for(n=0;n<neighbors.length;n++){
+            var nb = neighbors[n];
+            if(!inBounds(nb.r, nb.c)) continue;
+            swap(here, nb);
+            var matches = findMatches();
+            matches = expandMatchesForBombs(matches);
+            var ok = matches.total.length>0;
+            swap(here, nb);
+            if(ok) return { a: here, b: nb };
+          }
+        }
+      }
+      return null;
+    }
+
+    // Startup
+    window.addEventListener('load', function(){
+      newGame();
+    });
+
+    // Integrate bomb expansion into resolve flow by monkey-patching findMatches within swap flow
+    // We will wrap swapAndResolve's initial matches to include bombs before resolving.
+    // Override resolveBoard call site by intercepting in swapAndResolve? We'll integrate here by listening to board click pipeline.
+    // Instead, adjust resolveBoard entry point from swap to expand prior:
+    // Patch swapAndResolve to expand before passing to resolveBoard:
+    (function(){
+      var originalSwapAndResolve = swapAndResolve;
+      swapAndResolve = function(a,b){
+        // replicate logic but with bomb expansion at first match check
+        if(isBusy || movesLeft<=0) return;
+        isBusy = true;
+        clearSelection();
+
+        swap(a,b);
+        renderBoard();
+
+        var matches = findMatches();
+        matches = expandMatchesForBombs(matches);
+        if(matches.total.length === 0){
+          swap(a,b);
+          renderBoard();
+          isBusy = false;
+          return;
+        }
+        movesLeft--;
+        updateHUD();
+
+        resolveBoard(matches, function(){
+          if(score >= targetScore){
+            levelUp();
+          }else if(movesLeft<=0){
+            gameOver();
+          }else{
+            if(!hasPossibleMove()){
+              if(shufflesLeft>0){
+                shufflesLeft--;
+                shuffleBoard();
+                renderBoard();
+                notify('warn','No moves','Board reshuffled. Shuffles left: '+shufflesLeft);
+              }else{
+                gameOver('No moves left to make.');
+              }
+            }
+          }
+          isBusy = false;
+        });
+      };
+    })();
+  </script>
+</body>
+</html>
