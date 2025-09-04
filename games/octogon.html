@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Octogon Match</title>
 
-
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4433722838067397" crossorigin="anonymous"></script>
-
 <style>
   :root {
     --bg: #0f1220;
@@ -242,7 +239,7 @@
 </div>
 
 <div id="wrap">
-  <!-- Level Map -->
+  <!-- Map Panel -->
   <section id="mapPanel">
     <div id="mapHeader">
       <button class="btn" id="prevPage">◀ Prev</button>
@@ -258,7 +255,7 @@
     <div id="mapGrid"></div>
   </section>
 
-  <!-- Game -->
+  <!-- Game Panel -->
   <section id="gamePanel">
     <div id="gameTop">
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -453,7 +450,6 @@ function toggleMusic() {
   saveProgress();
 }
 document.getElementById("musicToggle").onclick = function(){
-  // User gesture; safe to start audio
   toggleMusic();
 };
 function initMusicOnLoad() {
@@ -483,7 +479,7 @@ function makeSimpleLoop(ctx) {
   osc1.type = "sine";
   osc2.type = "sine";
   osc1.frequency.value = 220; // A3
-  osc2.frequency.value = 220 * Math.pow(2, 3/12); // C#4
+  osc2.frequency.value = 220 * Math.pow(2, 3/12);
   osc2.detune.value = 3;
 
   lfo.connect(lfoGain);
@@ -521,7 +517,7 @@ function toast(msg) {
    Level map (infinite)
    ========================= */
 function clampMapWindow() {
-  if (highestLevel >= mapWindowStart + mapWindowSize) {
+  if (highestLevel >= mapWindowStart + mapWindowSize - 1) {
     mapWindowStart = highestLevel - mapWindowSize + 1;
   }
   if (mapWindowStart < 1) mapWindowStart = 1;
@@ -531,7 +527,7 @@ function renderMap() {
   clampMapWindow();
   var grid = document.getElementById("mapGrid");
   grid.innerHTML = "";
-  for (var i = 0; i < mapWindowSize; i++) {
+  for (var i=0; i<mapWindowSize; i++) {
     var lv = mapWindowStart + i;
     var node = document.createElement("div");
     node.className = "level-node";
@@ -543,8 +539,8 @@ function renderMap() {
       dot.className = "dot";
       node.appendChild(dot);
     }
-    node.onclick = (function(lvv){
-      return function() {
+    (function(lvv) {
+      node.onclick = function() {
         if (lvv > highestLevel) { toast("Level locked."); return; }
         tryStartLevel(lvv);
       }
@@ -601,12 +597,14 @@ function tryStartLevel(lv) {
 
 function startLevel(lv) {
   currentLevel = lv;
+  score = 0; // Reset score when starting a new level
   var p = paramsForLevel(lv);
   rows = p.rows; cols = p.cols; colorsCount = p.colors; moves = p.moves; targetScore = p.target;
 
   selR = selC = -1;
   isResolving = false;
-  activePowerup = null; updatePowerupButtons();
+  activePowerup = null; 
+  updatePowerupButtons();
 
   buildEmptyBoard();
   fillBoardNoInitialMatches();
@@ -615,6 +613,8 @@ function startLevel(lv) {
   toast("Starting Level " + lv);
   saveProgress();
 }
+
+
 
 function buildEmptyBoard() {
   board = new Array(rows);
@@ -922,10 +922,12 @@ function onWin() {
   if (nextLevel > highestLevel) highestLevel = nextLevel;
   currentLevel = nextLevel;
   saveProgress();
-  setTimeout(function(){
+  // Notify user about level progression
+  setTimeout(function() {
+    toast("Proceeding to Level " + nextLevel);
     renderMap();
     startLevel(currentLevel);
-  }, 500);
+  }, 800);
 }
 
 function onLose() {
@@ -1114,7 +1116,7 @@ document.getElementById("watchAdPower").onclick = function(){
 function openReward(kind) {
   pendingReward = kind;
   document.getElementById("rewardModal").classList.add("open");
-  startRewardCountdown(15); // 15-second watch
+  startRewardCountdown(15); // 15-sec countdown
 }
 document.getElementById("rewardClose").onclick = function(){
   document.getElementById("rewardModal").classList.remove("open");
@@ -1167,6 +1169,8 @@ loadProgress();
 updateEnergyTick();
 setHUD();
 initUI();
+
+
 </script>
 </body>
 </html>
