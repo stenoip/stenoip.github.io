@@ -446,19 +446,27 @@ footer.note {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
 <script>
-/* ----------------------
-   StenoGraphs — Logic
------------------------ */
+/* ---------------------------------------
+   StenoGraphs — Stable JS (drop-in)
+   Works with existing HTML IDs and layout.
+---------------------------------------- */
 
-const $ = (s, root=document) => root.querySelector(s);
-const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+// Tiny DOM helpers
+const $ = (s, root = document) => root.querySelector(s);
+const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
-/* State */
-let chart;
-let currentType = 'line';
-let dataMode = 'json';
-let paletteName = 'classic';
+// Global state
+const State = {
+  chart: null,
+  currentType: 'line',
+  dataMode: 'json',
+  paletteName: 'classic',
+  renderScheduled: false,
+  debounceTimer: null,
+  lastConfig: null
+};
 
+// Palettes
 const palettes = {
   classic: ['#2a6ad7','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'],
   pastel:  ['#80b1d3','#fdb462','#b3de69','#fb8072','#cab2d6','#fccde5','#ccebc5','#d9d9d9','#ffe082','#a6cee3'],
@@ -466,98 +474,141 @@ const palettes = {
   mono:    ['#0078d7','#0d6efd','#1e88e5','#2196f3','#42a5f5','#64b5f6','#90caf9','#bbdefb','#e3f2fd','#0a58ca']
 };
 
-/* Helpers */
-function parseAspect(v) {
-  if (v === 'auto') return undefined;
-  try { return eval(v); } catch { return undefined; }
+// Utils
+function safeParseJSON(text, fallback = { labels: [], datasets: [] }) {
+  try { return JSON.parse(text); } catch { return fallback; }
+}
+function hexToRgba(hex, a = 0.3) {
+  const m = hex.replace('#', '');
+  const bigint = parseInt(m, 16);
+  if (Number.isNaN(bigint)) return `rgba(0,0,0,${a})`;
+  const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+function currentColors(count) {
+  const arr = palettes[State.paletteName] || palettes.classic;
+  return !count ? arr : arr.slice(0, Math.max(1, Math.min(count, arr.length)));
+}
+function parseAspect(value) {
+  if (!value || value === 'auto') return undefined;
+  const parts = String(value).split('/');
+  if (parts.length === 2) {
+    const a = parseFloat(parts[0]), b = parseFloat(parts[1]);
+    if (!Number.isNaN(a) && !Number.isNaN(b) && b !== 0) return a / b;
+  }
+  const num = parseFloat(value);
+  return Number.isNaN(num) ? undefined : num;
+}
+function debounceRender(delay = 120) {
+  clearTimeout(State.debounceTimer);
+  State.debounceTimer = setTimeout(scheduleRender, delay);
+}
+function scheduleRender() {
+  if (State.renderScheduled) return;
+  State.renderScheduled = true;
+
+  const doRender = () => {
+    State.renderScheduled = false;
+    renderChart();
+  };
+
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(doRender, { timeout: 250 });
+  } else {
+    requestAnimationFrame(doRender);
+  }
 }
 
-function currentColors(k) {
-  const arr = palettes[paletteName] || palettes.classic;
-  if (k) return arr.slice(0, k);
-  return arr;
-}
-
+// CSV → data
 function csvToData(text, type) {
-  const rows = text.trim().split(/\r?\n/).map(r => r.split(',').map(c => c.trim()));
+  const rows = text
+    .trim()
+    .split(/\r?\n/)
+    .map(r => r.split(',').map(c => c.trim()))
+    .filter(r => r.length && r.some(cell => cell !== ''));
+
   if (!rows.length) return { labels: [], datasets: [] };
-  // Scatter/Bubble expect x,y,(r),label columns
+
   if (type === 'scatter' || type === 'bubble') {
-    // headers optional
-    const hasHeader = isNaN(parseFloat(rows[0][0]));
+    const firstNum = parseFloat(rows[0]?.[0]);
+    const hasHeader = Number.isNaN(firstNum);
     const dataRows = hasHeader ? rows.slice(1) : rows;
-    const ds = {};
+    const seriesMap = new Map();
     for (const r of dataRows) {
       const [xv, yv, rvOrLabel, maybeLabel] = r;
-      const x = parseFloat(xv); const y = parseFloat(yv);
+      const x = parseFloat(xv), y = parseFloat(yv);
       if (Number.isNaN(x) || Number.isNaN(y)) continue;
-      let label = hasHeader ? (maybeLabel ?? 'Series 1') : (maybeLabel ?? rvOrLabel ?? 'Series 1');
-      let rVal;
+      const label = (hasHeader ? maybeLabel : maybeLabel || rvOrLabel) || 'Series 1';
+      let point = { x, y };
       if (type === 'bubble') {
-        rVal = parseFloat(hasHeader ? rvOrLabel : rvOrLabel);
-        if (Number.isNaN(rVal)) rVal = 6;
+        const rv = parseFloat(rvOrLabel);
+        point.r = Number.isNaN(rv) ? 6 : rv;
       }
-      if (!ds[label]) ds[label] = [];
-      ds[label].push(type === 'bubble' ? { x, y, r: rVal } : { x, y });
+      if (!seriesMap.has(label)) seriesMap.set(label, []);
+      seriesMap.get(label).push(point);
     }
     return {
       labels: [],
-      datasets: Object.keys(ds).map((k, i) => ({ label: k, data: ds[k] }))
+      datasets: Array.from(seriesMap.entries()).map(([label, data]) => ({ label, data }))
     };
   }
 
-  // Pie expects label, value[, group]
   if (type === 'pie') {
-    const hasHeader = isNaN(parseFloat(rows[0][1]));
+    const firstVal = parseFloat(rows[0]?.[1]);
+    const hasHeader = Number.isNaN(firstVal);
     const dataRows = hasHeader ? rows.slice(1) : rows;
-    const labels = [];
-    const data = [];
+    const labels = [], data = [];
     for (const r of dataRows) {
       const name = r[0];
       const val = parseFloat(r[1]);
       if (!name || Number.isNaN(val)) continue;
-      labels.push(name);
-      data.push(val);
+      labels.push(name); data.push(val);
     }
-    return {
-      labels,
-      datasets: [{ label: 'Series 1', data }]
-    };
+    return { labels, datasets: [{ label: 'Series 1', data }] };
   }
 
-  // Bar/Line/Area/Column/Radar/Histogram: first row headers, first col labels
+  // Bar/Column/Line/Area/Radar/Histogram
   const headers = rows[0];
   const labels = rows.slice(1).map(r => r[0]);
   const datasets = [];
   for (let c = 1; c < headers.length; c++) {
     const label = headers[c] || `Series ${c}`;
-    const data = rows.slice(1).map(r => parseFloat(r[c]));
+    const data = rows.slice(1).map(r => {
+      const v = parseFloat(r[c]); return Number.isNaN(v) ? null : v;
+    });
     datasets.push({ label, data });
   }
   return { labels, datasets };
 }
 
 function jsonToData(text) {
-  const obj = JSON.parse(text);
+  const obj = safeParseJSON(text);
+  const ds = Array.isArray(obj.datasets) ? obj.datasets : [];
   return {
-    labels: obj.labels || [],
-    datasets: (obj.datasets || []).map(d => ({
+    labels: Array.isArray(obj.labels) ? obj.labels : [],
+    datasets: ds.map(d => ({
       label: d.label ?? 'Series',
-      data: d.data ?? [],
+      data: Array.isArray(d.data) ? d.data : [],
       backgroundColor: d.backgroundColor,
       borderColor: d.borderColor
     }))
   };
 }
 
-function genHistogram(labels, datasets, binsCount) {
-  // Flatten numeric values
-  const values = datasets.flatMap(d => d.data).filter(v => typeof v === 'number' && !Number.isNaN(v));
+// Histogram and Waterfall builders
+function genHistogram(input, binsCount) {
+  const values = (input.datasets || [])
+    .flatMap(d => d.data)
+    .map(Number)
+    .filter(v => Number.isFinite(v));
+
   if (values.length === 0) return { labels: [], datasets: [] };
+
   const min = Math.min(...values);
   const max = Math.max(...values);
   const bins = Math.max(2, Math.min(100, Math.floor(binsCount || 10)));
   const step = (max - min) / bins || 1;
+
   const edges = Array.from({ length: bins }, (_, i) => min + i * step);
   const counts = new Array(bins).fill(0);
   for (const v of values) {
@@ -566,163 +617,375 @@ function genHistogram(labels, datasets, binsCount) {
     if (idx < 0) idx = 0;
     counts[idx]++;
   }
-  const binLabels = edges.map((e, i) => {
+  const labels = edges.map((e, i) => {
     const end = i === bins - 1 ? max : (e + step);
     return `${e.toFixed(2)}–${end.toFixed(2)}`;
   });
-  return {
-    labels: binLabels,
-    datasets: [{ label: 'Frequency', data: counts }]
-  };
+  return { labels, datasets: [{ label: 'Frequency', data: counts }] };
 }
 
 function genWaterfall(input) {
-  // input: { labels, datasets: [{data: [...] }]} — single series expected
-  const labels = input.labels ?? [];
-  const vals = (input.datasets[0]?.data ?? []).map(Number);
-  const start = labels[0]?.toLowerCase().includes('start') ? vals[0] : 0;
-  const steps = vals.slice(start ? 1 : 0);
-  const stepLabels = labels.slice(start ? 1 : 0);
-  let running = start;
-  const data = [];
-  const bases = [];
+  const labels = Array.isArray(input.labels) ? input.labels.slice() : [];
+  const raw = (input.datasets?.[0]?.data || []).map(Number);
+  const startProvided = labels[0]?.toLowerCase?.().includes('start');
+  const startVal = startProvided ? raw[0] : 0;
+  const steps = startProvided ? raw.slice(1) : raw.slice();
+  const stepLabels = startProvided ? labels.slice(1) : labels.slice();
+
+  let running = startVal;
+  const data = [], bases = [];
   for (let i = 0; i < steps.length; i++) {
     const v = steps[i];
-    if (typeof v !== 'number' || Number.isNaN(v)) { data.push(0); bases.push(running); continue; }
+    if (!Number.isFinite(v)) { data.push(0); bases.push(running); continue; }
     const base = v >= 0 ? running : running + v;
-    const height = Math.abs(v);
     bases.push(base);
-    data.push(height);
+    data.push(Math.abs(v));
     running += v;
   }
-  // add total bar
   stepLabels.push('Total');
   bases.push(0);
   data.push(Math.abs(running));
-  const colors = stepLabels.map((lab, i) => {
+
+  const colors = stepLabels.map((_, i) => {
     if (i === stepLabels.length - 1) return '#6c757d';
     return steps[i] >= 0 ? '#2ca02c' : '#d62728';
   });
+
   return {
     labels: stepLabels,
     datasets: [{
       label: 'Waterfall',
       data: data.map((h, i) => ({ x: stepLabels[i], y: h, base: bases[i] })),
-      backgroundColor: colors
+      backgroundColor: colors,
+      borderWidth: 0
     }]
   };
 }
 
-function areaizeDatasets(ds) {
-  return ds.map((d, i) => ({ ...d, fill: true, tension: 0.2 }));
+// Data shaping
+function areaizeDatasets(ds, tension = 0.2) {
+  return ds.map(d => ({ ...d, fill: true, tension }));
 }
-
-function applyPalette(ds, palette) {
+function applyPalette(ds, mode) {
   const colors = currentColors(ds.length);
-  return ds.map((d, i) => ({
-    ...d,
-    backgroundColor: d.backgroundColor ?? (palette === 'pie' ? colors[i % colors.length] : hexToRgba(colors[i % colors.length], 0.25)),
-    borderColor: d.borderColor ?? colors[i % colors.length]
-  }));
+  return ds.map((d, i) => {
+    const stroke = d.borderColor || colors[i % colors.length];
+    const fill = d.backgroundColor || (mode === 'pie' ? stroke : hexToRgba(stroke, 0.25));
+    return { ...d, borderColor: stroke, backgroundColor: fill };
+  });
 }
 
-function hexToRgba(hex, a=0.3) {
-  const m = hex.replace('#','');
-  const bigint = parseInt(m, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-}
+// Chart manager
+const ChartManager = {
+  create(ctx, config) {
+    // Ensure previous instance is gone
+    this.destroy();
+    State.chart = new Chart(ctx, config);
+    return State.chart;
+  },
+  update(config) {
+    // If type or indexAxis changed, full recreate; else patch
+    const prev = State.lastConfig;
+    const typeChanged = !prev || prev.type !== config.type;
+    const axisChanged = !prev || prev.options?.indexAxis !== config.options?.indexAxis;
 
-/* UI wiring */
-$$('.tab-button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    $$('.tab-button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const id = btn.dataset.tab;
-    $$('.tab-panel').forEach(p => p.classList.remove('active'));
-    $('#' + id).classList.add('active');
-  });
-});
+    if (!State.chart || typeChanged || axisChanged) {
+      return this.create($('#chart-canvas').getContext('2d'), config);
+    }
 
-$$('.chart-type').forEach(btn => {
-  btn.addEventListener('click', () => {
-    $$('.chart-type').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    setChartType(btn.dataset.type);
-  });
-});
-
-$('#modeJSON').addEventListener('click', () => setDataMode('json'));
-$('#modeCSV').addEventListener('click', () => setDataMode('csv'));
-
-$('#btnSample').addEventListener('click', loadSample);
-$('#btnClear').addEventListener('click', () => { $('#dataInput').value = ''; });
-$('#btnAddSeries').addEventListener('click', addSeries);
-$('#btnRemoveSeries').addEventListener('click', removeSeries);
-$('#btnRender').addEventListener('click', renderChart);
-$('#btnUpdate').addEventListener('click', renderChart);
-$('#palette').addEventListener('change', e => { paletteName = e.target.value; renderChart(); });
-$('#legendPos').addEventListener('change', renderChart);
-$('#chartTitle').addEventListener('input', renderChart);
-$('#gridLines').addEventListener('change', renderChart);
-$('#bgColor').addEventListener('change', renderChart);
-$('#smoothness').addEventListener('change', renderChart);
-$('#stacked').addEventListener('change', renderChart);
-$('#histBins').addEventListener('input', renderChart);
-$('#yMin').addEventListener('input', renderChart);
-$('#yMax').addEventListener('input', renderChart);
-$('#xTitle').addEventListener('input', renderChart);
-$('#yTitle').addEventListener('input', renderChart);
-$('#anim').addEventListener('change', renderChart);
-$('#tooltips').addEventListener('change', renderChart);
-$('#aspect').addEventListener('change', renderChart);
-$('#showValues').addEventListener('change', renderChart);
-
-$('#btnExportPNG').addEventListener('click', () => {
-  const a = document.createElement('a');
-  a.download = `stenographs-${currentType}.png`;
-  a.href = $('#chart-canvas').toDataURL('image/png', 1.0);
-  a.click();
-});
-$('#btnCopyConfig').addEventListener('click', () => {
-  const cfg = buildConfig();
-  navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
-});
-
-/* Command box: quick type switch */
-$('#commandBox').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    const v = e.target.value.trim().toLowerCase();
-    const match = ['bar','column','line','area','pie','histogram','scatter','radar','bubble','waterfall'].find(t => v.includes(t));
-    if (match) setChartType(match);
-    const m = v.match(/(\d+)\s*bin/);
-    if (m) { $('#histBins').value = m[1]; }
-    renderChart();
+    // Patch data/options to avoid recreation
+    State.chart.config.data = config.data;
+    State.chart.options = config.options;
+    State.chart.update('none');
+    return State.chart;
+  },
+  destroy() {
+    if (State.chart && typeof State.chart.destroy === 'function') {
+      State.chart.destroy();
+    }
+    State.chart = null;
   }
-});
+};
 
-/* Type handling */
+// Read data from UI
+function readData() {
+  let parsed = { labels: [], datasets: [] };
+  if (State.dataMode === 'csv') {
+    parsed = csvToData($('#dataInput').value || '', State.currentType);
+  } else {
+    parsed = jsonToData($('#dataInput').value || '{}');
+  }
+
+  if (State.currentType === 'histogram') {
+    const bins = Math.max(2, Math.min(100, parseInt($('#histBins').value || '10', 10)));
+    return genHistogram(parsed, bins);
+  }
+  if (State.currentType === 'waterfall') {
+    return genWaterfall(parsed);
+  }
+  return parsed;
+}
+
+function buildConfig() {
+  const { labels, datasets } = readData();
+
+  const legendPos = $('#legendPos').value;
+  const bg = $('#bgColor').value || '#ffffff';
+  const showGrid = $('#gridLines').value === 'true';
+  const smooth = parseFloat($('#smoothness').value || '0');
+  const stacked = $('#stacked').value === 'true';
+  const showVals = $('#showValues').value === 'true'; // kept for compatibility
+  const anim = $('#anim').value === 'true';
+  const tooltips = $('#tooltips').value === 'true';
+  const aspect = parseAspect($('#aspect').value);
+  const yMin = parseFloat($('#yMin').value);
+  const yMax = parseFloat($('#yMax').value);
+  const title = $('#chartTitle').value || '';
+
+  let type = State.currentType;
+  if (type === 'column') type = 'bar';
+  if (type === 'area') type = 'line';
+  if (type === 'histogram') type = 'bar';
+  if (type === 'waterfall') type = 'bar';
+
+  let indexAxis = 'x';
+  if (State.currentType === 'bar') indexAxis = 'y';
+  if (['column','histogram','waterfall'].includes(State.currentType)) indexAxis = 'x';
+
+  // Tension and fills
+  let ds = datasets.slice();
+  if (State.currentType === 'area') ds = areaizeDatasets(ds, smooth);
+  if (State.currentType === 'line') ds = ds.map(d => ({ ...d, tension: smooth }));
+
+  // Palette
+  const paletteKind = (State.currentType === 'pie' || State.currentType === 'radar') ? 'pie' : 'series';
+  ds = applyPalette(ds, paletteKind);
+
+  // Pie: single dataset
+  if (State.currentType === 'pie') {
+    const merged = {
+      label: ds[0]?.label || 'Series 1',
+      data: ds[0]?.data || [],
+      backgroundColor: currentColors((ds[0]?.data || []).length)
+    };
+    ds = [merged];
+  }
+
+  // Scales
+  const axisTitle = t => ({ display: !!t, text: t });
+  const commonScales = {
+    x: { stacked, grid: { display: showGrid }, title: axisTitle($('#xTitle').value) },
+    y: {
+      stacked, grid: { display: showGrid }, title: axisTitle($('#yTitle').value),
+      suggestedMin: Number.isFinite(yMin) ? yMin : undefined,
+      suggestedMax: Number.isFinite(yMax) ? yMax : undefined
+    }
+  };
+  const xyScales = {
+    x: { type: 'linear', grid: { display: showGrid }, title: axisTitle($('#xTitle').value) },
+    y: { type: 'linear', grid: { display: showGrid }, title: axisTitle($('#yTitle').value) }
+  };
+
+  // Decimation: only for large line/area/scatter/bubble datasets
+  const enableDecimation = ['line','scatter','bubble'].includes(type);
+
+  const config = {
+    type,
+    data: { labels, datasets: ds },
+    options: {
+      parsing: true,            // allow decimation to work on standard arrays
+      normalized: true,         // better performance with uniform data types
+      responsive: true,
+      maintainAspectRatio: Boolean(aspect),
+      aspectRatio: aspect,
+      animation: anim ? { duration: 300 } : false,
+      backgroundColor: bg,
+      plugins: {
+        legend: { display: legendPos !== 'hidden', position: legendPos === 'hidden' ? 'top' : legendPos },
+        tooltip: { enabled: tooltips },
+        title: { display: !!title, text: title },
+        decimation: enableDecimation ? { enabled: true, algorithm: 'lttb', samples: 1000 } : { enabled: false }
+      },
+      scales: (['pie','radar'].includes(State.currentType)) ? undefined
+           : (['scatter','bubble'].includes(State.currentType)) ? xyScales
+           : commonScales,
+      indexAxis
+    }
+  };
+
+  // Waterfall-specific tooltips
+  if (State.currentType === 'waterfall') {
+    config.options.plugins.tooltip = {
+      enabled: true,
+      callbacks: {
+        label: (ctx) => {
+          const raw = ctx.raw || {};
+          const base = raw.base ?? 0;
+          const delta = raw.y ?? 0;
+          const end = base + delta;
+          if (ctx.dataIndex === (labels.length - 1)) return `Total: ${end}`;
+          return `Δ ${delta} (from ${base} to ${end})`;
+        }
+      }
+    };
+  }
+
+  // Lighten bar borders to reduce overdraw
+  if (type === 'bar') {
+    config.data.datasets.forEach(d => {
+      d.borderWidth = 0.5;
+      d.borderColor = hexToRgba(d.borderColor || '#000000', 0.35);
+    });
+  }
+
+  // Canvas bg color (CSS)
+  $('#chart-canvas').style.background = bg;
+
+  // Value labels overlay is disabled by default to avoid extra canvas passes
+  // If you really want it, you can re-enable after update via attachValueLabels(State.chart)
+
+  return config;
+}
+
+// Rendering
+function renderChart() {
+  const ctx = $('#chart-canvas').getContext('2d', { willReadFrequently: false });
+  const cfg = buildConfig();
+
+  // If config is deeply identical, skip update (cheap check)
+  const cfgStr = JSON.stringify(cfg, (k, v) => (typeof v === 'function' ? undefined : v));
+  const lastStr = State.lastConfig ? JSON.stringify(State.lastConfig, (k, v) => (typeof v === 'function' ? undefined : v)) : '';
+  State.lastConfig = cfg;
+
+  if (cfgStr === lastStr && State.chart) {
+    // No material change
+    return;
+  }
+
+  ChartManager.update(cfg);
+}
+
+// Value labels (optional; disabled by default to save memory/draws)
+function attachValueLabels(chart) {
+  if (!chart) return;
+  const ctx = chart.ctx;
+  chart.draw();
+  ctx.save();
+  ctx.font = '12px system-ui';
+  ctx.fillStyle = '#333';
+  const metas = chart.data.datasets.map((_, i) => chart.getDatasetMeta(i));
+
+  metas.forEach((meta, di) => {
+    if (!meta || !meta.data) return;
+    meta.data.forEach((el, i) => {
+      const val = chart.data.datasets[di].data[i];
+      if (!el || el.x == null || el.y == null) return;
+      let text = '';
+      if (typeof val === 'number') text = String(val);
+      else if (val && typeof val === 'object') {
+        if ('r' in val) text = `${val.x}, ${val.y} (r=${val.r})`;
+        else if ('base' in val) text = `${(val.base ?? 0) + (val.y ?? 0)}`;
+        else text = `${val.x}, ${val.y}`;
+      }
+      ctx.textAlign = 'center';
+      ctx.fillText(text, el.x, el.y - 6);
+    });
+  });
+  ctx.restore();
+}
+
+// UI wiring (single-bind; no duplicate listeners)
+function initUI() {
+  // Tabs
+  $$('.tab-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.tab-button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const id = btn.dataset.tab;
+      $$('.tab-panel').forEach(p => p.classList.remove('active'));
+      $('#' + id).classList.add('active');
+    }, { passive: true });
+  });
+
+  // Chart type buttons
+  $$('.chart-type').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.chart-type').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setChartType(btn.dataset.type);
+      debounceRender(80);
+    }, { passive: true });
+  });
+
+  // Data mode
+  $('#modeJSON').addEventListener('click', () => { setDataMode('json'); debounceRender(); }, { passive: true });
+  $('#modeCSV').addEventListener('click', () => { setDataMode('csv'); debounceRender(); }, { passive: true });
+
+  // Quick actions
+  $('#btnSample').addEventListener('click', () => { loadSample(); debounceRender(60); });
+  $('#btnClear').addEventListener('click', () => { $('#dataInput').value = ''; debounceRender(); });
+  $('#btnAddSeries').addEventListener('click', () => { addSeries(); debounceRender(); });
+  $('#btnRemoveSeries').addEventListener('click', () => { removeSeries(); debounceRender(); });
+  $('#btnRender').addEventListener('click', () => scheduleRender());
+  $('#btnUpdate').addEventListener('click', () => scheduleRender());
+
+  // Style/Options
+  $('#palette').addEventListener('change', e => { State.paletteName = e.target.value; debounceRender(); });
+  ['legendPos','chartTitle','gridLines','bgColor','smoothness','stacked','histBins',
+   'yMin','yMax','xTitle','yTitle','anim','tooltips','aspect','showValues'
+  ].forEach(id => {
+    const el = $('#' + id);
+    if (!el) return;
+    const evt = el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ? 'input' : 'change';
+    el.addEventListener(evt, () => debounceRender(120));
+  });
+
+  // Export
+  $('#btnExportPNG').addEventListener('click', () => {
+    try {
+      const a = document.createElement('a');
+      a.download = `stenographs-${State.currentType}.png`;
+      a.href = $('#chart-canvas').toDataURL('image/png', 1.0);
+      a.click();
+    } catch {}
+  });
+  $('#btnCopyConfig').addEventListener('click', () => {
+    const cfg = buildConfig();
+    navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)).catch(() => {});
+  });
+
+  // Command box
+  $('#commandBox').addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const v = e.target.value.trim().toLowerCase();
+    const type = ['bar','column','line','area','pie','histogram','scatter','radar','bubble','waterfall'].find(t => v.includes(t));
+    if (type) setChartType(type);
+    const m = v.match(/(\d+)\s*bin/);
+    if (m) $('#histBins').value = m[1];
+    debounceRender(50);
+  }, { passive: true });
+}
+
 function setChartType(type) {
-  currentType = type;
+  State.currentType = type;
   $('#chartTypeBadge').textContent = `Type: ${type}`;
-  $$('.chart-type').forEach(b => { if (b.dataset.type === type) b.classList.add('active'); });
-  // Toggle axis and options visibility for pie/radar
-  const axisNeeded = !['pie','radar'].includes(type);
-  ['xTitle','yTitle','yMin','yMax','stacked','histBins','smoothness'].forEach(id => {
-    const el = $('#' + id).closest('.kv') || $('#' + id);
-    if (el) el.classList.toggle('hidden', !axisNeeded && ['yMin','yMax','stacked','smoothness','xTitle','yTitle'].includes(id));
+  // Show/hide axis-related controls
+  const hideFor = ['pie','radar'];
+  const axisNeeded = !hideFor.includes(type);
+  ['xTitle','yTitle','yMin','yMax','stacked','smoothness'].forEach(id => {
+    const node = $('#' + id);
+    if (!node) return;
+    const group = node.closest('.kv') || node;
+    group.classList.toggle('hidden', !axisNeeded && ['yMin','yMax','stacked','smoothness','xTitle','yTitle'].includes(id));
   });
 }
 
 function setDataMode(mode) {
-  dataMode = mode;
+  State.dataMode = mode;
   $('#dataModeBadge').textContent = `Data: ${mode.toUpperCase()}`;
-  renderChart();
 }
 
-/* Samples */
+// Samples
 function loadSample() {
   const samples = {
     line: {
@@ -776,237 +1039,55 @@ function loadSample() {
     },
     histogram: {
       labels: [],
-      datasets: [{ label: 'Measurements', data: [1.2, 1.5, 1.7, 1.8, 2.2, 1.2, 1.3, 2.6, 2.8, 3.0, 2.1, 2.0, 2.5, 1.9] }]
+      datasets: [{ label: 'Measurements', data: [1.2,1.5,1.7,1.8,2.2,1.2,1.3,2.6,2.8,3.0,2.1,2.0,2.5,1.9] }]
     },
     waterfall: {
       labels: ['Start','Sales','COGS','Marketing','R&D','Other','Net'],
       datasets: [{ label: 'Cashflow', data: [100, 60, -30, -10, -8, -2] }]
     }
   };
-  const s = samples[currentType] || samples.line;
+  const s = samples[State.currentType] || samples.line;
   $('#dataInput').value = JSON.stringify(s, null, 2);
-  dataMode = 'json';
-  $('#dataModeBadge').textContent = 'Data: JSON';
-  renderChart();
+  setDataMode('json');
 }
 
-/* Series mutators (JSON mode only) */
+// Series mutators (JSON mode only)
 function addSeries() {
-  try {
-    const obj = JSON.parse($('#dataInput').value || '{}');
-    obj.datasets = obj.datasets || [];
-    obj.datasets.push({ label: `Series ${obj.datasets.length + 1}`, data: new Array((obj.labels||[]).length).fill(0) });
-    $('#dataInput').value = JSON.stringify(obj, null, 2);
-    renderChart();
-  } catch {}
+  const obj = safeParseJSON($('#dataInput').value || '{}', { labels: [], datasets: [] });
+  obj.datasets = obj.datasets || [];
+  obj.datasets.push({ label: `Series ${obj.datasets.length + 1}`, data: new Array((obj.labels||[]).length).fill(0) });
+  $('#dataInput').value = JSON.stringify(obj, null, 2);
 }
 function removeSeries() {
-  try {
-    const obj = JSON.parse($('#dataInput').value || '{}');
-    obj.datasets = (obj.datasets || []).slice(0, -1);
-    $('#dataInput').value = JSON.stringify(obj, null, 2);
-    renderChart();
-  } catch {}
+  const obj = safeParseJSON($('#dataInput').value || '{}', { labels: [], datasets: [] });
+  obj.datasets = (obj.datasets || []).slice(0, -1);
+  $('#dataInput').value = JSON.stringify(obj, null, 2);
 }
 
-/* Build config */
-function readData() {
-  let parsed;
-  try {
-    if (dataMode === 'csv') {
-      parsed = csvToData($('#dataInput').value || '', currentType);
-    } else {
-      parsed = jsonToData($('#dataInput').value || '{}');
-    }
-  } catch (e) {
-    parsed = { labels: [], datasets: [] };
-  }
-
-  // Transformations
-  if (currentType === 'histogram') {
-    const bins = parseInt($('#histBins').value || '10', 10);
-    parsed = genHistogram(parsed.labels, parsed.datasets, bins);
-  }
-  if (currentType === 'waterfall') {
-    parsed = genWaterfall(parsed);
-  }
-  return parsed;
+// Boot
+function boot() {
+  setChartType('line');
+  $('#legendPos').value = 'top';
+  $('#palette').value = 'classic';
+  $('#dataInput').value = JSON.stringify({
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
+    datasets: [
+      { label: 'Revenue', data: [12, 19, 13, 25, 18, 22, 30] },
+      { label: 'Cost', data: [8, 11, 9, 12, 10, 13, 15] }
+    ]
+  }, null, 2);
+  initUI();
+  scheduleRender();
 }
 
-function buildConfig() {
-  const { labels, datasets } = readData();
-  const legendPos = $('#legendPos').value;
-  const bg = $('#bgColor').value || '#ffffff';
-  const showGrid = $('#gridLines').value === 'true';
-  const smooth = parseFloat($('#smoothness').value || '0');
-  const stacked = $('#stacked').value === 'true';
-  const showVals = $('#showValues').value === 'true';
-  const anim = $('#anim').value === 'true';
-  const tooltips = $('#tooltips').value === 'true';
-  const aspect = parseAspect($('#aspect').value);
-  const yMin = parseFloat($('#yMin').value);
-  const yMax = parseFloat($('#yMax').value);
-  const title = $('#chartTitle').value || '';
+// Guard: destroy chart when unloading to free memory
+window.addEventListener('beforeunload', () => {
+  ChartManager.destroy();
+});
 
-  let type = currentType;
-  let ds = datasets;
+// Start
+boot();
 
-  // Map Steno types to Chart.js types
-  if (currentType === 'column') type = 'bar';
-  if (currentType === 'bar') type = 'bar';
-  if (currentType === 'area') type = 'line';
-  if (currentType === 'histogram') type = 'bar';
-  if (currentType === 'waterfall') type = 'bar';
-
-  // axis orientation
-  let indexAxis = 'x';
-  if (currentType === 'bar') indexAxis = 'y'; // horizontal bars
-  if (currentType === 'column' || currentType === 'histogram' || currentType === 'waterfall') indexAxis = 'x';
-
-  // dataset shaping
-  let shaped = ds;
-  if (currentType === 'area') shaped = areaizeDatasets(ds).map(d => ({ ...d, tension: smooth }));
-  if (currentType === 'line') shaped = ds.map(d => ({ ...d, tension: smooth }));
-
-  // palette / colors
-  const paletteKind = (currentType === 'pie' || currentType === 'radar') ? 'pie' : 'series';
-  shaped = applyPalette(shaped, paletteKind);
-
-  // special cases
-  if (currentType === 'pie') {
-    // Chart.js pie expects a single dataset; merge if multiple
-    const merged = {
-      label: shaped[0]?.label || 'Series 1',
-      data: shaped[0]?.data || [],
-      backgroundColor: currentColors((shaped[0]?.data || []).length)
-    };
-    shaped = [merged];
-  }
-
-  const commonScales = {
-    x: {
-      stacked,
-      grid: { display: showGrid },
-      title: { display: !!$('#xTitle').value, text: $('#xTitle').value }
-    },
-    y: {
-      stacked,
-      grid: { display: showGrid },
-      title: { display: !!$('#yTitle').value, text: $('#yTitle').value },
-      suggestedMin: isNaN(yMin) ? undefined : yMin,
-      suggestedMax: isNaN(yMax) ? undefined : yMax
-    }
-  };
-
-  // scatter/bubble scales numeric
-  const xyScales = {
-    x: { type: 'linear', grid: { display: showGrid }, title: { display: !!$('#xTitle').value, text: $('#xTitle').value } },
-    y: { type: 'linear', grid: { display: showGrid }, title: { display: !!$('#yTitle').value, text: $('#yTitle').value } }
-  };
-
-  const config = {
-    type,
-    data: { labels, datasets: shaped },
-    options: {
-      responsive: true,
-      maintainAspectRatio: aspect ? true : false,
-      aspectRatio: aspect,
-      backgroundColor: bg,
-      animation: anim,
-      plugins: {
-        legend: { display: legendPos !== 'hidden', position: legendPos === 'hidden' ? 'top' : legendPos },
-        tooltip: { enabled: tooltips },
-        title: { display: !!title, text: title }
-      },
-      scales: (['pie','radar'].includes(currentType)) ? undefined
-             : (['scatter','bubble'].includes(currentType)) ? xyScales
-             : commonScales,
-      indexAxis
-    }
-  };
-
-  // Waterfall: remove borders, keep bases, tooltips customization
-  if (currentType === 'waterfall') {
-    config.options.plugins.tooltip = {
-      enabled: true,
-      callbacks: {
-        label: (ctx) => {
-          const { raw } = ctx;
-          const base = raw?.base ?? 0;
-          const delta = raw?.y ?? 0;
-          const end = base + delta;
-          if (ctx.dataIndex === (labels.length - 1)) return `Total: ${end}`;
-          return `Δ ${delta} (from ${base} to ${end})`;
-        }
-      }
-    };
-    config.data.datasets[0].borderWidth = 0;
-  }
-
-  // Histogram: nicer bars
-  if (currentType === 'histogram') {
-    config.data.datasets[0].borderWidth = 0;
-  }
-
-  return config;
-}
-
-/* Render */
-function renderChart() {
-  const ctx = $('#chart-canvas').getContext('2d');
-  const cfg = buildConfig();
-
-  // Background color for canvas
-  const bg = $('#bgColor').value || '#ffffff';
-  $('#chart-canvas').style.background = bg;
-
-  if (chart) chart.destroy();
-  chart = new Chart(ctx, cfg);
-
-  // Optional data labels (simple)
-  const showVals = $('#showValues').value === 'true';
-  if (showVals) attachValueLabels(chart);
-}
-
-function attachValueLabels(chart) {
-  const ctx = chart.ctx;
-  chart.options.animation = false;
-  chart.draw();
-  const metaByDs = chart.getDatasetMeta(0) ? chart.data.datasets.map((_, i) => chart.getDatasetMeta(i)) : [];
-  ctx.save();
-  ctx.font = '12px system-ui';
-  ctx.fillStyle = '#333';
-  metaByDs.forEach((meta, di) => {
-    if (!meta || !meta.data) return;
-    meta.data.forEach((el, i) => {
-      if (!el || !el.x || !el.y) return;
-      const val = chart.data.datasets[di].data[i];
-      let text = '';
-      if (typeof val === 'number') text = String(val);
-      else if (val && typeof val === 'object') {
-        if ('r' in val) text = `${val.x}, ${val.y} (r=${val.r})`;
-        else if ('base' in val) text = `${val.base + val.y}`;
-        else text = `${val.x}, ${val.y}`;
-      }
-      ctx.textAlign = 'center';
-      ctx.fillText(text, el.x, el.y - 6);
-    });
-  });
-  ctx.restore();
-}
-
-/* Initialize */
-setChartType('line');
-$('#legendPos').value = 'top';
-$('#palette').value = 'classic';
-$('#dataInput').value = JSON.stringify({
-  labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
-  datasets: [
-    { label: 'Revenue', data: [12, 19, 13, 25, 18, 22, 30] },
-    { label: 'Cost', data: [8, 11, 9, 12, 10, 13, 15] }
-  ]
-}, null, 2);
-renderChart();
 
 </script>
 </body>
