@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>StenoGraphs </title>
+<style>
+/* --- Base / Ribbon ---*/
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f3f3f3;
+  color: #333;
+}
+.ribbon-menu {
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  padding: 5px 15px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.tabs-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+.tabs {
+  display: flex;
+}
+.tab-button {
+  background-color: transparent;
+  border: none;
+  padding: 10px 15px;
+  font-size: 15px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  color: #555;
+  font-weight: 500;
+}
+.tab-button:hover {
+  background-color: #f0f0f0;
+}
+.tab-button.active {
+  border-color: #0078d7;
+  color: #0078d7;
+}
+.tell-me {
+  display: flex;
+  align-items: center;
+}
+.tell-me input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 250px;
+  transition: all 0.2s;
+}
+.tell-me input:focus {
+  outline: none;
+  border-color: #0078d7;
+  box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.2);
+}
+.tab-panel {
+  display: none;
+  padding: 10px 0;
+  margin-top: 5px;
+}
+.tab-panel.active {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-start;
+}
+.ribbon-group {
+  padding: 0 15px;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+.ribbon-group:last-child {
+  border-right: none;
+}
+.ribbon-group-title {
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+  margin-top: 5px;
+}
+.ribbon-group-items {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.ribbon-item {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  font-size: 14px;
+  transition: background-color 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+}
+.ribbon-item:hover {
+  background-color: #e9e9e9;
+}
+.ribbon-item:active {
+  transform: scale(0.98);
+}
+.ribbon-item.active {
+  background-color: #d1e2f6;
+  border-color: #0078d7;
+}
+.document-container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+}
+#editor {
+  width: 8.5in;
+  min-height: 11in;
+  padding: 1in;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  outline: none;
+  line-height: 1.6;
+  font-size: 16px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  position: relative;
+}
+#drawing-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+.drawing-canvas-active {
+  cursor: crosshair;
+  pointer-events: auto !important;
+}
+.spellcheck-highlight {
+  background-color: #fce8e8;
+  border-bottom: 2px solid #ff4d4d;
+}
+.theme-select {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* --- App-specific layout --- */
+#editor {
+  padding-top: 0.6in;
+}
+.editor-topbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+}
+#chart-canvas {
+  width: 100%;
+  max-width: 100%;
+  height: 480px;
+}
+.controls {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+  width: 100%;
+  margin-top: 12px;
+}
+.panel {
+  background: #fafafa;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  padding: 10px;
+}
+.panel-title {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+label.small {
+  font-size: 12px;
+  color: #666;
+}
+.input, textarea, select {
+  width: 100%;
+  box-sizing: border-box;
+}
+.textarea {
+  width: 100%;
+  min-height: 150px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;
+  font-size: 13px;
+  background: #fff;
+  color: #333;
+}
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.btn {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn:hover { background: #efefef; }
+.btn.primary {
+  background: #0078d7;
+  border-color: #0078d7;
+  color: #fff;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  background: #eef5ff;
+  color: #2a6ad7;
+}
+.flex { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.hidden { display: none !important; }
+.kv {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 8px;
+  align-items: center;
+}
+.color-input { width: 36px; height: 28px; padding: 0; border: 1px solid #ddd; border-radius: 4px; }
+footer.note {
+  margin-top: 10px; font-size: 12px; color: #777;
+}
+</style>
+</head>
+<body>
+  <div class="ribbon-menu">
+    <div class="tabs-container">
+      <div class="tabs">
+        <button class="tab-button active" data-tab="insert">Insert</button>
+        <button class="tab-button" data-tab="data">Data</button>
+        <button class="tab-button" data-tab="style">Style</button>
+        <button class="tab-button" data-tab="export">Export</button>
+      </div>
+      <div class="tell-me">
+        <input id="commandBox" type="text" placeholder="Type: 'line sales by month', 'histogram 20 bins', 'waterfall cashflow'..." />
+      </div>
+    </div>
+<!-- This is the main section! -->
+    <div id="insert" class="tab-panel active">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item chart-type" data-type="bar">Bar</button>
+          <button class="ribbon-item chart-type" data-type="column">Column</button>
+          <button class="ribbon-item chart-type" data-type="line">Line</button>
+          <button class="ribbon-item chart-type" data-type="area">Area</button>
+          <button class="ribbon-item chart-type" data-type="pie">Pie</button>
+          <button class="ribbon-item chart-type" data-type="histogram">Histogram</button>
+          <button class="ribbon-item chart-type" data-type="scatter">Scatter</button>
+          <button class="ribbon-item chart-type" data-type="radar">Radar</button>
+          <button class="ribbon-item chart-type" data-type="bubble">Bubble</button>
+          <button class="ribbon-item chart-type" data-type="waterfall">Waterfall</button>
+        </div>
+        <div class="ribbon-group-title">Chart types</div>
+      </div>
+
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="btnSample">Sample data</button>
+          <button class="ribbon-item" id="btnClear">Clear</button>
+          <button class="ribbon-item" id="btnUpdate">Update</button>
+        </div>
+        <div class="ribbon-group-title">Quick actions</div>
+      </div>
+
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <label class="small">Title</label>
+          <input id="chartTitle" class="input" placeholder="Chart title" />
+          <label class="small">Legend</label>
+          <select id="legendPos" class="input">
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+            <option value="hidden">Hidden</option>
+          </select>
+        </div>
+        <div class="ribbon-group-title">Meta</div>
+      </div>
+    </div>
+
+    <div id="data" class="tab-panel">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="modeJSON">JSON</button>
+          <button class="ribbon-item" id="modeCSV">CSV</button>
+        </div>
+        <div class="ribbon-group-title">Mode</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="btnAddSeries">Add series</button>
+          <button class="ribbon-item" id="btnRemoveSeries">Remove series</button>
+        </div>
+        <div class="ribbon-group-title">Series</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <label class="small">Histogram bins</label>
+          <input id="histBins" type="number" class="input" min="2" max="100" value="10" />
+          <label class="small">Smooth lines</label>
+          <select id="smoothness" class="input">
+            <option value="0">0</option>
+            <option value="0.2">0.2</option>
+            <option value="0.4">0.4</option>
+            <option value="0.6">0.6</option>
+            <option value="0.8">0.8</option>
+          </select>
+          <label class="small">Stacked</label>
+          <select id="stacked" class="input">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+        <div class="ribbon-group-title">Analysis</div>
+      </div>
+    </div>
+
+    <div id="style" class="tab-panel">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <label class="small">Palette</label>
+          <select id="palette" class="input">
+            <option value="classic">Classic</option>
+            <option value="pastel">Pastel</option>
+            <option value="vivid">Vivid</option>
+            <option value="mono">Mono blue</option>
+          </select>
+          <label class="small">Background</label>
+          <input id="bgColor" class="color-input" type="color" value="#ffffff" />
+          <label class="small">Grid lines</label>
+          <select id="gridLines" class="input">
+            <option value="true">Show</option>
+            <option value="false">Hide</option>
+          </select>
+        </div>
+        <div class="ribbon-group-title">Appearance</div>
+      </div>
+    </div>
+
+    <div id="export" class="tab-panel">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="btnExportPNG">Export PNG</button>
+          <button class="ribbon-item" id="btnCopyConfig">Copy config</button>
+        </div>
+        <div class="ribbon-group-title">Output</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="document-container">
+    <div id="editor">
+      <div class="editor-topbar">
+        <span class="badge" id="chartTypeBadge">Type: line</span>
+        <span class="badge" id="dataModeBadge">Data: JSON</span>
+        <button class="btn primary" id="btnRender">Render</button>
+      </div>
+      <canvas id="chart-canvas" aria-label="Chart canvas"></canvas>
+
+      <div class="controls">
+        <div class="panel">
+          <div class="panel-title">Data input</div>
+          <textarea id="dataInput" class="textarea" spellcheck="false"></textarea>
+          <footer class="note">
+            JSON: { "labels": [...], "datasets": [{ "label": "...", "data": [...] }]}<br/>
+            CSV (bar/line/area/column): first row headers; first column labels.<br/>
+            CSV (scatter): columns x,y,label; CSV (bubble): x,y,r,label.
+          </footer>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Options</div>
+          <div class="kv"><label class="small">X axis title</label><input id="xTitle" class="input" placeholder="X axis" /></div>
+          <div class="kv"><label class="small">Y axis title</label><input id="yTitle" class="input" placeholder="Y axis" /></div>
+          <div class="kv"><label class="small">Min Y</label><input id="yMin" class="input" type="number" placeholder="auto" /></div>
+          <div class="kv"><label class="small">Max Y</label><input id="yMax" class="input" type="number" placeholder="auto" /></div>
+          <div class="kv"><label class="small">Show values</label>
+            <select id="showValues" class="input">
+              <option value="false">No</option>
+              <option value="true">Yes</option>
+            </select>
+          </div>
+          <div class="kv"><label class="small">Animation</label>
+            <select id="anim" class="input">
+              <option value="true">On</option>
+              <option value="false">Off</option>
+            </select>
+          </div>
+          <div class="kv"><label class="small">Tooltips</label>
+            <select id="tooltips" class="input">
+              <option value="true">Show</option>
+              <option value="false">Hide</option>
+            </select>
+          </div>
+          <div class="kv"><label class="small">Aspect ratio</label>
+            <select id="aspect" class="input">
+              <option value="auto">Auto</option>
+              <option value="16/9">16:9</option>
+              <option value="4/3">4:3</option>
+              <option value="1">Square</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+<script>
+/* ----------------------
+   StenoGraphs — Logic
+----------------------- */
+
+const $ = (s, root=document) => root.querySelector(s);
+const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+
+/* State */
+let chart;
+let currentType = 'line';
+let dataMode = 'json';
+let paletteName = 'classic';
+
+const palettes = {
+  classic: ['#2a6ad7','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'],
+  pastel:  ['#80b1d3','#fdb462','#b3de69','#fb8072','#cab2d6','#fccde5','#ccebc5','#d9d9d9','#ffe082','#a6cee3'],
+  vivid:   ['#1f77b4','#ff4136','#2ecc40','#ff851b','#b10dc9','#0074d9','#ffdc00','#39cccc','#01ff70','#85144b'],
+  mono:    ['#0078d7','#0d6efd','#1e88e5','#2196f3','#42a5f5','#64b5f6','#90caf9','#bbdefb','#e3f2fd','#0a58ca']
+};
+
+/* Helpers */
+function parseAspect(v) {
+  if (v === 'auto') return undefined;
+  try { return eval(v); } catch { return undefined; }
+}
+
+function currentColors(k) {
+  const arr = palettes[paletteName] || palettes.classic;
+  if (k) return arr.slice(0, k);
+  return arr;
+}
+
+function csvToData(text, type) {
+  const rows = text.trim().split(/\r?\n/).map(r => r.split(',').map(c => c.trim()));
+  if (!rows.length) return { labels: [], datasets: [] };
+  // Scatter/Bubble expect x,y,(r),label columns
+  if (type === 'scatter' || type === 'bubble') {
+    // headers optional
+    const hasHeader = isNaN(parseFloat(rows[0][0]));
+    const dataRows = hasHeader ? rows.slice(1) : rows;
+    const ds = {};
+    for (const r of dataRows) {
+      const [xv, yv, rvOrLabel, maybeLabel] = r;
+      const x = parseFloat(xv); const y = parseFloat(yv);
+      if (Number.isNaN(x) || Number.isNaN(y)) continue;
+      let label = hasHeader ? (maybeLabel ?? 'Series 1') : (maybeLabel ?? rvOrLabel ?? 'Series 1');
+      let rVal;
+      if (type === 'bubble') {
+        rVal = parseFloat(hasHeader ? rvOrLabel : rvOrLabel);
+        if (Number.isNaN(rVal)) rVal = 6;
+      }
+      if (!ds[label]) ds[label] = [];
+      ds[label].push(type === 'bubble' ? { x, y, r: rVal } : { x, y });
+    }
+    return {
+      labels: [],
+      datasets: Object.keys(ds).map((k, i) => ({ label: k, data: ds[k] }))
+    };
+  }
+
+  // Pie expects label, value[, group]
+  if (type === 'pie') {
+    const hasHeader = isNaN(parseFloat(rows[0][1]));
+    const dataRows = hasHeader ? rows.slice(1) : rows;
+    const labels = [];
+    const data = [];
+    for (const r of dataRows) {
+      const name = r[0];
+      const val = parseFloat(r[1]);
+      if (!name || Number.isNaN(val)) continue;
+      labels.push(name);
+      data.push(val);
+    }
+    return {
+      labels,
+      datasets: [{ label: 'Series 1', data }]
+    };
+  }
+
+  // Bar/Line/Area/Column/Radar/Histogram: first row headers, first col labels
+  const headers = rows[0];
+  const labels = rows.slice(1).map(r => r[0]);
+  const datasets = [];
+  for (let c = 1; c < headers.length; c++) {
+    const label = headers[c] || `Series ${c}`;
+    const data = rows.slice(1).map(r => parseFloat(r[c]));
+    datasets.push({ label, data });
+  }
+  return { labels, datasets };
+}
+
+function jsonToData(text) {
+  const obj = JSON.parse(text);
+  return {
+    labels: obj.labels || [],
+    datasets: (obj.datasets || []).map(d => ({
+      label: d.label ?? 'Series',
+      data: d.data ?? [],
+      backgroundColor: d.backgroundColor,
+      borderColor: d.borderColor
+    }))
+  };
+}
+
+function genHistogram(labels, datasets, binsCount) {
+  // Flatten numeric values
+  const values = datasets.flatMap(d => d.data).filter(v => typeof v === 'number' && !Number.isNaN(v));
+  if (values.length === 0) return { labels: [], datasets: [] };
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const bins = Math.max(2, Math.min(100, Math.floor(binsCount || 10)));
+  const step = (max - min) / bins || 1;
+  const edges = Array.from({ length: bins }, (_, i) => min + i * step);
+  const counts = new Array(bins).fill(0);
+  for (const v of values) {
+    let idx = Math.floor((v - min) / step);
+    if (idx >= bins) idx = bins - 1;
+    if (idx < 0) idx = 0;
+    counts[idx]++;
+  }
+  const binLabels = edges.map((e, i) => {
+    const end = i === bins - 1 ? max : (e + step);
+    return `${e.toFixed(2)}–${end.toFixed(2)}`;
+  });
+  return {
+    labels: binLabels,
+    datasets: [{ label: 'Frequency', data: counts }]
+  };
+}
+
+function genWaterfall(input) {
+  // input: { labels, datasets: [{data: [...] }]} — single series expected
+  const labels = input.labels ?? [];
+  const vals = (input.datasets[0]?.data ?? []).map(Number);
+  const start = labels[0]?.toLowerCase().includes('start') ? vals[0] : 0;
+  const steps = vals.slice(start ? 1 : 0);
+  const stepLabels = labels.slice(start ? 1 : 0);
+  let running = start;
+  const data = [];
+  const bases = [];
+  for (let i = 0; i < steps.length; i++) {
+    const v = steps[i];
+    if (typeof v !== 'number' || Number.isNaN(v)) { data.push(0); bases.push(running); continue; }
+    const base = v >= 0 ? running : running + v;
+    const height = Math.abs(v);
+    bases.push(base);
+    data.push(height);
+    running += v;
+  }
+  // add total bar
+  stepLabels.push('Total');
+  bases.push(0);
+  data.push(Math.abs(running));
+  const colors = stepLabels.map((lab, i) => {
+    if (i === stepLabels.length - 1) return '#6c757d';
+    return steps[i] >= 0 ? '#2ca02c' : '#d62728';
+  });
+  return {
+    labels: stepLabels,
+    datasets: [{
+      label: 'Waterfall',
+      data: data.map((h, i) => ({ x: stepLabels[i], y: h, base: bases[i] })),
+      backgroundColor: colors
+    }]
+  };
+}
+
+function areaizeDatasets(ds) {
+  return ds.map((d, i) => ({ ...d, fill: true, tension: 0.2 }));
+}
+
+function applyPalette(ds, palette) {
+  const colors = currentColors(ds.length);
+  return ds.map((d, i) => ({
+    ...d,
+    backgroundColor: d.backgroundColor ?? (palette === 'pie' ? colors[i % colors.length] : hexToRgba(colors[i % colors.length], 0.25)),
+    borderColor: d.borderColor ?? colors[i % colors.length]
+  }));
+}
+
+function hexToRgba(hex, a=0.3) {
+  const m = hex.replace('#','');
+  const bigint = parseInt(m, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+/* UI wiring */
+$$('.tab-button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.tab-button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const id = btn.dataset.tab;
+    $$('.tab-panel').forEach(p => p.classList.remove('active'));
+    $('#' + id).classList.add('active');
+  });
+});
+
+$$('.chart-type').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.chart-type').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    setChartType(btn.dataset.type);
+  });
+});
+
+$('#modeJSON').addEventListener('click', () => setDataMode('json'));
+$('#modeCSV').addEventListener('click', () => setDataMode('csv'));
+
+$('#btnSample').addEventListener('click', loadSample);
+$('#btnClear').addEventListener('click', () => { $('#dataInput').value = ''; });
+$('#btnAddSeries').addEventListener('click', addSeries);
+$('#btnRemoveSeries').addEventListener('click', removeSeries);
+$('#btnRender').addEventListener('click', renderChart);
+$('#btnUpdate').addEventListener('click', renderChart);
+$('#palette').addEventListener('change', e => { paletteName = e.target.value; renderChart(); });
+$('#legendPos').addEventListener('change', renderChart);
+$('#chartTitle').addEventListener('input', renderChart);
+$('#gridLines').addEventListener('change', renderChart);
+$('#bgColor').addEventListener('change', renderChart);
+$('#smoothness').addEventListener('change', renderChart);
+$('#stacked').addEventListener('change', renderChart);
+$('#histBins').addEventListener('input', renderChart);
+$('#yMin').addEventListener('input', renderChart);
+$('#yMax').addEventListener('input', renderChart);
+$('#xTitle').addEventListener('input', renderChart);
+$('#yTitle').addEventListener('input', renderChart);
+$('#anim').addEventListener('change', renderChart);
+$('#tooltips').addEventListener('change', renderChart);
+$('#aspect').addEventListener('change', renderChart);
+$('#showValues').addEventListener('change', renderChart);
+
+$('#btnExportPNG').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.download = `stenographs-${currentType}.png`;
+  a.href = $('#chart-canvas').toDataURL('image/png', 1.0);
+  a.click();
+});
+$('#btnCopyConfig').addEventListener('click', () => {
+  const cfg = buildConfig();
+  navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
+});
+
+/* Command box: quick type switch */
+$('#commandBox').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const v = e.target.value.trim().toLowerCase();
+    const match = ['bar','column','line','area','pie','histogram','scatter','radar','bubble','waterfall'].find(t => v.includes(t));
+    if (match) setChartType(match);
+    const m = v.match(/(\d+)\s*bin/);
+    if (m) { $('#histBins').value = m[1]; }
+    renderChart();
+  }
+});
+
+/* Type handling */
+function setChartType(type) {
+  currentType = type;
+  $('#chartTypeBadge').textContent = `Type: ${type}`;
+  $$('.chart-type').forEach(b => { if (b.dataset.type === type) b.classList.add('active'); });
+  // Toggle axis and options visibility for pie/radar
+  const axisNeeded = !['pie','radar'].includes(type);
+  ['xTitle','yTitle','yMin','yMax','stacked','histBins','smoothness'].forEach(id => {
+    const el = $('#' + id).closest('.kv') || $('#' + id);
+    if (el) el.classList.toggle('hidden', !axisNeeded && ['yMin','yMax','stacked','smoothness','xTitle','yTitle'].includes(id));
+  });
+}
+
+function setDataMode(mode) {
+  dataMode = mode;
+  $('#dataModeBadge').textContent = `Data: ${mode.toUpperCase()}`;
+  renderChart();
+}
+
+/* Samples */
+function loadSample() {
+  const samples = {
+    line: {
+      labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
+      datasets: [
+        { label: 'Revenue', data: [12, 19, 13, 25, 18, 22, 30] },
+        { label: 'Cost', data: [8, 11, 9, 12, 10, 13, 15] }
+      ]
+    },
+    area: {
+      labels: ['2019','2020','2021','2022','2023'],
+      datasets: [
+        { label: 'iOS', data: [20,25,30,42,50] },
+        { label: 'Android', data: [28,33,35,38,44] }
+      ]
+    },
+    bar: {
+      labels: ['A','B','C','D','E'],
+      datasets: [
+        { label: 'North', data: [12,18,7,13,20] },
+        { label: 'South', data: [10,15,12,9,16] }
+      ]
+    },
+    column: {
+      labels: ['Q1','Q2','Q3','Q4'],
+      datasets: [{ label: 'Units', data: [120, 160, 140, 180] }]
+    },
+    pie: {
+      labels: ['Alpha','Beta','Gamma','Delta'],
+      datasets: [{ label: 'Share', data: [35, 25, 20, 20] }]
+    },
+    scatter: {
+      labels: [],
+      datasets: [
+        { label: 'Set 1', data: [{x:1,y:1},{x:2,y:1.2},{x:3,y:2.5},{x:4,y:2.8}] },
+        { label: 'Set 2', data: [{x:1,y:0.8},{x:2,y:1.7},{x:3,y:1.9},{x:4,y:3.1}] }
+      ]
+    },
+    bubble: {
+      labels: [],
+      datasets: [
+        { label: 'Markets', data: [{x:10,y:20,r:12},{x:15,y:12,r:18},{x:20,y:25,r:10}] }
+      ]
+    },
+    radar: {
+      labels: ['Speed','Reliability','Usability','Features','Security','Support'],
+      datasets: [
+        { label: 'Product A', data: [65,59,90,81,56,55] },
+        { label: 'Product B', data: [28,48,40,19,96,27] }
+      ]
+    },
+    histogram: {
+      labels: [],
+      datasets: [{ label: 'Measurements', data: [1.2, 1.5, 1.7, 1.8, 2.2, 1.2, 1.3, 2.6, 2.8, 3.0, 2.1, 2.0, 2.5, 1.9] }]
+    },
+    waterfall: {
+      labels: ['Start','Sales','COGS','Marketing','R&D','Other','Net'],
+      datasets: [{ label: 'Cashflow', data: [100, 60, -30, -10, -8, -2] }]
+    }
+  };
+  const s = samples[currentType] || samples.line;
+  $('#dataInput').value = JSON.stringify(s, null, 2);
+  dataMode = 'json';
+  $('#dataModeBadge').textContent = 'Data: JSON';
+  renderChart();
+}
+
+/* Series mutators (JSON mode only) */
+function addSeries() {
+  try {
+    const obj = JSON.parse($('#dataInput').value || '{}');
+    obj.datasets = obj.datasets || [];
+    obj.datasets.push({ label: `Series ${obj.datasets.length + 1}`, data: new Array((obj.labels||[]).length).fill(0) });
+    $('#dataInput').value = JSON.stringify(obj, null, 2);
+    renderChart();
+  } catch {}
+}
+function removeSeries() {
+  try {
+    const obj = JSON.parse($('#dataInput').value || '{}');
+    obj.datasets = (obj.datasets || []).slice(0, -1);
+    $('#dataInput').value = JSON.stringify(obj, null, 2);
+    renderChart();
+  } catch {}
+}
+
+/* Build config */
+function readData() {
+  let parsed;
+  try {
+    if (dataMode === 'csv') {
+      parsed = csvToData($('#dataInput').value || '', currentType);
+    } else {
+      parsed = jsonToData($('#dataInput').value || '{}');
+    }
+  } catch (e) {
+    parsed = { labels: [], datasets: [] };
+  }
+
+  // Transformations
+  if (currentType === 'histogram') {
+    const bins = parseInt($('#histBins').value || '10', 10);
+    parsed = genHistogram(parsed.labels, parsed.datasets, bins);
+  }
+  if (currentType === 'waterfall') {
+    parsed = genWaterfall(parsed);
+  }
+  return parsed;
+}
+
+function buildConfig() {
+  const { labels, datasets } = readData();
+  const legendPos = $('#legendPos').value;
+  const bg = $('#bgColor').value || '#ffffff';
+  const showGrid = $('#gridLines').value === 'true';
+  const smooth = parseFloat($('#smoothness').value || '0');
+  const stacked = $('#stacked').value === 'true';
+  const showVals = $('#showValues').value === 'true';
+  const anim = $('#anim').value === 'true';
+  const tooltips = $('#tooltips').value === 'true';
+  const aspect = parseAspect($('#aspect').value);
+  const yMin = parseFloat($('#yMin').value);
+  const yMax = parseFloat($('#yMax').value);
+  const title = $('#chartTitle').value || '';
+
+  let type = currentType;
+  let ds = datasets;
+
+  // Map Steno types to Chart.js types
+  if (currentType === 'column') type = 'bar';
+  if (currentType === 'bar') type = 'bar';
+  if (currentType === 'area') type = 'line';
+  if (currentType === 'histogram') type = 'bar';
+  if (currentType === 'waterfall') type = 'bar';
+
+  // axis orientation
+  let indexAxis = 'x';
+  if (currentType === 'bar') indexAxis = 'y'; // horizontal bars
+  if (currentType === 'column' || currentType === 'histogram' || currentType === 'waterfall') indexAxis = 'x';
+
+  // dataset shaping
+  let shaped = ds;
+  if (currentType === 'area') shaped = areaizeDatasets(ds).map(d => ({ ...d, tension: smooth }));
+  if (currentType === 'line') shaped = ds.map(d => ({ ...d, tension: smooth }));
+
+  // palette / colors
+  const paletteKind = (currentType === 'pie' || currentType === 'radar') ? 'pie' : 'series';
+  shaped = applyPalette(shaped, paletteKind);
+
+  // special cases
+  if (currentType === 'pie') {
+    // Chart.js pie expects a single dataset; merge if multiple
+    const merged = {
+      label: shaped[0]?.label || 'Series 1',
+      data: shaped[0]?.data || [],
+      backgroundColor: currentColors((shaped[0]?.data || []).length)
+    };
+    shaped = [merged];
+  }
+
+  const commonScales = {
+    x: {
+      stacked,
+      grid: { display: showGrid },
+      title: { display: !!$('#xTitle').value, text: $('#xTitle').value }
+    },
+    y: {
+      stacked,
+      grid: { display: showGrid },
+      title: { display: !!$('#yTitle').value, text: $('#yTitle').value },
+      suggestedMin: isNaN(yMin) ? undefined : yMin,
+      suggestedMax: isNaN(yMax) ? undefined : yMax
+    }
+  };
+
+  // scatter/bubble scales numeric
+  const xyScales = {
+    x: { type: 'linear', grid: { display: showGrid }, title: { display: !!$('#xTitle').value, text: $('#xTitle').value } },
+    y: { type: 'linear', grid: { display: showGrid }, title: { display: !!$('#yTitle').value, text: $('#yTitle').value } }
+  };
+
+  const config = {
+    type,
+    data: { labels, datasets: shaped },
+    options: {
+      responsive: true,
+      maintainAspectRatio: aspect ? true : false,
+      aspectRatio: aspect,
+      backgroundColor: bg,
+      animation: anim,
+      plugins: {
+        legend: { display: legendPos !== 'hidden', position: legendPos === 'hidden' ? 'top' : legendPos },
+        tooltip: { enabled: tooltips },
+        title: { display: !!title, text: title }
+      },
+      scales: (['pie','radar'].includes(currentType)) ? undefined
+             : (['scatter','bubble'].includes(currentType)) ? xyScales
+             : commonScales,
+      indexAxis
+    }
+  };
+
+  // Waterfall: remove borders, keep bases, tooltips customization
+  if (currentType === 'waterfall') {
+    config.options.plugins.tooltip = {
+      enabled: true,
+      callbacks: {
+        label: (ctx) => {
+          const { raw } = ctx;
+          const base = raw?.base ?? 0;
+          const delta = raw?.y ?? 0;
+          const end = base + delta;
+          if (ctx.dataIndex === (labels.length - 1)) return `Total: ${end}`;
+          return `Δ ${delta} (from ${base} to ${end})`;
+        }
+      }
+    };
+    config.data.datasets[0].borderWidth = 0;
+  }
+
+  // Histogram: nicer bars
+  if (currentType === 'histogram') {
+    config.data.datasets[0].borderWidth = 0;
+  }
+
+  return config;
+}
+
+/* Render */
+function renderChart() {
+  const ctx = $('#chart-canvas').getContext('2d');
+  const cfg = buildConfig();
+
+  // Background color for canvas
+  const bg = $('#bgColor').value || '#ffffff';
+  $('#chart-canvas').style.background = bg;
+
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, cfg);
+
+  // Optional data labels (simple)
+  const showVals = $('#showValues').value === 'true';
+  if (showVals) attachValueLabels(chart);
+}
+
+function attachValueLabels(chart) {
+  const ctx = chart.ctx;
+  chart.options.animation = false;
+  chart.draw();
+  const metaByDs = chart.getDatasetMeta(0) ? chart.data.datasets.map((_, i) => chart.getDatasetMeta(i)) : [];
+  ctx.save();
+  ctx.font = '12px system-ui';
+  ctx.fillStyle = '#333';
+  metaByDs.forEach((meta, di) => {
+    if (!meta || !meta.data) return;
+    meta.data.forEach((el, i) => {
+      if (!el || !el.x || !el.y) return;
+      const val = chart.data.datasets[di].data[i];
+      let text = '';
+      if (typeof val === 'number') text = String(val);
+      else if (val && typeof val === 'object') {
+        if ('r' in val) text = `${val.x}, ${val.y} (r=${val.r})`;
+        else if ('base' in val) text = `${val.base + val.y}`;
+        else text = `${val.x}, ${val.y}`;
+      }
+      ctx.textAlign = 'center';
+      ctx.fillText(text, el.x, el.y - 6);
+    });
+  });
+  ctx.restore();
+}
+
+/* Initialize */
+setChartType('line');
+$('#legendPos').value = 'top';
+$('#palette').value = 'classic';
+$('#dataInput').value = JSON.stringify({
+  labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
+  datasets: [
+    { label: 'Revenue', data: [12, 19, 13, 25, 18, 22, 30] },
+    { label: 'Cost', data: [8, 11, 9, 12, 10, 13, 15] }
+  ]
+}, null, 2);
+renderChart();
+
+</script>
+</body>
+</html>
