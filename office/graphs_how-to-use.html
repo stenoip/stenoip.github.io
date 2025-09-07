@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>StenoGraphs — How to Use Graphs</title>
+<style>
+  :root {
+    --ink: #333;
+    --muted: #666;
+    --soft: #888;
+    --border: #e0e0e0;
+    --bg: #f3f3f3;
+    --panel: #ffffff;
+    --brand: #0078d7;
+    --code-bg: #f7f7f9;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    margin: 0;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 5px rgba(0,0,0,.05);
+  }
+  .wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 18px 20px;
+  }
+  h1, h2, h3 {
+    line-height: 1.25;
+    margin: 0.6em 0 0.3em;
+  }
+  h1 { font-size: 28px; }
+  h2 { font-size: 22px; margin-top: 1.2em; }
+  h3 { font-size: 18px; margin-top: 1em; color: var(--muted); }
+  p { margin: 0.4em 0 0.8em; }
+  .note {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .pill {
+    display: inline-block;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: #eef5ff;
+    color: #2257b3;
+    margin-left: 8px;
+  }
+  .callout {
+    border-left: 3px solid var(--brand);
+    background: #f6fbff;
+    padding: 10px 12px;
+    border-radius: 4px;
+  }
+  section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 14px 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+  ul, ol { padding-left: 18px; }
+  li + li { margin-top: 6px; }
+  .kbd {
+    display: inline-block;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    background: #fff;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    padding: 10px;
+    overflow: auto;
+    font-size: 13px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace; }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 14px;
+  }
+  .tag { font-size: 11px; color: #fff; background: #999; border-radius: 3px; padding: 1px 6px; }
+  .tag.use { background: #2ca02c; }
+  .tag.avoid { background: #d62728; }
+  .hr {
+    height: 1px; background: var(--border); margin: 12px 0;
+  }
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .table th, .table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+  .caps { text-transform: uppercase; letter-spacing: .04em; font-size: 12px; color: var(--soft); }
+  footer {
+    padding: 20px;
+    text-align: center;
+    color: var(--soft);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>StenoGraphs help: How to use graphs <span class="pill">Guide</span></h1>
+      <p class="note">A practical reference for choosing chart types, preparing data, and getting crisp, honest visuals.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section>
+      <h2>Overview</h2>
+      <p>StenoGraphs supports ten chart types: bar, column, line, area, pie, histogram, scatter, radar, bubble, and waterfall. This page shows when to use each, how to format data (JSON or CSV), and quick best practices.</p>
+      <div class="grid">
+        <div class="callout">
+          <strong>Quick steps</strong>
+          <ol>
+            <li>Pick a chart type that matches your question.</li>
+            <li>Prepare data in JSON or CSV with the right columns.</li>
+            <li>Set titles, axes, palette, and legend placement.</li>
+            <li>Check readability (labels, grid, contrast), then export.</li>
+          </ol>
+        </div>
+        <div>
+          <strong>CSV vs JSON</strong>
+          <ul>
+            <li><span class="kbd">CSV</span>: fastest for tables. First row = headers; first column = labels (most charts).</li>
+            <li><span class="kbd">JSON</span>: precise control; supports scatter/bubble objects like <code>{x,y,r}</code>.</li>
+          </ul>
+          <p class="note">Scatter/Bubble CSV: use columns <code>x,y,label</code> or <code>x,y,r,label</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Data formats</h2>
+      <div class="two-col">
+        <div>
+          <h3>JSON pattern</h3>
+          <pre><code>{
+  "labels": ["Jan","Feb","Mar"],
+  "datasets": [
+    { "label": "Revenue", "data": [12, 19, 13] },
+    { "label": "Cost", "data": [8, 11, 9] }
+  ]
+}</code></pre>
+          <p class="note">Scatter/Bubble use arrays of points instead of numbers:</p>
+          <pre><code>{
+  "labels": [],
+  "datasets": [
+    { "label": "Set A", "data": [{ "x": 1, "y": 2 }, { "x": 2, "y": 3 }] }
+  ]
+}</code></pre>
+        </div>
+        <div>
+          <h3>CSV patterns</h3>
+          <p class="caps">Bar / column / line / area / radar</p>
+          <pre><code>Month,Revenue,Cost
+Jan,12,8
+Feb,19,11
+Mar,13,9</code></pre>
+          <p class="caps">Pie</p>
+          <pre><code>Segment,Value
+Alpha,35
+Beta,25
+Gamma,20
+Delta,20</code></pre>
+          <p class="caps">Scatter / bubble</p>
+          <pre><code>x,y,label
+1,2,Set A
+2,3,Set A
+1.5,2.2,Set B</code></pre>
+          <pre><code>x,y,r,label
+10,20,12,Markets
+15,12,18,Markets</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Choosing the right chart</h2>
+      <table class="table">
+        <thead><tr><th>Question</th><th>Best chart</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Compare categories</td><td>Bar or Column</td><td>Bars make differences obvious across discrete groups.</td></tr>
+          <tr><td>Trends over time</td><td>Line or Area</td><td>Shows change and rate; area adds volume/stacking context.</td></tr>
+          <tr><td>Part-to-whole</td><td>Pie</td><td>Limited categories; emphasizes proportion in a single snapshot.</td></tr>
+          <tr><td>Distribution</td><td>Histogram</td><td>Shows shape (skew, modality) across continuous bins.</td></tr>
+          <tr><td>Relationship</td><td>Scatter or Bubble</td><td>Correlations, clusters; bubble adds a third variable.</td></tr>
+          <tr><td>Profile across axes</td><td>Radar</td><td>Compare multi-metric profiles for a few items.</td></tr>
+          <tr><td>Running totals</td><td>Waterfall</td><td>Stepwise positive/negative contributions to a total.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Chart-by-chart guidance</h2>
+
+      <h3>Bar and column</h3>
+      <div class="grid">
+        <div>
+          <p><span class="tag use">Use for</span> categorical comparisons; long labels (bar), time buckets (column).</p>
+          <ul>
+            <li><strong>Data:</strong> labels + 1–N series of numbers.</li>
+            <li><strong>Tip:</strong> Use <em>bar</em> for horizontal (better for long labels).</li>
+            <li><strong>Avoid:</strong> too many categories; group or filter to the top 8–12.</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>Labels,North,South
+A,12,10
+B,18,15
+C,7,12
+D,13,9</code></pre>
+        </div>
+      </div>
+      <div class="hr"></div>
+
+      <h3>Line</h3>
+      <div class="grid">
+        <div>
+          <p><span class="tag use">Use for</span> trends over ordered time; multiple series ok.</p>
+          <ul>
+            <li><strong>Smoothing:</strong> small tension (0.2–0.4) for gentle curves, keep truth to data.</li>
+            <li><strong>YAxis:</strong> start at zero only if meaningful; otherwise use auto to keep detail.</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>{
+  "labels": ["Jan","Feb","Mar","Apr"],
+  "datasets": [
+    {"label":"Revenue", "data":[12,19,13,25]},
+    {"label":"Cost", "data":[8,11,9,12]}
+  ]
+}</code></pre>
+        </div>
+      </div>
+      <div class="hr"></div>
+
+      <h3>Area</h3>
+      <div class="grid">
+        <div>
+          <p><span class="tag use">Use for</span> cumulative feel, stacked contribution over time.</p>
+          <ul>
+            <li><strong>Stacking:</strong> enable “Stacked” for parts-of-trend (e.g., product lines).</li>
+            <li><strong>Transparency:</strong> keep fills ~25–35% opacity to avoid occlusion.</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>{
+  "labels": ["2019","2020","2021","2022","2023"],
+  "datasets": [
+    {"label":"iOS","data":[20,25,30,42,50]},
+    {"label":"Android","data":[28,33,35,38,44]}
+  ]
+}</code></pre>
+        </div>
+      </div>
+      <div class="hr"></div>
+
+      <h3>Pie</h3>
+      <div class="grid">
+        <div>
+          <p><span class="tag use">Use for</span> single snapshot part-to-whole with ≤6 slices.</p>
+          <ul>
+            <li><strong>Labels:</strong> sort slices by size and avoid many tiny categories.</li>
+            <li><strong>Alternative:</strong> use bar for precise comparisons.</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>Segment,Value
+Alpha,35
+Beta,25
+Gamma,20
+Delta,20</code></pre>
+        </div>
+      </div>
+      <div class="hr"></div>
+
+      <h3>Histogram</h3>
+      <div class="grid">
+        <div>
+          <p><span class="tag use">Use for</span> distribution of continuous values.</p>
+          <ul>
+            <li><strong>Bins:</strong> try 10–20; adjust to reveal shape without overfitting noise.</li>
+            <li><strong>Data:</strong> a single series of raw numbers; StenoGraphs bins for you.</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>{
+  "labels": [],
+  "datasets": [{ "label": "Measurements", "data": [1.2,1.5,1.7,1.8,2.2,2.6,2.8,3.0] }]
+}</code></pre>
+        </div>
+      </div>
+      <div class="hr"></div>
+
+      <h3>Scatter</h3>
+      <div class="grid">
+        <div>
+          <p><span class="tag use">Use for</span> relationships and correlations.</p>
+          <ul>
+            <li><strong>Axes:</strong> both numeric; add units in axis titles.</li>
+            <li><strong>Series:</strong> group points by label to compare clusters.</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>{
+  "labels": [],
+  "datasets": [
+    {"label":"Set 1","data":[{"x":1,"y":1},{"x":2,"y":1.2},{"x":3,"y":2.5}]},
+    {"label":"Set 2","data":[{"x":1,"y":0.8},{"x":2,"y":1.7},{"x":3,"y":1.9}]}
+  ]
+}</code></pre>
+        </div>
+      </div>
+      <div class="hr"></div>
+
+      <h3>Bubble</h3>
+      <div class="grid">
+        <div>
+          <p><span class="tag use">Use for</span> 3 variables: x, y, and magnitude (r).</p>
+          <ul>
+            <li><strong>Scaling:</strong> keep bubble sizes within a readable range (e.g., 6–24 px radii).</li>
+            <li><strong>Legend:</strong> clarify what radius encodes.</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>{
+  "labels": [],
+  "datasets": [
+    {"label":"Markets","data":[{"x":10,"y":20,"r":12},{"x":15,"y":12,"r":18}]}
+  ]
+}</code></pre>
+        </div>
+      </div>
+      <div class="hr"></div>
+
+      <h3>Radar</h3>
+      <div class="grid">
+        <div>
+          <p><span class="tag use">Use for</span> comparing profiles across several axes for a few items.</p>
+          <ul>
+            <li><strong>Limit:</strong> ≤6–8 axes; more becomes cluttered.</li>
+            <li><strong>Normalize:</strong> consistent scales (e.g., 0–100) across axes.</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>{
+  "labels": ["Speed","Reliability","Usability","Features","Security","Support"],
+  "datasets": [
+    {"label":"Product A","data":[65,59,90,81,56,55]},
+    {"label":"Product B","data":[28,48,40,19,96,27]}
+  ]
+}</code></pre>
+        </div>
+      </div>
+      <div class="hr"></div>
+
+      <h3>Waterfall</h3>
+      <div class="grid">
+        <div>
+          <p><span class="tag use">Use for</span> stepwise contributions to a final total.</p>
+          <ul>
+            <li><strong>Start:</strong> include a starting value labeled “Start” if applicable.</li>
+            <li><strong>Total:</strong> last bar is auto-calculated “Total.”</li>
+          </ul>
+        </div>
+        <div>
+<pre><code>{
+  "labels": ["Start","Sales","COGS","Marketing","R&amp;D","Other","Net"],
+  "datasets": [{ "label":"Cashflow", "data":[100,60,-30,-10,-8,-2] }]
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Style and readability</h2>
+      <div class="grid">
+        <div>
+          <ul>
+            <li><strong>Palette:</strong> pick contrasty colors; avoid misleading hues for diverging data.</li>
+            <li><strong>Grid lines:</strong> keep light; disable if they fight with the data.</li>
+            <li><strong>Legend:</strong> position where labels are closest to data (top/right is typical).</li>
+            <li><strong>Labels:</strong> enable “Show values” sparingly; prioritize clean axes and tooltips.</li>
+          </ul>
+        </div>
+        <div>
+          <ul>
+            <li><strong>Axes:</strong> title with units (e.g., “Revenue (USD)”).</li>
+            <li><strong>Scale:</strong> don’t truncate axes to exaggerate differences (unless justified).</li>
+            <li><strong>Annotations:</strong> keep it minimal—one callout beats a label soup.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Exporting and sharing</h2>
+      <ul>
+        <li><strong>PNG export:</strong> use a light chart background for print; dark for slides.</li>
+        <li><strong>Aspect ratio:</strong> 16:9 for slides, 4:3 for reports, Square for dashboards.</li>
+        <li><strong>Config copy:</strong> copy chart config to reproduce a figure later with new data.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Troubleshooting</h2>
+      <ul>
+        <li><strong>Empty chart:</strong> check CSV headers and first column labels; verify numeric cells.</li>
+        <li><strong>Weird scatter/bubble:</strong> confirm <code>x</code> and <code>y</code> are numbers, not strings.</li>
+        <li><strong>Histogram is flat:</strong> increase bins or verify your data isn’t all identical.</li>
+        <li><strong>Pie labels overlap:</strong> reduce slices; group small categories into “Other.”</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Examples you can paste</h2>
+      <div class="grid">
+        <div>
+          <h3>CSV — multi-series column</h3>
+<pre><code>Quarter,Units,Returns
+Q1,120,8
+Q2,160,6
+Q3,140,7
+Q4,180,5</code></pre>
+        </div>
+        <div>
+          <h3>JSON — scatter vs bubble</h3>
+<pre><code>{
+  "labels": [],
+  "datasets": [
+    { "label":"Scatter", "data":[{"x":1,"y":2},{"x":2,"y":2.5},{"x":3,"y":2.8}] },
+    { "label":"Bubble",  "data":[{"x":1,"y":2,"r":10},{"x":2,"y":2.5,"r":16}] }
+  ]
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Copyright 2025 Stenoip Company
+  </footer>
+</body>
+</html>
