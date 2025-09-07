@@ -1,505 +1,525 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="icon" href="new-swc.png" type="image/png" />
-    <title>Stenoip Wonder Computer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Allgemeine Stile */
-        body {
-            font-family: 'Google Sans', sans-serif;
-            background-color: rgb(240, 0, 0);
-            margin: 0;
-            overflow-x: hidden; /* Verhindert nur horizontales Scrollen */
-        }
-        /* Vollbild-Videostyling */
-        .intro-video {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Stellt sicher, dass das Video richtig skaliert wird */
-            z-index: 10;
-        }
-        /* Grüner Bildschirm für den Start */
-        .launch-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: green;
-            color: white;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            z-index: 15;
-        }
-        /* Inhalt anfangs ausblenden */
-        #main-content {
-            display: none;
-        }
-        /* Design des Stenoip Wonder Computer-Bandes (Der Titel ist im Band) */
-        .header {
-            font-size: 13px;
-            text-align: right;
-            padding: 22px 10px;
-            background-color: rgba(238, 255, 0);
-            width: 100%;
-            box-sizing: border-box;
-        }
-        /* Ende des Designs */
-        .menuItems {
-            font-size: 13px;
-            padding: 0 20px;
-            display: inline-block;
-        }
-        nav a {
-            text-decoration: none !important; /* !important verwenden, um Tailwind bei Bedarf zu überschreiben */
-            color: rgb(255, 255, 255) !important;
-        }
-        nav a:hover {
-            text-decoration: underline !important;
-            color: rgb(255, 255, 255) !important;
-        }
-        .header a:hover {
-            text-decoration: underline;
-        }
-        /* Dropdown-Styling */
-        .menu {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            width: 270px;
-            padding: 28px;
-            border: 1px solid rgb(220, 225, 229);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            display: none;
-            position: absolute;
-            z-index: 1;
-            right: 0;
-            background-color: rgb(255, 255, 255);
-        }
-        .menuItems:hover .dropdown-content {
-            display: block;
-        }
-        .appLogo {
-            text-align: center;
-            display: inline-block;
-            width: 86px;
-            padding: 5px;
-        }
-        .menuItemLogo {
-            width: 50px;
-            height: 50px;
-        }
-        .caption {
-            text-align: center;
-        }
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            border-radius: 10px;
-        }
-        .search {
-            font-size: 14px;
-            padding: 12px 20px;
-            width: 90%;
-            max-width: 600px; /* Breite für größere Bildschirme begrenzen */
-            color: rgb(51, 51, 51);
-            border: 1px solid rgb(223, 225, 229);
-            border-radius: 24px;
-            outline: none;
-            background-color: rgb(241, 243, 244);
-            margin: 0 auto;
-            display: block;
-        }
-        .search:focus {
-            border-color: rgb(66, 133, 244);
-        }
-        .search-results {
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 10px;
-            background-color: rgb(255, 255, 255);
-            border: 1px solid rgb(223, 225, 229);
-            border-radius: 5px;
-            display: none;
-            margin-top: 10px;
-        }
-        .result-item {
-            padding: 8px;
-            cursor: pointer;
-        }
-        .result-item:hover {
-            background-color: rgb(241, 243, 244);
-        }
-        /* Schaltflächen-Stile */
-        .btns {
-            margin: 7px 0;
-            padding: 20px 40px;
-            font-size: 18px;
-            color: rgb(95, 99, 104);
-            background-color: rgb(248, 249, 250);
-            border: 1px solid rgb(223, 225, 229);
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .btns:hover {
-            background-color: rgb(241, 243, 244);
-        }
-        /* Learn Centre Schaltfläche */
-        .learn-centre-btn {
-            margin: 20px 0;
-            padding: 20px 50px;
-            font-size: 22px;
-            background-color: rgb(66, 133, 244);
-            color: rgb(255, 255, 255);
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-        }
-        .learn-centre-btn:hover {
-            background-color: rgb(57, 103, 204);
-        }
-        /* Skip-Schaltflächen-Stile */
-        .skip-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            padding: 10px 20px;
-            background-color: rgb(66, 133, 244);
-            color: rgb(255, 255, 255);
-            border: none;
-            border-radius: 20px;
-            font-size: 16px;
-            cursor: pointer;
-            z-index: 20;
-        }
-        .skip-btn:hover {
-            background-color: rgb(57, 103, 204);
-        }
-        /* Intro Toggle Switch Styles */
-        .intro-toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end; /* Rechts im Header ausrichten */
-            gap: 10px;
-            padding: 10px;
-            font-size: 14px;
-            color: black;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgb(204, 204, 204);
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: rgb(33, 150, 243);
-        }
-        input:focus + .slider {
-            box-shadow: 0 0 1px rgb(33, 150, 243);
-        }
-        input:checked + .slider:before {
-            -webkit-transform: translateX(20px);
-            -ms-transform: translateX(20px);
-            transform: translateX(20px);
-        }
-        /* Medienabfragen für Reaktionsfähigkeit */
-        @media (max-width: 768px) {
-            .header {
-                font-size: 12px;
-                padding: 10px;
-            }
-            .search {
-                width: 90%;
-                font-size: 16px;
-            }
-            .container {
-                padding: 80px 10px;
-            }
-            .learn-centre-btn {
-                padding: 18px 40px;
-                font-size: 18px;
-            }
-            .skip-btn {
-                bottom: 10px;
-                left: 10px;
-                padding: 8px 15px;
-                font-size: 14px;
-            }
-            .footer {
-                font-size: 10px;
-                padding: 15px;
-            }
-            /* Unerwünschten Überlauf entfernen */
-            body, html {
-                width: 100%;
-                height: 100%;
-                overflow-x: hidden;
-            }
-            .intro-toggle-container {
-                justify-content: center; /* Auf kleineren Bildschirmen zentrieren */
-            }
-        }
-        /* Anpassungen für Querformat und andere größere Bildschirme */
-        @media (max-width: 1024px) and (min-width: 769px) {
-            .search {
-                width: 70%;
-            }
-            .learn-centre-btn {
-                padding: 20px 45px;
-                font-size: 20px;
-            }
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
-        body {
-            font-family: 'Google Sans', sans-serif;
-            /* Hintergrundfarbe hier ändern */
-            background-color: rgb(255, 191, 0);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            margin-top: 20px;
-            border-radius: 10px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            font-size: 48px;
-        }
-        /* Neue CSS-Stile, um alle Überschriften-Tags (h1-h6) und p-Tags eindeutig zu gestalten. NICHT ENTFERNEN, wenn Sie dies haben: <script src="https://cdn.tailwindcss.com"></script>(über dem style-Tag) */
-        #main-content h1 {
-            font-size: 32px; /* Große Überschrift */
-            margin-bottom: 15px;
-        }
-        #main-content h2 {
-            font-size: 28px; /* Etwas kleiner als h1 */
-            margin-bottom: 12px;
-        }
-        #main-content h3 {
-            font-size: 24px; /* Kleiner als h2 */
-            margin-bottom: 10px;
-        }
-        #main-content h4 {
-            font-size: 20px; /* Kleiner als h3 */
-            margin-bottom: 8px;
-        }
-        #main-content h5 {
-            font-size: 18px; /* Kleiner als h4 */
-            margin-bottom: 6px;
-        }
-        #main-content h6 {
-            font-size: 16px; /* Kleinste Überschrift */
-            margin-bottom: 4px;
-        }
-        #main-content p {
-            font-size: 14px; /* Standard-Absatztext, kleiner als alle Überschriften */
-            line-height: 1.6; /* Verbesserte Lesbarkeit für Absätze */
-            margin-bottom: 1em; /* Abstand zwischen Absätzen */
-        }
-        /* Allgemeines Link-Styling für den Hauptinhaltbereich */
-        #main-content a {
-            color: rgb(0, 0, 238); /* Standard-blaue Linkfarbe */
-            text-decoration: underline; /* Standard-Unterstreichung */
-        }
-        #main-content a:hover {
-            color: rgb(0, 0, 238); /* Auf Hover blau lassen */
-            text-decoration: underline; /* Auf Hover unterstrichen lassen */
-        }
-        .search-bar {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .search-bar input {
-            padding: 10px;
-            width: 70%;
-            font-size: 16px;
-            border: 1px solid rgb(204, 204, 204);
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-        .search-bar button {
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            background-color: rgb(0, 120, 212);
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .search-bar button:hover {
-            background-color: rgb(0, 91, 161);
-        }
-        .suggestions {
-            position: absolute;
-            top: 40px;
-            left: 0;
-            width: 70%;
-            background: white;
-            border: 1px solid rgb(204, 204, 204);
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1;
-        }
-        .suggestions div {
-            padding: 10px;
-            cursor: pointer;
-        }
-        .suggestions div:hover {
-            background-color: rgb(240, 240, 240);
-        }
-        .news {
-            margin-bottom: 20px;
-        }
-        .news h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: rgb(0, 120, 212);
-        }
-        .news iframe {
-            width: 100%;
-            height: 400px;
-            border: none;
-            border-radius: 10px;
-        }
-        .ads {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .ads img {
-            width: 48%;
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-        .ads img:hover {
-            transform: scale(1.05);
-        }
-        .links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-        }
-        .links button {
-            padding: 15px 30px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            background-color: rgb(0, 120, 212);
-            color: white;
-            border-radius: 5px;
-            margin: 5px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        .links button:hover {
-            background-color: rgb(0, 91, 161);
-            transform: translateY(-3px);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="icon" href="new-swc.png" type="image/png" />
+  <title>Stenoip Wonder Computer</title>
+   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+/* General Styles */
+body {
+    font-family: 'Google Sans', sans-serif;
+    background-color: rgb(240, 0, 0);
+    margin: 0;
+    overflow-x: hidden; /* Prevent horizontal scroll only */
+
+}
+/* Fullscreen video styling */
+.intro-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure video scales properly */
+    z-index: 10;
+}
+/* Green Screen for launch */
+.launch-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: green;
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    z-index: 15;
+}
+/* Hide content initially */
+#main-content {
+    display: none;
+}
+/* Design of Stenoip Wonder Computer band(The title in in the band) */
+.header {
+    font-size: 13px;
+    text-align: right;
+    padding: 22px 10px;
+    background-color: rgba(238, 255, 0);
+    width: 100%; 
+    box-sizing: border-box;
+}
+/*End of Design */
+.menuItems {
+    font-size: 13px;
+    padding: 0 20px;
+    display: inline-block;
+}
+
+nav a {
+    text-decoration: none !important; /* Use !important to override Tailwind if necessary */
+    color: rgb(255, 255, 255) !important;
+}
+
+nav a:hover {
+    text-decoration: underline !important;
+    color: rgb(255, 255, 255) !important; 
+}
+
+
+.header a:hover {
+    text-decoration: underline;
+}
+/* Dropdown styling */
+.menu {
+    position: relative;
+    display: inline-block;
+}
+.dropdown-content {
+    width: 270px;
+    padding: 28px;
+    border: 1px solid rgb(220, 225, 229);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    background-color: rgb(255, 255, 255);
+}
+.menuItems:hover .dropdown-content {
+    display: block;
+}
+.appLogo {
+    text-align: center;
+    display: inline-block;
+    width: 86px;
+    padding: 5px;
+}
+.menuItemLogo {
+    width: 50px;
+    height: 50px;
+}
+.caption {
+    text-align: center;
+}
+.container {
+    width: 80%;
+    max-width: 1200px;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    border-radius: 10px;
+
+}
+
+.search {
+    font-size: 14px;
+    padding: 12px 20px;
+    width: 90%;
+    max-width: 600px; /* Limit width for larger screens */
+    color: rgb(51, 51, 51);
+    border: 1px solid rgb(223, 225, 229);
+    border-radius: 24px;
+    outline: none;
+    background-color: rgb(241, 243, 244);
+    margin: 0 auto;
+    display: block;
+}
+.search:focus {
+    border-color: rgb(66, 133, 244);
+}
+.search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(223, 225, 229);
+    border-radius: 5px;
+    display: none;
+    margin-top: 10px;
+}
+.result-item {
+    padding: 8px;
+    cursor: pointer;
+}
+.result-item:hover {
+    background-color: rgb(241, 243, 244);
+}
+/* Button styles */
+.btns {
+    margin: 7px 0;
+    padding: 20px 40px;
+    font-size: 18px;
+    color: rgb(95, 99, 104);
+    background-color: rgb(248, 249, 250);
+    border: 1px solid rgb(223, 225, 229);
+    border-radius: 5px;
+    cursor: pointer;
+}
+.btns:hover {
+    background-color: rgb(241, 243, 244);
+}
+/* Learn Centre Button*/
+.learn-centre-btn {
+    margin: 20px 0;
+    padding: 20px 50px;
+    font-size: 22px;
+    background-color: rgb(66, 133, 244);
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+}
+.learn-centre-btn:hover {
+    background-color: rgb(57, 103, 204);
+}
+/* Skip button styles */
+.skip-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background-color: rgb(66, 133, 244);
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 20;
+}
+.skip-btn:hover {
+    background-color: rgb(57, 103, 204);
+}
+/* Intro Toggle Switch Styles */
+.intro-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align to the right in the header */
+    gap: 10px;
+    padding: 10px;
+    font-size: 14px;
+    color: black;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(204, 204, 204);
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 20px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: rgb(33, 150, 243);
+}
+input:focus + .slider {
+  box-shadow: 0 0 1px rgb(33, 150, 243);
+}
+input:checked + .slider:before {
+  -webkit-transform: translateX(20px);
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+    .header {
+        font-size: 12px;
+        padding: 10px;
+    }
+
+    .search {
+        width: 90%;
+        font-size: 16px;
+    }
+    .container {
+        padding: 80px 10px;
+    }
+    .learn-centre-btn {
+        padding: 18px 40px;
+        font-size: 18px;
+    }
+    .skip-btn {
+        bottom: 10px;
+        left: 10px;
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+    .footer {
+        font-size: 10px;
+        padding: 15px;
+    }
+    /* Remove any unwanted overflow */
+    body, html {
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+    }
+    .intro-toggle-container {
+        justify-content: center; /* Center on smaller screens */
+    }
+}
+/* Landscape and other larger screens adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .search {
+        width: 70%;
+    }
+    .learn-centre-btn {
+        padding: 20px 45px;
+        font-size: 20px;
+    }
+}
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
+body {
+    font-family: 'Google Sans', sans-serif;
+  /* Change Background Colour here*/
+    background-color: rgb(255, 191, 0);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+.container {
+    width: 80%;
+    max-width: 1200px;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    margin-top: 20px;
+    border-radius: 10px;
+}
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.header h1 { 
+    font-size: 48px; 
+}
+
+/* New CSS to style all heading tags (h1-h6) and p tags distinctly . Do NOT REMOVE when you have this: <script src="https://cdn.tailwindcss.com"></script>(above the style tag) */
+#main-content h1 {
+    font-size: 32px; /* Large heading */
+    margin-bottom: 15px;
+}
+
+#main-content h2 {
+    font-size: 28px; /* Slightly smaller than h1 */
+    margin-bottom: 12px;
+}
+
+#main-content h3 {
+    font-size: 24px; /* Smaller than h2 */
+    margin-bottom: 10px;
+}
+
+#main-content h4 {
+    font-size: 20px; /* Smaller than h3 */
+    margin-bottom: 8px;
+}
+
+#main-content h5 {
+    font-size: 18px; /* Smaller than h4 */
+    margin-bottom: 6px;
+}
+
+#main-content h6 {
+    font-size: 16px; /* Smallest heading */
+    margin-bottom: 4px;
+}
+
+#main-content p {
+    font-size: 14px; /* Standard paragraph text, smaller than all headings */
+    line-height: 1.6; /* Improved readability for paragraphs */
+    margin-bottom: 1em; /* Space between paragraphs */
+}
+
+/* General link styling for the main content area */
+#main-content a {
+    color: rgb(0, 0, 238); /* Standard blue link color */
+    text-decoration: underline; /* Standard underline */
+}
+
+#main-content a:hover {
+    color: rgb(0, 0, 238); /* Keep blue on hover */
+    text-decoration: underline; /* Keep underline on hover */
+}
+
+
+.search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+.search-bar input {
+    padding: 10px;
+    width: 70%;
+    font-size: 16px;
+    border: 1px solid rgb(204, 204, 204);
+    border-radius: 5px;
+    margin-right: 10px;
+}
+.search-bar button {
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    background-color: rgb(0, 120, 212);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.search-bar button:hover {
+    background-color: rgb(0, 91, 161);
+}
+.suggestions {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 70%;
+    background: white;
+    border: 1px solid rgb(204, 204, 204);
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1;
+}
+.suggestions div {
+    padding: 10px;
+    cursor: pointer;
+}
+.suggestions div:hover {
+    background-color: rgb(240, 240, 240);
+}
+.news {
+    margin-bottom: 20px;
+}
+.news h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: rgb(0, 120, 212);
+}
+.news iframe {
+    width: 100%;
+    height: 400px;
+    border: none;
+    border-radius: 10px;
+}
+.ads {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.ads img {
+    width: 48%;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+.ads img:hover {
+    transform: scale(1.05);
+}
+.links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+.links button {
+    padding: 15px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: rgb(0, 120, 212);
+    color: white;
+    border-radius: 5px;
+    margin: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+.links button:hover {
+    background-color: rgb(0, 91, 161);
+    transform: translateY(-3px);
+}
+  </style>
 </head>
 <body>
 
-    <div class="launch-screen" id="launch-screen" onclick="startExperience()">
-        Zum Starten klicken
-    </div>
+  <div class="launch-screen" id="launch-screen" onclick="startExperience()">
+    Click to Launch
+  </div>
 
-    <video id="intro-video" class="intro-video" autoplay playsinline>
-        <source src="https://stenoip.github.io/intro_ringzauber.mp4" type="video/mp4" />
-        <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
-        Ihr Browser unterstützt das Video-Tag nicht.
-    </video>
+  <video id="intro-video" class="intro-video" autoplay playsinline>
+    <source src="https://stenoip.github.io/intro_ringzauber.mp4" type="video/mp4" />
+    <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
-    <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Intro überspringen</button>
+  <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
-    <div id="main-content" style="display: none;">
+  <div id="main-content" style="display: none;">
 
-    <nav class="w-full max-w-4xl bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg">
+  <nav class="w-full max-w-4xl bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg">
         <ul class="flex flex-col sm:flex-row justify-around items-center space-y-3 sm:space-y-0 sm:space-x-4">
             <li>
                 <a href="index.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
-                    Startseite
+                    Home
                 </a>
             </li>
             <li>
                 <a href="about.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    Über uns
+                    About
                 </a>
             </li>
             <li>
                 <a href="copyright.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    Bedingungen
+                    Terms
                 </a>
             </li>
             <li>
                 <a href="contact.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    Kontakt
+                    Contact
                 </a>
             </li>
             <li>
                 <a href="privacy.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
-                    Datenschutzrichtlinie
+                    Privacy Policy
                 </a>
-            </li>
-            <li>
+            </li> 
+          <li>
                 <a href="blog.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
                     Blog
                 </a>
@@ -507,200 +527,203 @@
         </ul>
     </nav>
 <br>
-        <div class="header">
-            <h1 class="block px-10 py-10 text-black font-bold">Stenoip Wonder Computer</h1>
-            <div class="intro-toggle-container">
-                <span>Intro-Video:</span>
-                <label class="switch">
-                    <input type="checkbox" id="introToggle">
-                    <span class="slider round"></span>
-                </label>
-            </div>
+      <div class="header">
+        <h1 class="block px-10 py-10 text-black font-bold">Stenoip Wonder Computer</h1>
+        <div class="intro-toggle-container">
+            <span>Intro Video:</span>
+            <label class="switch">
+                <input type="checkbox" id="introToggle">
+                <span class="slider round"></span>
+            </label>
         </div>
-        <div class="search-bar">
-            <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Unsere Website durchsuchen..." />
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search our website..." />
 
-            <button onclick="search()">Suchen</button>
-            <div class="suggestions" id="suggestions" style="display: none;"></div>
-        </div>
+        <button onclick="search()">Search</button>
+        <div class="suggestions" id="suggestions" style="display: none;"></div>
+      </div>
 
-    <h1><mark>Eilmeldung! Ringzauber 1.5 kommt jetzt raus!<a href="ringzauber.html">Mehr erfahren</a></mark></h1>
-    <h2><a href="television_guide.html">Private Programme Online</a></h2>
-    <p>Stenoip Wonder Computer bietet die neueste fortschrittliche Technologie kostenlos an, ohne dass Ihre Historie bekannt wird.</p>
-    <ul>
-    <h3><strong>Vorgeschlagen</strong> </h3>
-    <p>
-    <br>
-    <mark><a href="https://stenoip.github.io/praterich">Lady Praterich, ein KI-Chatbot und SWC-Assistent. </a></mark>
-    </p>
-    <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
-        Lernzentrum
-    </button>
-    <br>
-    <iframe src="https://stenoip.github.io/wheel_gifs" height="500px" width="100%"></iframe>
-    <br>
-    <p>Besuchen Sie das Lernzentrum für Nachrichten und Wetter</p>
-    <div class="footer">
-        <br>
-        <p>Version 0.97 &copy; Stenoip Company</p>
-        <a href ="copyright.html">Unsere Bedingungen anzeigen.</a>
-    <br>
-    <p>WARUM GIBT ES <strong>WERBUNG</strong>! Wir haben Werbung, um unsere Projekte zu finanzieren und Geld zu verdienen. Lesen Sie unsere Datenschutzrichtlinie (oben) für weitere Informationen.</p>
-    </div>
+<h1><mark>Breaking News! Ringzauber 1.5 is coming out now!<a href="ringzauber.html">Learn more</a></mark></h1>
+<h2><a href="television_guide.html">Private Programs Online</a></h2>
+<p>Stenoip Wonder Computer provides the latest advanced tech for free without any of your history being known.</p>
+<ul>
+<h3><strong>Suggested</strong> </h3>
+<p>
+<br>
+<mark><a href="https://stenoip.github.io/praterich">Lady Praterich, an AI chatbot and SWC assistant. </a></mark>
+</p>
+ <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
+        Learn Center
+      </button>
+      <br>
+  <iframe src="https://stenoip.github.io/wheel_gifs" height="500px" width="100%"></iframe>
+  <br>   
+  <p>Visit the Learn Center for the News and Weather</p>
+<div class="footer">
+       <br>
+       <p>Version 0.99 &copy; Stenoip Company</p>
+       <a href ="copyright.html">View our terms.</a>
+<br>
+  <p>WHY ARE THERE <strong>ADS</strong>! We have ads to fund our projects and earn money. Read our Privacy and Policy(at the top) for more info.</p>
+</div>
 
 
-    <script>
-    // Links für Suchvorschläge
-        const links = [
-            { name: '2048', url: '2048.html' },
-            { name: 'Jubiläum', url: 'anniversary.html' },
-            { name: 'Boublok Coding', url: 'boublok.html' },
-            { name: 'TI 30XS', url: 'calculator_ti30xiis.html' },
-            { name: 'TI 84', url: 'calculator_ti84.html' },
-            { name: 'Kamera', url: 'camera.html' },
-            { name: 'Clocker', url: 'clocker.html' },
-            { name: 'Comics!', url: 'comic.html' },
-            { name: 'Der Datenspeicher', url: 'download.html' },
-            { name: 'MailSteno(WIP)', url: 'email.html' },
-            { name: 'Flappy Bird', url: 'flappybird.html' },
-            { name: 'StenoipToanielstik(Spiele)', url: 'games.html' },
-            { name: 'Schwerkraft-Simulation', url: 'gravity.html' },
-            { name: 'StenoVids', url: 'video.html' },
-            { name: 'StenoVids Plus', url: 'video_plus.html' },
-            { name: 'SearXNG Download', url: 'searxng.html' },
-            { name: 'KI-Simulation', url: 'bot.html' },
-            { name: 'Eine Box', url: 'box_model.html' },
-            { name: 'Sprechender Hund!', url: 'pet.html' },
-            { name: 'Eiertastische Schüssel', url: 'eggtastic.html' },
-            { name: 'PhET Sonnensystem', url: 'my-solar-system_en.html' },
-            { name: 'Zeichne es!', url: 'draw.html' },
-            { name: 'Wurm', url: 'worm.html' }
-        ];
+   
 
-        // Suchnavigation
-        function search() {
-            const query = document.getElementById('search-input').value;
-            const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
-            if (matchedLink) {
-                window.location.href = matchedLink.url + '?q=' + encodeURIComponent(query);
-            }
-        }
+  <script>
+// Links used for search suggestions
+    const links = [
+      { name: '2048', url: '2048.html' },
+      { name: 'Anniversary', url: 'anniversary.html' },
+      { name: 'Boublok Coding', url: 'boublok.html' },
+      { name: 'TI 30XS', url: 'calculator_ti30xiis.html' },
+      { name: 'TI 84', url: 'calculator_ti84.html' },
+      { name: 'Camera', url: 'camera.html' },
+      { name: 'Clocker', url: 'clocker.html' },
+      { name: 'Comics!', url: 'comic.html' },
+      { name: 'The Data Store(Datenspeicher)', url: 'download.html' },
+      { name: 'MailSteno(WIP)', url: 'email.html' },
+      { name: 'Flappy Bird', url: 'flappybird.html' },
+      { name: 'StenoipToanielstik(Games)', url: 'games.html' },
+      { name: 'Gravity Simulation', url: 'gravity.html' },
+      { name: 'StenoVids', url: 'video.html' },
+      { name: 'StenoVids Plus', url: 'video_plus.html' },
+       { name: 'SearXNG Download', url: 'searxng.html' },
+       { name: 'AI Simulation', url: 'bot.html' },
+     { name: 'A box', url: 'box_model.html' },
+     { name: 'Talking Dog!', url: 'pet.html' },
+     { name: 'Eggtastic Bowl', url: 'eggtastic.html' },
+     { name: 'PhET Solar System', url: 'my-solar-system_en.html' },
+     { name: 'Draw It!', url: 'draw.html' },
+      { name: 'Worm', url: 'worm.html' }
+    
+    ];
 
-        // Suchvorschläge
-        function showSuggestions() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const suggestionsContainer = document.getElementById('suggestions');
-            suggestionsContainer.innerHTML = '';
-            const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
-            filteredLinks.forEach(link => {
-                const suggestion = document.createElement('div');
-                suggestion.textContent = link.name;
-                suggestion.onclick = () => {
-                    document.getElementById('search-input').value = link.name;
-                    search();
-                };
-                suggestionsContainer.appendChild(suggestion);
-            });
-            suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
-        }
+    // Search navigation
+    function search() {
+      const query = document.getElementById('search-input').value;
+      const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
+      if (matchedLink) {
+        window.location.href = matchedLink.url + '?q=' + encodeURIComponent(query);
+      }
+    }
 
-        // Funktion zum Anzeigen des Hauptinhalts und Ausblenden der Intro-Elemente
-        function showMainContent() {
-            document.getElementById('intro-video').style.display = 'none';
-            document.getElementById('launch-screen').style.display = 'none';
-            document.getElementById('skip-btn').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            document.body.style.overflow = 'auto'; // Scrollen aktivieren
-        }
+    // Search suggestions
+    function showSuggestions() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const suggestionsContainer = document.getElementById('suggestions');
+      suggestionsContainer.innerHTML = '';
+      const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
+      filteredLinks.forEach(link => {
+        const suggestion = document.createElement('div');
+        suggestion.textContent = link.name;
+        suggestion.onclick = () => {
+          document.getElementById('search-input').value = link.name;
+          search();
+        };
+        suggestionsContainer.appendChild(suggestion);
+      });
+      suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
+    }
 
-        // Diese Funktion wird immer noch verwendet, wenn "Zum Starten klicken" manuell gedrückt wird.
-        function startExperience() {
-            const introToggle = document.getElementById('introToggle');
-            document.getElementById('launch-screen').style.display = 'none';
+    // Function to show main content and hide intro elements
+    function showMainContent() {
+        document.getElementById('intro-video').style.display = 'none';
+        document.getElementById('launch-screen').style.display = 'none';
+        document.getElementById('skip-btn').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        document.body.style.overflow = 'auto'; // Enable scrolling
+    }
 
-            if (introToggle.checked) { // Wenn Schalter AN ist (Intro aktiviert)
-                const video = document.getElementById('intro-video');
-                video.muted = false; // Stummschaltung aufheben, wenn der Benutzer das Video explizit startet
-                video.style.display = 'block';
-                video.play(); // Sicherstellen, dass das Video abgespielt wird
-                document.getElementById('skip-btn').style.display = 'block'; // Skip-Schaltfläche anzeigen
-            } else { // Wenn Schalter AUS ist (Intro deaktiviert)
-                showMainContent();
-            }
-        }
-
-        // Video überspringen
-        function skipVideo() {
-            const video = document.getElementById('intro-video');
-            video.pause();
-            video.currentTime = 0;
-            showMainContent();
-        }
-
-        // Event-Listener für das Ende des Videos
-        document.getElementById('intro-video').addEventListener('ended', function () {
-            showMainContent();
-        });
-
-        // Zustand des Intro-Umschalters behandeln
+    // This function is still used when "Click to Launch" is pressed manually.
+    function startExperience() {
         const introToggle = document.getElementById('introToggle');
+        document.getElementById('launch-screen').style.display = 'none';
 
-        // Gespeicherten Zustand aus dem localStorage laden (Standard AUS, wenn nicht gefunden)
-        const savedIntroState = localStorage.getItem('introVideoEnabled');
-        if (savedIntroState === null) {
-            introToggle.checked = false; // Standardmäßig AUS, wenn kein Zustand gespeichert ist
-        } else {
-            introToggle.checked = (savedIntroState === 'true');
+        if (introToggle.checked) { // If switch is ON (intro enabled)
+            const video = document.getElementById('intro-video');
+            video.muted = false; // Unmute if the user is explicitly starting the video
+            video.style.display = 'block';
+            video.play(); // Make sure the video plays
+            document.getElementById('skip-btn').style.display = 'block'; // Show skip button
+        } else { // If switch is OFF (intro disabled)
+            showMainContent();
         }
+    }
 
-        // Zustand speichern, wenn der Umschalter geändert wird
-        introToggle.addEventListener('change', function() {
-            localStorage.setItem('introVideoEnabled', this.checked);
-            // Wenn der Benutzer den Umschalter AUS schaltet, während das Video abgespielt wird, stoppen Sie es und zeigen Sie den Inhalt an
-            if (!this.checked && document.getElementById('intro-video').style.display === 'block') {
-                skipVideo();
-            } else if (this.checked && document.getElementById('main-content').style.display === 'block') {
-                // Wenn der Benutzer den Umschalter AN schaltet, nachdem der Hauptinhalt angezeigt wurde, blenden Sie den Hauptinhalt aus und bereiten Sie das Video vor
-                document.getElementById('main-content').style.display = 'none';
-                document.getElementById('intro-video').style.display = 'block';
-                document.getElementById('skip-btn').style.display = 'block';
-                document.getElementById('intro-video').load(); // Video neu laden, um sicherzustellen, dass es am Anfang ist
-                document.getElementById('intro-video').muted = true; // Stummgeschaltet lassen, bis der Benutzer explizit abspielt oder die Stummschaltung aufhebt
-            }
-        });
+    // Skip video
+   function skipVideo() {
+    const video = document.getElementById('intro-video');
+    video.pause();
+    video.currentTime = 0;
+    showMainContent();
+}
 
-        // --- NEUE/MODIFIZIERTE LOGIK FÜR DIE SOFORTIGE ANZEIGE BEIM LADEN ---
-        // Dieser Teil stellt sicher, dass, wenn das Intro ausgeschaltet ist, der Hauptinhalt sofort beim Laden der Seite angezeigt wird.
-        document.addEventListener('DOMContentLoaded', function() {
-            // Wenn das Intro standardmäßig ausgeschaltet ist oder vom Benutzer ausgeschaltet wurde, den Hauptinhalt direkt anzeigen.
-            // Dies geschieht sofort, wenn der Seiteninhalt geladen wird.
-            if (!introToggle.checked) {
-                showMainContent();
-            } else {
-                // Wenn das Intro aktiviert ist, den "Zum Starten klicken"-Bildschirm anfangs anzeigen.
-                // Der Benutzer muss dann darauf klicken, um das Video zu starten.
-                document.getElementById('launch-screen').style.display = 'flex';
-                // Sicherstellen, dass das Video ausgeblendet und stummgeschaltet ist, bis es gestartet wird
-                document.getElementById('intro-video').style.display = 'none';
-                document.getElementById('intro-video').muted = true;
-            }
-        });
+// Event listener for when video ends
+document.getElementById('intro-video').addEventListener('ended', function () {
+    showMainContent();
+});
+
+// Handle the intro toggle switch state
+const introToggle = document.getElementById('introToggle');
+
+// Load saved state from localStorage (default to OFF if not found)
+const savedIntroState = localStorage.getItem('introVideoEnabled');
+if (savedIntroState === null) {
+    introToggle.checked = false; // Default to OFF if no state is saved
+} else {
+    introToggle.checked = (savedIntroState === 'true');
+}
+
+// Save state when toggle changes
+introToggle.addEventListener('change', function() {
+    localStorage.setItem('introVideoEnabled', this.checked);
+    // If the user turns the toggle OFF while the video is playing, stop it and show content
+    if (!this.checked && document.getElementById('intro-video').style.display === 'block') {
+        skipVideo();
+    } else if (this.checked && document.getElementById('main-content').style.display === 'block') {
+        // If the user turns the toggle ON after main content is shown, hide main content and prepare video
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('intro-video').style.display = 'block';
+        document.getElementById('skip-btn').style.display = 'block';
+        document.getElementById('intro-video').load(); // Reload video to ensure it's at the start
+        document.getElementById('intro-video').muted = true; // Keep muted until user explicitly plays or un-mutes
+    }
+});
+
+// --- NEW/MODIFIED LOGIC FOR IMMEDIATE DISPLAY ON LOAD ---
+// This part ensures that if the intro is toggled off, the main content shows immediately on page load.
+document.addEventListener('DOMContentLoaded', function() {
+    // If the intro is off by default or was set off by the user, show main content directly.
+    // This happens immediately when the page content is loaded.
+    if (!introToggle.checked) {
+        showMainContent();
+    } else {
+        // If intro is enabled, show the "Click to Launch" screen initially.
+        // The user will then click it to start the video.
+        document.getElementById('launch-screen').style.display = 'flex';
+        // Make sure video is hidden and muted until launched
+        document.getElementById('intro-video').style.display = 'none';
+        document.getElementById('intro-video').muted = true;
+    }
+});
 
 
-        // Laden des Tomorrow.io-Widgets
-        (function (d, s, id) {
-            if (d.getElementById(id)) {
-                if (window.__TOMORROW__) {
-                    window.__TOMORROW__.renderWidget();
-                }
-                return;
-            }
-            const fjs = d.getElementsByTagName(s)[0];
-            const js = d.createElement(s);
-            js.id = id;
-            js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
-            fjs.parentNode.insertBefore(js, fjs);
-        })(document, 'script', 'tomorrow-sdk');
-    </script>
+    // Load Tomorrow.io widget
+    (function (d, s, id) {
+      if (d.getElementById(id)) {
+        if (window.__TOMORROW__) {
+          window.__TOMORROW__.renderWidget();
+        }
+        return;
+      }
+      const fjs = d.getElementsByTagName(s)[0];
+      const js = d.createElement(s);
+      js.id = id;
+      js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    })(document, 'script', 'tomorrow-sdk');
+  </script>
 </body>
 </html>
