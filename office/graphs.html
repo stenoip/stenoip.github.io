@@ -264,13 +264,14 @@ footer.note {
         <button class="tab-button active" data-tab="insert">Insert</button>
         <button class="tab-button" data-tab="data">Data</button>
         <button class="tab-button" data-tab="style">Style</button>
+        <button class="tab-button" data-tab="performance">Performance</button>
         <button class="tab-button" data-tab="export">Export</button>
       </div>
       <div class="tell-me">
         <input id="commandBox" type="text" placeholder="Type: 'line sales by month', 'histogram 20 bins', 'waterfall cashflow'..." />
       </div>
     </div>
-<!-- This is the main section! -->
+
     <div id="insert" class="tab-panel active">
       <div class="ribbon-group">
         <div class="ribbon-group-items">
@@ -292,9 +293,10 @@ footer.note {
         <div class="ribbon-group-items">
           <button class="ribbon-item" id="btnSample">Sample data</button>
           <button class="ribbon-item" id="btnClear">Clear</button>
-          <button class="ribbon-item" id="btnUpdate">Update</button>
+          <button class="ribbon-item" id="btnRender">Render</button>
+          <button class="ribbon-item" id="btnPreview">Preview</button>
         </div>
-        <div class="ribbon-group-title">Quick actions</div>
+        <div class="ribbon-group-title">Actions</div>
       </div>
 
       <div class="ribbon-group">
@@ -333,14 +335,6 @@ footer.note {
         <div class="ribbon-group-items">
           <label class="small">Histogram bins</label>
           <input id="histBins" type="number" class="input" min="2" max="100" value="10" />
-          <label class="small">Smooth lines</label>
-          <select id="smoothness" class="input">
-            <option value="0">0</option>
-            <option value="0.2">0.2</option>
-            <option value="0.4">0.4</option>
-            <option value="0.6">0.6</option>
-            <option value="0.8">0.8</option>
-          </select>
           <label class="small">Stacked</label>
           <select id="stacked" class="input">
             <option value="false">No</option>
@@ -368,8 +362,75 @@ footer.note {
             <option value="true">Show</option>
             <option value="false">Hide</option>
           </select>
+          <label class="small">Smooth lines</label>
+          <select id="smoothness" class="input">
+            <option value="0">0</option>
+            <option value="0.2">0.2</option>
+            <option value="0.4">0.4</option>
+            <option value="0.6">0.6</option>
+            <option value="0.8">0.8</option>
+          </select>
         </div>
         <div class="ribbon-group-title">Appearance</div>
+      </div>
+
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <label class="small">X axis title</label>
+          <input id="xTitle" class="input" placeholder="X axis" />
+          <label class="small">Y axis title</label>
+          <input id="yTitle" class="input" placeholder="Y axis" />
+          <label class="small">Min Y</label>
+          <input id="yMin" class="input" type="number" placeholder="auto" />
+          <label class="small">Max Y</label>
+          <input id="yMax" class="input" type="number" placeholder="auto" />
+          <label class="small">Tooltips</label>
+          <select id="tooltips" class="input">
+            <option value="true">Show</option>
+            <option value="false">Hide</option>
+          </select>
+          <label class="small">Aspect ratio</label>
+          <select id="aspect" class="input">
+            <option value="auto">Auto</option>
+            <option value="16/9">16:9</option>
+            <option value="4/3">4:3</option>
+            <option value="1">Square</option>
+          </select>
+        </div>
+        <div class="ribbon-group-title">Axes & UX</div>
+      </div>
+    </div>
+
+    <div id="performance" class="tab-panel">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <label class="small">Mode</label>
+          <select id="perfMode" class="input">
+            <option value="light">Light (safer)</option>
+            <option value="full">Full (slower)</option>
+          </select>
+          <label class="small">Point cap per series</label>
+          <input id="pointCap" class="input" type="number" min="500" max="20000" step="500" value="5000" />
+          <label class="small">Downsampling</label>
+          <select id="downsampleStrategy" class="input">
+            <option value="everyN">Keep every Nth</option>
+            <option value="average">Average into bins</option>
+          </select>
+          <label class="small">Live preview</label>
+          <select id="livePreview" class="input">
+            <option value="off">Off</option>
+            <option value="on">On</option>
+          </select>
+        </div>
+        <div class="ribbon-group-title">Stability controls</div>
+      </div>
+
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <div id="memInfo" class="ribbon-item" title="Approximate JS heap usage">Heap: —</div>
+          <div id="dsInfo" class="ribbon-item" title="Data reduction applied">Downsample: —</div>
+        </div>
+        <div class="ribbon-group-title">Diagnostics</div>
       </div>
     </div>
 
@@ -389,8 +450,10 @@ footer.note {
       <div class="editor-topbar">
         <span class="badge" id="chartTypeBadge">Type: line</span>
         <span class="badge" id="dataModeBadge">Data: JSON</span>
-        <button class="btn primary" id="btnRender">Render</button>
+        <span class="badge" id="perfBadge">Mode: light</span>
+        <button class="btn primary" id="btnRenderBottom">Render</button>
       </div>
+
       <canvas id="chart-canvas" aria-label="Chart canvas"></canvas>
 
       <div class="controls">
@@ -406,10 +469,6 @@ footer.note {
 
         <div class="panel">
           <div class="panel-title">Options</div>
-          <div class="kv"><label class="small">X axis title</label><input id="xTitle" class="input" placeholder="X axis" /></div>
-          <div class="kv"><label class="small">Y axis title</label><input id="yTitle" class="input" placeholder="Y axis" /></div>
-          <div class="kv"><label class="small">Min Y</label><input id="yMin" class="input" type="number" placeholder="auto" /></div>
-          <div class="kv"><label class="small">Max Y</label><input id="yMax" class="input" type="number" placeholder="auto" /></div>
           <div class="kv"><label class="small">Show values</label>
             <select id="showValues" class="input">
               <option value="false">No</option>
@@ -418,22 +477,8 @@ footer.note {
           </div>
           <div class="kv"><label class="small">Animation</label>
             <select id="anim" class="input">
-              <option value="true">On</option>
               <option value="false">Off</option>
-            </select>
-          </div>
-          <div class="kv"><label class="small">Tooltips</label>
-            <select id="tooltips" class="input">
-              <option value="true">Show</option>
-              <option value="false">Hide</option>
-            </select>
-          </div>
-          <div class="kv"><label class="small">Aspect ratio</label>
-            <select id="aspect" class="input">
-              <option value="auto">Auto</option>
-              <option value="16/9">16:9</option>
-              <option value="4/3">4:3</option>
-              <option value="1">Square</option>
+              <option value="true">On</option>
             </select>
           </div>
         </div>
@@ -442,31 +487,33 @@ footer.note {
     </div>
   </div>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
-<script>
-/* ---------------------------------------
-   StenoGraphs — Stable JS (drop-in)
-   Works with existing HTML IDs and layout.
----------------------------------------- */
+  <script>
+/* ==========================================================
+   StenoGraphs — Safe Render Pipeline (Crash-Resistant)
+   Key strategies:
+   - Explicit render (no heavy auto-renders while typing)
+   - Data caps + downsampling/aggregation
+   - Proper chart destroy + canvas reset
+   - Optional decimation with sorted data
+   - Light mode defaults for safety
+========================================================== */
 
-// Tiny DOM helpers
-const $ = (s, root = document) => root.querySelector(s);
-const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-// Global state
 const State = {
   chart: null,
   currentType: 'line',
   dataMode: 'json',
   paletteName: 'classic',
-  renderScheduled: false,
-  debounceTimer: null,
-  lastConfig: null
+  perfMode: 'light',
+  lastConfigHash: '',
+  livePreview: 'off'
 };
 
-// Palettes
 const palettes = {
   classic: ['#2a6ad7','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'],
   pastel:  ['#80b1d3','#fdb462','#b3de69','#fb8072','#cab2d6','#fccde5','#ccebc5','#d9d9d9','#ffe082','#a6cee3'],
@@ -474,83 +521,55 @@ const palettes = {
   mono:    ['#0078d7','#0d6efd','#1e88e5','#2196f3','#42a5f5','#64b5f6','#90caf9','#bbdefb','#e3f2fd','#0a58ca']
 };
 
-// Utils
-function safeParseJSON(text, fallback = { labels: [], datasets: [] }) {
-  try { return JSON.parse(text); } catch { return fallback; }
+function currentColors(k) {
+  const arr = palettes[State.paletteName] || palettes.classic;
+  return k ? arr.slice(0, k) : arr;
 }
-function hexToRgba(hex, a = 0.3) {
-  const m = hex.replace('#', '');
-  const bigint = parseInt(m, 16);
-  if (Number.isNaN(bigint)) return `rgba(0,0,0,${a})`;
-  const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
+function hexToRgba(hex, a=0.3) {
+  const m = hex.replace('#','');
+  const n = parseInt(m, 16);
+  if (Number.isNaN(n)) return `rgba(0,0,0,${a})`;
+  const r = (n>>16)&255, g=(n>>8)&255, b=n&255;
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 }
-function currentColors(count) {
-  const arr = palettes[State.paletteName] || palettes.classic;
-  return !count ? arr : arr.slice(0, Math.max(1, Math.min(count, arr.length)));
-}
-function parseAspect(value) {
-  if (!value || value === 'auto') return undefined;
-  const parts = String(value).split('/');
+function parseAspect(v) {
+  if (!v || v === 'auto') return undefined;
+  const parts = String(v).split('/');
   if (parts.length === 2) {
     const a = parseFloat(parts[0]), b = parseFloat(parts[1]);
-    if (!Number.isNaN(a) && !Number.isNaN(b) && b !== 0) return a / b;
+    if (Number.isFinite(a) && Number.isFinite(b) && b !== 0) return a/b;
   }
-  const num = parseFloat(value);
-  return Number.isNaN(num) ? undefined : num;
-}
-function debounceRender(delay = 120) {
-  clearTimeout(State.debounceTimer);
-  State.debounceTimer = setTimeout(scheduleRender, delay);
-}
-function scheduleRender() {
-  if (State.renderScheduled) return;
-  State.renderScheduled = true;
-
-  const doRender = () => {
-    State.renderScheduled = false;
-    renderChart();
-  };
-
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(doRender, { timeout: 250 });
-  } else {
-    requestAnimationFrame(doRender);
-  }
+  const num = parseFloat(v);
+  return Number.isFinite(num) ? num : undefined;
 }
 
-// CSV → data
+/* ------------------ Data parsing ------------------ */
+function safeJSON(text, fallback = { labels: [], datasets: [] }) {
+  try { return JSON.parse(text); } catch { return fallback; }
+}
 function csvToData(text, type) {
-  const rows = text
-    .trim()
-    .split(/\r?\n/)
-    .map(r => r.split(',').map(c => c.trim()))
-    .filter(r => r.length && r.some(cell => cell !== ''));
-
+  const rows = text.trim().split(/\r?\n/).map(r => r.split(',').map(c => c.trim())).filter(r => r.length);
   if (!rows.length) return { labels: [], datasets: [] };
 
   if (type === 'scatter' || type === 'bubble') {
     const firstNum = parseFloat(rows[0]?.[0]);
     const hasHeader = Number.isNaN(firstNum);
     const dataRows = hasHeader ? rows.slice(1) : rows;
-    const seriesMap = new Map();
+    const map = new Map();
     for (const r of dataRows) {
       const [xv, yv, rvOrLabel, maybeLabel] = r;
       const x = parseFloat(xv), y = parseFloat(yv);
-      if (Number.isNaN(x) || Number.isNaN(y)) continue;
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
       const label = (hasHeader ? maybeLabel : maybeLabel || rvOrLabel) || 'Series 1';
-      let point = { x, y };
+      const point = { x, y };
       if (type === 'bubble') {
         const rv = parseFloat(rvOrLabel);
         point.r = Number.isNaN(rv) ? 6 : rv;
       }
-      if (!seriesMap.has(label)) seriesMap.set(label, []);
-      seriesMap.get(label).push(point);
+      if (!map.has(label)) map.set(label, []);
+      map.get(label).push(point);
     }
-    return {
-      labels: [],
-      datasets: Array.from(seriesMap.entries()).map(([label, data]) => ({ label, data }))
-    };
+    return { labels: [], datasets: Array.from(map, ([label, data]) => ({ label, data })) };
   }
 
   if (type === 'pie') {
@@ -559,71 +578,59 @@ function csvToData(text, type) {
     const dataRows = hasHeader ? rows.slice(1) : rows;
     const labels = [], data = [];
     for (const r of dataRows) {
-      const name = r[0];
-      const val = parseFloat(r[1]);
-      if (!name || Number.isNaN(val)) continue;
+      const name = r[0]; const val = parseFloat(r[1]);
+      if (!name || !Number.isFinite(val)) continue;
       labels.push(name); data.push(val);
     }
     return { labels, datasets: [{ label: 'Series 1', data }] };
   }
 
-  // Bar/Column/Line/Area/Radar/Histogram
   const headers = rows[0];
   const labels = rows.slice(1).map(r => r[0]);
   const datasets = [];
-  for (let c = 1; c < headers.length; c++) {
+  for (let c=1; c<headers.length; c++) {
     const label = headers[c] || `Series ${c}`;
     const data = rows.slice(1).map(r => {
-      const v = parseFloat(r[c]); return Number.isNaN(v) ? null : v;
+      const v = parseFloat(r[c]); return Number.isFinite(v) ? v : null;
     });
     datasets.push({ label, data });
   }
   return { labels, datasets };
 }
-
 function jsonToData(text) {
-  const obj = safeParseJSON(text);
-  const ds = Array.isArray(obj.datasets) ? obj.datasets : [];
+  const obj = safeJSON(text);
   return {
     labels: Array.isArray(obj.labels) ? obj.labels : [],
-    datasets: ds.map(d => ({
+    datasets: Array.isArray(obj.datasets) ? obj.datasets.map(d => ({
       label: d.label ?? 'Series',
       data: Array.isArray(d.data) ? d.data : [],
       backgroundColor: d.backgroundColor,
       borderColor: d.borderColor
-    }))
+    })) : []
   };
 }
 
-// Histogram and Waterfall builders
+/* ------------------ Transforms ------------------ */
 function genHistogram(input, binsCount) {
-  const values = (input.datasets || [])
-    .flatMap(d => d.data)
-    .map(Number)
-    .filter(v => Number.isFinite(v));
-
-  if (values.length === 0) return { labels: [], datasets: [] };
-
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const bins = Math.max(2, Math.min(100, Math.floor(binsCount || 10)));
+  const values = (input.datasets||[]).flatMap(d => d.data).map(Number).filter(Number.isFinite);
+  if (!values.length) return { labels: [], datasets: [] };
+  const min = Math.min(...values), max = Math.max(...values);
+  const bins = Math.max(2, Math.min(100, Math.floor(binsCount||10)));
   const step = (max - min) / bins || 1;
-
-  const edges = Array.from({ length: bins }, (_, i) => min + i * step);
+  const edges = Array.from({length: bins}, (_,i)=>min + i*step);
   const counts = new Array(bins).fill(0);
   for (const v of values) {
-    let idx = Math.floor((v - min) / step);
-    if (idx >= bins) idx = bins - 1;
+    let idx = Math.floor((v-min)/step);
+    if (idx >= bins) idx = bins-1;
     if (idx < 0) idx = 0;
     counts[idx]++;
   }
-  const labels = edges.map((e, i) => {
-    const end = i === bins - 1 ? max : (e + step);
+  const labels = edges.map((e,i)=>{
+    const end = i===bins-1 ? max : e+step;
     return `${e.toFixed(2)}–${end.toFixed(2)}`;
   });
-  return { labels, datasets: [{ label: 'Frequency', data: counts }] };
+  return { labels, datasets:[{ label:'Frequency', data: counts }] };
 }
-
 function genWaterfall(input) {
   const labels = Array.isArray(input.labels) ? input.labels.slice() : [];
   const raw = (input.datasets?.[0]?.data || []).map(Number);
@@ -631,10 +638,9 @@ function genWaterfall(input) {
   const startVal = startProvided ? raw[0] : 0;
   const steps = startProvided ? raw.slice(1) : raw.slice();
   const stepLabels = startProvided ? labels.slice(1) : labels.slice();
-
   let running = startVal;
   const data = [], bases = [];
-  for (let i = 0; i < steps.length; i++) {
+  for (let i=0;i<steps.length;i++){
     const v = steps[i];
     if (!Number.isFinite(v)) { data.push(0); bases.push(running); continue; }
     const base = v >= 0 ? running : running + v;
@@ -642,90 +648,127 @@ function genWaterfall(input) {
     data.push(Math.abs(v));
     running += v;
   }
-  stepLabels.push('Total');
-  bases.push(0);
-  data.push(Math.abs(running));
-
-  const colors = stepLabels.map((_, i) => {
-    if (i === stepLabels.length - 1) return '#6c757d';
-    return steps[i] >= 0 ? '#2ca02c' : '#d62728';
-  });
-
+  stepLabels.push('Total'); bases.push(0); data.push(Math.abs(running));
+  const colors = stepLabels.map((_,i)=> i===stepLabels.length-1 ? '#6c757d' : (steps[i]>=0 ? '#2ca02c' : '#d62728'));
   return {
     labels: stepLabels,
-    datasets: [{
-      label: 'Waterfall',
-      data: data.map((h, i) => ({ x: stepLabels[i], y: h, base: bases[i] })),
-      backgroundColor: colors,
-      borderWidth: 0
-    }]
+    datasets: [{ label:'Waterfall', data: data.map((h,i)=>({x:stepLabels[i], y:h, base:bases[i]})), backgroundColor: colors, borderWidth:0 }]
   };
 }
 
-// Data shaping
-function areaizeDatasets(ds, tension = 0.2) {
+/* ------------------ Performance helpers ------------------ */
+function downsampleEveryN(arr, maxPoints) {
+  if (!Array.isArray(arr) || arr.length <= maxPoints) return arr;
+  const step = Math.ceil(arr.length / maxPoints);
+  const out = [];
+  for (let i=0;i<arr.length;i+=step) out.push(arr[i]);
+  return out;
+}
+function downsampleAverage(arr, maxPoints) {
+  if (!Array.isArray(arr) || arr.length <= maxPoints) return arr;
+  const bins = maxPoints;
+  const size = Math.floor(arr.length / bins);
+  const out = [];
+  for (let b=0;b<bins;b++){
+    const start = b*size;
+    const end = b===bins-1 ? arr.length : start+size;
+    let sx=0, sy=0, sr=0, c=0;
+    for (let i=start;i<end;i++) {
+      const v = arr[i];
+      if (typeof v === 'number') { sx += i; sy += v; c++; }
+      else if (v && typeof v === 'object') {
+        const x = Number.isFinite(v.x) ? v.x : i, y = v.y;
+        if (Number.isFinite(y)) { sx += x; sy += y; sr += (v.r||0); c++; }
+      }
+    }
+    if (c>0) {
+      const x = sx / c, y = sy / c;
+      if (arr[0] && typeof arr[0] === 'object' && 'y' in arr[0]) {
+        const r = sr / c || undefined;
+        out.push(r ? { x, y, r } : { x, y });
+      } else {
+        out.push(y);
+      }
+    }
+  }
+  return out;
+}
+function maybeReduceDataset(ds, maxPoints, strategy) {
+  const reduce = strategy === 'average' ? downsampleAverage : downsampleEveryN;
+  return ds.map(series => {
+    const data = series.data || [];
+    const reduced = reduce(data, maxPoints);
+    return { ...series, data: reduced };
+  });
+}
+function formatForDecimationIfNeeded(type, datasets) {
+  if (!['line','area','scatter','bubble'].includes(type)) return datasets;
+  return datasets.map(d => {
+    const arr = d.data || [];
+    // If numeric array, convert to {x,y}
+    const needsXY = arr.length && typeof arr[0] === 'number';
+    let data = arr;
+    if (needsXY) data = arr.map((y, i) => ({ x: i, y }));
+    // Ensure sorted by x
+    if (data.length && typeof data[0] === 'object' && 'x' in data[0]) {
+      data = data.slice().sort((a,b) => (a.x ?? 0) - (b.x ?? 0));
+    }
+    return { ...d, data };
+  });
+}
+
+/* ------------------ Styling helpers ------------------ */
+function areaize(ds, tension=0.2) {
   return ds.map(d => ({ ...d, fill: true, tension }));
 }
-function applyPalette(ds, mode) {
+function applyPalette(ds, kind) {
   const colors = currentColors(ds.length);
-  return ds.map((d, i) => {
+  return ds.map((d,i) => {
     const stroke = d.borderColor || colors[i % colors.length];
-    const fill = d.backgroundColor || (mode === 'pie' ? stroke : hexToRgba(stroke, 0.25));
+    const fill = d.backgroundColor || (kind === 'pie' ? stroke : hexToRgba(stroke, 0.25));
     return { ...d, borderColor: stroke, backgroundColor: fill };
   });
 }
 
-// Chart manager
-const ChartManager = {
-  create(ctx, config) {
-    // Ensure previous instance is gone
-    this.destroy();
-    State.chart = new Chart(ctx, config);
-    return State.chart;
-  },
-  update(config) {
-    // If type or indexAxis changed, full recreate; else patch
-    const prev = State.lastConfig;
-    const typeChanged = !prev || prev.type !== config.type;
-    const axisChanged = !prev || prev.options?.indexAxis !== config.options?.indexAxis;
-
-    if (!State.chart || typeChanged || axisChanged) {
-      return this.create($('#chart-canvas').getContext('2d'), config);
-    }
-
-    // Patch data/options to avoid recreation
-    State.chart.config.data = config.data;
-    State.chart.options = config.options;
-    State.chart.update('none');
-    return State.chart;
-  },
-  destroy() {
-    if (State.chart && typeof State.chart.destroy === 'function') {
-      State.chart.destroy();
-    }
-    State.chart = null;
-  }
-};
-
-// Read data from UI
-function readData() {
-  let parsed = { labels: [], datasets: [] };
-  if (State.dataMode === 'csv') {
-    parsed = csvToData($('#dataInput').value || '', State.currentType);
-  } else {
-    parsed = jsonToData($('#dataInput').value || '{}');
-  }
-
-  if (State.currentType === 'histogram') {
-    const bins = Math.max(2, Math.min(100, parseInt($('#histBins').value || '10', 10)));
-    return genHistogram(parsed, bins);
-  }
-  if (State.currentType === 'waterfall') {
-    return genWaterfall(parsed);
-  }
-  return parsed;
+/* ------------------ UI wiring ------------------ */
+function setChartType(type) {
+  State.currentType = type;
+  $('#chartTypeBadge').textContent = `Type: ${type}`;
+  // Toggle axis controls for non-axis charts
+  const hide = ['pie','radar'];
+  const axisNeeded = !hide.includes(type);
+  ['xTitle','yTitle','yMin','yMax','stacked','smoothness'].forEach(id => {
+    const el = $('#'+id);
+    if (!el) return;
+    const group = el.closest('.kv') || el;
+    group.classList.toggle('hidden', !axisNeeded && ['yMin','yMax','stacked','smoothness','xTitle','yTitle'].includes(id));
+  });
+}
+function setDataMode(mode) {
+  State.dataMode = mode;
+  $('#dataModeBadge').textContent = `Data: ${mode.toUpperCase()}`;
+}
+function setPerfMode(mode) {
+  State.perfMode = mode;
+  $('#perfBadge').textContent = `Mode: ${mode}`;
 }
 
+/* ------------------ Build config ------------------ */
+function readData() {
+  const base = State.dataMode === 'csv' ? csvToData($('#dataInput').value || '', State.currentType)
+                                        : jsonToData($('#dataInput').value || '{}');
+  if (State.currentType === 'histogram') {
+    const bins = clampInt($('#histBins').value, 2, 100, 10);
+    return genHistogram(base, bins);
+  }
+  if (State.currentType === 'waterfall') return genWaterfall(base);
+  return base;
+}
+function clampInt(v, min, max, def) {
+  const n = parseInt(v, 10);
+  if (!Number.isFinite(n)) return def;
+  return Math.max(min, Math.min(max, n));
+}
 function buildConfig() {
   const { labels, datasets } = readData();
 
@@ -734,8 +777,8 @@ function buildConfig() {
   const showGrid = $('#gridLines').value === 'true';
   const smooth = parseFloat($('#smoothness').value || '0');
   const stacked = $('#stacked').value === 'true';
-  const showVals = $('#showValues').value === 'true'; // kept for compatibility
-  const anim = $('#anim').value === 'true';
+  const showVals = $('#showValues').value === 'true';
+  const anim = $('#anim').value === 'true' && State.perfMode === 'full';
   const tooltips = $('#tooltips').value === 'true';
   const aspect = parseAspect($('#aspect').value);
   const yMin = parseFloat($('#yMin').value);
@@ -752,16 +795,40 @@ function buildConfig() {
   if (State.currentType === 'bar') indexAxis = 'y';
   if (['column','histogram','waterfall'].includes(State.currentType)) indexAxis = 'x';
 
-  // Tension and fills
+  // Apply performance reductions
+  const maxPoints = clampInt($('#pointCap').value, 500, 20000, 5000);
+  const strategy = $('#downsampleStrategy').value;
   let ds = datasets.slice();
-  if (State.currentType === 'area') ds = areaizeDatasets(ds, smooth);
+
+  // Reduce only if exceeding cap
+  let reducedFlag = false;
+  ds = ds.map(series => {
+    const arr = series.data || [];
+    if (Array.isArray(arr) && arr.length > maxPoints) {
+      reducedFlag = true;
+      const reducer = strategy === 'average' ? downsampleAverage : downsampleEveryN;
+      return { ...series, data: reducer(arr, maxPoints) };
+    }
+    return series;
+  });
+  $('#dsInfo').textContent = reducedFlag ? `Downsample: yes (≤${maxPoints}/series)` : 'Downsample: no';
+
+  // Light mode defaults
+  if (State.perfMode === 'light') {
+    // Reduce a bit more for super large cases
+    const hardCap = Math.min(maxPoints, 8000);
+    ds = maybeReduceDataset(ds, hardCap, strategy);
+  }
+
+  // Area smoothing
+  if (State.currentType === 'area') ds = areaize(ds, smooth);
   if (State.currentType === 'line') ds = ds.map(d => ({ ...d, tension: smooth }));
 
   // Palette
   const paletteKind = (State.currentType === 'pie' || State.currentType === 'radar') ? 'pie' : 'series';
   ds = applyPalette(ds, paletteKind);
 
-  // Pie: single dataset
+  // Pie expects single dataset
   if (State.currentType === 'pie') {
     const merged = {
       label: ds[0]?.label || 'Series 1',
@@ -771,34 +838,33 @@ function buildConfig() {
     ds = [merged];
   }
 
-  // Scales
+  // Optional: format for decimation
+  const forDecimate = formatForDecimationIfNeeded(type, ds);
+
   const axisTitle = t => ({ display: !!t, text: t });
   const commonScales = {
-    x: { stacked, grid: { display: showGrid }, title: axisTitle($('#xTitle').value) },
-    y: {
-      stacked, grid: { display: showGrid }, title: axisTitle($('#yTitle').value),
-      suggestedMin: Number.isFinite(yMin) ? yMin : undefined,
-      suggestedMax: Number.isFinite(yMax) ? yMax : undefined
-    }
+    x: { stacked, grid:{ display: showGrid }, title: axisTitle($('#xTitle').value) },
+    y: { stacked, grid:{ display: showGrid }, title: axisTitle($('#yTitle').value),
+         suggestedMin: Number.isFinite(yMin) ? yMin : undefined,
+         suggestedMax: Number.isFinite(yMax) ? yMax : undefined }
   };
   const xyScales = {
-    x: { type: 'linear', grid: { display: showGrid }, title: axisTitle($('#xTitle').value) },
-    y: { type: 'linear', grid: { display: showGrid }, title: axisTitle($('#yTitle').value) }
+    x: { type:'linear', grid:{ display: showGrid }, title: axisTitle($('#xTitle').value) },
+    y: { type:'linear', grid:{ display: showGrid }, title: axisTitle($('#yTitle').value) }
   };
 
-  // Decimation: only for large line/area/scatter/bubble datasets
-  const enableDecimation = ['line','scatter','bubble'].includes(type);
+  const enableDecimation = State.perfMode === 'full' && ['line','scatter','bubble'].includes(type);
 
   const config = {
     type,
-    data: { labels, datasets: ds },
+    data: { labels, datasets: forDecimate },
     options: {
-      parsing: true,            // allow decimation to work on standard arrays
-      normalized: true,         // better performance with uniform data types
+      parsing: true,
+      normalized: true,
       responsive: true,
       maintainAspectRatio: Boolean(aspect),
       aspectRatio: aspect,
-      animation: anim ? { duration: 300 } : false,
+      animation: anim ? { duration: 250 } : false,
       backgroundColor: bg,
       plugins: {
         legend: { display: legendPos !== 'hidden', position: legendPos === 'hidden' ? 'top' : legendPos },
@@ -813,7 +879,7 @@ function buildConfig() {
     }
   };
 
-  // Waterfall-specific tooltips
+  // Waterfall tooltips
   if (State.currentType === 'waterfall') {
     config.options.plugins.tooltip = {
       enabled: true,
@@ -823,14 +889,14 @@ function buildConfig() {
           const base = raw.base ?? 0;
           const delta = raw.y ?? 0;
           const end = base + delta;
-          if (ctx.dataIndex === (labels.length - 1)) return `Total: ${end}`;
+          if (ctx.dataIndex === (config.data.labels.length - 1)) return `Total: ${end}`;
           return `Δ ${delta} (from ${base} to ${end})`;
         }
       }
     };
   }
 
-  // Lighten bar borders to reduce overdraw
+  // Bar borders lighter to reduce overdraw
   if (type === 'bar') {
     config.data.datasets.forEach(d => {
       d.borderWidth = 0.5;
@@ -838,34 +904,53 @@ function buildConfig() {
     });
   }
 
-  // Canvas bg color (CSS)
+  // Canvas bg
   $('#chart-canvas').style.background = bg;
 
-  // Value labels overlay is disabled by default to avoid extra canvas passes
-  // If you really want it, you can re-enable after update via attachValueLabels(State.chart)
+  // Value labels are optional (off by default)
+  config.options.plugins.datalabels = undefined;
 
   return config;
 }
 
-// Rendering
-function renderChart() {
-  const ctx = $('#chart-canvas').getContext('2d', { willReadFrequently: false });
-  const cfg = buildConfig();
-
-  // If config is deeply identical, skip update (cheap check)
-  const cfgStr = JSON.stringify(cfg, (k, v) => (typeof v === 'function' ? undefined : v));
-  const lastStr = State.lastConfig ? JSON.stringify(State.lastConfig, (k, v) => (typeof v === 'function' ? undefined : v)) : '';
-  State.lastConfig = cfg;
-
-  if (cfgStr === lastStr && State.chart) {
-    // No material change
-    return;
+/* ------------------ Chart lifecycle ------------------ */
+function resetCanvas() {
+  const canvas = $('#chart-canvas');
+  if (!canvas) return;
+  // Clear and force context loss to free GPU memory
+  const ctx = canvas.getContext('2d');
+  if (ctx) ctx.clearRect(0,0,canvas.width, canvas.height);
+  canvas.width = canvas.width;
+}
+function destroyChart() {
+  if (State.chart && typeof State.chart.destroy === 'function') {
+    State.chart.destroy();
   }
-
-  ChartManager.update(cfg);
+  State.chart = null;
+}
+function hashConfig(cfg) {
+  return JSON.stringify(cfg, (k,v)=> typeof v === 'function' ? undefined : v);
 }
 
-// Value labels (optional; disabled by default to save memory/draws)
+function renderChart() {
+  try {
+    const cfg = buildConfig();
+    const h = hashConfig(cfg);
+    if (h === State.lastConfigHash && State.chart) return; // no-op
+
+    destroyChart();
+    resetCanvas();
+
+    const ctx = $('#chart-canvas').getContext('2d');
+    State.chart = new Chart(ctx, cfg);
+    State.lastConfigHash = h;
+
+    if ($('#showValues').value === 'true') attachValueLabels(State.chart);
+  } catch (e) {
+    console.error('Render error:', e);
+    alert('Rendering failed. Try Light mode, reduce point cap, or check data format.');
+  }
+}
 function attachValueLabels(chart) {
   if (!chart) return;
   const ctx = chart.ctx;
@@ -873,19 +958,17 @@ function attachValueLabels(chart) {
   ctx.save();
   ctx.font = '12px system-ui';
   ctx.fillStyle = '#333';
-  const metas = chart.data.datasets.map((_, i) => chart.getDatasetMeta(i));
-
-  metas.forEach((meta, di) => {
-    if (!meta || !meta.data) return;
-    meta.data.forEach((el, i) => {
-      const val = chart.data.datasets[di].data[i];
+  chart.data.datasets.forEach((ds, di) => {
+    const meta = chart.getDatasetMeta(di);
+    (meta?.data || []).forEach((el, i) => {
+      const v = ds.data[i];
       if (!el || el.x == null || el.y == null) return;
       let text = '';
-      if (typeof val === 'number') text = String(val);
-      else if (val && typeof val === 'object') {
-        if ('r' in val) text = `${val.x}, ${val.y} (r=${val.r})`;
-        else if ('base' in val) text = `${(val.base ?? 0) + (val.y ?? 0)}`;
-        else text = `${val.x}, ${val.y}`;
+      if (typeof v === 'number') text = String(v);
+      else if (v && typeof v === 'object') {
+        if ('r' in v) text = `${v.x}, ${v.y} (r=${v.r})`;
+        else if ('base' in v) text = `${(v.base ?? 0) + (v.y ?? 0)}`;
+        else text = `${v.x}, ${v.y}`;
       }
       ctx.textAlign = 'center';
       ctx.fillText(text, el.x, el.y - 6);
@@ -894,8 +977,21 @@ function attachValueLabels(chart) {
   ctx.restore();
 }
 
-// UI wiring (single-bind; no duplicate listeners)
-function initUI() {
+/* ------------------ Diagnostics ------------------ */
+function startMemoryMonitor() {
+  const el = $('#memInfo');
+  if (!('memory' in performance) || !performance.memory) {
+    el.textContent = 'Heap: n/a';
+    return;
+  }
+  setInterval(() => {
+    const used = performance.memory.usedJSHeapSize / 1048576;
+    el.textContent = `Heap: ${used.toFixed(1)} MB`;
+  }, 2000);
+}
+
+/* ------------------ Events ------------------ */
+function bindUI() {
   // Tabs
   $$('.tab-button').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -903,42 +999,53 @@ function initUI() {
       btn.classList.add('active');
       const id = btn.dataset.tab;
       $$('.tab-panel').forEach(p => p.classList.remove('active'));
-      $('#' + id).classList.add('active');
+      $('#'+id).classList.add('active');
     }, { passive: true });
   });
 
-  // Chart type buttons
+  // Type buttons
   $$('.chart-type').forEach(btn => {
     btn.addEventListener('click', () => {
       $$('.chart-type').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       setChartType(btn.dataset.type);
-      debounceRender(80);
+      if (State.livePreview === 'on') renderChart();
     }, { passive: true });
   });
 
   // Data mode
-  $('#modeJSON').addEventListener('click', () => { setDataMode('json'); debounceRender(); }, { passive: true });
-  $('#modeCSV').addEventListener('click', () => { setDataMode('csv'); debounceRender(); }, { passive: true });
+  $('#modeJSON').addEventListener('click', () => { setDataMode('json'); if (State.livePreview==='on') renderChart(); });
+  '#modeCSV' && $('#modeCSV').addEventListener('click', () => { setDataMode('csv'); if (State.livePreview==='on') renderChart(); });
 
-  // Quick actions
-  $('#btnSample').addEventListener('click', () => { loadSample(); debounceRender(60); });
-  $('#btnClear').addEventListener('click', () => { $('#dataInput').value = ''; debounceRender(); });
-  $('#btnAddSeries').addEventListener('click', () => { addSeries(); debounceRender(); });
-  $('#btnRemoveSeries').addEventListener('click', () => { removeSeries(); debounceRender(); });
-  $('#btnRender').addEventListener('click', () => scheduleRender());
-  $('#btnUpdate').addEventListener('click', () => scheduleRender());
+  // Actions
+  const triggerRender = () => renderChart();
+  $('#btnRender').addEventListener('click', triggerRender);
+  $('#btnRenderBottom').addEventListener('click', triggerRender);
+  $('#btnPreview').addEventListener('click', renderChart);
+  $('#btnSample').addEventListener('click', () => { loadSample(); if (State.livePreview==='on') renderChart(); });
+  $('#btnClear').addEventListener('click', () => { $('#dataInput').value = ''; if (State.livePreview==='on') renderChart(); });
 
-  // Style/Options
-  $('#palette').addEventListener('change', e => { State.paletteName = e.target.value; debounceRender(); });
-  ['legendPos','chartTitle','gridLines','bgColor','smoothness','stacked','histBins',
-   'yMin','yMax','xTitle','yTitle','anim','tooltips','aspect','showValues'
-  ].forEach(id => {
-    const el = $('#' + id);
-    if (!el) return;
+  // Series
+  $('#btnAddSeries').addEventListener('click', () => { addSeries(); if (State.livePreview==='on') renderChart(); });
+  $('#btnRemoveSeries').addEventListener('click', () => { removeSeries(); if (State.livePreview==='on') renderChart(); });
+
+  // Style/Options (no auto render on keystroke unless livePreview = on)
+  const optIds = ['legendPos','chartTitle','gridLines','bgColor','smoothness','stacked','histBins',
+                  'yMin','yMax','xTitle','yTitle','anim','tooltips','aspect','palette','showValues'];
+  optIds.forEach(id => {
+    const el = $('#'+id); if (!el) return;
     const evt = el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ? 'input' : 'change';
-    el.addEventListener(evt, () => debounceRender(120));
+    el.addEventListener(evt, () => {
+      if (id === 'palette') State.paletteName = el.value;
+      if (State.livePreview === 'on') renderChart();
+    });
   });
+
+  // Performance controls
+  $('#perfMode').addEventListener('change', e => { setPerfMode(e.target.value); if (State.livePreview==='on') renderChart(); });
+  $('#pointCap').addEventListener('change', () => { if (State.livePreview==='on') renderChart(); });
+  $('#downsampleStrategy').addEventListener('change', () => { if (State.livePreview==='on') renderChart(); });
+  $('#livePreview').addEventListener('change', e => { State.livePreview = e.target.value; });
 
   // Export
   $('#btnExportPNG').addEventListener('click', () => {
@@ -950,42 +1057,25 @@ function initUI() {
     } catch {}
   });
   $('#btnCopyConfig').addEventListener('click', () => {
-    const cfg = buildConfig();
-    navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)).catch(() => {});
+    try {
+      const cfg = buildConfig();
+      navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
+    } catch {}
   });
 
   // Command box
   $('#commandBox').addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     const v = e.target.value.trim().toLowerCase();
-    const type = ['bar','column','line','area','pie','histogram','scatter','radar','bubble','waterfall'].find(t => v.includes(t));
-    if (type) setChartType(type);
+    const t = ['bar','column','line','area','pie','histogram','scatter','radar','bubble','waterfall'].find(x => v.includes(x));
+    if (t) setChartType(t);
     const m = v.match(/(\d+)\s*bin/);
     if (m) $('#histBins').value = m[1];
-    debounceRender(50);
-  }, { passive: true });
-}
-
-function setChartType(type) {
-  State.currentType = type;
-  $('#chartTypeBadge').textContent = `Type: ${type}`;
-  // Show/hide axis-related controls
-  const hideFor = ['pie','radar'];
-  const axisNeeded = !hideFor.includes(type);
-  ['xTitle','yTitle','yMin','yMax','stacked','smoothness'].forEach(id => {
-    const node = $('#' + id);
-    if (!node) return;
-    const group = node.closest('.kv') || node;
-    group.classList.toggle('hidden', !axisNeeded && ['yMin','yMax','stacked','smoothness','xTitle','yTitle'].includes(id));
+    if (State.livePreview === 'on') renderChart();
   });
 }
 
-function setDataMode(mode) {
-  State.dataMode = mode;
-  $('#dataModeBadge').textContent = `Data: ${mode.toUpperCase()}`;
-}
-
-// Samples
+/* ------------------ Data helpers ------------------ */
 function loadSample() {
   const samples = {
     line: {
@@ -1048,27 +1138,28 @@ function loadSample() {
   };
   const s = samples[State.currentType] || samples.line;
   $('#dataInput').value = JSON.stringify(s, null, 2);
-  setDataMode('json');
 }
-
-// Series mutators (JSON mode only)
 function addSeries() {
-  const obj = safeParseJSON($('#dataInput').value || '{}', { labels: [], datasets: [] });
+  const obj = safeJSON($('#dataInput').value || '{}', { labels: [], datasets: [] });
   obj.datasets = obj.datasets || [];
   obj.datasets.push({ label: `Series ${obj.datasets.length + 1}`, data: new Array((obj.labels||[]).length).fill(0) });
   $('#dataInput').value = JSON.stringify(obj, null, 2);
 }
 function removeSeries() {
-  const obj = safeParseJSON($('#dataInput').value || '{}', { labels: [], datasets: [] });
+  const obj = safeJSON($('#dataInput').value || '{}', { labels: [], datasets: [] });
   obj.datasets = (obj.datasets || []).slice(0, -1);
   $('#dataInput').value = JSON.stringify(obj, null, 2);
 }
 
-// Boot
+/* ------------------ Boot ------------------ */
 function boot() {
   setChartType('line');
+  setDataMode('json');
+  setPerfMode('light');
   $('#legendPos').value = 'top';
   $('#palette').value = 'classic';
+  $('#anim').value = 'false';
+  $('#livePreview').value = 'off';
   $('#dataInput').value = JSON.stringify({
     labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
     datasets: [
@@ -1076,19 +1167,15 @@ function boot() {
       { label: 'Cost', data: [8, 11, 9, 12, 10, 13, 15] }
     ]
   }, null, 2);
-  initUI();
-  scheduleRender();
+
+  bindUI();
+  startMemoryMonitor();
+  renderChart();
 }
 
-// Guard: destroy chart when unloading to free memory
-window.addEventListener('beforeunload', () => {
-  ChartManager.destroy();
-});
-
-// Start
+window.addEventListener('beforeunload', destroyChart);
 boot();
-
-
-</script>
+  </script>
 </body>
 </html>
+
