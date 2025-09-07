@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StenoFoarstelling</title>
+<style>
+  /* ---------- Base / theme ---------- */
+  :root{
+    --accent:#0078d7;
+    --bg:#f3f3f3;
+    --text:#333;
+    --panel:#fff;
+    --muted:#888;
+    --border:#e0e0e0;
+    --soft:#f9f9f9;
+    --soft2:#f0f0f0;
+    --warn:#ff4d4d;
+    --thumb-bg:#fafafa;
+    --grid:#eaeaea;
+  }
+  *{box-sizing:border-box}
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg);
+    color: var(--text);
+  }
+
+  /* ---------- Ribbon ---------- */
+  .ribbon-menu {
+    background-color: var(--panel);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 5px 15px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tabs-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tabs { display: flex; flex-wrap: wrap; }
+  .tab-button {
+    background-color: transparent;
+    border: none;
+    padding: 10px 15px;
+    font-size: 15px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    color: #555;
+    font-weight: 500;
+  }
+  .tab-button:hover { background-color: var(--soft2); }
+  .tab-button.active { border-color: var(--accent); color: var(--accent); }
+  .tell-me { display: flex; align-items: center; gap:8px }
+  .tell-me input {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 260px;
+    transition: all 0.2s;
+  }
+  .tell-me input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.2);
+  }
+  .tab-panel {
+    display: none;
+    padding: 10px 0;
+    margin-top: 5px;
+  }
+  .tab-panel.active {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  .ribbon-group {
+    padding: 0 15px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+  }
+  .ribbon-group:last-child { border-right: none; }
+  .ribbon-group-title {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 5px;
+  }
+  .ribbon-group-items { display: flex; gap: 5px; flex-wrap: wrap; }
+  .ribbon-item, .icon-btn {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: var(--soft);
+    font-size: 14px;
+    transition: background-color 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    gap:6px;
+  }
+  .ribbon-item:hover, .icon-btn:hover { background-color: #e9e9e9; }
+  .ribbon-item:active, .icon-btn:active { transform: scale(0.98); }
+  .ribbon-item.active { background-color: #d1e2f6; border-color: var(--accent); }
+  .theme-select, select, input[type="color"], input[type="number"] {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background:#fff;
+  }
+  .spacer{width:10px}
+
+  /* ---------- App layout ---------- */
+  .app {
+    display: grid;
+    grid-template-columns: 240px 1fr 320px;
+    grid-template-rows: auto 1fr;
+    gap: 0;
+    min-height: calc(100vh - 120px);
+  }
+  .sidebar {
+    background: var(--panel);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    min-height: 0;
+  }
+  .thumbs-header{
+    padding:10px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between
+  }
+  .thumbnails {
+    overflow:auto;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    background:#fff;
+  }
+  .thumb {
+    background: var(--thumb-bg);
+    border:1px solid #ddd;
+    border-radius:6px;
+    padding:8px;
+    cursor:grab;
+    position:relative;
+  }
+  .thumb-number{
+    position:absolute;left:6px;top:4px;font-size:12px;color:#666;
+    background:#fff;border:1px solid #ddd;border-radius:3px;padding:1px 4px;
+  }
+  .thumb.active{ outline:2px solid var(--accent) }
+  .thumb-canvas{
+    width: 160px; height: 90px; background:#fff; position:relative; overflow:hidden;
+  }
+  .thumb-title{
+    margin-top:6px;font-size:12px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+  }
+
+  .stage {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: var(--bg);
+    min-height: 0;
+    position:relative;
+    overflow:auto;
+  }
+  .stage-toolbar{
+    position:absolute; top:10px; left:50%; transform:translateX(-50%);
+    display:flex; gap:6px; background:rgba(255,255,255,0.9); backdrop-filter: blur(6px);
+    border:1px solid #ddd; border-radius:8px; padding:6px 8px; z-index:5;
+  }
+  .zoom-indicator{font-size:12px;color:#555; padding:0 6px}
+  .slide-wrapper{
+    background: #fff;
+    border:1px solid #ccc;
+    box-shadow: 0 6px 26px rgba(0,0,0,0.12);
+    position: relative;
+    width: 1280px; height: 720px; /* 16:9 */
+    transform-origin: top left;
+  }
+  .slide-grid{
+    position:absolute; inset:0; background-image:
+      linear-gradient(to right, transparent 0, transparent 19px, var(--grid) 20px),
+      linear-gradient(to bottom, transparent 0, transparent 19px, var(--grid) 20px);
+    background-size: 20px 20px;
+    opacity:.6; pointer-events:none;
+  }
+  .slide {
+    position: absolute; inset:0; overflow:hidden; background-size:cover; background-position:center;
+  }
+  .selection-box{
+    position:absolute; border:1px dashed var(--accent); background: rgba(0,120,215,0.08); display:none; z-index:9;
+  }
+
+  .rightbar {
+    background: var(--panel);
+    border-left:1px solid var(--border);
+    display:flex; flex-direction:column; min-height:0;
+  }
+  .panel {
+    padding:12px;
+    border-bottom:1px solid var(--border);
+  }
+  .panel h3{
+    margin:0 0 8px 0; font-size:14px; color:#444
+  }
+  .panel .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px }
+  .panel label{ font-size:12px; color:#555; min-width:90px }
+
+  /* ---------- Elements ---------- */
+  .el { position:absolute; outline:none; user-select:contain; }
+  .el[contenteditable="true"]{ cursor:text }
+  .box { border:1px solid transparent; }
+  .selected { outline:2px solid var(--accent) !important; }
+  .locked { pointer-events:none; }
+  .handle {
+    width:9px; height:9px; background:#fff; border:1px solid #333;
+    position:absolute; z-index:3;
+  }
+  .handle.tl{left:-6px; top:-6px; cursor:nwse-resize}
+  .handle.tr{right:-6px; top:-6px; cursor:nesw-resize}
+  .handle.bl{left:-6px; bottom:-6px; cursor:nesw-resize}
+  .handle.br{right:-6px; bottom:-6px; cursor:nwse-resize}
+  .handle.ml{left:-6px; top:50%; transform:translateY(-50%); cursor:ew-resize}
+  .handle.mr{right:-6px; top:50%; transform:translateY(-50%); cursor:ew-resize}
+  .handle.mt{top:-6px; left:50%; transform:translateX(-50%); cursor:ns-resize}
+  .handle.mb{bottom:-6px; left:50%; transform:translateX(-50%); cursor:ns-resize}
+  .rotate{
+    position:absolute; top:-28px; left:50%; transform:translateX(-50%);
+    width:14px; height:14px; border:1px solid #333; border-radius:50%; background:#fff; cursor:grab;
+  }
+
+  /* ---------- Draw canvas ---------- */
+  #drawing-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .drawing-canvas-active { cursor: crosshair; pointer-events: auto !important; }
+
+  /* ---------- Presenter ---------- */
+  .presenter {
+    position:fixed; inset:0; background:#000; color:#fff; display:none; align-items:center; justify-content:center;
+  }
+  .presenter .slide-present {
+    width:90vw; height:50.6vw; max-height:90vh; max-width:160vh;
+    background:#000; position:relative; overflow:hidden;
+  }
+  .presenter .notes {
+    position:fixed; left:20px; bottom:20px; font-size:14px; color:#ddd; max-width:40vw; opacity:.9
+  }
+
+  /* ---------- Themes ---------- */
+  .theme-default {}
+  .theme-dark .slide { background-color:#111; color:#eee }
+  .theme-dark .el { color:#eee }
+  .theme-minimal .slide { background-color:#fff; color:#222 }
+
+  /* ---------- Utility ---------- */
+  .hidden{display:none !important}
+  .muted{color:#666}
+  .hr{height:1px; background:var(--border); margin:6px 0}
+  .small{font-size:12px}
+</style>
+</head>
+<body>
+  <!-- Ribbon -->
+  <div class="ribbon-menu">
+    <div class="tabs-container">
+      <div class="tabs">
+        <button class="tab-button active" data-tab="file">File</button>
+        <button class="tab-button" data-tab="home">Home</button>
+        <button class="tab-button" data-tab="insert">Insert</button>
+        <button class="tab-button" data-tab="design">Design</button>
+        <button class="tab-button" data-tab="transitions">Transitions</button>
+        <button class="tab-button" data-tab="draw">Draw</button>
+        <button class="tab-button" data-tab="view">View</button>
+      </div>
+      <div class="tell-me">
+        <input id="tellMe" type="text" placeholder="Tell me what you want to do..." />
+        <button class="icon-btn" id="runTellMe">Go</button>
+      </div>
+    </div>
+
+    <!-- File -->
+    <div class="tab-panel active" id="file">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="newDeck">New</button>
+          <button class="ribbon-item" id="openDeck">Open</button>
+          <input type="file" id="openDeckFile" class="hidden" accept=".json" />
+          <button class="ribbon-item" id="saveDeck">Save JSON</button>
+          <button class="ribbon-item" id="exportHTML">Export HTML</button>
+          <button class="ribbon-item" id="printPDF">Print/PDF</button>
+        </div>
+        <div class="ribbon-group-title">Project</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="present">Presenter</button>
+          <button class="ribbon-item" id="exportPNG">Export PNG</button>
+        </div>
+        <div class="ribbon-group-title">Share</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <label class="small muted">Autosave: <span id="autosaveStatus">On</span></label>
+        </div>
+        <div class="ribbon-group-title">Settings</div>
+      </div>
+    </div>
+
+    <!-- Home -->
+    <div class="tab-panel" id="home">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="addSlide">New Slide</button>
+          <button class="ribbon-item" id="duplicateSlide">Duplicate</button>
+          <button class="ribbon-item" id="deleteSlide">Delete</button>
+        </div>
+        <div class="ribbon-group-title">Slides</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <select id="fontName" class="theme-select">
+            <option>Segoe UI</option><option>Arial</option><option>Roboto</option><option>Georgia</option><option>Monaco</option>
+          </select>
+          <input type="number" id="fontSize" min="8" max="200" value="24" style="width:70px"/>
+          <button class="ribbon-item" data-cmd="bold"><b>B</b></button>
+          <button class="ribbon-item" data-cmd="italic"><i>I</i></button>
+          <button class="ribbon-item" data-cmd="underline"><u>U</u></button>
+          <input type="color" id="fontColor" value="#222222" />
+        </div>
+        <div class="ribbon-group-title">Text</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="alignLeft">Align Left</button>
+          <button class="ribbon-item" id="alignCenter">Align Center</button>
+          <button class="ribbon-item" id="alignRight">Align Right</button>
+          <button class="ribbon-item" id="distributeH">Distribute H</button>
+          <button class="ribbon-item" id="distributeV">Distribute V</button>
+        </div>
+        <div class="ribbon-group-title">Arrange</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="bringFront">Bring Front</button>
+          <button class="ribbon-item" id="sendBack">Send Back</button>
+          <button class="ribbon-item" id="lock">Lock</button>
+          <button class="ribbon-item" id="unlock">Unlock</button>
+          <button class="ribbon-item" id="group">Group</button>
+          <button class="ribbon-item" id="ungroup">Ungroup</button>
+        </div>
+        <div class="ribbon-group-title">Layers</div>
+      </div>
+    </div>
+
+    <!-- Insert -->
+    <div class="tab-panel" id="insert">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="insertTitle">Title + Subtitle</button>
+          <button class="ribbon-item" id="insertTwoCols">Two Columns</button>
+          <button class="ribbon-item" id="insertBlank">Blank</button>
+        </div>
+        <div class="ribbon-group-title">Layouts</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="addText">Text Box</button>
+          <button class="ribbon-item" id="addRect">Rectangle</button>
+          <button class="ribbon-item" id="addEllipse">Ellipse</button>
+          <button class="ribbon-item" id="addSticky">Sticky</button>
+        </div>
+        <div class="ribbon-group-title">Elements</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="addImage">Image</button>
+          <input type="file" id="imageFile" class="hidden" accept="image/*" />
+          <button class="ribbon-item" id="addVideo">Video URL</button>
+        </div>
+        <div class="ribbon-group-title">Media</div>
+      </div>
+    </div>
+
+    <!-- Design -->
+    <div class="tab-panel" id="design">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <select id="themeSelect" class="theme-select">
+            <option value="theme-default">Default</option>
+            <option value="theme-dark">Dark</option>
+            <option value="theme-minimal">Minimal</option>
+          </select>
+          <div class="spacer"></div>
+          <label class="small muted">BG Color</label><input type="color" id="slideBgColor" value="#ffffff"/>
+          <label class="small muted">BG Image</label><input type="file" id="slideBgImage" accept="image/*"/>
+          <button class="ribbon-item" id="clearBg">Clear</button>
+        </div>
+        <div class="ribbon-group-title">Theme & Background</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <label class="small muted">Grid</label>
+          <button class="ribbon-item" id="toggleGrid">Toggle Grid</button>
+          <label class="small muted">Snap</label>
+          <button class="ribbon-item" id="toggleSnap">Toggle Snap</button>
+        </div>
+        <div class="ribbon-group-title">Canvas</div>
+      </div>
+    </div>
+
+    <!-- Transitions -->
+    <div class="tab-panel" id="transitions">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <select id="transitionType" class="theme-select">
+            <option value="none">None</option>
+            <option value="fade">Fade</option>
+            <option value="slide">Slide</option>
+            <option value="zoom">Zoom</option>
+          </select>
+          <label class="small muted">Duration</label>
+          <input type="number" id="transitionDuration" min="100" max="5000" value="500" style="width:90px"/>
+          <button class="ribbon-item" id="previewTransition">Preview</button>
+        </div>
+        <div class="ribbon-group-title">Slide Transition</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <select id="animType" class="theme-select">
+            <option value="none">None</option>
+            <option value="fade-in">Fade In</option>
+            <option value="slide-up">Slide Up</option>
+            <option value="zoom-in">Zoom In</option>
+          </select>
+          <label class="small muted">Delay</label>
+          <input type="number" id="animDelay" min="0" max="5000" value="0" style="width:90px"/>
+          <button class="ribbon-item" id="applyAnim">Apply to Selection</button>
+        </div>
+        <div class="ribbon-group-title">Element Animation</div>
+      </div>
+    </div>
+
+    <!-- Draw -->
+    <div class="tab-panel" id="draw">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="toggleDraw">Toggle Draw</button>
+          <label class="small muted">Color</label><input type="color" id="drawColor" value="#e91e63" />
+          <label class="small muted">Width</label><input type="number" id="drawWidth" value="4" min="1" max="40" style="width:70px"/>
+          <button class="ribbon-item" id="drawEraser">Eraser</button>
+          <button class="ribbon-item" id="clearDrawing">Clear</button>
+        </div>
+        <div class="ribbon-group-title">Ink</div>
+      </div>
+    </div>
+
+    <!-- View -->
+    <div class="tab-panel" id="view">
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="zoomOut">-</button>
+          <span class="ribbon-item" id="zoomLabel">100%</span>
+          <button class="ribbon-item" id="zoomIn">+</button>
+          <button class="ribbon-item" id="fit">Fit</button>
+          <button class="ribbon-item" id="actual">Actual</button>
+        </div>
+        <div class="ribbon-group-title">Zoom</div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-items">
+          <button class="ribbon-item" id="toggleNotes">Notes Panel</button>
+        </div>
+        <div class="ribbon-group-title">Notes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div class="app">
+    <!-- Sidebar thumbnails -->
+    <div class="sidebar">
+      <div class="thumbs-header">
+        <span class="muted small">Slides</span>
+        <div style="display:flex;gap:6px">
+          <button title="Add slide" class="icon-btn" id="addSlide2">+</button>
+          <button title="Duplicate slide" class="icon-btn" id="duplicateSlide2">⧉</button>
+        </div>
+      </div>
+      <div id="thumbnails" class="thumbnails"></div>
+    </div>
+
+    <!-- Stage -->
+    <div class="stage">
+      <div class="stage-toolbar">
+        <button class="icon-btn" id="nudgeUp">↑</button>
+        <button class="icon-btn" id="nudgeLeft">←</button>
+        <button class="icon-btn" id="nudgeRight">→</button>
+        <button class="icon-btn" id="nudgeDown">↓</button>
+        <span class="zoom-indicator" id="zoomIndicator">100%</span>
+      </div>
+      <div id="slideWrapper" class="slide-wrapper theme-default">
+        <div class="slide-grid" id="slideGrid"></div>
+        <div id="slide" class="slide"></div>
+        <canvas id="drawing-canvas"></canvas>
+        <div id="selectionBox" class="selection-box"></div>
+      </div>
+    </div>
+
+    <!-- Right sidebar -->
+    <div class="rightbar">
+      <div class="panel">
+        <h3>Selection</h3>
+        <div class="row"><label>Type</label><span id="selType" class="small muted">None</span></div>
+        <div class="row"><label>X</label><input type="number" id="posX" style="width:90px"/><label>Y</label><input type="number" id="posY" style="width:90px"/></div>
+        <div class="row"><label>W</label><input type="number" id="sizeW" style="width:90px"/><label>H</label><input type="number" id="sizeH" style="width:90px"/></div>
+        <div class="row"><label>Rotate</label><input type="number" id="rotateDeg" value="0" style="width:90px"/></div>
+        <div class="row"><label>Fill</label><input type="color" id="fillColor" value="#ffffff"/><label>Stroke</label><input type="color" id="strokeColor" value="#333333"/></div>
+        <div class="row"><label>Stroke px</label><input type="number" id="strokeWidth" min="0" value="1" style="width:90px"/></div>
+      </div>
+
+      <div class="panel">
+        <h3>Slide notes</h3>
+        <textarea id="notes" rows="8" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px" placeholder="Speaker notes for this slide..."></textarea>
+      </div>
+
+      <div class="panel">
+        <h3>Project</h3>
+        <div class="row"><label>Title</label><input id="deckTitle" type="text" placeholder="Untitled deck" style="flex:1"/></div>
+        <div class="row small muted">Autosave to browser storage.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Presenter -->
+  <div id="presenter" class="presenter">
+    <div class="slide-present" id="presentCanvas"></div>
+    <div class="notes" id="presentNotes"></div>
+  </div>
+
+<script>
+/* =========================
+   StenoFoarstelling Logic
+   ========================= */
+(function(){
+  // ---------- State ----------
+  const slideSize = { w:1280, h:720 };
+  let zoom = 1;
+  let currentSlide = 0;
+  let hoveringThumbIndex = null;
+  let isGrid = true;
+  let isSnap = true;
+  let drawing = false;
+  let erasing = false;
+  let history = [];
+  let future = [];
+  let lastSaved = 0;
+
+  // Data model
+  let deck = {
+    title: "StenoFoarstelling Deck",
+    theme: "theme-default",
+    slides: [
+      {
+        id: uid(),
+        background: { color:"#ffffff", image:null },
+        transition: { type:"fade", duration:500 },
+        notes: "",
+        elements: [
+          elText("Welcome to StenoFoarstelling", 120, 200, 1040, 120, {fontSize:48, fontFamily:"Segoe UI", color:"#222", align:"center"}),
+          elText("Start building your presentation...", 240, 340, 800, 60, {fontSize:24, fontFamily:"Segoe UI", color:"#444", align:"center"})
+        ],
+        drawings: [] // { path:[{x,y}], color, width }
+      }
+    ]
+  };
+
+  // ---------- DOM ----------
+  const tabs = qsa('.tab-button');
+  const panels = qsa('.tab-panel');
+  tabs.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+  const slideEl = qs('#slide');
+  const slideWrapper = qs('#slideWrapper');
+  const thumbnailsEl = qs('#thumbnails');
+  const gridEl = qs('#slideGrid');
+  const selectionBox = qs('#selectionBox');
+
+  const posX = qs('#posX'), posY=qs('#posY'), sizeW=qs('#sizeW'), sizeH=qs('#sizeH'), rotateDeg=qs('#rotateDeg');
+  const fillColor=qs('#fillColor'), strokeColor=qs('#strokeColor'), strokeWidth=qs('#strokeWidth');
+  const selType = qs('#selType');
+  const notes = qs('#notes');
+  const deckTitle = qs('#deckTitle');
+
+  const fontName=qs('#fontName'), fontSize=qs('#fontSize'), fontColor=qs('#fontColor');
+
+  const themeSelect = qs('#themeSelect');
+  const slideBgColor = qs('#slideBgColor');
+  const slideBgImage = qs('#slideBgImage');
+  const transitionType = qs('#transitionType');
+  const transitionDuration = qs('#transitionDuration');
+  const animType = qs('#animType');
+  const animDelay = qs('#animDelay');
+
+  const tellMe = qs('#tellMe'); qs('#runTellMe').addEventListener('click', runTellMe);
+
+  // Draw
+  const drawCanvas = qs('#drawing-canvas');
+  const ctx = drawCanvas.getContext('2d', { willReadFrequently: true });
+  const drawColor = qs('#drawColor');
+  const drawWidth = qs('#drawWidth');
+
+  const presenter = qs('#presenter');
+  const presentCanvas = qs('#presentCanvas');
+  const presentNotes = qs('#presentNotes');
+
+  // Toolbar bindings
+  bindClicks({
+    addSlide, duplicateSlide, deleteSlide, addSlide2:addSlide, duplicateSlide2:duplicateSlide,
+    addText:()=>addElement(elText("Double-click to edit", 100,100, 320,60, {fontSize:24})),
+    addRect:()=>addElement(elShape("rect", 200,200, 240,140, "#f5f5f5", "#333")),
+    addEllipse:()=>addElement(elShape("ellipse", 300,240, 220,180, "#f0f8ff", "#1976d2")),
+    addSticky:()=>addElement(elSticky(80,80)),
+    addImage: openImage,
+    addVideo: addVideoURL,
+    insertTitle:()=>applyLayout('title'),
+    insertTwoCols:()=>applyLayout('two-cols'),
+    insertBlank:()=>applyLayout('blank'),
+    bringFront:()=>reorderSelection(1),
+    sendBack:()=>reorderSelection(-1),
+    lock: lockSelection,
+    unlock: unlockSelection,
+    group: groupSelection,
+    ungroup: ungroupSelection,
+    alignLeft:()=>alignSelection('left'),
+    alignCenter:()=>alignSelection('center'),
+    alignRight:()=>alignSelection('right'),
+    distributeH:()=>distribute('h'),
+    distributeV:()=>distribute('v'),
+    toggleGrid:()=>{isGrid=!isGrid; renderSlide();},
+    toggleSnap:()=>{isSnap=!isSnap; toast("Snap "+(isSnap?"On":"Off"))},
+    previewTransition: previewTransition,
+    applyAnim: applyAnimToSelection,
+    toggleDraw: toggleDraw,
+    drawEraser: ()=>{ erasing=true; drawCanvas.classList.add('drawing-canvas-active'); drawing=true; },
+    clearDrawing: clearDrawing,
+    newDeck: newDeck,
+    openDeck: ()=>qs('#openDeckFile').click(),
+    saveDeck: saveDeckJSON,
+    exportHTML: exportHTML,
+    printPDF: ()=>window.print(),
+    present: startPresenter,
+    exportPNG: exportPNG,
+    toggleNotes: ()=> document.querySelector('.panel:nth-of-type(2)').classList.toggle('hidden'),
+    zoomIn: ()=>setZoom(zoom*1.1),
+    zoomOut: ()=>setZoom(zoom/1.1),
+    fit: fitToViewport,
+    actual: ()=>setZoom(1),
+    nudgeUp: ()=>nudgeSelection(0,-1),
+    nudgeDown: ()=>nudgeSelection(0,1),
+    nudgeLeft: ()=>nudgeSelection(-1,0),
+    nudgeRight: ()=>nudgeSelection(1,0),
+    clearBg: ()=>{curSlide().background={color:"#ffffff", image:null}; renderSlide(); pushHistory();}
+  });
+
+  qs('#openDeckFile').addEventListener('change', importDeckFile);
+
+  // Font + text formatting
+  fontName.addEventListener('change', ()=>applyTextStyle({fontFamily:fontName.value}));
+  fontSize.addEventListener('change', ()=>applyTextStyle({fontSize:parseInt(fontSize.value,10)}));
+  fontColor.addEventListener('change', ()=>applyTextStyle({color:fontColor.value}));
+  qsa('[data-cmd]').forEach(b=>b.addEventListener('click', ()=>execTextCmd(b.dataset.cmd)));
+
+  // Theme, background, transitions
+  themeSelect.addEventListener('change', ()=>{ deck.theme=themeSelect.value; slideWrapper.className = 'slide-wrapper '+deck.theme; pushHistory(); });
+  slideBgColor.addEventListener('input', ()=>{ curSlide().background.color = slideBgColor.value; renderSlide(); pushHistoryThrottle(); });
+  slideBgImage.addEventListener('change', handleBgImage);
+  transitionType.addEventListener('change', ()=>{ curSlide().transition.type=transitionType.value; pushHistory(); });
+  transitionDuration.addEventListener('change', ()=>{ curSlide().transition.duration=parseInt(transitionDuration.value,10); pushHistory(); });
+
+  // Selection inspectors
+  [posX,posY,sizeW,sizeH,rotateDeg,fillColor,strokeColor,strokeWidth].forEach(input=> input.addEventListener('input', inspectorChange));
+
+  // Notes/title
+  notes.addEventListener('input', ()=>{ curSlide().notes = notes.value; pushHistoryThrottle(); });
+  deckTitle.addEventListener('input', ()=>{ deck.title = deckTitle.value; pushHistoryThrottle(); });
+
+  // Zoom
+  const zoomLabel = qs('#zoomLabel');
+  const zoomIndicator = qs('#zoomIndicator');
+
+  // ---------- Init ----------
+  loadAutosave();
+  slideWrapper.classList.add(deck.theme);
+  setZoom(1);
+  renderAll();
+  pushHistory(); // initial
+
+  // ---------- Tabs ----------
+  function switchTab(id){
+    tabs.forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+    panels.forEach(p=>p.classList.toggle('active', p.id===id));
+  }
+
+  // ---------- Slides ----------
+  function addSlide(){
+    const s = {
+      id: uid(),
+      background: { color:"#ffffff", image:null },
+      transition: { type:"none", duration:500 },
+      notes: "",
+      elements: [],
+      drawings: []
+    };
+    deck.slides.splice(currentSlide+1, 0, s);
+    currentSlide++;
+    renderAll();
+    pushHistory();
+  }
+  function duplicateSlide(){
+    const s = JSON.parse(JSON.stringify(curSlide()));
+    s.id = uid();
+    deck.slides.splice(currentSlide+1,0,s);
+    currentSlide++;
+    renderAll();
+    pushHistory();
+  }
+  function deleteSlide(){
+    if(deck.slides.length<=1) return toast("At least one slide required");
+    deck.slides.splice(currentSlide,1);
+    currentSlide = Math.max(0, currentSlide-1);
+    renderAll();
+    pushHistory();
+  }
+  function applyLayout(type){
+    const s = curSlide();
+    s.elements = [];
+    if(type==='title'){
+      s.elements.push(elText("Title", 140,160, 1000,120, {fontSize:48, align:"center"}));
+      s.elements.push(elText("Subtitle", 340,320, 600,80, {fontSize:28, align:"center"}));
+    } else if(type==='two-cols'){
+      s.elements.push(elText("Left", 120,140, 520,420, {fontSize:24}));
+      s.elements.push(elText("Right", 640,140, 520,420, {fontSize:24}));
+    } else {
+      // blank
+    }
+    renderSlide();
+    pushHistory();
+  }
+
+  // ---------- Elements ----------
+  let selection = new Set(); // element ids
+  let groupMap = {}; // groupId -> [elementIds]
+
+  function addElement(el){
+    curSlide().elements.push(el);
+    renderSlide();
+    selectOnly(el.id);
+    pushHistory();
+  }
+
+  function elText(text, x,y,w,h, style={}) {
+    return {
+      id: uid(), type:'text', x,y,w,h, r:0, lock:false, group:null,
+      style: { fontFamily: style.fontFamily||"Segoe UI", fontSize: style.fontSize||24, color: style.color||"#222", align: style.align||"left", bold:false, italic:false, underline:false, fill:null, stroke:null, strokeWidth:0 },
+      text
+    };
+  }
+  function elShape(kind, x,y,w,h, fill, stroke) {
+    return { id: uid(), type:'shape', kind, x,y,w,h, r:0, lock:false, group:null,
+      style:{ fill: fill||"#f5f5f5", stroke: stroke||"#333", strokeWidth:1 } };
+  }
+  function elImage(src, x,y,w,h){
+    return { id: uid(), type:'image', src, x,y,w,h, r:0, lock:false, group:null, style:{ } };
+  }
+  function elVideo(src, x,y,w,h){
+    return { id: uid(), type:'video', src, x,y,w,h, r:0, lock:false, group:null, style:{ } };
+  }
+  function elSticky(x,y){
+    return { id: uid(), type:'sticky', x,y,w:220,h:200,r:0, lock:false, group:null,
+      style:{ fill:"#fff8b3", stroke:"#c8be6a", strokeWidth:1, fontFamily:"Georgia", fontSize:18, color:"#333" },
+      text:"Sticky note" };
+  }
+
+  function elementById(id){ return curSlide().elements.find(e=>e.id===id); }
+
+  // Render slide elements
+  function renderSlide(){
+    const s = curSlide();
+    slideEl.innerHTML = '';
+    slideEl.style.background = s.background.color||'#fff';
+    slideEl.style.backgroundImage = s.background.image ? `url(${s.background.image})` : 'none';
+
+    // adjust canvas
+    drawCanvas.width = slideSize.w;
+    drawCanvas.height = slideSize.h;
+    drawCanvas.style.width = "100%";
+    drawCanvas.style.height = "100%";
+    redrawInk();
+
+    // grid
+    gridEl.style.display = isGrid ? 'block' : 'none';
+
+    // elements
+    s.elements.forEach(e=>{
+      const node = renderElement(e);
+      slideEl.appendChild(node);
+    });
+
+    updateInspector();
+    renderThumbnails();
+    updateZoomLabels();
+  }
+
+  function renderElement(e){
+    const node = document.createElement('div');
+    node.className = 'el box';
+    node.style.left = e.x+'px';
+    node.style.top = e.y+'px';
+    node.style.width = e.w+'px';
+    node.style.height = e.h+'px';
+    node.style.transform = `rotate(${e.r||0}deg)`;
+    node.dataset.id = e.id;
+    if(e.lock) node.classList.add('locked');
+    if(selection.has(e.id)) node.classList.add('selected');
+
+    // content
+    if(e.type==='text'){
+      node.contentEditable = true;
+      node.style.whiteSpace = 'pre-wrap';
+      node.style.padding = '6px';
+      node.style.fontFamily = e.style.fontFamily;
+      node.style.fontSize = e.style.fontSize+'px';
+      node.style.color = e.style.color;
+      node.style.textAlign = e.style.align;
+      node.style.background = e.style.fill || 'transparent';
+      node.style.border = e.style.stroke ? `1px solid ${e.style.stroke}` : '1px solid transparent';
+      node.style.borderWidth = (e.style.strokeWidth||0)+'px';
+      node.style.outline = 'none';
+      node.innerText = e.text||'';
+      if(e.style.bold) node.style.fontWeight = '700';
+      if(e.style.italic) node.style.fontStyle = 'italic';
+      if(e.style.underline) node.style.textDecoration = 'underline';
+
+      node.addEventListener('input', ()=>{ e.text = node.innerText; pushHistoryThrottle();});
+
+    } else if(e.type==='shape'){
+      node.style.background = e.style.fill || 'transparent';
+      node.style.border = e.style.stroke ? `${e.style.strokeWidth||1}px solid ${e.style.stroke}` : '1px solid transparent';
+      if(e.kind==='ellipse') node.style.borderRadius = '50%';
+
+    } else if(e.type==='image'){
+      const img = new Image();
+      img.src = e.src;
+      img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover';
+      node.appendChild(img);
+
+    } else if(e.type==='video'){
+      const iframe = document.createElement('iframe');
+      iframe.src = e.src;
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      iframe.style.width='100%'; iframe.style.height='100%'; iframe.style.border='0';
+      node.appendChild(iframe);
+
+    } else if(e.type==='sticky'){
+      node.style.background = e.style.fill;
+      node.style.border = `${e.style.strokeWidth||1}px solid ${e.style.stroke}`;
+      node.style.fontFamily = e.style.fontFamily;
+      node.style.fontSize = e.style.fontSize+'px';
+      node.style.color = e.style.color;
+      node.style.padding = '10px';
+      node.contentEditable = true;
+      node.innerText = e.text;
+      node.addEventListener('input', ()=>{ e.text = node.innerText; pushHistoryThrottle();});
+    }
+
+    // interactions
+    node.addEventListener('pointerdown', elementPointerDown);
+    node.addEventListener('dblclick', ()=> {
+      selectOnly(e.id);
+      if(e.type!=='shape') node.focus();
+    });
+
+    // handles for resize/rotate when selected
+    if(selection.has(e.id)){
+      addHandles(node);
+    }
+    return node;
+  }
+
+  function addHandles(node){
+    ['tl','tr','bl','br','ml','mr','mt','mb'].forEach(h=>{
+      const d=document.createElement('div'); d.className='handle '+h; node.appendChild(d);
+    });
+    const r = document.createElement('div'); 
+r.className = 'rotate';
+r.title = 'Rotate element';
+node.appendChild(r);
+
+// Attach pointer events for rotation
+r.addEventListener('pointerdown', ev => {
+  ev.stopPropagation();
+  const id = node.dataset.id;
+  const el = elementById(id);
+  if (!el || el.lock) return;
+
+  const startAngle = el.r || 0;
+  const rect = slideEl.getBoundingClientRect();
+  const centerX = (el.x + el.w / 2) * zoom + rect.left;
+  const centerY = (el.y + el.h / 2) * zoom + rect.top;
+
+  function onMove(e) {
+    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI + 90;
+    el.r = Math.round(angle);
+    renderSlide();
+  }
+
+  function onUp() {
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    pushHistory();
+  }
+
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+});</script></body></html>
