@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <link rel="icon" href="new-swc.png" type="image/png" />
-  <title>Stenoip Wonder Computer</title>
-   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="icon" href="new-swc.png" type="image/png" />
+  <title>Stenoip Wonder Computer</title>
+   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+/* General Styles */
 /* General Styles */
 body {
-    font-family: 'Google Sans', sans-serif;
-    background-color: rgb(240, 0, 0);
-    margin: 0;
-    overflow-x: hidden; /* Prevent horizontal scroll only */
+  font-family: 'Google Sans', sans-serif;
+  background-color: rgb(240, 0, 0);
+  margin: 0;
+  overflow-x: hidden;
+  /* Add the animation property here */
+  animation: color-change 10s infinite;
+}
 
+/* Define the keyframes for the color change animation */
+@keyframes color-change {
+  0% { background-color: rgb(240, 0, 0); } /* Red */
+  25% { background-color: rgb(0, 240, 0); } /* Green */
+  50% { background-color: rgb(0, 0, 240); } /* Blue */
+  75% { background-color: rgb(240, 240, 0); } /* Yellow */
+  100% { background-color: rgb(240, 0, 0); } /* Back to Red */
 }
 /* Fullscreen video styling */
 .intro-video {
@@ -474,78 +485,81 @@ body {
     background-color: rgb(0, 91, 161);
     transform: translateY(-3px);
 }
-  </style>
+</style>
 </head>
-<body>
+<body class="celebration-bg">
 
-  <div class="launch-screen" id="launch-screen" onclick="startExperience()">
-    Click to Launch
-  </div>
+  <div class="launch-screen" id="launch-screen" onclick="startExperience()">
+    Click to Launch
+  </div>
 
-  <video id="intro-video" class="intro-video" autoplay playsinline>
-    <source src="https://stenoip.github.io/intro_ringzauber.mp4" type="video/mp4" />
-    <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
+  <video id="intro-video" class="intro-video" autoplay playsinline>
+    <source src="https://stenoip.github.io/intro_ringzauber.mp4" type="video/mp4" />
+    <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
-  <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
+  <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
-  <div id="main-content" style="display: none;">
+  <div id="main-content" style="display: none;">
 
-  <nav class="w-full max-w-4xl bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg">
-        <ul class="flex flex-col sm:flex-row justify-around items-center space-y-3 sm:space-y-0 sm:space-x-4">
-            <li>
-                <a href="index.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
-                    Home
-                </a>
-            </li>
-            <li>
-                <a href="about.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    About
-                </a>
-            </li>
-            <li>
-                <a href="copyright.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    Terms
-                </a>
-            </li>
-            <li>
-                <a href="contact.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    Contact
-                </a>
-            </li>
-            <li>
-                <a href="privacy.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
-                    Privacy Policy
-                </a>
-            </li> 
-          <li>
-                <a href="blog.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    Blog
-                </a>
-            </li>
-        </ul>
-    </nav>
+  <nav class="w-full max-w-4xl bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg">
+        <ul class="flex flex-col sm:flex-row justify-around items-center space-y-3 sm:space-y-0 sm:space-x-4">
+            <li>
+                <a href="index.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
+                    Home
+                </a>
+            </li>
+            <li>
+                <a href="about.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    About
+                </a>
+            </li>
+            <li>
+                <a href="copyright.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    Terms
+                </a>
+            </li>
+            <li>
+                <a href="contact.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    Contact
+                </a>
+            </li>
+            <li>
+                <a href="privacy.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
+                    Privacy Policy
+                </a>
+            </li>
+          <li>
+                <a href="blog.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
+                    Blog
+                </a>
+            </li>
+        </ul>
+    </nav>
 <br>
-      <div class="header">
-        <h1 class="block px-10 py-10 text-black font-bold">Stenoip Wonder Computer</h1>
-        <div class="intro-toggle-container">
-            <span>Intro Video:</span>
-            <label class="switch">
-                <input type="checkbox" id="introToggle">
-                <span class="slider round"></span>
-            </label>
-        </div>
-      </div>
-      <div class="search-bar">
-        <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search our website..." />
+      <div class="header">
+        <h1 class="block px-10 py-10 text-black font-bold">Stenoip Wonder Computer</h1>
+        <div class="intro-toggle-container">
+            <span>Intro Video:</span>
+            <label class="switch">
+                <input type="checkbox" id="introToggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search our website..." />
 
-        <button onclick="search()">Search</button>
-        <div class="suggestions" id="suggestions" style="display: none;"></div>
-      </div>
+        <button onclick="search()">Search</button>
+        <div class="suggestions" id="suggestions" style="display: none;"></div>
+      </div>
 
-<h1><mark>Breaking News! Ringzauber 1.5 is coming out now!<a href="ringzauber.html">Learn more</a></mark></h1>
-<h2><a href="television_guide.html">Private Programs Online</a></h2>
+<h1 class="celebration-text">🎉 Happy 100th Version! 🎉</h1>
+
+<h3><mark> We've made Ringzauber 1.5 just for you! <a href="ringzauber.html">Learn more</a></mark></h3>
+
+<br><br><br><h2><a href="television_guide.html">Private Programs Online</a></h2>
 <p>Stenoip Wonder Computer provides the latest advanced tech for free without any of your history being known.</p>
 <ul>
 <h3><strong>Suggested</strong> </h3>
@@ -553,116 +567,112 @@ body {
 <br>
 <mark><a href="https://stenoip.github.io/praterich">Lady Praterich, an AI chatbot and SWC assistant. </a></mark>
 </p>
- <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
-        Learn Center
-      </button>
-      <br>
-  <iframe src="https://stenoip.github.io/wheel_gifs" height="500px" width="100%"></iframe>
-  <br>   
-  <p>Visit the Learn Center for the News and Weather</p>
+ <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
+        Learn Center
+      </button>
+      <br>
+  <iframe src="https://stenoip.github.io/wheel_gifs" height="500px" width="100%"></iframe>
+  <br>
+  <p>Visit the Learn Center for the News and Weather</p>
 <div class="footer">
-       <br>
-       <p>Version 0.99 &copy; Stenoip Company</p>
-       <a href ="copyright.html">View our terms.</a>
+       <br>
+       <p>Version 1.00 &copy; Stenoip Company</p>
+       <a href ="copyright.html">View our terms.</a>
 <br>
-  <p>WHY ARE THERE <strong>ADS</strong>! We have ads to fund our projects and earn money. Read our Privacy and Policy(at the top) for more info.</p>
+  <p>WHY ARE THERE <strong>ADS</strong>! We have ads to fund our projects and earn money. Read our Privacy and Policy(at the top) for more info.</p>
 </div>
-
-
-   
-
-  <script>
+  <script>
 // Links used for search suggestions
-    const links = [
-      { name: '2048', url: '2048.html' },
-      { name: 'Anniversary', url: 'anniversary.html' },
-      { name: 'Boublok Coding', url: 'boublok.html' },
-      { name: 'TI 30XS', url: 'calculator_ti30xiis.html' },
-      { name: 'TI 84', url: 'calculator_ti84.html' },
-      { name: 'Camera', url: 'camera.html' },
-      { name: 'Clocker', url: 'clocker.html' },
-      { name: 'Comics!', url: 'comic.html' },
-      { name: 'The Data Store(Datenspeicher)', url: 'download.html' },
-      { name: 'MailSteno(WIP)', url: 'email.html' },
-      { name: 'Flappy Bird', url: 'flappybird.html' },
-      { name: 'StenoipToanielstik(Games)', url: 'games.html' },
-      { name: 'Gravity Simulation', url: 'gravity.html' },
-      { name: 'StenoVids', url: 'video.html' },
-      { name: 'StenoVids Plus', url: 'video_plus.html' },
-       { name: 'SearXNG Download', url: 'searxng.html' },
-       { name: 'AI Simulation', url: 'bot.html' },
-     { name: 'A box', url: 'box_model.html' },
-     { name: 'Talking Dog!', url: 'pet.html' },
-     { name: 'Eggtastic Bowl', url: 'eggtastic.html' },
-     { name: 'PhET Solar System', url: 'my-solar-system_en.html' },
-     { name: 'Draw It!', url: 'draw.html' },
-      { name: 'Worm', url: 'worm.html' }
-    
-    ];
+    const links = [
+      { name: '2048', url: '2048.html' },
+      { name: 'Anniversary', url: 'anniversary.html' },
+      { name: 'Boublok Coding', url: 'boublok.html' },
+      { name: 'TI 30XS', url: 'calculator_ti30xiis.html' },
+      { name: 'TI 84', url: 'calculator_ti84.html' },
+      { name: 'Camera', url: 'camera.html' },
+      { name: 'Clocker', url: 'clocker.html' },
+      { name: 'Comics!', url: 'comic.html' },
+      { name: 'The Data Store(Datenspeicher)', url: 'download.html' },
+      { name: 'MailSteno(WIP)', url: 'email.html' },
+      { name: 'Flappy Bird', url: 'flappybird.html' },
+      { name: 'StenoipToanielstik(Games)', url: 'games.html' },
+      { name: 'Gravity Simulation', url: 'gravity.html' },
+      { name: 'StenoVids', url: 'video.html' },
+      { name: 'StenoVids Plus', url: 'video_plus.html' },
+       { name: 'SearXNG Download', url: 'searxng.html' },
+       { name: 'AI Simulation', url: 'bot.html' },
+     { name: 'A box', url: 'box_model.html' },
+     { name: 'Talking Dog!', url: 'pet.html' },
+     { name: 'Eggtastic Bowl', url: 'eggtastic.html' },
+     { name: 'PhET Solar System', url: 'my-solar-system_en.html' },
+     { name: 'Draw It!', url: 'draw.html' },
+      { name: 'Worm', url: 'worm.html' }
+   
+    ];
 
-    // Search navigation
-    function search() {
-      const query = document.getElementById('search-input').value;
-      const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
-      if (matchedLink) {
-        window.location.href = matchedLink.url + '?q=' + encodeURIComponent(query);
-      }
-    }
+    // Search navigation
+    function search() {
+      const query = document.getElementById('search-input').value;
+      const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
+      if (matchedLink) {
+        window.location.href = matchedLink.url + '?q=' + encodeURIComponent(query);
+      }
+    }
 
-    // Search suggestions
-    function showSuggestions() {
-      const query = document.getElementById('search-input').value.toLowerCase();
-      const suggestionsContainer = document.getElementById('suggestions');
-      suggestionsContainer.innerHTML = '';
-      const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
-      filteredLinks.forEach(link => {
-        const suggestion = document.createElement('div');
-        suggestion.textContent = link.name;
-        suggestion.onclick = () => {
-          document.getElementById('search-input').value = link.name;
-          search();
-        };
-        suggestionsContainer.appendChild(suggestion);
-      });
-      suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
-    }
+    // Search suggestions
+    function showSuggestions() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const suggestionsContainer = document.getElementById('suggestions');
+      suggestionsContainer.innerHTML = '';
+      const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
+      filteredLinks.forEach(link => {
+        const suggestion = document.createElement('div');
+        suggestion.textContent = link.name;
+        suggestion.onclick = () => {
+          document.getElementById('search-input').value = link.name;
+          search();
+        };
+        suggestionsContainer.appendChild(suggestion);
+      });
+      suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
+    }
 
-    // Function to show main content and hide intro elements
-    function showMainContent() {
-        document.getElementById('intro-video').style.display = 'none';
-        document.getElementById('launch-screen').style.display = 'none';
-        document.getElementById('skip-btn').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-        document.body.style.overflow = 'auto'; // Enable scrolling
-    }
+    // Function to show main content and hide intro elements
+    function showMainContent() {
+        document.getElementById('intro-video').style.display = 'none';
+        document.getElementById('launch-screen').style.display = 'none';
+        document.getElementById('skip-btn').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        document.body.style.overflow = 'auto'; // Enable scrolling
+    }
 
-    // This function is still used when "Click to Launch" is pressed manually.
-    function startExperience() {
-        const introToggle = document.getElementById('introToggle');
-        document.getElementById('launch-screen').style.display = 'none';
+    // This function is still used when "Click to Launch" is pressed manually.
+    function startExperience() {
+        const introToggle = document.getElementById('introToggle');
+        document.getElementById('launch-screen').style.display = 'none';
 
-        if (introToggle.checked) { // If switch is ON (intro enabled)
-            const video = document.getElementById('intro-video');
-            video.muted = false; // Unmute if the user is explicitly starting the video
-            video.style.display = 'block';
-            video.play(); // Make sure the video plays
-            document.getElementById('skip-btn').style.display = 'block'; // Show skip button
-        } else { // If switch is OFF (intro disabled)
-            showMainContent();
-        }
-    }
+        if (introToggle.checked) { // If switch is ON (intro enabled)
+            const video = document.getElementById('intro-video');
+            video.muted = false; // Unmute if the user is explicitly starting the video
+            video.style.display = 'block';
+            video.play(); // Make sure the video plays
+            document.getElementById('skip-btn').style.display = 'block'; // Show skip button
+        } else { // If switch is OFF (intro disabled)
+            showMainContent();
+        }
+    }
 
-    // Skip video
-   function skipVideo() {
-    const video = document.getElementById('intro-video');
-    video.pause();
-    video.currentTime = 0;
-    showMainContent();
+    // Skip video
+   function skipVideo() {
+    const video = document.getElementById('intro-video');
+    video.pause();
+    video.currentTime = 0;
+    showMainContent();
 }
 
 // Event listener for when video ends
 document.getElementById('intro-video').addEventListener('ended', function () {
-    showMainContent();
+    showMainContent();
 });
 
 // Handle the intro toggle switch state
@@ -671,59 +681,59 @@ const introToggle = document.getElementById('introToggle');
 // Load saved state from localStorage (default to OFF if not found)
 const savedIntroState = localStorage.getItem('introVideoEnabled');
 if (savedIntroState === null) {
-    introToggle.checked = false; // Default to OFF if no state is saved
+    introToggle.checked = false; // Default to OFF if no state is saved
 } else {
-    introToggle.checked = (savedIntroState === 'true');
+    introToggle.checked = (savedIntroState === 'true');
 }
 
 // Save state when toggle changes
 introToggle.addEventListener('change', function() {
-    localStorage.setItem('introVideoEnabled', this.checked);
-    // If the user turns the toggle OFF while the video is playing, stop it and show content
-    if (!this.checked && document.getElementById('intro-video').style.display === 'block') {
-        skipVideo();
-    } else if (this.checked && document.getElementById('main-content').style.display === 'block') {
-        // If the user turns the toggle ON after main content is shown, hide main content and prepare video
-        document.getElementById('main-content').style.display = 'none';
-        document.getElementById('intro-video').style.display = 'block';
-        document.getElementById('skip-btn').style.display = 'block';
-        document.getElementById('intro-video').load(); // Reload video to ensure it's at the start
-        document.getElementById('intro-video').muted = true; // Keep muted until user explicitly plays or un-mutes
-    }
+    localStorage.setItem('introVideoEnabled', this.checked);
+    // If the user turns the toggle OFF while the video is playing, stop it and show content
+    if (!this.checked && document.getElementById('intro-video').style.display === 'block') {
+        skipVideo();
+    } else if (this.checked && document.getElementById('main-content').style.display === 'block') {
+        // If the user turns the toggle ON after main content is shown, hide main content and prepare video
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('intro-video').style.display = 'block';
+        document.getElementById('skip-btn').style.display = 'block';
+        document.getElementById('intro-video').load(); // Reload video to ensure it's at the start
+        document.getElementById('intro-video').muted = true; // Keep muted until user explicitly plays or un-mutes
+    }
 });
 
 // --- NEW/MODIFIED LOGIC FOR IMMEDIATE DISPLAY ON LOAD ---
 // This part ensures that if the intro is toggled off, the main content shows immediately on page load.
 document.addEventListener('DOMContentLoaded', function() {
-    // If the intro is off by default or was set off by the user, show main content directly.
-    // This happens immediately when the page content is loaded.
-    if (!introToggle.checked) {
-        showMainContent();
-    } else {
-        // If intro is enabled, show the "Click to Launch" screen initially.
-        // The user will then click it to start the video.
-        document.getElementById('launch-screen').style.display = 'flex';
-        // Make sure video is hidden and muted until launched
-        document.getElementById('intro-video').style.display = 'none';
-        document.getElementById('intro-video').muted = true;
-    }
+    // If the intro is off by default or was set off by the user, show main content directly.
+    // This happens immediately when the page content is loaded.
+    if (!introToggle.checked) {
+        showMainContent();
+    } else {
+        // If intro is enabled, show the "Click to Launch" screen initially.
+        // The user will then click it to start the video.
+        document.getElementById('launch-screen').style.display = 'flex';
+        // Make sure video is hidden and muted until launched
+        document.getElementById('intro-video').style.display = 'none';
+        document.getElementById('intro-video').muted = true;
+    }
 });
 
 
-    // Load Tomorrow.io widget
-    (function (d, s, id) {
-      if (d.getElementById(id)) {
-        if (window.__TOMORROW__) {
-          window.__TOMORROW__.renderWidget();
-        }
-        return;
-      }
-      const fjs = d.getElementsByTagName(s)[0];
-      const js = d.createElement(s);
-      js.id = id;
-      js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
-      fjs.parentNode.insertBefore(js, fjs);
-    })(document, 'script', 'tomorrow-sdk');
-  </script>
+    // Load Tomorrow.io widget
+    (function (d, s, id) {
+      if (d.getElementById(id)) {
+        if (window.__TOMORROW__) {
+          window.__TOMORROW__.renderWidget();
+        }
+        return;
+      }
+      const fjs = d.getElementsByTagName(s)[0];
+      const js = d.createElement(s);
+      js.id = id;
+      js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    })(document, 'script', 'tomorrow-sdk');
+  </script>
 </body>
 </html>
