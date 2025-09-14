@@ -1,302 +1,203 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://stenoip.github.io/</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>1.00</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/television_guide.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/about.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/copyright.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/contact.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/blog.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/praterich</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/download.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.51</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/ringzauber.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/login.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/calculator_ti30xiis.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/calculator_ti84.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/kompmasine.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/kompmasine-functions.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/draw.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/count.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/gravity.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/bot.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/camera.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/maps2d.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/games/home</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/video.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/video_plus.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/games/flappybird.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/tetris.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/games/2048.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/quiz.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/pet.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/sirpraterich.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/games/worm.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/comic.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/eggtastic.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/searxng.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+ 
 
-
-<url>
-  <loc>https://stenoip.github.io/</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>1.00</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/index.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/about.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/copyright.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/contact.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/blog.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/television_guide.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/luddiel/</loc>
-  <lastmod>2025-08-11T19:58:29+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/sirpraterich</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/ringzauber.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/blog/first.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/blog/ringzauber_new_update.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/login.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/signup.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/settings.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/backup.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/404.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/calculator_ti30xiis.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/calculator_ti84.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/kompmasine.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/kompmasine-functions.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/draw.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/count.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/gravity.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/bot.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/box_model.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/camera.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/maps2d.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/games.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/video.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/video_plus.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/flappybird.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/tetris.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/2048.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/quiz.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/pet.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/sirpraterich.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/worm.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/comic.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/eggtastic.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/searxng.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/khan-academy.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/email.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/send-email.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/inbox.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/media.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/maps.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/sample.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/space-map.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/swc.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/clocker.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/compass.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/testing.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/boublok.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/luddiel/index.html</loc>
-  <lastmod>2025-08-11T19:58:29+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/luddiel/following.html</loc>
-  <lastmod>2025-08-11T19:58:29+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/luddiel/upload.html</loc>
-  <lastmod>2025-08-11T19:58:29+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://stenoip.github.io/download.html</loc>
-  <lastmod>2025-08-11T20:50:12+00:00</lastmod>
-  <priority>0.51</priority>
-</url>
-
-
+  <url>
+    <loc>https://stenoip.github.io/media.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/maps.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  
+  
+  <url>
+    <loc>https://stenoip.github.io/clocker.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/compass.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/testing.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://stenoip.github.io/boublok.html</loc>
+    <lastmod>2025-08-11T20:50:12+00:00</lastmod>
+    <priority>0.64</priority>
+  </url>
+  
 </urlset>
