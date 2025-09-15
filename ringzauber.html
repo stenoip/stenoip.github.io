@@ -1,241 +1,164 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="swc.png">
+  <title>Download Ringzauber</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #34eb40;
+    }
+    header {
+      background-color: #3a34eb;
+      padding: 15px;
+      text-align: center;
+      color: #fff;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #0056b3;
+      padding: 10px;
+    }
+    nav a {
+      color: #fff;
+      margin: 0 15px;
+      text-decoration: none;
+      font-size: 16px;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      padding: 20px;
+      text-indent: 50px;
+    }
+    .carousel {
+      display: flex;
+      overflow-x: scroll;
+      margin-bottom: 20px;
+    }
+    .carousel img {
+      width: 200px;
+      margin-right: 10px;
+      border-radius: 5px;
+    }
+    .section {
+      margin-bottom: 30px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .section h2 {
+      color: #333;
+      margin-bottom: 15px;
+    }
+    .button {
+      display: inline-block;
+      margin: 5px;
+      padding: 10px 20px;
+      color: #fff;
+      background-color: #007bff;
+      text-decoration: none;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .button:hover {
+      background-color: #0056b3;
+    }
+    
+    /* Animation for specific download button */
+    .download-1-5 {
+      display: inline-block;
+      padding: 15px 30px;
+      background-color: #ff4500;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      text-decoration: none;
+      text-align: center;
+      animation: colorChange 3s infinite, growShrink 2s infinite;
+    }
 
-    <title>Download Ringzauber</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #34eb40;
-           
-        }
-        header {
-            background-color: #3a34eb;
-            padding: 15px;
-            text-align: center;
-            color: #fff;
-        }
-        nav {
-            display: flex;
-            justify-content: center;
-            background-color: #0056b3;
-            padding: 10px;
-        }
-        nav a {
-            color: #fff;
-            margin: 0 15px;
-            text-decoration: none;
-            font-size: 16px;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        .container {
-            padding: 20px;
-              text-indent: 50px;
-        }
-        .carousel {
-            display: flex;
-            overflow-x: scroll;
-            margin-bottom: 20px;
-        }
-        .carousel img {
-            width: 200px;
-            margin-right: 10px;
-            border-radius: 5px;
-        }
-        .section {
-            margin-bottom: 30px;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .section h2 {
-            color: #333;
-            margin-bottom: 15px;
-        }
-        .button {
-            display: inline-block;
-            margin: 5px;
-            padding: 10px 20px;
-            color: #fff;
-            background-color: #007bff;
-            text-decoration: none;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        footer {
-            background-color: #3a34eb;
-            text-align: center;
-            padding: 10px;
-            color: #fff;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
-        .search-bar {
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            width: calc(100% - 45px);
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-right: 5px;
-        }
-        .search-bar button {
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .search-bar button:hover {
-            background-color: #0056b3;
-        }
-        .sorting-options {
-            margin-bottom: 20px;
-        }
-        .sorting-options label {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        .reviews {
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .review {
-            margin-bottom: 10px;
-        }
-        .review h3 {
-            margin: 0;
-            font-size: 18px;
-            color: #007bff;
-        }
-        .review p {
-            margin: 5px 0;
-        }
-    </style>
+    @keyframes colorChange {
+      0% { background-color: #ff4500; }
+      50% { background-color: #ff6347; }
+      100% { background-color: #ff4500; }
+    }
+
+    @keyframes growShrink {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    footer {
+      background-color: #3a34eb;
+      text-align: center;
+      padding: 10px;
+      color: #fff;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Ringzauber</h1>
-    </header>
-    
-    <div class="container">
-    <p>Ringzauber is a private browser made by Python that does not save your history. It is easy use by anyone and aviable to use on Windows 7, 8.1 and 10 and 11.</p>
-        </div>
-       
-        <div class="carousel">
-            <img src="https://stenoip.github.io/ringzauber.png" alt="Photo of Ringzauber Logo">
-           <p>Ringzauber Logo</p>
-         
-        </div>
-       
-       <div class = "container">
-    
-          
-       Best used with <a href = "https://github.com/searxng/searxng">SearXNG</a>(note, we did not create this)! Download SearXNG in your terminal. Instructions <a href = "searxng.html">here</a>.</p>
-<br>
-           <p>What truly sets Ringzauber apart in the crowded landscape of web browsers is its foundational commitment to privacy. Unlike many mainstream browsers that often log and store extensive user data, Ringzauber’s architecture is specifically designed to prevent the persistent storage of your browsing activities. The browser’s internal history list is not saved to a file, ensuring that once a session ends, your browsing trail vanishes. This deliberate choice means that no local record of your viewed pages or search queries is built or saved, reinforcing its promise of a history-free browsing experience. This contrasts sharply with browsers that, by default, collect and retain vast amounts of data about your online behaviour.
-</p>
-<div class = "container">
-<p>
-However, even with Ringzauber’s robust privacy features, it is a significant mistake to use search engines like Google. Google, a dominant force in online search, operates on a business model heavily reliant on data collection. Every search query, every click and every interaction is meticulously logged and analysed to build comprehensive user profiles. This data is then used for targeted advertising and other commercial purposes. Therefore, even if Ringzauber prevents local history saving, using Google on it would still expose your search activities to extensive third-party tracking, undermining the very privacy Ringzauber aims to provide.
-<div class = "container">
-<p>
-For those serious about maintaining their online anonymity and privacy, SearXNG is the recommended alternative. SearXNG is a free meta-search engine that aggregates results from over 70 search services, but crucially, it does so without storing any information about its users. It does not track your IP address, use cookies, or create profiles. By routing your search queries through SearXNG, you effectively anonymise your searches, preventing individual search engines from linking queries back to you. This combination of Ringzauber’s history-free browsing and SearXNG’s privacy-respecting search capabilities creates a powerful shield against pervasive online surveillance.
-</p>
-</div>
-<div class= "container">
-<p>
-Beyond its strong privacy safeguards, Ringzauber excels in user-friendliness and adaptability. Built using the lightweight PyQt5 and QtWebEngine frameworks, it offers a responsive and efficient browsing experience. The browser supports multiple languages including English, German, Spanish, Mandarin, Frisian, French and Ga, making it accessible to a diverse global user base. Features like easy tab management, quick navigation controls—back, forward, reload, home—and a customisable theme toggle contribute to a streamlined and personalised browsing environment. The ability to add and manage bookmarks allows users to quickly return to their favourite sites without compromising their privacy by maintaining a persistent browsing history.
-<br>
+  <header>
+    <h1>Ringzauber</h1>
+  </header>
 
-<p>
-Ringzauber distinguishes itself as a premier private browser by offering a secure, history-free and user-centric web experience. Its Python-based development ensures a lightweight application, while features like multi-language support and intuitive navigation make it an accessible choice for anyone seeking to protect their online privacy. By focusing on essential browsing functionalities and consciously omitting data retention features, Ringzauber empowers users to navigate the internet with confidence and peace of mind, especially when paired with a privacy-focused search engine like SearXNG.
-</p>
+  <div class="container">
+    <p>Ringzauber is a private browser made with Python that does not save your history. It is easy to use by anyone and available for Windows 7, 8.1, 10 and 11.</p>
+  </div>
 
+  <div class="carousel">
+    <img src="https://stenoip.github.io/ringzauber.png" alt="Ringzauber Logo">
+  </div>
 
-      
-       
-       </div>
-       <div class="section" id="windows">
-<h2>Warning!</h2>
-           <p>Windows may display Ringzauber as malicious. <a href="privacy.html#About Ringzauber">Please read our Privacy Policy.</a></p>
-      <img src ="Screenshot_20250813_200414_Chrome.png" alt="Image of Windows Warning"/>
-      
-       <p>Watch this video about how to download Ringzauber. This is important!</p>
-       <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%;
- padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
- border-radius: 8px; will-change: transform;">
-  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-    src="https://www.canva.com/design/DAGy_u_TQAU/DkMOOuwwQOiVp6TnpO3L0A/watch?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
-  </iframe>
-</div>
-<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGy_u_TQAU&#x2F;DkMOOuwwQOiVp6TnpO3L0A&#x2F;watch?utm_content=DAGy_u_TQAU&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">How to Download Ringzauber 1.5</a> by Stenoip Media 
-       </div>
-       <div class="section" id="windows">
-            <h2>Download now!</h2>
-              <a href="https://drive.google.com/drive/folders/1SfcprFhW9uFGJ2fGA56gEvMJdEdHo2Ml?usp=sharing" class="button">Ringzauber Browser version 1.5 beta(new)</a>
-           <a href="https://drive.google.com/file/d/1q-xV-EpmSCoKv8HiSSRfNn60GYGyJJBG/view?usp=sharing" class="button">Ringzauber Browser Penguin(For Chromebooks)</a>
-            <a href="https://drive.google.com/file/d/1kGswsvTJjdyueLFhQ4EkSCLPKy1i3rha/view?usp=sharing" class="button">Ringzauber Browser version 1.4</a>
-        </div>
-    
-        <div class="section" id="reviews">
-            <h2>User Reviews</h2>
-            <div class="reviews">
-                <div class="review">
-                    <h3>Gerald Topps</h3>
-                    <p>Great platform! Really easy to use and find what I need.</p>
-                </div>
-                <div class="review">
-                    <h3>Abby K. Roberts</h3>
-                    <p>Amazing collection of apps and resources. Highly recommended!</p>
-                </div>
-                <p>Give a review of <a href="https://docs.google.com/forms/d/e/1FAIpQLSe2X6hADn3f4t0tZ9NJ-ytXsSKhpOff0ptaik6JMqEKJ4zUYA/viewform?usp=dialog">Ringzauber 1.5</a></p>
-            </div>
-        </div>
+  <div class="container">
+    Best used with <a href="https://github.com/searxng/searxng">SearXNG</a> (note: we did not create this). Download SearXNG in your terminal. Instructions <a href="searxng.html">here</a>.
+  </div>
+<div class="container">
+    <details>
+      <summary>About Ringzauber</summary>
+      <p>Ringzauber is a private and simple browser commited to make your user experience on the web easier.It is as homemade as your first time baking cookies and is continuously updated.</p>
+    </details>
+
+    <details>
+      <summary>What's New in Ringzauber 1.5</summary>
+      <p>To celebrate the release of the SWC's version 1.00. We give you Ringzauber 1.5! This browser is unique as the AI, Praterich Plus, controls your browser acts like a Chrome Extension and helps perform tasks for you. See the <a href="blog/version1.5-is-here.html">blogs</a> about how this amazing idea came to be.</p>
+    </details>
+  </div>
+
+  <div class="section" id="warning">
+    <h2>Warning!</h2>
+    <p>Windows may display Ringzauber as malicious. <a href="privacy.html#About Ringzauber">Please read our Privacy Policy.</a></p>
+    <img src="Screenshot_20250813_200414_Chrome.png" alt="Image of Windows Warning">
+    <p>Watch this video about how to download Ringzauber. This is important(Speaker may be needed)!</p>
+    <div style="position: relative; width: 100%; height: 0; padding-top: 56.25%; overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em;">
+      <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none;" src="https://www.canva.com/design/DAGy_u_TQAU/DkMOOuwwQOiVp6TnpO3L0A/watch?embed" allowfullscreen></iframe>
     </div>
-   
-   <div class="section" id="reviews">
-            <h2>Help</h2>
-            <div class="reviews">
-                <div class="review">
-                    <h3>When is Ringzauber 1.6 coming?</h3>
-                    <p>It will be released sometime in late 2025/early 2026.</p>
-                </div>
-                <div class="review">
-                    <h3>The Inspect tag does not work</h3>
-                    <p>A glitch in the code caused this. It will be fixed in the next update.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-  
-  
-  
-  
-  
-  
+    <a href="https://www.canva.com/design/DAGy_u_TQAU/DkMOOuwwQOiVp6TnpO3L0A/watch" target="_blank" rel="noopener">How to Download Ringzauber 1.5</a> by Stenoip Media
+  </div>
+  <div class="section" id="download">
+    <h2>Download now!</h2>
+    <a href="https://drive.google.com/drive/folders/1SfcprFhW9uFGJ2fGA56gEvMJdEdHo2Ml?usp=sharing" class="download-1-5">
+      Ringzauber Browser version 1.5 beta (new)
+    </a>
+    <a href="https://drive.google.com/file/d/1q-xV-EpmSCoKv8HiSSRfNn60GYGyJJBG/view?usp=sharing" class="button">Ringzauber Browser Penguin (for Chromebooks)</a>
+    <a href="https://drive.google.com/file/d/1kGswsvTJjdyueLFhQ4EkSCLPKy1i3rha/view?usp=sharing" class="button">Ringzauber Browser version 1.4</a>
+  </div>
+
   <footer>
-        &copy; 2025 Stenoip Company. All rights reserved.
-    </footer>
+    &copy; 2025 Stenoip Company. All rights reserved.
+  </footer>
 </body>
 </html>
