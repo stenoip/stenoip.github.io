@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StenoGraphs(WIP)</title>
+    <title>StenoGraphs</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
 
@@ -243,14 +243,13 @@ body {
     margin-top: 1rem;
     align-self: flex-end;
 }
-
       
     </style>
 </head>
 <body>
     <div class="app-container">
         <header class="app-header">
-            <h1>StenoGraphs(W.I.P)</h1>
+            <h1>StenoGraphs</h1>
             <div class="header-badges">
                 <span id="chartTypeBadge" class="badge">Type: line</span>
                 <span id="dataModeBadge" class="badge">Data: JSON</span>
@@ -290,7 +289,7 @@ body {
             <div class="ribbon-group">
                 <span class="ribbon-label">Export</span>
                 <div class="ribbon-items">
-                    <button class="ribbon-item" id="btnExportPNG">Export PNG(Does not work. Please take screenshot)</button>
+                    <button class="ribbon-item" id="btnExportPNG">Export PNG</button>
                     <button class="ribbon-item" id="btnCopyConfig">Copy Config</button>
                 </div>
             </div>
@@ -416,7 +415,7 @@ body {
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script>
 
-      // Register the Chart.js datalabels plugin
+// Register the Chart.js datalabels plugin
 Chart.register(ChartDataLabels);
 
 // Application state object to store key variables
@@ -424,7 +423,6 @@ var appState = {
     chartType: 'line',
     dataMode: 'JSON',
     chart: null,
-    isExporting: false, // New flag to manage export state
     sampleData: {
         'line': {
             "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
@@ -464,7 +462,13 @@ var appState = {
             "labels": ["Alpha", "Beta", "Gamma", "Delta"],
             "datasets": [{
                 "label": "Segments",
-                "data": [35, 25, 20, 20]
+                "data": [35, 25, 20, 20],
+                "backgroundColor": [
+                    "#4c78a8",
+                    "#f58518",
+                    "#e45756",
+                    "#72b7b2"
+                ]
             }]
         },
         'histogram': {
@@ -478,28 +482,10 @@ var appState = {
             "labels": [],
             "datasets": [{
                 "label": "Set 1",
-                "data": [{
-                    "x": 1,
-                    "y": 1
-                }, {
-                    "x": 2,
-                    "y": 1.2
-                }, {
-                    "x": 3,
-                    "y": 2.5
-                }]
+                "data": [{ "x": 1, "y": 1 }, { "x": 2, "y": 1.2 }, { "x": 3, "y": 2.5 }]
             }, {
                 "label": "Set 2",
-                "data": [{
-                    "x": 1,
-                    "y": 0.8
-                }, {
-                    "x": 2,
-                    "y": 1.7
-                }, {
-                    "x": 3,
-                    "y": 1.9
-                }]
+                "data": [{ "x": 1, "y": 0.8 }, { "x": 2, "y": 1.7 }, { "x": 3, "y": 1.9 }]
             }]
         },
         'radar': {
@@ -516,19 +502,7 @@ var appState = {
             "labels": [],
             "datasets": [{
                 "label": "Markets",
-                "data": [{
-                    "x": 10,
-                    "y": 20,
-                    "r": 12
-                }, {
-                    "x": 15,
-                    "y": 12,
-                    "r": 18
-                }, {
-                    "x": 25,
-                    "y": 30,
-                    "r": 20
-                }]
+                "data": [{ "x": 10, "y": 20, "r": 12 }, { "x": 15, "y": 12, "r": 18 }, { "x": 25, "y": 30, "r": 20 }]
             }]
         },
         'waterfall': {
@@ -542,134 +516,55 @@ var appState = {
     chartOptions: {
         'default': {
             plugins: {
-                tooltip: {
-                    enabled: true,
-                },
-                legend: {
-                    display: true,
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Chart Title',
-                },
+                tooltip: { enabled: true },
+                legend: { display: true, position: 'top' },
+                title: { display: true, text: 'Chart Title' },
             },
             responsive: true,
             maintainAspectRatio: false,
-            animation: true,
+            animation: { duration: 1000 },
             scales: {
-                x: {
-                    title: {
-                        display: false,
-                        text: ''
-                    }
-                },
-                y: {
-                    title: {
-                        display: false,
-                        text: ''
-                    },
-                    min: undefined,
-                    max: undefined,
-                }
+                x: { title: { display: false, text: '' } },
+                y: { title: { display: false, text: '' }, min: undefined, max: undefined }
             },
         },
         'pie': {
             plugins: {
-                tooltip: {
-                    enabled: true,
-                },
-                legend: {
-                    display: true,
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Pie Chart',
-                },
+                tooltip: { enabled: true },
+                legend: { display: true, position: 'top' },
+                title: { display: true, text: 'Pie Chart' },
             },
             animation: true,
         },
         'scatter': {
             scales: {
-                x: {
-                    type: 'linear',
-                    position: 'bottom',
-                    title: {
-                        display: false,
-                        text: 'X Axis'
-                    }
-                },
-                y: {
-                    title: {
-                        display: false,
-                        text: 'Y Axis'
-                    }
-                }
+                x: { type: 'linear', position: 'bottom', title: { display: false, text: 'X Axis' } },
+                y: { title: { display: false, text: 'Y Axis' } }
             }
         },
         'bubble': {
             scales: {
-                x: {
-                    type: 'linear',
-                    position: 'bottom',
-                    title: {
-                        display: false,
-                        text: 'X Axis'
-                    }
-                },
-                y: {
-                    title: {
-                        display: false,
-                        text: 'Y Axis'
-                    }
-                }
+                x: { type: 'linear', position: 'bottom', title: { display: false, text: 'X Axis' } },
+                y: { title: { display: false, text: 'Y Axis' } }
             }
         },
         'radar': {
             scales: {
-                r: {
-                    angleLines: {
-                        display: true
-                    },
-                    suggestedMin: 0,
-                    suggestedMax: 100
-                }
+                r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 100 }
             }
         },
         'waterfall': {
             scales: {
-                x: {
-                    title: {
-                        display: false
-                    }
-                },
-                y: {
-                    stacked: true,
-                    title: {
-                        display: false
-                    }
-                }
+                x: { title: { display: false } },
+                y: { stacked: true, title: { display: false } }
             },
             plugins: {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
                             var label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.raw.y !== undefined) {
-                                label += new Intl.NumberFormat('en-US', {
-                                    style: 'currency',
-                                    currency: 'USD'
-                                }).format(context.raw.y);
-                            } else {
-                                label += new Intl.NumberFormat('en-US', {
-                                    style: 'currency',
-                                    currency: 'USD'
-                                }).format(context.raw);
-                            }
+                            if (label) { label += ': '; }
+                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.raw.y || context.raw);
                             return label;
                         }
                     }
@@ -680,119 +575,50 @@ var appState = {
 };
 
 // Map custom chart types to Chart.js types
-var chartTypeMap = {
-    'bar': 'bar',
-    'column': 'bar',
-    'line': 'line',
-    'area': 'line',
-    'pie': 'pie',
-    'histogram': 'bar',
-    'scatter': 'scatter',
-    'radar': 'radar',
-    'bubble': 'bubble',
-    'waterfall': 'bar'
-};
+var chartTypeMap = { 'bar': 'bar', 'column': 'bar', 'line': 'line', 'area': 'line', 'pie': 'pie', 'histogram': 'bar', 'scatter': 'scatter', 'radar': 'radar', 'bubble': 'bubble', 'waterfall': 'bar' };
+var getChartJSType = (appType) => chartTypeMap[appType] || 'bar';
 
-var getChartJSType = function(appType) {
-    return chartTypeMap[appType] || 'bar';
-};
-
-// Color palettes for chart datasets
+// Color palettes
 var palettes = {
     'classic': ['#4c78a8', '#f58518', '#e45756', '#72b7b2', '#54a24b', '#eeca3b', '#b279a2', '#ff9da7'],
     'pastel': ['#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7'],
     'vivid': ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6'],
     'mono': ['#2a6ad7', '#4683de', '#619cf5', '#7db2ff', '#99c6ff', '#b3d3ff', '#ccdeff', '#e6f0ff']
 };
+var getColor = (index) => palettes[document.getElementById('palette').value][index % palettes[document.getElementById('palette').value].length];
 
-var getColor = function(index) {
-    var paletteName = document.getElementById('palette').value;
-    var palette = palettes[paletteName];
-    return palette[index % palette.length];
-};
-
-// Function to parse CSV data into Chart.js format
+// Function to parse CSV data
 var parseCSV = function(csv) {
     var lines = csv.trim().split('\n');
     if (lines.length < 2) return null;
-
-    var headers = lines[0].split(',').map(function(h) {
-        return h.trim();
-    });
-    var dataRows = lines.slice(1).map(function(line) {
-        return line.split(',').map(function(s) {
-            return s.trim();
-        });
-    });
-
-    var labels = dataRows.map(function(row) {
-        return row[0];
-    });
+    var headers = lines[0].split(',').map(h => h.trim());
+    var dataRows = lines.slice(1).map(line => line.split(',').map(s => s.trim()));
+    var labels = dataRows.map(row => row[0]);
     var datasets = [];
-
     if (appState.chartType === 'scatter' || appState.chartType === 'bubble') {
-        var xIndex = headers.indexOf('x');
-        var yIndex = headers.indexOf('y');
-        var rIndex = headers.indexOf('r');
-        var labelIndex = headers.indexOf('label');
-
-        if (xIndex === -1 || yIndex === -1) {
-            console.error('CSV for scatter/bubble must have "x" and "y" headers.');
-            return null;
-        }
-
-        var groupedData = dataRows.reduce(function(acc, row) {
+        var xIndex = headers.indexOf('x'), yIndex = headers.indexOf('y'), rIndex = headers.indexOf('r'), labelIndex = headers.indexOf('label');
+        if (xIndex === -1 || yIndex === -1) return null;
+        var groupedData = dataRows.reduce((acc, row) => {
             var label = row[labelIndex] || 'Series';
-            if (!acc[label]) {
-                acc[label] = [];
-            }
-            var point = {
-                x: parseFloat(row[xIndex]),
-                y: parseFloat(row[yIndex])
-            };
-            if (rIndex !== -1) {
-                point.r = parseFloat(row[rIndex]);
-            }
+            if (!acc[label]) acc[label] = [];
+            var point = { x: parseFloat(row[xIndex]), y: parseFloat(row[yIndex]) };
+            if (rIndex !== -1) point.r = parseFloat(row[rIndex]);
             acc[label].push(point);
             return acc;
         }, {});
-
-        for (var label in groupedData) {
-            datasets.push({
-                label: label,
-                data: groupedData[label],
-            });
-        }
+        for (var label in groupedData) datasets.push({ label, data: groupedData[label] });
     } else {
         for (var i = 1; i < headers.length; i++) {
-            var label = headers[i];
-            var data = dataRows.map(function(row) {
-                return parseFloat(row[i]);
-            });
-            datasets.push({
-                label: label,
-                data: data,
-            });
+            datasets.push({ label: headers[i], data: dataRows.map(row => parseFloat(row[i])) });
         }
     }
-
-    return {
-        labels: labels,
-        datasets: datasets,
-    };
+    return { labels, datasets };
 };
 
-// Function to parse JSON data and apply colors
+// Function to parse JSON data
 var parseJSON = function(json) {
     try {
-        var data = JSON.parse(json);
-        if (data && data.datasets) {
-            data.datasets.forEach(function(dataset, index) {
-                dataset.backgroundColor = getColor(index);
-                dataset.borderColor = getColor(index);
-            });
-        }
-        return data;
+        return JSON.parse(json);
     } catch (e) {
         console.error("Invalid JSON:", e);
         return null;
@@ -803,44 +629,25 @@ var parseJSON = function(json) {
 var exportChart = function() {
     if (appState.chart) {
         var link = document.createElement('a');
-        link.download = 'stenograph-' + appState.chartType + '.png';
+        link.download = `stenograph-${appState.chartType}.png`;
         link.href = appState.chart.toBase64Image();
         link.click();
     }
-    appState.isExporting = false; // Reset the flag
 };
 
 // Function to build the final chart configuration
 var buildConfig = function(parsedData) {
     if (!parsedData) return null;
-
     var chartType = getChartJSType(appState.chartType);
-
-    var options = Object.assign({}, appState.chartOptions['default']);
+    var options = JSON.parse(JSON.stringify(appState.chartOptions['default'])); // Deep copy
     Object.assign(options, appState.chartOptions[appState.chartType]);
 
     options.plugins.title.text = document.getElementById('chartTitle').value;
     options.plugins.legend.position = document.getElementById('legendPos').value;
     options.plugins.legend.display = document.getElementById('legendPos').value !== 'hidden';
     options.animation.duration = document.getElementById('anim').value === 'true' ? 1000 : 0;
-
-    // Reset callbacks for normal rendering
-    options.animation.onComplete = undefined;
     options.plugins.tooltip.enabled = document.getElementById('tooltips').value === 'true';
 
-    // Special handling for export
-    if (appState.isExporting) {
-        options.plugins.tooltip.enabled = false;
-        options.animation.onComplete = function() {
-            setTimeout(exportChart, 100); // Add a small delay for safety
-        };
-        options.onAfterDraw = function() {
-            if (appState.isExporting) {
-                setTimeout(exportChart, 100);
-            }
-        };
-    }
-    
     if (options.scales && options.scales.x) {
         options.scales.x.title.display = document.getElementById('xTitle').value.length > 0;
         options.scales.x.title.text = document.getElementById('xTitle').value;
@@ -848,37 +655,25 @@ var buildConfig = function(parsedData) {
     if (options.scales && options.scales.y) {
         options.scales.y.title.display = document.getElementById('yTitle').value.length > 0;
         options.scales.y.title.text = document.getElementById('yTitle').value;
-        var yMin = document.getElementById('yMin').value;
-        var yMax = document.getElementById('yMax').value;
+        var yMin = document.getElementById('yMin').value, yMax = document.getElementById('yMax').value;
         options.scales.y.min = yMin ? parseFloat(yMin) : undefined;
         options.scales.y.max = yMax ? parseFloat(yMax) : undefined;
     }
 
     parsedData.datasets.forEach(function(dataset, index) {
-        var color = getColor(index);
-        dataset.backgroundColor = color;
-        dataset.borderColor = color;
+        if (appState.chartType === 'pie') {
+            if (!dataset.backgroundColor) dataset.backgroundColor = dataset.data.map((_, i) => getColor(i));
+        } else {
+            var color = getColor(index);
+            if (!dataset.backgroundColor) dataset.backgroundColor = color;
+            if (!dataset.borderColor) dataset.borderColor = color;
+        }
+
         dataset.borderWidth = 2;
 
         if (appState.chartType === 'line' || appState.chartType === 'area') {
-            dataset.cubicInterpolationMode = 'monotone';
             dataset.tension = parseFloat(document.getElementById('smoothness').value);
-            if (appState.chartType === 'area') {
-                dataset.fill = true;
-                dataset.backgroundColor = color + '40';
-            } else {
-                dataset.fill = false;
-            }
-        }
-        if (appState.chartType === 'waterfall') {
-            dataset.backgroundColor = function(context) {
-                var value = context.parsed.y;
-                return value >= 0 ? 'rgb(75, 192, 192)' : 'rgb(255, 99, 132)';
-            };
-            var totalData = parsedData.datasets[0].data.slice(1).reduce(function(sum, val) {
-                return sum + val;
-            }, parsedData.datasets[0].data[0]);
-            parsedData.datasets[0].data.push(totalData);
+            dataset.fill = appState.chartType === 'area';
         }
     });
 
@@ -886,382 +681,163 @@ var buildConfig = function(parsedData) {
     if (isStacked && (chartType === 'bar' || chartType === 'line')) {
         options.scales.x.stacked = true;
         options.scales.y.stacked = true;
-    } else if (options.scales && options.scales.x) {
-        options.scales.x.stacked = false;
-        if (options.scales.y) {
-            options.scales.y.stacked = false;
-        }
     }
 
     var aspect = document.getElementById('aspect').value;
-    if (aspect !== 'auto') {
-        var parts = aspect.split('/');
-        var w = Number(parts[0]);
-        var h = Number(parts[1]);
-        options.aspectRatio = w / h;
-    } else {
-        options.aspectRatio = undefined;
-    }
+    options.aspectRatio = (aspect !== 'auto') ? eval(aspect) : undefined;
 
-    var showValues = document.getElementById('showValues').value === 'true';
-    if (showValues) {
-        options.plugins.datalabels = {
-            anchor: 'end',
-            align: 'top',
-            formatter: function(value) {
-                return value;
-            }
-        };
-    } else {
-        delete options.plugins.datalabels;
-    }
+    options.plugins.datalabels = (document.getElementById('showValues').value === 'true') ? { anchor: 'end', align: 'top', formatter: val => val } : { display: false };
 
-    var config = {
-        type: chartType,
-        data: parsedData,
-        options: options
-    };
-    return config;
+    return { type: chartType, data: parsedData, options: options };
 };
 
 // Main function to render the chart
 var renderChart = function() {
     var canvas = document.getElementById('chart-canvas');
     var dataInput = document.getElementById('dataInput').value;
+    var parsedData = (appState.dataMode === 'JSON') ? parseJSON(dataInput) : parseCSV(dataInput);
+    if (!parsedData) { console.error("Data parsing failed."); return; }
 
-    var parsedData = null;
-    if (appState.dataMode === 'JSON') {
-        parsedData = parseJSON(dataInput);
-    } else if (appState.dataMode === 'CSV') {
-        parsedData = parseCSV(dataInput);
-    }
-    
-    if (!parsedData) {
-      console.error("Data parsing failed. Check your input format.");
-      return;
-    }
-    
-    // Special handling for histogram chart data
-    if (appState.chartType === 'histogram' && parsedData && parsedData.datasets.length > 0) {
-        var rawData = parsedData.datasets[0].data;
-        var bins = parseInt(document.getElementById('histBins').value, 10);
+    if (appState.chartType === 'histogram' && parsedData.datasets.length > 0) {
+        var rawData = parsedData.datasets[0].data, bins = parseInt(document.getElementById('histBins').value, 10);
         if (rawData.length > 0) {
-            var dataMin = Math.min.apply(Math, rawData);
-            var dataMax = Math.max.apply(Math, rawData);
+            var dataMin = Math.min(...rawData), dataMax = Math.max(...rawData);
             var binSize = (dataMax - dataMin) / bins;
-
             var binnedData = Array(bins).fill(0);
-            var binLabels = [];
-
-            for (var i = 0; i < bins; i++) {
-                var binStart = dataMin + i * binSize;
-                var binEnd = binStart + binSize;
-                binLabels.push(binStart.toFixed(2) + '-' + binEnd.toFixed(2));
-            }
-
-            rawData.forEach(function(val) {
-                var binIndex = Math.floor((val - dataMin) / binSize);
-                if (binIndex >= bins) binIndex = bins - 1;
+            var binLabels = Array.from({ length: bins }, (_, i) => `${(dataMin + i * binSize).toFixed(2)}-${(dataMin + (i + 1) * binSize).toFixed(2)}`);
+            rawData.forEach(val => {
+                var binIndex = Math.min(bins - 1, Math.floor((val - dataMin) / binSize));
                 binnedData[binIndex]++;
             });
-
-            parsedData = {
-                labels: binLabels,
-                datasets: [{
-                    label: parsedData.datasets[0].label,
-                    data: binnedData,
-                }]
-            };
+            parsedData = { labels: binLabels, datasets: [{ label: parsedData.datasets[0].label, data: binnedData }] };
         }
     }
-    
-    // Special handling for waterfall chart data
-    if (appState.chartType === 'waterfall' && parsedData) {
-        var originalData = parsedData.datasets[0].data;
-        var waterfallData = [{
-            x: parsedData.labels[0],
-            y: originalData[0]
-        }];
-        var runningTotal = originalData[0];
-        for (var i = 1; i < originalData.length; i++) {
-            waterfallData.push({
-                x: parsedData.labels[i],
-                y: runningTotal
-            });
-            runningTotal += originalData[i];
-            waterfallData.push({
-                x: parsedData.labels[i],
-                y: runningTotal
-            });
-        }
-        var netLabel = parsedData.labels[parsedData.labels.length - 1];
-        waterfallData.push({
-            x: netLabel,
-            y: runningTotal
-        });
 
-        var newDatasets = [{
-            label: parsedData.datasets[0].label,
-            data: waterfallData,
-            backgroundColor: function(context) {
-                var index = context.dataIndex;
-                if (index === 0 || index === waterfallData.length - 1) {
-                    return '#0078d7';
-                }
-                var value = originalData[Math.floor((index - 1) / 2) + 1];
-                return value >= 0 ? '#4CAF50' : '#F44336';
-            },
-            borderColor: 'transparent',
-            borderWidth: 1
-        }];
-
-        parsedData = {
-            labels: parsedData.labels,
-            datasets: newDatasets
-        };
-    }
-    
     var config = buildConfig(parsedData);
-    if (!config) {
-        return;
-    }
-
-    if (appState.chart) {
-        appState.chart.destroy();
-    }
+    if (!config) return;
+    if (appState.chart) appState.chart.destroy();
     appState.chart = new Chart(canvas, config);
 };
 
-// Function to add a new data series
+// Functions to add/remove data series
 var addSeries = function() {
     var dataInput = document.getElementById('dataInput');
     if (appState.dataMode === 'JSON') {
         try {
             var data = JSON.parse(dataInput.value);
             if (data && data.datasets) {
-                var newSeriesLabel = `Series ${data.datasets.length + 1}`;
                 var newSeriesData = Array(data.labels.length).fill(0).map(() => Math.floor(Math.random() * 100));
-                
-                if (appState.chartType === 'scatter' || appState.chartType === 'bubble') {
-                    newSeriesData = newSeriesData.map((val, index) => ({
-                        x: index + 1,
-                        y: val,
-                        r: appState.chartType === 'bubble' ? Math.random() * 30 + 5 : undefined
-                    }));
-                }
-
-                data.datasets.push({
-                    label: newSeriesLabel,
-                    data: newSeriesData
-                });
+                data.datasets.push({ label: `Series ${data.datasets.length + 1}`, data: newSeriesData });
                 dataInput.value = JSON.stringify(data, null, 2);
             }
-        } catch (e) {
-            alert('Invalid JSON data. Cannot add series.');
-            console.error(e);
-        }
-    } else if (appState.dataMode === 'CSV') {
+        } catch (e) { alert('Invalid JSON data.'); }
+    } else {
         var lines = dataInput.value.trim().split('\n');
-        var headers = lines[0].split(',').map(h => h.trim());
-        var newHeader = `New Series ${headers.length}`;
-        lines[0] = lines[0] + `,${newHeader}`;
-        
-        for (let i = 1; i < lines.length; i++) {
-            lines[i] = lines[i] + `,${Math.floor(Math.random() * 100)}`;
-        }
+        lines[0] += `,New Series`;
+        for (let i = 1; i < lines.length; i++) lines[i] += `,${Math.floor(Math.random() * 100)}`;
         dataInput.value = lines.join('\n');
     }
     renderChart();
 };
 
-// Function to remove the last data series
 var removeSeries = function() {
     var dataInput = document.getElementById('dataInput');
     if (appState.dataMode === 'JSON') {
         try {
             var data = JSON.parse(dataInput.value);
-            if (data && data.datasets && data.datasets.length > 1) {
+            if (data.datasets.length > 1) {
                 data.datasets.pop();
                 dataInput.value = JSON.stringify(data, null, 2);
-            } else {
-                alert('Cannot remove the last series.');
-            }
-        } catch (e) {
-            alert('Invalid JSON data. Cannot remove series.');
-            console.error(e);
-        }
-    } else if (appState.dataMode === 'CSV') {
+            } else alert('Cannot remove the last series.');
+        } catch (e) { alert('Invalid JSON data.'); }
+    } else {
         var lines = dataInput.value.trim().split('\n');
-        var headers = lines[0].split(',').map(h => h.trim());
-        if (headers.length > 2) {
-            var newLines = lines.map(line => {
-                var cols = line.split(',');
-                return cols.slice(0, cols.length - 1).join(',');
-            });
-            dataInput.value = newLines.join('\n');
-        } else {
-            alert('Cannot remove the last data series.');
-        }
+        if (lines[0].split(',').length > 2) {
+            dataInput.value = lines.map(line => line.substring(0, line.lastIndexOf(','))).join('\n');
+        } else alert('Cannot remove the last data series.');
     }
     renderChart();
-};
-
-// Function to handle file upload
-var uploadFile = function(event) {
-    const file = event.target.files[0];
-    if (!file) {
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const fileContent = e.target.result;
-        const dataInput = document.getElementById('dataInput');
-        const dataModeBadge = document.getElementById('dataModeBadge');
-        
-        if (file.name.endsWith('.json')) {
-            appState.dataMode = 'JSON';
-            dataModeBadge.textContent = 'Data: JSON';
-            dataInput.value = fileContent;
-            document.getElementById('modeJSON').classList.add('active');
-            document.getElementById('modeCSV').classList.remove('active');
-        } else if (file.name.endsWith('.csv')) {
-            appState.dataMode = 'CSV';
-            dataModeBadge.textContent = 'Data: CSV';
-            dataInput.value = fileContent;
-            document.getElementById('modeCSV').classList.add('active');
-            document.getElementById('modeJSON').classList.remove('active');
-        } else {
-            alert('Unsupported file type. Please upload a .json or .csv file.');
-            dataInput.value = '';
-        }
-        renderChart();
-    };
-
-    reader.readAsText(file);
 };
 
 // Initialize the application and set up event listeners
 document.addEventListener('DOMContentLoaded', function() {
     // Tab functionality
-    var tabs = document.querySelectorAll('.tab-button');
-    tabs.forEach(function(tab) {
-        tab.addEventListener('click', function(e) {
-            var targetTab = e.target.dataset.tab;
-            document.querySelectorAll('.tab-button').forEach(function(btn) {
-                return btn.classList.remove('active');
-            });
+    document.querySelectorAll('.tab-button').forEach(tab => {
+        tab.addEventListener('click', e => {
+            document.querySelectorAll('.tab-button, .tab-panel').forEach(el => el.classList.remove('active'));
             e.target.classList.add('active');
-            document.querySelectorAll('.tab-panel').forEach(function(panel) {
-                return panel.classList.remove('active');
-            });
-            document.getElementById(targetTab).classList.add('active');
+            document.getElementById(e.target.dataset.tab).classList.add('active');
         });
     });
 
     // Chart type selection
-    var chartTypeButtons = document.querySelectorAll('.chart-type');
-    chartTypeButtons.forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
+    document.querySelectorAll('.chart-type').forEach(btn => {
+        btn.addEventListener('click', e => {
             appState.chartType = e.target.dataset.type;
-            document.querySelectorAll('.chart-type').forEach(function(b) {
-                return b.classList.remove('active');
-            });
+            document.querySelectorAll('.chart-type').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            document.getElementById('chartTypeBadge').textContent = 'Type: ' + appState.chartType;
+            document.getElementById('chartTypeBadge').textContent = `Type: ${appState.chartType}`;
             document.getElementById('dataInput').value = JSON.stringify(appState.sampleData[appState.chartType], null, 2);
             renderChart();
         });
     });
 
     // Data mode selection
-    document.getElementById('modeJSON').addEventListener('click', function() {
+    document.getElementById('modeJSON').addEventListener('click', () => {
         appState.dataMode = 'JSON';
         document.getElementById('dataModeBadge').textContent = 'Data: JSON';
         document.getElementById('modeJSON').classList.add('active');
         document.getElementById('modeCSV').classList.remove('active');
-        document.getElementById('dataInput').value = JSON.stringify(appState.sampleData[appState.chartType], null, 2);
-        renderChart();
     });
-
-    document.getElementById('modeCSV').addEventListener('click', function() {
+    document.getElementById('modeCSV').addEventListener('click', () => {
         appState.dataMode = 'CSV';
         document.getElementById('dataModeBadge').textContent = 'Data: CSV';
         document.getElementById('modeCSV').classList.add('active');
         document.getElementById('modeJSON').classList.remove('active');
-        var sampleCsv = "Month,Revenue,Cost\nJan,12,8\nFeb,19,11\nMar,13,9";
-        document.getElementById('dataInput').value = sampleCsv;
+        document.getElementById('dataInput').value = "Month,Revenue,Cost\nJan,12,8\nFeb,19,11\nMar,13,9";
         renderChart();
     });
-
-    // File upload
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.json, .csv';
-    fileInput.style.display = 'none';
-    document.body.appendChild(fileInput);
-    
-    document.getElementById('btnUpload').addEventListener('click', () => {
-        fileInput.click();
-    });
-    fileInput.addEventListener('change', uploadFile);
 
     // Data control buttons
-    document.getElementById('btnSample').addEventListener('click', function() {
-        if (appState.dataMode === 'JSON') {
-            document.getElementById('dataInput').value = JSON.stringify(appState.sampleData[appState.chartType], null, 2);
-        } else if (appState.dataMode === 'CSV') {
-            var sampleCsv = "Month,Revenue,Cost\nJan,12,8\nFeb,19,11\nMar,13,9";
-            document.getElementById('dataInput').value = sampleCsv;
-        }
+    document.getElementById('btnSample').addEventListener('click', () => {
+        document.getElementById('dataInput').value = (appState.dataMode === 'JSON') ? JSON.stringify(appState.sampleData[appState.chartType], null, 2) : "Month,Revenue,Cost\nJan,12,8\nFeb,19,11\nMar,13,9";
         renderChart();
     });
-
-    document.getElementById('btnClear').addEventListener('click', function() {
+    document.getElementById('btnClear').addEventListener('click', () => {
         document.getElementById('dataInput').value = '';
-        if (appState.chart) {
-            appState.chart.destroy();
-        }
+        if (appState.chart) appState.chart.destroy();
     });
 
+    // Render, Series, and Data Panel buttons
     document.getElementById('btnRender').addEventListener('click', renderChart);
-    document.getElementById('btnRenderBottom').addEventListener('click', renderChart);
+    document.getElementById('btnRenderBottom').addEventListener('click', () => {
+        renderChart();
+        document.getElementById('dataPanel').classList.remove('active');
+    });
     document.getElementById('btnAddSeries').addEventListener('click', addSeries);
     document.getElementById('btnRemoveSeries').addEventListener('click', removeSeries);
-    
-    // Data panel toggle
-    document.getElementById('btnDataPanel').addEventListener('click', function() {
-        document.getElementById('dataPanel').classList.toggle('active');
-    });
+    document.getElementById('btnDataPanel').addEventListener('click', () => document.getElementById('dataPanel').classList.toggle('active'));
 
     // Export functionality
-    document.getElementById('btnExportPNG').addEventListener('click', function() {
+    document.getElementById('btnExportPNG').addEventListener('click', () => {
+        if (appState.chart) exportChart();
+        else alert('Please render a chart first.');
+    });
+    document.getElementById('btnCopyConfig').addEventListener('click', () => {
         if (appState.chart) {
-            appState.isExporting = true; // Set flag
-            renderChart(); // Re-render with export logic enabled
-        } else {
-            alert('Please render a chart first.');
-        }
+            navigator.clipboard.writeText(JSON.stringify(appState.chart.config, null, 2))
+                .then(() => alert('Chart config copied to clipboard!'))
+                .catch(err => console.error('Failed to copy config:', err));
+        } else alert('Please render a chart first.');
     });
 
-    document.getElementById('btnCopyConfig').addEventListener('click', function() {
-        if (appState.chart) {
-            var config = appState.chart.config;
-            navigator.clipboard.writeText(JSON.stringify(config, null, 2))
-                .then(function() {
-                    return alert('Chart config copied to clipboard!');
-                })
-                .catch(function(err) {
-                    return console.error('Failed to copy config:', err);
-                });
-        } else {
-            alert('Please render a chart first.');
-        }
-    });
-
-    // Initial chart render on page load
+    // Set initial data and render chart on page load
+    document.getElementById('dataInput').value = JSON.stringify(appState.sampleData.line, null, 2);
+    document.querySelector('.chart-type[data-type="line"]').classList.add('active');
+    document.getElementById('modeJSON').classList.add('active');
     renderChart();
 });
+
     </script>
 </body>
 </html>
