@@ -1,1181 +1,1267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>StenoGraphs </title>
-<style>
-/* --- Base / Ribbon ---*/
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StenoGraphs(WIP)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f3f3f3;
-  color: #333;
-}
-.ribbon-menu {
-  background-color: #fff;
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  padding: 5px 15px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.tabs-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px 0;
-  border-bottom: 1px solid #e0e0e0;
-}
-.tabs {
-  display: flex;
-}
-.tab-button {
-  background-color: transparent;
-  border: none;
-  padding: 10px 15px;
-  font-size: 15px;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
-  color: #555;
-  font-weight: 500;
-}
-.tab-button:hover {
-  background-color: #f0f0f0;
-}
-.tab-button.active {
-  border-color: #0078d7;
-  color: #0078d7;
-}
-.tell-me {
-  display: flex;
-  align-items: center;
-}
-.tell-me input {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  width: 250px;
-  transition: all 0.2s;
-}
-.tell-me input:focus {
-  outline: none;
-  border-color: #0078d7;
-  box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.2);
-}
-.tab-panel {
-  display: none;
-  padding: 10px 0;
-  margin-top: 5px;
-}
-.tab-panel.active {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: flex-start;
-}
-.ribbon-group {
-  padding: 0 15px;
-  border-right: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  align-items: center;
-}
-.ribbon-group:last-child {
-  border-right: none;
-}
-.ribbon-group-title {
-  font-size: 11px;
-  color: #888;
-  text-align: center;
-  margin-top: 5px;
-}
-.ribbon-group-items {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-.ribbon-item {
-  padding: 8px 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: #f9f9f9;
-  font-size: 14px;
-  transition: background-color 0.2s, transform 0.1s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 30px;
-}
-.ribbon-item:hover {
-  background-color: #e9e9e9;
-}
-.ribbon-item:active {
-  transform: scale(0.98);
-}
-.ribbon-item.active {
-  background-color: #d1e2f6;
-  border-color: #0078d7;
-}
-.document-container {
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  min-height: calc(100vh - 100px);
-}
-#editor {
-  width: 8.5in;
-  min-height: 11in;
-  padding: 1in;
-  background-color: white;
-  border: 1px solid #ccc;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  outline: none;
-  line-height: 1.6;
-  font-size: 16px;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-  position: relative;
-}
-#drawing-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  pointer-events: none;
-}
-.drawing-canvas-active {
-  cursor: crosshair;
-  pointer-events: auto !important;
-}
-.spellcheck-highlight {
-  background-color: #fce8e8;
-  border-bottom: 2px solid #ff4d4d;
-}
-.theme-select {
-  padding: 8px 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-/* --- App-specific layout --- */
-#editor {
-  padding-top: 0.6in;
+.app-container {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 95%;
+    max-width: 1400px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 90vh;
 }
-.editor-topbar {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 10px 0;
+
+.app-header {
+    background-color: #0078d7;
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
-#chart-canvas {
-  width: 100%;
-  max-width: 100%;
-  height: 480px;
+
+.app-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
 }
-.controls {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 16px;
-  width: 100%;
-  margin-top: 12px;
+
+.header-badges {
+    display: flex;
+    gap: 10px;
 }
-.panel {
-  background: #fafafa;
-  border: 1px solid #e6e6e6;
-  border-radius: 6px;
-  padding: 10px;
-}
-.panel-title {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 8px;
-}
-label.small {
-  font-size: 12px;
-  color: #666;
-}
-.input, textarea, select {
-  width: 100%;
-  box-sizing: border-box;
-}
-.textarea {
-  width: 100%;
-  min-height: 150px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 8px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;
-  font-size: 13px;
-  background: #fff;
-  color: #333;
-}
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.btn {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 8px 10px;
-  font-size: 14px;
-  cursor: pointer;
-}
-.btn:hover { background: #efefef; }
-.btn.primary {
-  background: #0078d7;
-  border-color: #0078d7;
-  color: #fff;
-}
+
 .badge {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 11px;
-  background: #eef5ff;
-  color: #2a6ad7;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.9rem;
 }
-.flex { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.hidden { display: none !important; }
-.kv {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 8px;
-  align-items: center;
+
+.ribbon {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.8rem 2rem;
+    background-color: #e3e6e8;
+    border-bottom: 1px solid #ccc;
+    flex-wrap: wrap;
+    gap: 20px;
 }
-.color-input { width: 36px; height: 28px; padding: 0; border: 1px solid #ddd; border-radius: 4px; }
-footer.note {
-  margin-top: 10px; font-size: 12px; color: #777;
+
+.ribbon-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
-</style>
+
+.ribbon-label {
+    font-size: 0.8rem;
+    color: #555;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.ribbon-items {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ribbon-item {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.ribbon-item:hover {
+    background-color: #ddd;
+}
+
+.ribbon-item.active {
+    background-color: #0078d7;
+    color: #fff;
+    border-color: #005a9e;
+}
+
+.render-button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.render-button:hover {
+    background-color: #218838;
+}
+
+.content-container {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.chart-container {
+    flex: 3;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 500px;
+}
+
+#chart-canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.options-panel {
+    flex: 1;
+    background-color: #f5f5f5;
+    border-left: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    overflow-y: auto;
+    min-width: 250px;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab-button {
+    background-color: transparent;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #555;
+    transition: color 0.2s, border-bottom 0.2s;
+}
+
+.tab-button.active {
+    color: #0078d7;
+    border-bottom: 2px solid #0078d7;
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+.control-group {
+    margin-bottom: 1.5rem;
+}
+
+.control-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.control-group input[type="text"],
+.control-group input[type="number"],
+.control-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.data-panel {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%; /* Adjust as needed */
+    background: #fff;
+    border-top: 2px solid #ccc;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    z-index: 100;
+    flex-direction: column;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.data-panel.active {
+    display: flex;
+}
+
+#dataInput {
+    flex: 1;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    padding: 10px;
+    box-sizing: border-box;
+    resize: none;
+}
+
+#btnRenderBottom {
+    margin-top: 1rem;
+    align-self: flex-end;
+}
+
+      
+    </style>
 </head>
 <body>
-  <div class="ribbon-menu">
-    <div class="tabs-container">
-      <div class="tabs">
-        <button class="tab-button active" data-tab="insert">Insert</button>
-        <button class="tab-button" data-tab="data">Data</button>
-        <button class="tab-button" data-tab="style">Style</button>
-        <button class="tab-button" data-tab="performance">Performance</button>
-        <button class="tab-button" data-tab="export">Export</button>
-      </div>
-      <div class="tell-me">
-        <input id="commandBox" type="text" placeholder="Type: 'line sales by month', 'histogram 20 bins', 'waterfall cashflow'..." />
-      </div>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>StenoGraphs(W.I.P)</h1>
+            <div class="header-badges">
+                <span id="chartTypeBadge" class="badge">Type: line</span>
+                <span id="dataModeBadge" class="badge">Data: JSON</span>
+            </div>
+        </header>
+
+        <div class="ribbon">
+            <div class="ribbon-group">
+                <span class="ribbon-label">Chart Type</span>
+                <div class="ribbon-items">
+                    <button class="ribbon-item chart-type" data-type="line">Line</button>
+                    <button class="ribbon-item chart-type" data-type="bar">Bar</button>
+                    <button class="ribbon-item chart-type" data-type="column">Column</button>
+                    <button class="ribbon-item chart-type" data-type="pie">Pie</button>
+                    <button class="ribbon-item chart-type" data-type="area">Area</button>
+                    <button class="ribbon-item chart-type" data-type="radar">Radar</button>
+                    <button class="ribbon-item chart-type" data-type="scatter">Scatter</button>
+                    <button class="ribbon-item chart-type" data-type="bubble">Bubble</button>
+                    <button class="ribbon-item chart-type" data-type="waterfall">Waterfall</button>
+                    <button class="ribbon-item chart-type" data-type="histogram">Histogram</button>
+                </div>
+            </div>
+            
+            <div class="ribbon-group">
+                <span class="ribbon-label">Data</span>
+                <div class="ribbon-items">
+                    <button class="ribbon-item" id="modeJSON">JSON</button>
+                    <button class="ribbon-item" id="modeCSV">CSV</button>
+                    <button class="ribbon-item" id="btnSample">Sample</button>
+                    <button class="ribbon-item" id="btnClear">Clear</button>
+                    <button class="ribbon-item" id="btnAddSeries">Add series</button>
+                    <button class="ribbon-item" id="btnRemoveSeries">Remove series</button>
+                    <button class="ribbon-item" id="btnDataPanel">Edit Data</button>
+                </div>
+            </div>
+
+            <div class="ribbon-group">
+                <span class="ribbon-label">Export</span>
+                <div class="ribbon-items">
+                    <button class="ribbon-item" id="btnExportPNG">Export PNG(Does not work. Please take screenshot)</button>
+                    <button class="ribbon-item" id="btnCopyConfig">Copy Config</button>
+                </div>
+            </div>
+
+            <button id="btnRender" class="render-button">Render Chart</button>
+        </div>
+
+        <div class="content-container">
+            <div class="chart-container">
+                <canvas id="chart-canvas"></canvas>
+            </div>
+            
+            <div class="options-panel">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="tab-chart-options">Chart Options</button>
+                    <button class="tab-button" data-tab="tab-axis-options">Axis & Scales</button>
+                    <button class="tab-button" data-tab="tab-advanced-options">Advanced</button>
+                </div>
+
+                <div id="tab-chart-options" class="tab-panel active">
+                    <div class="control-group">
+                        <label for="chartTitle">Chart Title</label>
+                        <input type="text" id="chartTitle" value="Chart Title">
+                    </div>
+                    <div class="control-group">
+                        <label for="legendPos">Legend Position</label>
+                        <select id="legendPos">
+                            <option value="top">Top</option>
+                            <option value="bottom">Bottom</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                            <option value="hidden">Hidden</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="palette">Color Palette</label>
+                        <select id="palette">
+                            <option value="classic">Classic</option>
+                            <option value="pastel">Pastel</option>
+                            <option value="vivid">Vivid</option>
+                            <option value="mono">Mono</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="tab-axis-options" class="tab-panel">
+                    <div class="control-group">
+                        <label for="xTitle">X-Axis Title</label>
+                        <input type="text" id="xTitle" value="">
+                    </div>
+                    <div class="control-group">
+                        <label for="yTitle">Y-Axis Title</label>
+                        <input type="text" id="yTitle" value="">
+                    </div>
+                    <div class="control-group">
+                        <label for="yMin">Y-Axis Min</label>
+                        <input type="number" id="yMin">
+                    </div>
+                    <div class="control-group">
+                        <label for="yMax">Y-Axis Max</label>
+                        <input type="number" id="yMax">
+                    </div>
+                </div>
+
+                <div id="tab-advanced-options" class="tab-panel">
+                    <div class="control-group">
+                        <label for="anim">Animation</label>
+                        <select id="anim">
+                            <option value="true">On</option>
+                            <option value="false">Off</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="tooltips">Tooltips</label>
+                        <select id="tooltips">
+                            <option value="true">On</option>
+                            <option value="false">Off</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="smoothness">Line Smoothness</label>
+                        <input type="number" id="smoothness" value="0.4" min="0" max="1" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label for="stacked">Stacked</label>
+                        <select id="stacked">
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="aspect">Aspect Ratio</label>
+                        <select id="aspect">
+                            <option value="auto">Auto</option>
+                            <option value="16/9">16:9</option>
+                            <option value="4/3">4:3</option>
+                            <option value="1/1">1:1</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="showValues">Show Values</label>
+                        <select id="showValues">
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="histBins">Histogram Bins</label>
+                        <input type="number" id="histBins" value="10" min="1" max="50">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dataPanel" class="data-panel">
+            <textarea id="dataInput"></textarea>
+            <button id="btnRenderBottom" class="render-button">Render Chart</button>
+        </div>
+   <p>&copy; 2025 Stenoip Company</p>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script>
 
-    <div id="insert" class="tab-panel active">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item chart-type" data-type="bar">Bar</button>
-          <button class="ribbon-item chart-type" data-type="column">Column</button>
-          <button class="ribbon-item chart-type" data-type="line">Line</button>
-          <button class="ribbon-item chart-type" data-type="area">Area</button>
-          <button class="ribbon-item chart-type" data-type="pie">Pie</button>
-          <button class="ribbon-item chart-type" data-type="histogram">Histogram</button>
-          <button class="ribbon-item chart-type" data-type="scatter">Scatter</button>
-          <button class="ribbon-item chart-type" data-type="radar">Radar</button>
-          <button class="ribbon-item chart-type" data-type="bubble">Bubble</button>
-          <button class="ribbon-item chart-type" data-type="waterfall">Waterfall</button>
-        </div>
-        <div class="ribbon-group-title">Chart types</div>
-      </div>
+      // Register the Chart.js datalabels plugin
+Chart.register(ChartDataLabels);
 
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btnSample">Sample data</button>
-          <button class="ribbon-item" id="btnClear">Clear</button>
-          <button class="ribbon-item" id="btnRender">Render</button>
-          <button class="ribbon-item" id="btnPreview">Preview</button>
-        </div>
-        <div class="ribbon-group-title">Actions</div>
-      </div>
-
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <label class="small">Title</label>
-          <input id="chartTitle" class="input" placeholder="Chart title" />
-          <label class="small">Legend</label>
-          <select id="legendPos" class="input">
-            <option value="top">Top</option>
-            <option value="bottom">Bottom</option>
-            <option value="left">Left</option>
-            <option value="right">Right</option>
-            <option value="hidden">Hidden</option>
-          </select>
-        </div>
-        <div class="ribbon-group-title">Meta</div>
-      </div>
-    </div>
-
-    <div id="data" class="tab-panel">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="modeJSON">JSON</button>
-          <button class="ribbon-item" id="modeCSV">CSV</button>
-        </div>
-        <div class="ribbon-group-title">Mode</div>
-      </div>
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btnAddSeries">Add series</button>
-          <button class="ribbon-item" id="btnRemoveSeries">Remove series</button>
-        </div>
-        <div class="ribbon-group-title">Series</div>
-      </div>
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <label class="small">Histogram bins</label>
-          <input id="histBins" type="number" class="input" min="2" max="100" value="10" />
-          <label class="small">Stacked</label>
-          <select id="stacked" class="input">
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-          </select>
-        </div>
-        <div class="ribbon-group-title">Analysis</div>
-      </div>
-    </div>
-
-    <div id="style" class="tab-panel">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <label class="small">Palette</label>
-          <select id="palette" class="input">
-            <option value="classic">Classic</option>
-            <option value="pastel">Pastel</option>
-            <option value="vivid">Vivid</option>
-            <option value="mono">Mono blue</option>
-          </select>
-          <label class="small">Background</label>
-          <input id="bgColor" class="color-input" type="color" value="#ffffff" />
-          <label class="small">Grid lines</label>
-          <select id="gridLines" class="input">
-            <option value="true">Show</option>
-            <option value="false">Hide</option>
-          </select>
-          <label class="small">Smooth lines</label>
-          <select id="smoothness" class="input">
-            <option value="0">0</option>
-            <option value="0.2">0.2</option>
-            <option value="0.4">0.4</option>
-            <option value="0.6">0.6</option>
-            <option value="0.8">0.8</option>
-          </select>
-        </div>
-        <div class="ribbon-group-title">Appearance</div>
-      </div>
-
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <label class="small">X axis title</label>
-          <input id="xTitle" class="input" placeholder="X axis" />
-          <label class="small">Y axis title</label>
-          <input id="yTitle" class="input" placeholder="Y axis" />
-          <label class="small">Min Y</label>
-          <input id="yMin" class="input" type="number" placeholder="auto" />
-          <label class="small">Max Y</label>
-          <input id="yMax" class="input" type="number" placeholder="auto" />
-          <label class="small">Tooltips</label>
-          <select id="tooltips" class="input">
-            <option value="true">Show</option>
-            <option value="false">Hide</option>
-          </select>
-          <label class="small">Aspect ratio</label>
-          <select id="aspect" class="input">
-            <option value="auto">Auto</option>
-            <option value="16/9">16:9</option>
-            <option value="4/3">4:3</option>
-            <option value="1">Square</option>
-          </select>
-        </div>
-        <div class="ribbon-group-title">Axes & UX</div>
-      </div>
-    </div>
-
-    <div id="performance" class="tab-panel">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <label class="small">Mode</label>
-          <select id="perfMode" class="input">
-            <option value="light">Light (safer)</option>
-            <option value="full">Full (slower)</option>
-          </select>
-          <label class="small">Point cap per series</label>
-          <input id="pointCap" class="input" type="number" min="500" max="20000" step="500" value="5000" />
-          <label class="small">Downsampling</label>
-          <select id="downsampleStrategy" class="input">
-            <option value="everyN">Keep every Nth</option>
-            <option value="average">Average into bins</option>
-          </select>
-          <label class="small">Live preview</label>
-          <select id="livePreview" class="input">
-            <option value="off">Off</option>
-            <option value="on">On</option>
-          </select>
-        </div>
-        <div class="ribbon-group-title">Stability controls</div>
-      </div>
-
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <div id="memInfo" class="ribbon-item" title="Approximate JS heap usage">Heap: —</div>
-          <div id="dsInfo" class="ribbon-item" title="Data reduction applied">Downsample: —</div>
-        </div>
-        <div class="ribbon-group-title">Diagnostics</div>
-      </div>
-    </div>
-
-    <div id="export" class="tab-panel">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btnExportPNG">Export PNG</button>
-          <button class="ribbon-item" id="btnCopyConfig">Copy config</button>
-        </div>
-        <div class="ribbon-group-title">Output</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="document-container">
-    <div id="editor">
-      <div class="editor-topbar">
-        <span class="badge" id="chartTypeBadge">Type: line</span>
-        <span class="badge" id="dataModeBadge">Data: JSON</span>
-        <span class="badge" id="perfBadge">Mode: light</span>
-        <button class="btn primary" id="btnRenderBottom">Render</button>
-      </div>
-
-      <canvas id="chart-canvas" aria-label="Chart canvas"></canvas>
-
-      <div class="controls">
-        <div class="panel">
-          <div class="panel-title">Data input</div>
-          <textarea id="dataInput" class="textarea" spellcheck="false"></textarea>
-          <footer class="note">
-            JSON: { "labels": [...], "datasets": [{ "label": "...", "data": [...] }]}<br/>
-            CSV (bar/line/area/column): first row headers; first column labels.<br/>
-            CSV (scatter): columns x,y,label; CSV (bubble): x,y,r,label.
-          </footer>
-        </div>
-
-        <div class="panel">
-          <div class="panel-title">Options</div>
-          <div class="kv"><label class="small">Show values</label>
-            <select id="showValues" class="input">
-              <option value="false">No</option>
-              <option value="true">Yes</option>
-            </select>
-          </div>
-          <div class="kv"><label class="small">Animation</label>
-            <select id="anim" class="input">
-              <option value="false">Off</option>
-              <option value="true">On</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-
-  <script>
-/* ==========================================================
-   StenoGraphs — Safe Render Pipeline (Crash-Resistant)
-   Key strategies:
-   - Explicit render (no heavy auto-renders while typing)
-   - Data caps + downsampling/aggregation
-   - Proper chart destroy + canvas reset
-   - Optional decimation with sorted data
-   - Light mode defaults for safety
-========================================================== */
-
-const $ = (s, r=document) => r.querySelector(s);
-const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-
-const State = {
-  chart: null,
-  currentType: 'line',
-  dataMode: 'json',
-  paletteName: 'classic',
-  perfMode: 'light',
-  lastConfigHash: '',
-  livePreview: 'off'
-};
-
-const palettes = {
-  classic: ['#2a6ad7','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'],
-  pastel:  ['#80b1d3','#fdb462','#b3de69','#fb8072','#cab2d6','#fccde5','#ccebc5','#d9d9d9','#ffe082','#a6cee3'],
-  vivid:   ['#1f77b4','#ff4136','#2ecc40','#ff851b','#b10dc9','#0074d9','#ffdc00','#39cccc','#01ff70','#85144b'],
-  mono:    ['#0078d7','#0d6efd','#1e88e5','#2196f3','#42a5f5','#64b5f6','#90caf9','#bbdefb','#e3f2fd','#0a58ca']
-};
-
-function currentColors(k) {
-  const arr = palettes[State.paletteName] || palettes.classic;
-  return k ? arr.slice(0, k) : arr;
-}
-function hexToRgba(hex, a=0.3) {
-  const m = hex.replace('#','');
-  const n = parseInt(m, 16);
-  if (Number.isNaN(n)) return `rgba(0,0,0,${a})`;
-  const r = (n>>16)&255, g=(n>>8)&255, b=n&255;
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-}
-function parseAspect(v) {
-  if (!v || v === 'auto') return undefined;
-  const parts = String(v).split('/');
-  if (parts.length === 2) {
-    const a = parseFloat(parts[0]), b = parseFloat(parts[1]);
-    if (Number.isFinite(a) && Number.isFinite(b) && b !== 0) return a/b;
-  }
-  const num = parseFloat(v);
-  return Number.isFinite(num) ? num : undefined;
-}
-
-/* ------------------ Data parsing ------------------ */
-function safeJSON(text, fallback = { labels: [], datasets: [] }) {
-  try { return JSON.parse(text); } catch { return fallback; }
-}
-function csvToData(text, type) {
-  const rows = text.trim().split(/\r?\n/).map(r => r.split(',').map(c => c.trim())).filter(r => r.length);
-  if (!rows.length) return { labels: [], datasets: [] };
-
-  if (type === 'scatter' || type === 'bubble') {
-    const firstNum = parseFloat(rows[0]?.[0]);
-    const hasHeader = Number.isNaN(firstNum);
-    const dataRows = hasHeader ? rows.slice(1) : rows;
-    const map = new Map();
-    for (const r of dataRows) {
-      const [xv, yv, rvOrLabel, maybeLabel] = r;
-      const x = parseFloat(xv), y = parseFloat(yv);
-      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-      const label = (hasHeader ? maybeLabel : maybeLabel || rvOrLabel) || 'Series 1';
-      const point = { x, y };
-      if (type === 'bubble') {
-        const rv = parseFloat(rvOrLabel);
-        point.r = Number.isNaN(rv) ? 6 : rv;
-      }
-      if (!map.has(label)) map.set(label, []);
-      map.get(label).push(point);
-    }
-    return { labels: [], datasets: Array.from(map, ([label, data]) => ({ label, data })) };
-  }
-
-  if (type === 'pie') {
-    const firstVal = parseFloat(rows[0]?.[1]);
-    const hasHeader = Number.isNaN(firstVal);
-    const dataRows = hasHeader ? rows.slice(1) : rows;
-    const labels = [], data = [];
-    for (const r of dataRows) {
-      const name = r[0]; const val = parseFloat(r[1]);
-      if (!name || !Number.isFinite(val)) continue;
-      labels.push(name); data.push(val);
-    }
-    return { labels, datasets: [{ label: 'Series 1', data }] };
-  }
-
-  const headers = rows[0];
-  const labels = rows.slice(1).map(r => r[0]);
-  const datasets = [];
-  for (let c=1; c<headers.length; c++) {
-    const label = headers[c] || `Series ${c}`;
-    const data = rows.slice(1).map(r => {
-      const v = parseFloat(r[c]); return Number.isFinite(v) ? v : null;
-    });
-    datasets.push({ label, data });
-  }
-  return { labels, datasets };
-}
-function jsonToData(text) {
-  const obj = safeJSON(text);
-  return {
-    labels: Array.isArray(obj.labels) ? obj.labels : [],
-    datasets: Array.isArray(obj.datasets) ? obj.datasets.map(d => ({
-      label: d.label ?? 'Series',
-      data: Array.isArray(d.data) ? d.data : [],
-      backgroundColor: d.backgroundColor,
-      borderColor: d.borderColor
-    })) : []
-  };
-}
-
-/* ------------------ Transforms ------------------ */
-function genHistogram(input, binsCount) {
-  const values = (input.datasets||[]).flatMap(d => d.data).map(Number).filter(Number.isFinite);
-  if (!values.length) return { labels: [], datasets: [] };
-  const min = Math.min(...values), max = Math.max(...values);
-  const bins = Math.max(2, Math.min(100, Math.floor(binsCount||10)));
-  const step = (max - min) / bins || 1;
-  const edges = Array.from({length: bins}, (_,i)=>min + i*step);
-  const counts = new Array(bins).fill(0);
-  for (const v of values) {
-    let idx = Math.floor((v-min)/step);
-    if (idx >= bins) idx = bins-1;
-    if (idx < 0) idx = 0;
-    counts[idx]++;
-  }
-  const labels = edges.map((e,i)=>{
-    const end = i===bins-1 ? max : e+step;
-    return `${e.toFixed(2)}–${end.toFixed(2)}`;
-  });
-  return { labels, datasets:[{ label:'Frequency', data: counts }] };
-}
-function genWaterfall(input) {
-  const labels = Array.isArray(input.labels) ? input.labels.slice() : [];
-  const raw = (input.datasets?.[0]?.data || []).map(Number);
-  const startProvided = labels[0]?.toLowerCase?.().includes('start');
-  const startVal = startProvided ? raw[0] : 0;
-  const steps = startProvided ? raw.slice(1) : raw.slice();
-  const stepLabels = startProvided ? labels.slice(1) : labels.slice();
-  let running = startVal;
-  const data = [], bases = [];
-  for (let i=0;i<steps.length;i++){
-    const v = steps[i];
-    if (!Number.isFinite(v)) { data.push(0); bases.push(running); continue; }
-    const base = v >= 0 ? running : running + v;
-    bases.push(base);
-    data.push(Math.abs(v));
-    running += v;
-  }
-  stepLabels.push('Total'); bases.push(0); data.push(Math.abs(running));
-  const colors = stepLabels.map((_,i)=> i===stepLabels.length-1 ? '#6c757d' : (steps[i]>=0 ? '#2ca02c' : '#d62728'));
-  return {
-    labels: stepLabels,
-    datasets: [{ label:'Waterfall', data: data.map((h,i)=>({x:stepLabels[i], y:h, base:bases[i]})), backgroundColor: colors, borderWidth:0 }]
-  };
-}
-
-/* ------------------ Performance helpers ------------------ */
-function downsampleEveryN(arr, maxPoints) {
-  if (!Array.isArray(arr) || arr.length <= maxPoints) return arr;
-  const step = Math.ceil(arr.length / maxPoints);
-  const out = [];
-  for (let i=0;i<arr.length;i+=step) out.push(arr[i]);
-  return out;
-}
-function downsampleAverage(arr, maxPoints) {
-  if (!Array.isArray(arr) || arr.length <= maxPoints) return arr;
-  const bins = maxPoints;
-  const size = Math.floor(arr.length / bins);
-  const out = [];
-  for (let b=0;b<bins;b++){
-    const start = b*size;
-    const end = b===bins-1 ? arr.length : start+size;
-    let sx=0, sy=0, sr=0, c=0;
-    for (let i=start;i<end;i++) {
-      const v = arr[i];
-      if (typeof v === 'number') { sx += i; sy += v; c++; }
-      else if (v && typeof v === 'object') {
-        const x = Number.isFinite(v.x) ? v.x : i, y = v.y;
-        if (Number.isFinite(y)) { sx += x; sy += y; sr += (v.r||0); c++; }
-      }
-    }
-    if (c>0) {
-      const x = sx / c, y = sy / c;
-      if (arr[0] && typeof arr[0] === 'object' && 'y' in arr[0]) {
-        const r = sr / c || undefined;
-        out.push(r ? { x, y, r } : { x, y });
-      } else {
-        out.push(y);
-      }
-    }
-  }
-  return out;
-}
-function maybeReduceDataset(ds, maxPoints, strategy) {
-  const reduce = strategy === 'average' ? downsampleAverage : downsampleEveryN;
-  return ds.map(series => {
-    const data = series.data || [];
-    const reduced = reduce(data, maxPoints);
-    return { ...series, data: reduced };
-  });
-}
-function formatForDecimationIfNeeded(type, datasets) {
-  if (!['line','area','scatter','bubble'].includes(type)) return datasets;
-  return datasets.map(d => {
-    const arr = d.data || [];
-    // If numeric array, convert to {x,y}
-    const needsXY = arr.length && typeof arr[0] === 'number';
-    let data = arr;
-    if (needsXY) data = arr.map((y, i) => ({ x: i, y }));
-    // Ensure sorted by x
-    if (data.length && typeof data[0] === 'object' && 'x' in data[0]) {
-      data = data.slice().sort((a,b) => (a.x ?? 0) - (b.x ?? 0));
-    }
-    return { ...d, data };
-  });
-}
-
-/* ------------------ Styling helpers ------------------ */
-function areaize(ds, tension=0.2) {
-  return ds.map(d => ({ ...d, fill: true, tension }));
-}
-function applyPalette(ds, kind) {
-  const colors = currentColors(ds.length);
-  return ds.map((d,i) => {
-    const stroke = d.borderColor || colors[i % colors.length];
-    const fill = d.backgroundColor || (kind === 'pie' ? stroke : hexToRgba(stroke, 0.25));
-    return { ...d, borderColor: stroke, backgroundColor: fill };
-  });
-}
-
-/* ------------------ UI wiring ------------------ */
-function setChartType(type) {
-  State.currentType = type;
-  $('#chartTypeBadge').textContent = `Type: ${type}`;
-  // Toggle axis controls for non-axis charts
-  const hide = ['pie','radar'];
-  const axisNeeded = !hide.includes(type);
-  ['xTitle','yTitle','yMin','yMax','stacked','smoothness'].forEach(id => {
-    const el = $('#'+id);
-    if (!el) return;
-    const group = el.closest('.kv') || el;
-    group.classList.toggle('hidden', !axisNeeded && ['yMin','yMax','stacked','smoothness','xTitle','yTitle'].includes(id));
-  });
-}
-function setDataMode(mode) {
-  State.dataMode = mode;
-  $('#dataModeBadge').textContent = `Data: ${mode.toUpperCase()}`;
-}
-function setPerfMode(mode) {
-  State.perfMode = mode;
-  $('#perfBadge').textContent = `Mode: ${mode}`;
-}
-
-/* ------------------ Build config ------------------ */
-function readData() {
-  const base = State.dataMode === 'csv' ? csvToData($('#dataInput').value || '', State.currentType)
-                                        : jsonToData($('#dataInput').value || '{}');
-  if (State.currentType === 'histogram') {
-    const bins = clampInt($('#histBins').value, 2, 100, 10);
-    return genHistogram(base, bins);
-  }
-  if (State.currentType === 'waterfall') return genWaterfall(base);
-  return base;
-}
-function clampInt(v, min, max, def) {
-  const n = parseInt(v, 10);
-  if (!Number.isFinite(n)) return def;
-  return Math.max(min, Math.min(max, n));
-}
-function buildConfig() {
-  const { labels, datasets } = readData();
-
-  const legendPos = $('#legendPos').value;
-  const bg = $('#bgColor').value || '#ffffff';
-  const showGrid = $('#gridLines').value === 'true';
-  const smooth = parseFloat($('#smoothness').value || '0');
-  const stacked = $('#stacked').value === 'true';
-  const showVals = $('#showValues').value === 'true';
-  const anim = $('#anim').value === 'true' && State.perfMode === 'full';
-  const tooltips = $('#tooltips').value === 'true';
-  const aspect = parseAspect($('#aspect').value);
-  const yMin = parseFloat($('#yMin').value);
-  const yMax = parseFloat($('#yMax').value);
-  const title = $('#chartTitle').value || '';
-
-  let type = State.currentType;
-  if (type === 'column') type = 'bar';
-  if (type === 'area') type = 'line';
-  if (type === 'histogram') type = 'bar';
-  if (type === 'waterfall') type = 'bar';
-
-  let indexAxis = 'x';
-  if (State.currentType === 'bar') indexAxis = 'y';
-  if (['column','histogram','waterfall'].includes(State.currentType)) indexAxis = 'x';
-
-  // Apply performance reductions
-  const maxPoints = clampInt($('#pointCap').value, 500, 20000, 5000);
-  const strategy = $('#downsampleStrategy').value;
-  let ds = datasets.slice();
-
-  // Reduce only if exceeding cap
-  let reducedFlag = false;
-  ds = ds.map(series => {
-    const arr = series.data || [];
-    if (Array.isArray(arr) && arr.length > maxPoints) {
-      reducedFlag = true;
-      const reducer = strategy === 'average' ? downsampleAverage : downsampleEveryN;
-      return { ...series, data: reducer(arr, maxPoints) };
-    }
-    return series;
-  });
-  $('#dsInfo').textContent = reducedFlag ? `Downsample: yes (≤${maxPoints}/series)` : 'Downsample: no';
-
-  // Light mode defaults
-  if (State.perfMode === 'light') {
-    // Reduce a bit more for super large cases
-    const hardCap = Math.min(maxPoints, 8000);
-    ds = maybeReduceDataset(ds, hardCap, strategy);
-  }
-
-  // Area smoothing
-  if (State.currentType === 'area') ds = areaize(ds, smooth);
-  if (State.currentType === 'line') ds = ds.map(d => ({ ...d, tension: smooth }));
-
-  // Palette
-  const paletteKind = (State.currentType === 'pie' || State.currentType === 'radar') ? 'pie' : 'series';
-  ds = applyPalette(ds, paletteKind);
-
-  // Pie expects single dataset
-  if (State.currentType === 'pie') {
-    const merged = {
-      label: ds[0]?.label || 'Series 1',
-      data: ds[0]?.data || [],
-      backgroundColor: currentColors((ds[0]?.data || []).length)
-    };
-    ds = [merged];
-  }
-
-  // Optional: format for decimation
-  const forDecimate = formatForDecimationIfNeeded(type, ds);
-
-  const axisTitle = t => ({ display: !!t, text: t });
-  const commonScales = {
-    x: { stacked, grid:{ display: showGrid }, title: axisTitle($('#xTitle').value) },
-    y: { stacked, grid:{ display: showGrid }, title: axisTitle($('#yTitle').value),
-         suggestedMin: Number.isFinite(yMin) ? yMin : undefined,
-         suggestedMax: Number.isFinite(yMax) ? yMax : undefined }
-  };
-  const xyScales = {
-    x: { type:'linear', grid:{ display: showGrid }, title: axisTitle($('#xTitle').value) },
-    y: { type:'linear', grid:{ display: showGrid }, title: axisTitle($('#yTitle').value) }
-  };
-
-  const enableDecimation = State.perfMode === 'full' && ['line','scatter','bubble'].includes(type);
-
-  const config = {
-    type,
-    data: { labels, datasets: forDecimate },
-    options: {
-      parsing: true,
-      normalized: true,
-      responsive: true,
-      maintainAspectRatio: Boolean(aspect),
-      aspectRatio: aspect,
-      animation: anim ? { duration: 250 } : false,
-      backgroundColor: bg,
-      plugins: {
-        legend: { display: legendPos !== 'hidden', position: legendPos === 'hidden' ? 'top' : legendPos },
-        tooltip: { enabled: tooltips },
-        title: { display: !!title, text: title },
-        decimation: enableDecimation ? { enabled: true, algorithm: 'lttb', samples: 1000 } : { enabled: false }
-      },
-      scales: (['pie','radar'].includes(State.currentType)) ? undefined
-           : (['scatter','bubble'].includes(State.currentType)) ? xyScales
-           : commonScales,
-      indexAxis
-    }
-  };
-
-  // Waterfall tooltips
-  if (State.currentType === 'waterfall') {
-    config.options.plugins.tooltip = {
-      enabled: true,
-      callbacks: {
-        label: (ctx) => {
-          const raw = ctx.raw || {};
-          const base = raw.base ?? 0;
-          const delta = raw.y ?? 0;
-          const end = base + delta;
-          if (ctx.dataIndex === (config.data.labels.length - 1)) return `Total: ${end}`;
-          return `Δ ${delta} (from ${base} to ${end})`;
+// Application state object to store key variables
+var appState = {
+    chartType: 'line',
+    dataMode: 'JSON',
+    chart: null,
+    isExporting: false, // New flag to manage export state
+    sampleData: {
+        'line': {
+            "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+            "datasets": [{
+                "label": "Revenue",
+                "data": [65, 59, 80, 81, 56, 55, 40],
+            }, {
+                "label": "Cost",
+                "data": [28, 48, 40, 19, 86, 27, 90],
+            }]
+        },
+        'bar': {
+            "labels": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+            "datasets": [{
+                "label": "Sessions",
+                "data": [12, 19, 3, 5, 2]
+            }]
+        },
+        'column': {
+            "labels": ["Jan", "Feb", "Mar", "Apr"],
+            "datasets": [{
+                "label": "Sales",
+                "data": [12, 19, 13, 25]
+            }]
+        },
+        'area': {
+            "labels": ["2019", "2020", "2021", "2022", "2023"],
+            "datasets": [{
+                "label": "iOS",
+                "data": [20, 25, 30, 42, 50]
+            }, {
+                "label": "Android",
+                "data": [28, 33, 35, 38, 44]
+            }]
+        },
+        'pie': {
+            "labels": ["Alpha", "Beta", "Gamma", "Delta"],
+            "datasets": [{
+                "label": "Segments",
+                "data": [35, 25, 20, 20]
+            }]
+        },
+        'histogram': {
+            "labels": [],
+            "datasets": [{
+                "label": "Measurements",
+                "data": [1.2, 1.5, 1.7, 1.8, 2.2, 2.6, 2.8, 3.0]
+            }]
+        },
+        'scatter': {
+            "labels": [],
+            "datasets": [{
+                "label": "Set 1",
+                "data": [{
+                    "x": 1,
+                    "y": 1
+                }, {
+                    "x": 2,
+                    "y": 1.2
+                }, {
+                    "x": 3,
+                    "y": 2.5
+                }]
+            }, {
+                "label": "Set 2",
+                "data": [{
+                    "x": 1,
+                    "y": 0.8
+                }, {
+                    "x": 2,
+                    "y": 1.7
+                }, {
+                    "x": 3,
+                    "y": 1.9
+                }]
+            }]
+        },
+        'radar': {
+            "labels": ["Speed", "Reliability", "Usability", "Features", "Security", "Support"],
+            "datasets": [{
+                "label": "Product A",
+                "data": [65, 59, 90, 81, 56, 55]
+            }, {
+                "label": "Product B",
+                "data": [28, 48, 40, 19, 96, 27]
+            }]
+        },
+        'bubble': {
+            "labels": [],
+            "datasets": [{
+                "label": "Markets",
+                "data": [{
+                    "x": 10,
+                    "y": 20,
+                    "r": 12
+                }, {
+                    "x": 15,
+                    "y": 12,
+                    "r": 18
+                }, {
+                    "x": 25,
+                    "y": 30,
+                    "r": 20
+                }]
+            }]
+        },
+        'waterfall': {
+            "labels": ["Start", "Sales", "COGS", "Marketing", "R&D", "Other", "Net"],
+            "datasets": [{
+                "label": "Cashflow",
+                "data": [100, 60, -30, -10, -8, -2]
+            }]
         }
-      }
-    };
-  }
-
-  // Bar borders lighter to reduce overdraw
-  if (type === 'bar') {
-    config.data.datasets.forEach(d => {
-      d.borderWidth = 0.5;
-      d.borderColor = hexToRgba(d.borderColor || '#000000', 0.35);
-    });
-  }
-
-  // Canvas bg
-  $('#chart-canvas').style.background = bg;
-
-  // Value labels are optional (off by default)
-  config.options.plugins.datalabels = undefined;
-
-  return config;
-}
-
-/* ------------------ Chart lifecycle ------------------ */
-function resetCanvas() {
-  const canvas = $('#chart-canvas');
-  if (!canvas) return;
-  // Clear and force context loss to free GPU memory
-  const ctx = canvas.getContext('2d');
-  if (ctx) ctx.clearRect(0,0,canvas.width, canvas.height);
-  canvas.width = canvas.width;
-}
-function destroyChart() {
-  if (State.chart && typeof State.chart.destroy === 'function') {
-    State.chart.destroy();
-  }
-  State.chart = null;
-}
-function hashConfig(cfg) {
-  return JSON.stringify(cfg, (k,v)=> typeof v === 'function' ? undefined : v);
-}
-
-function renderChart() {
-  try {
-    const cfg = buildConfig();
-    const h = hashConfig(cfg);
-    if (h === State.lastConfigHash && State.chart) return; // no-op
-
-    destroyChart();
-    resetCanvas();
-
-    const ctx = $('#chart-canvas').getContext('2d');
-    State.chart = new Chart(ctx, cfg);
-    State.lastConfigHash = h;
-
-    if ($('#showValues').value === 'true') attachValueLabels(State.chart);
-  } catch (e) {
-    console.error('Render error:', e);
-    alert('Rendering failed. Try Light mode, reduce point cap, or check data format.');
-  }
-}
-function attachValueLabels(chart) {
-  if (!chart) return;
-  const ctx = chart.ctx;
-  chart.draw();
-  ctx.save();
-  ctx.font = '12px system-ui';
-  ctx.fillStyle = '#333';
-  chart.data.datasets.forEach((ds, di) => {
-    const meta = chart.getDatasetMeta(di);
-    (meta?.data || []).forEach((el, i) => {
-      const v = ds.data[i];
-      if (!el || el.x == null || el.y == null) return;
-      let text = '';
-      if (typeof v === 'number') text = String(v);
-      else if (v && typeof v === 'object') {
-        if ('r' in v) text = `${v.x}, ${v.y} (r=${v.r})`;
-        else if ('base' in v) text = `${(v.base ?? 0) + (v.y ?? 0)}`;
-        else text = `${v.x}, ${v.y}`;
-      }
-      ctx.textAlign = 'center';
-      ctx.fillText(text, el.x, el.y - 6);
-    });
-  });
-  ctx.restore();
-}
-
-/* ------------------ Diagnostics ------------------ */
-function startMemoryMonitor() {
-  const el = $('#memInfo');
-  if (!('memory' in performance) || !performance.memory) {
-    el.textContent = 'Heap: n/a';
-    return;
-  }
-  setInterval(() => {
-    const used = performance.memory.usedJSHeapSize / 1048576;
-    el.textContent = `Heap: ${used.toFixed(1)} MB`;
-  }, 2000);
-}
-
-/* ------------------ Events ------------------ */
-function bindUI() {
-  // Tabs
-  $$('.tab-button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      $$('.tab-button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const id = btn.dataset.tab;
-      $$('.tab-panel').forEach(p => p.classList.remove('active'));
-      $('#'+id).classList.add('active');
-    }, { passive: true });
-  });
-
-  // Type buttons
-  $$('.chart-type').forEach(btn => {
-    btn.addEventListener('click', () => {
-      $$('.chart-type').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      setChartType(btn.dataset.type);
-      if (State.livePreview === 'on') renderChart();
-    }, { passive: true });
-  });
-
-  // Data mode
-  $('#modeJSON').addEventListener('click', () => { setDataMode('json'); if (State.livePreview==='on') renderChart(); });
-  '#modeCSV' && $('#modeCSV').addEventListener('click', () => { setDataMode('csv'); if (State.livePreview==='on') renderChart(); });
-
-  // Actions
-  const triggerRender = () => renderChart();
-  $('#btnRender').addEventListener('click', triggerRender);
-  $('#btnRenderBottom').addEventListener('click', triggerRender);
-  $('#btnPreview').addEventListener('click', renderChart);
-  $('#btnSample').addEventListener('click', () => { loadSample(); if (State.livePreview==='on') renderChart(); });
-  $('#btnClear').addEventListener('click', () => { $('#dataInput').value = ''; if (State.livePreview==='on') renderChart(); });
-
-  // Series
-  $('#btnAddSeries').addEventListener('click', () => { addSeries(); if (State.livePreview==='on') renderChart(); });
-  $('#btnRemoveSeries').addEventListener('click', () => { removeSeries(); if (State.livePreview==='on') renderChart(); });
-
-  // Style/Options (no auto render on keystroke unless livePreview = on)
-  const optIds = ['legendPos','chartTitle','gridLines','bgColor','smoothness','stacked','histBins',
-                  'yMin','yMax','xTitle','yTitle','anim','tooltips','aspect','palette','showValues'];
-  optIds.forEach(id => {
-    const el = $('#'+id); if (!el) return;
-    const evt = el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ? 'input' : 'change';
-    el.addEventListener(evt, () => {
-      if (id === 'palette') State.paletteName = el.value;
-      if (State.livePreview === 'on') renderChart();
-    });
-  });
-
-  // Performance controls
-  $('#perfMode').addEventListener('change', e => { setPerfMode(e.target.value); if (State.livePreview==='on') renderChart(); });
-  $('#pointCap').addEventListener('change', () => { if (State.livePreview==='on') renderChart(); });
-  $('#downsampleStrategy').addEventListener('change', () => { if (State.livePreview==='on') renderChart(); });
-  $('#livePreview').addEventListener('change', e => { State.livePreview = e.target.value; });
-
-  // Export
-  $('#btnExportPNG').addEventListener('click', () => {
-    try {
-      const a = document.createElement('a');
-      a.download = `stenographs-${State.currentType}.png`;
-      a.href = $('#chart-canvas').toDataURL('image/png', 1.0);
-      a.click();
-    } catch {}
-  });
-  $('#btnCopyConfig').addEventListener('click', () => {
-    try {
-      const cfg = buildConfig();
-      navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
-    } catch {}
-  });
-
-  // Command box
-  $('#commandBox').addEventListener('keydown', e => {
-    if (e.key !== 'Enter') return;
-    const v = e.target.value.trim().toLowerCase();
-    const t = ['bar','column','line','area','pie','histogram','scatter','radar','bubble','waterfall'].find(x => v.includes(x));
-    if (t) setChartType(t);
-    const m = v.match(/(\d+)\s*bin/);
-    if (m) $('#histBins').value = m[1];
-    if (State.livePreview === 'on') renderChart();
-  });
-}
-
-/* ------------------ Data helpers ------------------ */
-function loadSample() {
-  const samples = {
-    line: {
-      labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
-      datasets: [
-        { label: 'Revenue', data: [12, 19, 13, 25, 18, 22, 30] },
-        { label: 'Cost', data: [8, 11, 9, 12, 10, 13, 15] }
-      ]
     },
-    area: {
-      labels: ['2019','2020','2021','2022','2023'],
-      datasets: [
-        { label: 'iOS', data: [20,25,30,42,50] },
-        { label: 'Android', data: [28,33,35,38,44] }
-      ]
-    },
-    bar: {
-      labels: ['A','B','C','D','E'],
-      datasets: [
-        { label: 'North', data: [12,18,7,13,20] },
-        { label: 'South', data: [10,15,12,9,16] }
-      ]
-    },
-    column: {
-      labels: ['Q1','Q2','Q3','Q4'],
-      datasets: [{ label: 'Units', data: [120, 160, 140, 180] }]
-    },
-    pie: {
-      labels: ['Alpha','Beta','Gamma','Delta'],
-      datasets: [{ label: 'Share', data: [35, 25, 20, 20] }]
-    },
-    scatter: {
-      labels: [],
-      datasets: [
-        { label: 'Set 1', data: [{x:1,y:1},{x:2,y:1.2},{x:3,y:2.5},{x:4,y:2.8}] },
-        { label: 'Set 2', data: [{x:1,y:0.8},{x:2,y:1.7},{x:3,y:1.9},{x:4,y:3.1}] }
-      ]
-    },
-    bubble: {
-      labels: [],
-      datasets: [
-        { label: 'Markets', data: [{x:10,y:20,r:12},{x:15,y:12,r:18},{x:20,y:25,r:10}] }
-      ]
-    },
-    radar: {
-      labels: ['Speed','Reliability','Usability','Features','Security','Support'],
-      datasets: [
-        { label: 'Product A', data: [65,59,90,81,56,55] },
-        { label: 'Product B', data: [28,48,40,19,96,27] }
-      ]
-    },
-    histogram: {
-      labels: [],
-      datasets: [{ label: 'Measurements', data: [1.2,1.5,1.7,1.8,2.2,1.2,1.3,2.6,2.8,3.0,2.1,2.0,2.5,1.9] }]
-    },
-    waterfall: {
-      labels: ['Start','Sales','COGS','Marketing','R&D','Other','Net'],
-      datasets: [{ label: 'Cashflow', data: [100, 60, -30, -10, -8, -2] }]
+    chartOptions: {
+        'default': {
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Chart Title',
+                },
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: true,
+            scales: {
+                x: {
+                    title: {
+                        display: false,
+                        text: ''
+                    }
+                },
+                y: {
+                    title: {
+                        display: false,
+                        text: ''
+                    },
+                    min: undefined,
+                    max: undefined,
+                }
+            },
+        },
+        'pie': {
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Pie Chart',
+                },
+            },
+            animation: true,
+        },
+        'scatter': {
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: false,
+                        text: 'X Axis'
+                    }
+                },
+                y: {
+                    title: {
+                        display: false,
+                        text: 'Y Axis'
+                    }
+                }
+            }
+        },
+        'bubble': {
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: false,
+                        text: 'X Axis'
+                    }
+                },
+                y: {
+                    title: {
+                        display: false,
+                        text: 'Y Axis'
+                    }
+                }
+            }
+        },
+        'radar': {
+            scales: {
+                r: {
+                    angleLines: {
+                        display: true
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 100
+                }
+            }
+        },
+        'waterfall': {
+            scales: {
+                x: {
+                    title: {
+                        display: false
+                    }
+                },
+                y: {
+                    stacked: true,
+                    title: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            var label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.raw.y !== undefined) {
+                                label += new Intl.NumberFormat('en-US', {
+                                    style: 'currency',
+                                    currency: 'USD'
+                                }).format(context.raw.y);
+                            } else {
+                                label += new Intl.NumberFormat('en-US', {
+                                    style: 'currency',
+                                    currency: 'USD'
+                                }).format(context.raw);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
     }
-  };
-  const s = samples[State.currentType] || samples.line;
-  $('#dataInput').value = JSON.stringify(s, null, 2);
-}
-function addSeries() {
-  const obj = safeJSON($('#dataInput').value || '{}', { labels: [], datasets: [] });
-  obj.datasets = obj.datasets || [];
-  obj.datasets.push({ label: `Series ${obj.datasets.length + 1}`, data: new Array((obj.labels||[]).length).fill(0) });
-  $('#dataInput').value = JSON.stringify(obj, null, 2);
-}
-function removeSeries() {
-  const obj = safeJSON($('#dataInput').value || '{}', { labels: [], datasets: [] });
-  obj.datasets = (obj.datasets || []).slice(0, -1);
-  $('#dataInput').value = JSON.stringify(obj, null, 2);
-}
+};
 
-/* ------------------ Boot ------------------ */
-function boot() {
-  setChartType('line');
-  setDataMode('json');
-  setPerfMode('light');
-  $('#legendPos').value = 'top';
-  $('#palette').value = 'classic';
-  $('#anim').value = 'false';
-  $('#livePreview').value = 'off';
-  $('#dataInput').value = JSON.stringify({
-    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul'],
-    datasets: [
-      { label: 'Revenue', data: [12, 19, 13, 25, 18, 22, 30] },
-      { label: 'Cost', data: [8, 11, 9, 12, 10, 13, 15] }
-    ]
-  }, null, 2);
+// Map custom chart types to Chart.js types
+var chartTypeMap = {
+    'bar': 'bar',
+    'column': 'bar',
+    'line': 'line',
+    'area': 'line',
+    'pie': 'pie',
+    'histogram': 'bar',
+    'scatter': 'scatter',
+    'radar': 'radar',
+    'bubble': 'bubble',
+    'waterfall': 'bar'
+};
 
-  bindUI();
-  startMemoryMonitor();
-  renderChart();
-}
+var getChartJSType = function(appType) {
+    return chartTypeMap[appType] || 'bar';
+};
 
-window.addEventListener('beforeunload', destroyChart);
-boot();
-  </script>
+// Color palettes for chart datasets
+var palettes = {
+    'classic': ['#4c78a8', '#f58518', '#e45756', '#72b7b2', '#54a24b', '#eeca3b', '#b279a2', '#ff9da7'],
+    'pastel': ['#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7'],
+    'vivid': ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6'],
+    'mono': ['#2a6ad7', '#4683de', '#619cf5', '#7db2ff', '#99c6ff', '#b3d3ff', '#ccdeff', '#e6f0ff']
+};
+
+var getColor = function(index) {
+    var paletteName = document.getElementById('palette').value;
+    var palette = palettes[paletteName];
+    return palette[index % palette.length];
+};
+
+// Function to parse CSV data into Chart.js format
+var parseCSV = function(csv) {
+    var lines = csv.trim().split('\n');
+    if (lines.length < 2) return null;
+
+    var headers = lines[0].split(',').map(function(h) {
+        return h.trim();
+    });
+    var dataRows = lines.slice(1).map(function(line) {
+        return line.split(',').map(function(s) {
+            return s.trim();
+        });
+    });
+
+    var labels = dataRows.map(function(row) {
+        return row[0];
+    });
+    var datasets = [];
+
+    if (appState.chartType === 'scatter' || appState.chartType === 'bubble') {
+        var xIndex = headers.indexOf('x');
+        var yIndex = headers.indexOf('y');
+        var rIndex = headers.indexOf('r');
+        var labelIndex = headers.indexOf('label');
+
+        if (xIndex === -1 || yIndex === -1) {
+            console.error('CSV for scatter/bubble must have "x" and "y" headers.');
+            return null;
+        }
+
+        var groupedData = dataRows.reduce(function(acc, row) {
+            var label = row[labelIndex] || 'Series';
+            if (!acc[label]) {
+                acc[label] = [];
+            }
+            var point = {
+                x: parseFloat(row[xIndex]),
+                y: parseFloat(row[yIndex])
+            };
+            if (rIndex !== -1) {
+                point.r = parseFloat(row[rIndex]);
+            }
+            acc[label].push(point);
+            return acc;
+        }, {});
+
+        for (var label in groupedData) {
+            datasets.push({
+                label: label,
+                data: groupedData[label],
+            });
+        }
+    } else {
+        for (var i = 1; i < headers.length; i++) {
+            var label = headers[i];
+            var data = dataRows.map(function(row) {
+                return parseFloat(row[i]);
+            });
+            datasets.push({
+                label: label,
+                data: data,
+            });
+        }
+    }
+
+    return {
+        labels: labels,
+        datasets: datasets,
+    };
+};
+
+// Function to parse JSON data and apply colors
+var parseJSON = function(json) {
+    try {
+        var data = JSON.parse(json);
+        if (data && data.datasets) {
+            data.datasets.forEach(function(dataset, index) {
+                dataset.backgroundColor = getColor(index);
+                dataset.borderColor = getColor(index);
+            });
+        }
+        return data;
+    } catch (e) {
+        console.error("Invalid JSON:", e);
+        return null;
+    }
+};
+
+// Function to handle the export
+var exportChart = function() {
+    if (appState.chart) {
+        var link = document.createElement('a');
+        link.download = 'stenograph-' + appState.chartType + '.png';
+        link.href = appState.chart.toBase64Image();
+        link.click();
+    }
+    appState.isExporting = false; // Reset the flag
+};
+
+// Function to build the final chart configuration
+var buildConfig = function(parsedData) {
+    if (!parsedData) return null;
+
+    var chartType = getChartJSType(appState.chartType);
+
+    var options = Object.assign({}, appState.chartOptions['default']);
+    Object.assign(options, appState.chartOptions[appState.chartType]);
+
+    options.plugins.title.text = document.getElementById('chartTitle').value;
+    options.plugins.legend.position = document.getElementById('legendPos').value;
+    options.plugins.legend.display = document.getElementById('legendPos').value !== 'hidden';
+    options.animation.duration = document.getElementById('anim').value === 'true' ? 1000 : 0;
+
+    // Reset callbacks for normal rendering
+    options.animation.onComplete = undefined;
+    options.plugins.tooltip.enabled = document.getElementById('tooltips').value === 'true';
+
+    // Special handling for export
+    if (appState.isExporting) {
+        options.plugins.tooltip.enabled = false;
+        options.animation.onComplete = function() {
+            setTimeout(exportChart, 100); // Add a small delay for safety
+        };
+        options.onAfterDraw = function() {
+            if (appState.isExporting) {
+                setTimeout(exportChart, 100);
+            }
+        };
+    }
+    
+    if (options.scales && options.scales.x) {
+        options.scales.x.title.display = document.getElementById('xTitle').value.length > 0;
+        options.scales.x.title.text = document.getElementById('xTitle').value;
+    }
+    if (options.scales && options.scales.y) {
+        options.scales.y.title.display = document.getElementById('yTitle').value.length > 0;
+        options.scales.y.title.text = document.getElementById('yTitle').value;
+        var yMin = document.getElementById('yMin').value;
+        var yMax = document.getElementById('yMax').value;
+        options.scales.y.min = yMin ? parseFloat(yMin) : undefined;
+        options.scales.y.max = yMax ? parseFloat(yMax) : undefined;
+    }
+
+    parsedData.datasets.forEach(function(dataset, index) {
+        var color = getColor(index);
+        dataset.backgroundColor = color;
+        dataset.borderColor = color;
+        dataset.borderWidth = 2;
+
+        if (appState.chartType === 'line' || appState.chartType === 'area') {
+            dataset.cubicInterpolationMode = 'monotone';
+            dataset.tension = parseFloat(document.getElementById('smoothness').value);
+            if (appState.chartType === 'area') {
+                dataset.fill = true;
+                dataset.backgroundColor = color + '40';
+            } else {
+                dataset.fill = false;
+            }
+        }
+        if (appState.chartType === 'waterfall') {
+            dataset.backgroundColor = function(context) {
+                var value = context.parsed.y;
+                return value >= 0 ? 'rgb(75, 192, 192)' : 'rgb(255, 99, 132)';
+            };
+            var totalData = parsedData.datasets[0].data.slice(1).reduce(function(sum, val) {
+                return sum + val;
+            }, parsedData.datasets[0].data[0]);
+            parsedData.datasets[0].data.push(totalData);
+        }
+    });
+
+    var isStacked = document.getElementById('stacked').value === 'true';
+    if (isStacked && (chartType === 'bar' || chartType === 'line')) {
+        options.scales.x.stacked = true;
+        options.scales.y.stacked = true;
+    } else if (options.scales && options.scales.x) {
+        options.scales.x.stacked = false;
+        if (options.scales.y) {
+            options.scales.y.stacked = false;
+        }
+    }
+
+    var aspect = document.getElementById('aspect').value;
+    if (aspect !== 'auto') {
+        var parts = aspect.split('/');
+        var w = Number(parts[0]);
+        var h = Number(parts[1]);
+        options.aspectRatio = w / h;
+    } else {
+        options.aspectRatio = undefined;
+    }
+
+    var showValues = document.getElementById('showValues').value === 'true';
+    if (showValues) {
+        options.plugins.datalabels = {
+            anchor: 'end',
+            align: 'top',
+            formatter: function(value) {
+                return value;
+            }
+        };
+    } else {
+        delete options.plugins.datalabels;
+    }
+
+    var config = {
+        type: chartType,
+        data: parsedData,
+        options: options
+    };
+    return config;
+};
+
+// Main function to render the chart
+var renderChart = function() {
+    var canvas = document.getElementById('chart-canvas');
+    var dataInput = document.getElementById('dataInput').value;
+
+    var parsedData = null;
+    if (appState.dataMode === 'JSON') {
+        parsedData = parseJSON(dataInput);
+    } else if (appState.dataMode === 'CSV') {
+        parsedData = parseCSV(dataInput);
+    }
+    
+    if (!parsedData) {
+      console.error("Data parsing failed. Check your input format.");
+      return;
+    }
+    
+    // Special handling for histogram chart data
+    if (appState.chartType === 'histogram' && parsedData && parsedData.datasets.length > 0) {
+        var rawData = parsedData.datasets[0].data;
+        var bins = parseInt(document.getElementById('histBins').value, 10);
+        if (rawData.length > 0) {
+            var dataMin = Math.min.apply(Math, rawData);
+            var dataMax = Math.max.apply(Math, rawData);
+            var binSize = (dataMax - dataMin) / bins;
+
+            var binnedData = Array(bins).fill(0);
+            var binLabels = [];
+
+            for (var i = 0; i < bins; i++) {
+                var binStart = dataMin + i * binSize;
+                var binEnd = binStart + binSize;
+                binLabels.push(binStart.toFixed(2) + '-' + binEnd.toFixed(2));
+            }
+
+            rawData.forEach(function(val) {
+                var binIndex = Math.floor((val - dataMin) / binSize);
+                if (binIndex >= bins) binIndex = bins - 1;
+                binnedData[binIndex]++;
+            });
+
+            parsedData = {
+                labels: binLabels,
+                datasets: [{
+                    label: parsedData.datasets[0].label,
+                    data: binnedData,
+                }]
+            };
+        }
+    }
+    
+    // Special handling for waterfall chart data
+    if (appState.chartType === 'waterfall' && parsedData) {
+        var originalData = parsedData.datasets[0].data;
+        var waterfallData = [{
+            x: parsedData.labels[0],
+            y: originalData[0]
+        }];
+        var runningTotal = originalData[0];
+        for (var i = 1; i < originalData.length; i++) {
+            waterfallData.push({
+                x: parsedData.labels[i],
+                y: runningTotal
+            });
+            runningTotal += originalData[i];
+            waterfallData.push({
+                x: parsedData.labels[i],
+                y: runningTotal
+            });
+        }
+        var netLabel = parsedData.labels[parsedData.labels.length - 1];
+        waterfallData.push({
+            x: netLabel,
+            y: runningTotal
+        });
+
+        var newDatasets = [{
+            label: parsedData.datasets[0].label,
+            data: waterfallData,
+            backgroundColor: function(context) {
+                var index = context.dataIndex;
+                if (index === 0 || index === waterfallData.length - 1) {
+                    return '#0078d7';
+                }
+                var value = originalData[Math.floor((index - 1) / 2) + 1];
+                return value >= 0 ? '#4CAF50' : '#F44336';
+            },
+            borderColor: 'transparent',
+            borderWidth: 1
+        }];
+
+        parsedData = {
+            labels: parsedData.labels,
+            datasets: newDatasets
+        };
+    }
+    
+    var config = buildConfig(parsedData);
+    if (!config) {
+        return;
+    }
+
+    if (appState.chart) {
+        appState.chart.destroy();
+    }
+    appState.chart = new Chart(canvas, config);
+};
+
+// Function to add a new data series
+var addSeries = function() {
+    var dataInput = document.getElementById('dataInput');
+    if (appState.dataMode === 'JSON') {
+        try {
+            var data = JSON.parse(dataInput.value);
+            if (data && data.datasets) {
+                var newSeriesLabel = `Series ${data.datasets.length + 1}`;
+                var newSeriesData = Array(data.labels.length).fill(0).map(() => Math.floor(Math.random() * 100));
+                
+                if (appState.chartType === 'scatter' || appState.chartType === 'bubble') {
+                    newSeriesData = newSeriesData.map((val, index) => ({
+                        x: index + 1,
+                        y: val,
+                        r: appState.chartType === 'bubble' ? Math.random() * 30 + 5 : undefined
+                    }));
+                }
+
+                data.datasets.push({
+                    label: newSeriesLabel,
+                    data: newSeriesData
+                });
+                dataInput.value = JSON.stringify(data, null, 2);
+            }
+        } catch (e) {
+            alert('Invalid JSON data. Cannot add series.');
+            console.error(e);
+        }
+    } else if (appState.dataMode === 'CSV') {
+        var lines = dataInput.value.trim().split('\n');
+        var headers = lines[0].split(',').map(h => h.trim());
+        var newHeader = `New Series ${headers.length}`;
+        lines[0] = lines[0] + `,${newHeader}`;
+        
+        for (let i = 1; i < lines.length; i++) {
+            lines[i] = lines[i] + `,${Math.floor(Math.random() * 100)}`;
+        }
+        dataInput.value = lines.join('\n');
+    }
+    renderChart();
+};
+
+// Function to remove the last data series
+var removeSeries = function() {
+    var dataInput = document.getElementById('dataInput');
+    if (appState.dataMode === 'JSON') {
+        try {
+            var data = JSON.parse(dataInput.value);
+            if (data && data.datasets && data.datasets.length > 1) {
+                data.datasets.pop();
+                dataInput.value = JSON.stringify(data, null, 2);
+            } else {
+                alert('Cannot remove the last series.');
+            }
+        } catch (e) {
+            alert('Invalid JSON data. Cannot remove series.');
+            console.error(e);
+        }
+    } else if (appState.dataMode === 'CSV') {
+        var lines = dataInput.value.trim().split('\n');
+        var headers = lines[0].split(',').map(h => h.trim());
+        if (headers.length > 2) {
+            var newLines = lines.map(line => {
+                var cols = line.split(',');
+                return cols.slice(0, cols.length - 1).join(',');
+            });
+            dataInput.value = newLines.join('\n');
+        } else {
+            alert('Cannot remove the last data series.');
+        }
+    }
+    renderChart();
+};
+
+// Function to handle file upload
+var uploadFile = function(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const fileContent = e.target.result;
+        const dataInput = document.getElementById('dataInput');
+        const dataModeBadge = document.getElementById('dataModeBadge');
+        
+        if (file.name.endsWith('.json')) {
+            appState.dataMode = 'JSON';
+            dataModeBadge.textContent = 'Data: JSON';
+            dataInput.value = fileContent;
+            document.getElementById('modeJSON').classList.add('active');
+            document.getElementById('modeCSV').classList.remove('active');
+        } else if (file.name.endsWith('.csv')) {
+            appState.dataMode = 'CSV';
+            dataModeBadge.textContent = 'Data: CSV';
+            dataInput.value = fileContent;
+            document.getElementById('modeCSV').classList.add('active');
+            document.getElementById('modeJSON').classList.remove('active');
+        } else {
+            alert('Unsupported file type. Please upload a .json or .csv file.');
+            dataInput.value = '';
+        }
+        renderChart();
+    };
+
+    reader.readAsText(file);
+};
+
+// Initialize the application and set up event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab functionality
+    var tabs = document.querySelectorAll('.tab-button');
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function(e) {
+            var targetTab = e.target.dataset.tab;
+            document.querySelectorAll('.tab-button').forEach(function(btn) {
+                return btn.classList.remove('active');
+            });
+            e.target.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(function(panel) {
+                return panel.classList.remove('active');
+            });
+            document.getElementById(targetTab).classList.add('active');
+        });
+    });
+
+    // Chart type selection
+    var chartTypeButtons = document.querySelectorAll('.chart-type');
+    chartTypeButtons.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            appState.chartType = e.target.dataset.type;
+            document.querySelectorAll('.chart-type').forEach(function(b) {
+                return b.classList.remove('active');
+            });
+            e.target.classList.add('active');
+            document.getElementById('chartTypeBadge').textContent = 'Type: ' + appState.chartType;
+            document.getElementById('dataInput').value = JSON.stringify(appState.sampleData[appState.chartType], null, 2);
+            renderChart();
+        });
+    });
+
+    // Data mode selection
+    document.getElementById('modeJSON').addEventListener('click', function() {
+        appState.dataMode = 'JSON';
+        document.getElementById('dataModeBadge').textContent = 'Data: JSON';
+        document.getElementById('modeJSON').classList.add('active');
+        document.getElementById('modeCSV').classList.remove('active');
+        document.getElementById('dataInput').value = JSON.stringify(appState.sampleData[appState.chartType], null, 2);
+        renderChart();
+    });
+
+    document.getElementById('modeCSV').addEventListener('click', function() {
+        appState.dataMode = 'CSV';
+        document.getElementById('dataModeBadge').textContent = 'Data: CSV';
+        document.getElementById('modeCSV').classList.add('active');
+        document.getElementById('modeJSON').classList.remove('active');
+        var sampleCsv = "Month,Revenue,Cost\nJan,12,8\nFeb,19,11\nMar,13,9";
+        document.getElementById('dataInput').value = sampleCsv;
+        renderChart();
+    });
+
+    // File upload
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json, .csv';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+    
+    document.getElementById('btnUpload').addEventListener('click', () => {
+        fileInput.click();
+    });
+    fileInput.addEventListener('change', uploadFile);
+
+    // Data control buttons
+    document.getElementById('btnSample').addEventListener('click', function() {
+        if (appState.dataMode === 'JSON') {
+            document.getElementById('dataInput').value = JSON.stringify(appState.sampleData[appState.chartType], null, 2);
+        } else if (appState.dataMode === 'CSV') {
+            var sampleCsv = "Month,Revenue,Cost\nJan,12,8\nFeb,19,11\nMar,13,9";
+            document.getElementById('dataInput').value = sampleCsv;
+        }
+        renderChart();
+    });
+
+    document.getElementById('btnClear').addEventListener('click', function() {
+        document.getElementById('dataInput').value = '';
+        if (appState.chart) {
+            appState.chart.destroy();
+        }
+    });
+
+    document.getElementById('btnRender').addEventListener('click', renderChart);
+    document.getElementById('btnRenderBottom').addEventListener('click', renderChart);
+    document.getElementById('btnAddSeries').addEventListener('click', addSeries);
+    document.getElementById('btnRemoveSeries').addEventListener('click', removeSeries);
+    
+    // Data panel toggle
+    document.getElementById('btnDataPanel').addEventListener('click', function() {
+        document.getElementById('dataPanel').classList.toggle('active');
+    });
+
+    // Export functionality
+    document.getElementById('btnExportPNG').addEventListener('click', function() {
+        if (appState.chart) {
+            appState.isExporting = true; // Set flag
+            renderChart(); // Re-render with export logic enabled
+        } else {
+            alert('Please render a chart first.');
+        }
+    });
+
+    document.getElementById('btnCopyConfig').addEventListener('click', function() {
+        if (appState.chart) {
+            var config = appState.chart.config;
+            navigator.clipboard.writeText(JSON.stringify(config, null, 2))
+                .then(function() {
+                    return alert('Chart config copied to clipboard!');
+                })
+                .catch(function(err) {
+                    return console.error('Failed to copy config:', err);
+                });
+        } else {
+            alert('Please render a chart first.');
+        }
+    });
+
+    // Initial chart render on page load
+    renderChart();
+});
+    </script>
 </body>
 </html>
-
