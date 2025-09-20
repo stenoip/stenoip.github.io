@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" type="image/png" href="new-swc.png" />
 <title>Boublok - HTML & p5.js Editor</title>
+
+<!-- CodeMirror CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+
 <style>
   * { box-sizing: border-box; }
   body {
@@ -44,16 +49,10 @@
     gap: 1px;
     background: #ddd;
   }
-  textarea {
+  .CodeMirror {
     flex: 1;
-    padding: 12px 14px;
-    border: none;
-    resize: none;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    height: 100%;
     font-size: 14px;
-    line-height: 1.5;
-    tab-size: 2;
-    outline: none;
   }
   iframe {
     flex: 1;
@@ -67,6 +66,32 @@
     background-color: #fff;
     border-top: 1px solid #ddd;
   }
+
+  /* === Custom Syntax Highlight Overrides (increased specificity) === */
+  .CodeMirror .cm-tag {
+    color: #4FC3F7 !important; /* bright blue for tag names */
+    font-weight: bold;
+  }
+  .CodeMirror .cm-attribute {
+    color: #FFB74D !important; /* warm orange for attribute names */
+  }
+  .CodeMirror .cm-string {
+    color: #A5D6A7 !important; /* soft green for attribute values */
+  }
+  .CodeMirror .cm-keyword {
+    color: #BA68C8 !important; /* purple for JS keywords */
+    font-weight: bold;
+  }
+  .CodeMirror .cm-property {
+    color: #FFD54F !important; /* yellow for CSS properties */
+  }
+  .CodeMirror .cm-atom {
+    color: #81C784 !important; /* green for CSS values */
+  }
+  .CodeMirror .cm-comment {
+    color: #90A4AE !important; /* grey for comments */
+    font-style: italic;
+  }
 </style>
 </head>
 <body>
@@ -77,12 +102,12 @@
   </div>
   <div class="editor-container">
     <div id="html-editor" class="editor">
-      <textarea id="html-code" placeholder="Type HTML/CSS/JS code here..."></textarea>
-      <iframe id="output" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer" title="HTML preview"></iframe>
+      <textarea id="html-code"></textarea>
+      <iframe id="output" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
     </div>
     <div id="p5-editor" class="editor" style="display: none;">
-      <textarea id="p5-code" placeholder="p5.js code here (global mode)"></textarea>
-      <iframe id="p5-output" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer" title="p5 preview"></iframe>
+      <textarea id="p5-code"></textarea>
+      <iframe id="p5-output" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
     </div>
   </div>
   <div class="note">
@@ -90,23 +115,42 @@
     p5.js editor supports normal p5 global mode (`setup()` & `draw()`).
   </div>
 
+<!-- CodeMirror JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+
 <script>
+  // Initialize CodeMirror editors
+  const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-code'), {
+    mode: 'htmlmixed',
+    theme: 'material-darker',
+    lineNumbers: true,
+    tabSize: 2
+  });
+
+  const p5Editor = CodeMirror.fromTextArea(document.getElementById('p5-code'), {
+    mode: 'javascript',
+    theme: 'material-darker',
+    lineNumbers: true,
+    tabSize: 2
+  });
+
   // Load saved code
-  const htmlTA = document.getElementById('html-code');
-  const p5TA = document.getElementById('p5-code');
-  htmlTA.value = localStorage.getItem('html-code') || '';
-  p5TA.value = localStorage.getItem('p5-code') || '';
-  htmlTA.addEventListener('input', () => localStorage.setItem('html-code', htmlTA.value));
-  p5TA.addEventListener('input', () => localStorage.setItem('p5-code', p5TA.value));
+  htmlEditor.setValue(localStorage.getItem('html-code') || '');
+  p5Editor.setValue(localStorage.getItem('p5-code') || '');
+
+  htmlEditor.on('change', () => localStorage.setItem('html-code', htmlEditor.getValue()));
+  p5Editor.on('change', () => localStorage.setItem('p5-code', p5Editor.getValue()));
 
   function runCode() {
-    const isHtmlEditor = document.getElementById('html-editor').style.display !== 'none';
-
-    if (isHtmlEditor) {
-      const code = htmlTA.value;
-      document.getElementById('output').srcdoc = code;
+    const isHtmlVisible = document.getElementById('html-editor').style.display !== 'none';
+    if (isHtmlVisible) {
+      document.getElementById('output').srcdoc = htmlEditor.getValue();
     } else {
-      const code = p5TA.value;
+      const code = p5Editor.getValue();
       const html = `
 <!doctype html>
 <html>
@@ -126,11 +170,11 @@ ${code}
   }
 
   function saveCode() {
-    const isHtmlEditor = document.getElementById('html-editor').style.display !== 'none';
-    if (isHtmlEditor) {
-      download('code.html', htmlTA.value, 'text/html');
+    const isHtmlVisible = document.getElementById('html-editor').style.display !== 'none';
+    if (isHtmlVisible) {
+      download('code.html', htmlEditor.getValue(), 'text/html');
     } else {
-      const code = p5TA.value;
+      const code = p5Editor.getValue();
       const html = `
 <!doctype html>
 <html><head><meta charset="utf-8">
@@ -157,13 +201,13 @@ ${code}
   }
 
   function switchEditor() {
-    const htmlEditor = document.getElementById('html-editor');
-    const p5Editor = document.getElementById('p5-editor');
+    const htmlDiv = document.getElementById('html-editor');
+    const p5Div = document.getElementById('p5-editor');
     const button = document.getElementById('switch-btn');
 
-    const htmlVisible = htmlEditor.style.display !== 'none';
-    htmlEditor.style.display = htmlVisible ? 'none' : 'flex';
-    p5Editor.style.display = htmlVisible ? 'flex' : 'none';
+    const htmlVisible = htmlDiv.style.display !== 'none';
+    htmlDiv.style.display = htmlVisible ? 'none' : 'flex';
+    p5Div.style.display = htmlVisible ? 'flex' : 'none';
     button.textContent = htmlVisible ? 'Switch to HTML' : 'Switch to p5.js';
   }
 
