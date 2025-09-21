@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="icon" type="image/png" href="new-swc.png" />
 <title>Boublok - HTML & p5.js Editor</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
@@ -20,11 +19,6 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-  }
-  .editor-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
   }
   .editor-buttons {
     display: flex;
@@ -43,6 +37,11 @@
   .editor-buttons button:hover {
     background-color: #0056b3;
   }
+  .editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
   .editor {
     flex: 1;
     display: flex;
@@ -59,56 +58,40 @@
     border: none;
     margin: 0;
   }
-  .note {
-    padding: 10px;
-    font-size: 14px;
-    color: #555;
-    background-color: #fff;
-    border-top: 1px solid #ddd;
+  #console-panel {
+    background: #111;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 12px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    border-top: 2px solid #444;
   }
-
-  /* === Custom Syntax Highlight Overrides (increased specificity) === */
-  .CodeMirror .cm-tag {
-    color: #4FC3F7 !important; /* bright blue for tag names */
+  #console-header {
+    background: #222;
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
     font-weight: bold;
   }
-  .CodeMirror .cm-attribute {
-    color: #FFB74D !important; /* warm orange for attribute names */
+  #console-output {
+    flex: 1;
+    overflow-y: auto;
+    padding: 5px;
   }
-  .CodeMirror .cm-string {
-    color: #A5D6A7 !important; /* soft green for attribute values */
+  #clear-console {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
   }
-  .CodeMirror .cm-keyword {
-    color: #BA68C8 !important; /* purple for JS keywords */
-    font-weight: bold;
-  }
-  .CodeMirror .cm-property {
-    color: #FFD54F !important; /* yellow for CSS properties */
-  }
-  .CodeMirror .cm-atom {
-    color: #81C784 !important; /* green for CSS values */
-  }
-  .CodeMirror .cm-comment {
-    color: #90A4AE !important; /* grey for comments */
-    font-style: italic;
-  }
-
-  /* === Mobile Responsiveness === */
-  @media (max-width: 768px) {
-    .editor {
-      flex-direction: column;
-    }
-    .CodeMirror, iframe {
-      width: 100%;
-      height: 50vh;
-    }
-    .editor-buttons {
-      flex-direction: column;
-      gap: 5px;
-    }
-    .editor-buttons button {
-      width: 100%;
-    }
+  #clear-console:hover {
+    background: #666;
   }
 </style>
 </head>
@@ -118,18 +101,25 @@
     <button onclick="saveCode()">Save</button>
     <button id="switch-btn" onclick="switchEditor()">Switch to p5.js</button>
   </div>
+
   <div class="editor-container">
     <div id="html-editor" class="editor">
       <textarea id="html-code"></textarea>
-      <iframe id="output" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+      <iframe id="output" sandbox="allow-scripts allow-same-origin"></iframe>
     </div>
     <div id="p5-editor" class="editor" style="display: none;">
       <textarea id="p5-code"></textarea>
-      <iframe id="p5-output" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+      <iframe id="p5-output" sandbox="allow-scripts allow-same-origin"></iframe>
     </div>
-  </div>
-  <div class="note">
-    Note: HTML editor supports HTML, CSS, JavaScript. p5.js editor supports normal p5 global mode (`setup()` & `draw()`).
+
+    <!-- Console Panel -->
+    <div id="console-panel">
+      <div id="console-header">
+        Console
+        <button id="clear-console">Clear</button>
+      </div>
+      <div id="console-output"></div>
+    </div>
   </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
@@ -144,118 +134,152 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
 
 <script>
-  // Autocomplete functionality
-  function getHints(cm, options) {
-    const p5Functions = ['setup', 'draw', 'createCanvas', 'background', 'fill', 'stroke', 'noFill', 'noStroke', 'rect', 'ellipse', 'line', 'point', 'triangle', 'quad', 'curve', 'bezier', 'arc', 'beginShape', 'endShape', 'vertex', 'push', 'pop', 'translate', 'rotate', 'scale', 'mouseX', 'mouseY', 'pmouseX', 'pmouseY', 'width', 'height', 'random', 'map', 'constrain', 'abs', 'round', 'floor', 'ceil', 'int', 'float', 'text', 'textSize', 'textFont', 'textLeading', 'textStyle', 'textWidth'];
-    const cursor = cm.getCursor();
-    const line = cm.getLine(cursor.line);
-    const start = cursor.ch;
-    const end = start;
-    const word = line.slice(0, start).match(/[\w$]+$/);
-
-    if (!word) {
-      return { list: [], from: CodeMirror.Pos(cursor.line, start) };
-    }
-
-    const from = CodeMirror.Pos(cursor.line, start - word[0].length);
-    const hints = p5Functions.filter(f => f.startsWith(word[0])).sort();
-
-    return { list: hints, from: from };
-  }
-
-  // Initialize CodeMirror editors
-  const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-code'), {
-    mode: 'htmlmixed',
-    theme: 'material-darker',
-    lineNumbers: true,
-    tabSize: 2,
-    autoCloseBrackets: true,
-    autoCloseTags: true,
-    extraKeys: {
-      "Ctrl-Space": "autocomplete"
-    },
-    hintOptions: {
-      hint: CodeMirror.hint.html,
-      alignWithWord: true
-    }
-  });
-
-  const p5Editor = CodeMirror.fromTextArea(document.getElementById('p5-code'), {
-    mode: 'javascript',
-    theme: 'material-darker',
-    lineNumbers: true,
-    tabSize: 2,
-    autoCloseBrackets: true,
-    extraKeys: {
-      "Ctrl-Space": "autocomplete"
-    },
-    hintOptions: {
-      hint: getHints,
-      alignWithWord: true
-    }
-  });
-
-  // Load saved code
-  htmlEditor.setValue(localStorage.getItem('html-code') || `<!DOCTYPE html>
-<html>
-<head>
-<style>
-  body {
-    background-color: #2c2f33;
-    color: #ffffff;
-    font-family: sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-</style>
-</head>
-<body>
-  <h1>Hello, Boublok!</h1>
-</body>
-</html>`);
-  p5Editor.setValue(localStorage.getItem('p5-code') || `function setup() {
-  createCanvas(400, 400);
+ // === Autocomplete for p5.js ===
+function getHints(cm) {
+  const p5Functions = [
+    'setup','draw','createCanvas','background','fill','stroke','noFill','noStroke',
+    'rect','ellipse','line','point','triangle','quad','curve','bezier','arc',
+    'beginShape','endShape','vertex','push','pop','translate','rotate','scale',
+    'mouseX','mouseY','pmouseX','pmouseY','width','height','random','map',
+    'constrain','abs','round','floor','ceil','int','float','text','textSize',
+    'textFont','textLeading','textStyle','textWidth'
+  ];
+  const cursor = cm.getCursor();
+  const line = cm.getLine(cursor.line);
+  const start = cursor.ch;
+  const word = line.slice(0, start).match(/[\w$]+$/);
+  if (!word) return { list: [], from: CodeMirror.Pos(cursor.line, start) };
+  const from = CodeMirror.Pos(cursor.line, start - word[0].length);
+  const hints = p5Functions.filter(f => f.startsWith(word[0])).sort();
+  return { list: hints, from: from };
 }
 
+// === CodeMirror editors ===
+const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-code'), {
+  mode: 'htmlmixed', theme: 'material-darker', lineNumbers: true, tabSize: 2,
+  autoCloseBrackets: true, autoCloseTags: true,
+  extraKeys: { "Ctrl-Space": "autocomplete" },
+  hintOptions: { hint: CodeMirror.hint.html, alignWithWord: true }
+});
+const p5Editor = CodeMirror.fromTextArea(document.getElementById('p5-code'), {
+  mode: 'javascript', theme: 'material-darker', lineNumbers: true, tabSize: 2,
+  autoCloseBrackets: true,
+  extraKeys: { "Ctrl-Space": "autocomplete" },
+  hintOptions: { hint: getHints, alignWithWord: true }
+});
+
+// === Load saved code or defaults ===
+htmlEditor.setValue(localStorage.getItem('html-code') || 
+`<!DOCTYPE html>
+<html>
+<body>
+<h1>Hello, Boublok!</h1>
+<script>
+console.log("HTML console ready");
+<\/script>
+</body>
+</html>`);
+
+p5Editor.setValue(localStorage.getItem('p5-code') || 
+`function setup() {
+  createCanvas(400, 400);
+  console.log("p5.js console ready");
+}
 function draw() {
   background(220);
-  fill(255, 0, 100);
-  noStroke();
   ellipse(mouseX, mouseY, 50, 50);
 }`);
 
-  // Debounced run function
-  let debounceTimer;
-  const runCodeDebounced = () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(runCode, 500);
+// === Debounced run ===
+let debounceTimer;
+const runCodeDebounced = () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(runCode, 500);
+};
+htmlEditor.on('change', () => { localStorage.setItem('html-code', htmlEditor.getValue()); runCodeDebounced(); });
+p5Editor.on('change', () => { localStorage.setItem('p5-code', p5Editor.getValue()); runCodeDebounced(); });
+
+// === Clear console button ===
+document.getElementById('clear-console').addEventListener('click', () => {
+  document.getElementById('console-output').innerHTML = '';
+});
+
+// === Console injection script (runs before user code) ===
+function getConsoleInjection() {
+  return `
+<script>
+(function(){
+  const parentConsole = window.parent;
+
+  function serializeArg(arg) {
+    if (arg instanceof Error) {
+      return arg.name + ": " + arg.message + "\\n" + arg.stack;
+    }
+    if (typeof arg === 'object') {
+      try { return JSON.stringify(arg); }
+      catch(e) { return String(arg); }
+    }
+    return String(arg);
+  }
+
+  function sendToParent(type, args) {
+    parentConsole.postMessage({
+      type: type,
+      args: Array.from(args).map(serializeArg)
+    }, '*');
+  }
+
+  // Override console methods
+  ['log','warn','error','info'].forEach(type => {
+    const orig = console[type];
+    console[type] = function() {
+      orig.apply(console, arguments);
+      sendToParent(type, arguments);
+    };
+  });
+
+  // Capture uncaught errors
+  window.onerror = function(message, source, lineno, colno, error) {
+    sendToParent('error', [message + " (" + source + ":" + lineno + ":" + colno + ")", error && error.stack ? error.stack : '']);
   };
 
-  htmlEditor.on('change', () => {
-    localStorage.setItem('html-code', htmlEditor.getValue());
-    runCodeDebounced();
+  // Capture unhandled promise rejections
+  window.addEventListener('unhandledrejection', function(event) {
+    sendToParent('error', ['Unhandled Promise Rejection:', event.reason]);
   });
-  p5Editor.on('change', () => {
-    localStorage.setItem('p5-code', p5Editor.getValue());
-    runCodeDebounced();
-  });
-  
-  function runCode() {
-    const isHtmlVisible = document.getElementById('html-editor').style.display !== 'none';
-    if (isHtmlVisible) {
-      document.getElementById('output').srcdoc = htmlEditor.getValue();
-    } else {
-      const code = p5Editor.getValue();
-      const html = `
+})();
+<\/script>
+`;
+}
+
+
+// === Parent listener for iframe messages ===
+window.addEventListener('message', (event) => {
+  if (!event.data || !event.data.type) return;
+  const output = document.getElementById('console-output');
+  const msg = document.createElement('div');
+  msg.textContent = `[${event.data.type}] ${event.data.args.join(' ')}`;
+  output.appendChild(msg);
+  output.scrollTop = output.scrollHeight;
+});
+
+// === Run code in iframe ===
+function runCode() {
+  const isHtmlVisible = document.getElementById('html-editor').style.display !== 'none';
+  if (isHtmlVisible) {
+    // Inject console before user HTML
+    document.getElementById('output').srcdoc =
+      getConsoleInjection() + htmlEditor.getValue();
+  } else {
+    const code = p5Editor.getValue();
+    const html = `
 <!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
 <style>html,body{margin:0;padding:0;}</style>
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"><\/script>
+${getConsoleInjection()}
 </head>
 <body>
 <script>
@@ -263,17 +287,18 @@ ${code}
 <\/script>
 </body>
 </html>`;
-      document.getElementById('p5-output').srcdoc = html;
-    }
+    document.getElementById('p5-output').srcdoc = html;
   }
+}
 
-  function saveCode() {
-    const isHtmlVisible = document.getElementById('html-editor').style.display !== 'none';
-    if (isHtmlVisible) {
-      download('code.html', htmlEditor.getValue(), 'text/html');
-    } else {
-      const code = p5Editor.getValue();
-      const html = `
+// === Save code to file ===
+function saveCode() {
+  const isHtmlVisible = document.getElementById('html-editor').style.display !== 'none';
+  if (isHtmlVisible) {
+    download('code.html', htmlEditor.getValue(), 'text/html');
+  } else {
+    const code = p5Editor.getValue();
+    const html = `
 <!doctype html>
 <html><head><meta charset="utf-8">
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"><\/script>
@@ -282,46 +307,47 @@ ${code}
 ${code}
 <\/script>
 </body></html>`;
-      download('code-p5.html', html, 'text/html');
-    }
+    download('code-p5.html', html, 'text/html');
   }
+}
 
-  function download(filename, content, type) {
-    const blob = new Blob([content], { type });
-    const a = Object.assign(document.createElement('a'), {
-      href: URL.createObjectURL(blob),
-      download: filename
-    });
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 0);
-  }
-
-  function switchEditor() {
-    const htmlDiv = document.getElementById('html-editor');
-    const p5Div = document.getElementById('p5-editor');
-    const button = document.getElementById('switch-btn');
-
-    const htmlVisible = htmlDiv.style.display !== 'none';
-    htmlDiv.style.display = htmlVisible ? 'none' : 'flex';
-    p5Div.style.display = htmlVisible ? 'flex' : 'none';
-    button.textContent = htmlVisible ? 'Switch to HTML' : 'Switch to p5.js';
-
-    // Run code after switching to see the result immediately
-    runCodeDebounced();
-  }
-
-  // Ctrl/Cmd + Enter runs code
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      runCode();
-    }
+function download(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(blob),
+    download: filename
   });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 0);
+}
 
-  // Initial run on page load
-  runCode();
+// === Switch between HTML and p5.js editors ===
+function switchEditor() {
+  const htmlDiv = document.getElementById('html-editor');
+  const p5Div = document.getElementById('p5-editor');
+  const button = document.getElementById('switch-btn');
+
+  const htmlVisible = htmlDiv.style.display !== 'none';
+  htmlDiv.style.display = htmlVisible ? 'none' : 'flex';
+  p5Div.style.display = htmlVisible ? 'flex' : 'none';
+  button.textContent = htmlVisible ? 'Switch to HTML' : 'Switch to p5.js';
+
+  runCodeDebounced();
+}
+
+// === Keyboard shortcut: Ctrl/Cmd + Enter ===
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    runCode();
+  }
+});
+
+// === Initial run ===
+runCode();
+
 </script>
 </body>
 </html>
