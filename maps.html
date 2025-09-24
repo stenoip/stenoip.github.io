@@ -1,86 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ferkenne Map</title>
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Cesium.js"></script>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        #cesiumContainer {
-            width: 100%;
-            height: 100vh;
-            display: block;
-        }
-        #searchContainer {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1;
-            display: flex;
-        }
-        #locationInput {
-            padding: 5px;
-            font-size: 14px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ferkenne Maps!</title>
+    <link rel="icon" href="/new-swc.png" type="image/png" />
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Cesium.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #cesiumContainer {
+      width: 100%;
+      height: 100vh;
+      display: block;
+    }
+    #routeForm {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+      background: rgba(255,255,255,0.9);
+      padding: 10px;
+      border-radius: 5px;
+      font-family: sans-serif;
+    }
+    #routeForm input, #routeForm button {
+      margin: 5px 0;
+      padding: 5px;
+      width: 200px;
+    }
+    #instructions {
+      position: absolute;
+      top: 120px;
+      left: 10px;
+      z-index: 2;
+      background: rgba(255,255,255,0.9);
+      padding: 10px;
+      border-radius: 5px;
+      font-family: sans-serif;
+      width: 250px;
+    }
+    footer {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+    }
+    footer a {
+      color: #00ffff;
+    }
+  </style>
 </head>
 <body>
-    <div id="cesiumContainer"></div>
+  <div id="cesiumContainer"></div>
 
-    <h2>Ferkenne Maps</h2>
-    <footer>
-        <p>&copy; <span id="year"></span> Stenoip Company. All rights reserved.</p>
-        <p>Powered by <a href="https://cesium.com/platform/cesiumjs/" target="_blank">CesiumJS</a> and <a href="https://www.stenoip.com/" target="_blank">Stenoip</a>.</p>
-    </footer>
-    <script>
-        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MDQ0YmNjMy02NDI5LTRjYTItOWZhYS0wYmMxMWVkOGI5MjMiLCJpZCI6MjUyODUxLCJpYXQiOjE3MzA3NjM3MTB9.pi4kOnQvSmZxTAkOELqnouNQi7cVnvJAq7WUWfX-sek';
+  <!-- Route form -->
+  <form id="routeForm">
+    <label>Start: <input type="text" id="startLocation" placeholder="e.g. Berlin"></label><br>
+    <label>End: <input type="text" id="endLocation" placeholder="e.g. Munich"></label><br>
+    <button type="submit">Get Route</button>
+  </form>
 
-        const viewer = new Cesium.Viewer('cesiumContainer', {
-            terrainProvider: Cesium.createWorldTerrain(),
-            locale: 'en-GB'
+  <!-- Dropdown for instructions -->
+  <div id="instructions">
+    <label for="stepsDropdown">Turn-by-turn:</label><br>
+    <select id="stepsDropdown" size="8" style="width:100%"></select><br>
+    <button id="speakBtn" type="button">🔊 Speak Selected</button>
+  </div>
+
+  <footer>
+    <p>&copy; <span id="year"></span> Stenoip Company. All rights reserved.</p>
+    <p>Powered by <a href="https://cesium.com/platform/cesiumjs/" target="_blank">CesiumJS</a> and 
+       <a href="https://openrouteservice.org/" target="_blank">OpenRouteService</a>.</p>
+  </footer>
+
+  <script>
+    // Cesium Access Token
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MDQ0YmNjMy02NDI5LTRjYTItOWZhYS0wYmMxMWVkOGI5MjMiLCJpZCI6MjUyODUxLCJpYXQiOjE3MzA3NjM3MTB9.pi4kOnQvSmZxTAkOELqnouNQi7cVnvJAq7WUWfX-sek';
+
+    // Initialize Cesium Viewer
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      terrainProvider: Cesium.createWorldTerrain(),
+      locale: 'en-GB'
+    });
+
+    // ORS API key
+    const apiKey = "5b3ce3597851110001cf6248fd6c09a7da6740f4a155af5b0314ddc4";
+
+    // Geocode function using Nominatim (free OSM geocoder)
+    async function geocode(place) {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.length > 0) {
+        return [parseFloat(data[0].lon), parseFloat(data[0].lat)]; // [lng, lat]
+      } else {
+        throw new Error("Location not found: " + place);
+      }
+    }
+
+    // Handle form submission
+    document.getElementById("routeForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const startPlace = document.getElementById("startLocation").value;
+      const endPlace = document.getElementById("endLocation").value;
+
+      if (!startPlace || !endPlace) {
+        alert("Please enter both start and end locations.");
+        return;
+      }
+
+      try {
+        const startCoords = await geocode(startPlace);
+        const endCoords = await geocode(endPlace);
+
+        const orsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.join(",")}&end=${endCoords.join(",")}`;
+
+        const res = await fetch(orsUrl);
+        const data = await res.json();
+
+        // Clear old routes
+        viewer.dataSources.removeAll();
+
+        // Load new route
+        Cesium.GeoJsonDataSource.load(data, {
+          stroke: Cesium.Color.CYAN,
+          strokeWidth: 4,
+          clampToGround: true
+        }).then((ds) => {
+          viewer.dataSources.add(ds);
+          viewer.flyTo(ds);
         });
 
-        const geocodeLocation = (location) => {
-            const geocoder = new Cesium.GeocoderService();
-            geocoder.geocode(location).then((result) => {
-                if (result.length > 0) {
-                    const { destination, orientation } = result[0];
-                    viewer.camera.flyTo({
-                        destination: destination,
-                        orientation: orientation
-                    });
-                } else {
-                    alert('Location not found');
-                }
-            }).catch((error) => {
-                console.error('Geocoding error:', error);
-            });
-        };
-
-        // Check for a location in the URL on page load
-        const urlParams = new URLSearchParams(window.location.search);
-        const locationFromUrl = urlParams.get('location');
-        if (locationFromUrl) {
-            document.getElementById('locationInput').value = locationFromUrl;
-            geocodeLocation(locationFromUrl);
-        }
-
-        // Handle search form submission
-        document.getElementById('searchForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const location = document.getElementById('locationInput').value;
-            if (location) {
-                geocodeLocation(location);
-            }
+        // Populate dropdown with steps
+        const stepsDropdown = document.getElementById("stepsDropdown");
+        stepsDropdown.innerHTML = ""; // clear old
+        const steps = data.features[0].properties.segments[0].steps;
+        steps.forEach((step, i) => {
+          const option = document.createElement("option");
+          option.value = step.instruction;
+          option.textContent = `${i+1}. ${step.instruction}`;
+          stepsDropdown.appendChild(option);
         });
 
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+      } catch (err) {
+        console.error(err);
+        alert("Error: " + err.message);
+      }
+    });
+
+    // Speak selected instruction
+    document.getElementById("speakBtn").addEventListener("click", () => {
+      const dropdown = document.getElementById("stepsDropdown");
+      const text = dropdown.value;
+      if (text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.pitch = 0.8; // lower pitch for robotic feel
+        utterance.rate = 0.9;  // slower pace
+        speechSynthesis.speak(utterance);
+      } else {
+        alert("Please select an instruction to speak.");
+      }
+    });
+
+    // Update footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
