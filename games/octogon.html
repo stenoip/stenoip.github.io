@@ -1,1041 +1,866 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
 <title>Octogon Match</title>
-<style>
-  :root {
-    --bg: #0f1220;
-    --panel: #111423;
-    --ink: #eaf0ff;
-    --muted: #9aa3ba;
-    --accent: #6ea8fe;
-    --good: #41d392;
-    --bad: #ff6b6b;
-    --warn: #ffb020;
-  }
-  html, body {
-    margin: 0;
-    height: 100%;
-    background: radial-gradient(1200px 600px at 70% -10%, #1a1f3b 0%, #0f1220 60%, #0b0e1a 100%);
-    color: var(--ink);
-    font: 15px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  }
-  #hud {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 12px;
-    align-items: center;
-    padding: 12px 14px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.04));
-    border-bottom: 1px dashed rgba(255,255,255,0.08);
-    position: sticky;
-    top: 0;
-    backdrop-filter: blur(6px);
-    z-index: 5;
-  }
-  #hud .left, #hud .right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  #hud .center { text-align: center; font-weight: 800; letter-spacing: 0.5px; }
-  .pill {
-    background: #151a2f;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 999px;
-    padding: 8px 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .pill b { font-weight: 800; color: var(--ink); }
-  .muted { color: var(--muted); }
-  #wrap {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 16px;
-    padding: 16px;
-  }
-  @media (max-width: 980px) {
-    #wrap { grid-template-columns: 1fr; }
-  }
-  #mapPanel {
-    background: var(--panel);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 12px;
-  }
-  #mapHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  .btn {
-    background: #1a2040;
-    color: var(--ink);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    padding: 8px 10px;
-    cursor: pointer;
-    user-select: none;
-    transition: transform 0.04s ease, background 0.2s ease;
-  }
-  .btn:active { transform: translateY(1px); }
-  .btn[disabled] { opacity: 0.4; cursor: default; }
-  #mapGrid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-  }
-  .level-node {
-    height: 54px;
-    border-radius: 12px;
-    background: linear-gradient(180deg, #1c2347, #131935);
-    border: 1px solid rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center; justify-content: center;
-    font-weight: 700;
-    letter-spacing: 0.2px;
-    cursor: pointer;
-    position: relative;
-    box-shadow: inset 0 0 0 1px rgba(110,168,254,0.08);
-  }
-  .level-node.locked {
-    background: #0f1430;
-    color: #63709a;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  .level-node.current { outline: 2px solid var(--accent); }
-  .level-node .dot {
-    position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--good);
-  }
-  .level-node.locked .dot { display: none; }
-  #gamePanel {
-    background: var(--panel);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 12px;
-    min-height: 560px;
-    display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    gap: 10px;
-  }
-  #gameTop {
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-  }
-  #powerups {
-    display: flex; gap: 8px; flex-wrap: wrap;
-  }
-  .pbtn {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: #18204a; border: 1px solid rgba(255,255,255,0.14);
-    color: var(--ink); border-radius: 10px; padding: 6px 10px; cursor: pointer;
-  }
-  .pbtn.active { outline: 2px solid var(--accent); }
-  .pcount { background: rgba(255,255,255,0.12); padding: 2px 6px; border-radius: 999px; font-weight: 700; }
-  #boardWrap { display: grid; place-items: center; padding: 8px; }
-  #board { display: grid; gap: 8px; touch-action: manipulation; }
-  .cell { width: 56px; height: 56px; display: grid; place-items: center; }
-  .tile {
-    width: 54px; height: 54px;
-    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-    border: 2px solid rgba(255,255,255,0.16);
-    box-shadow: inset 0 0 18px rgba(255,255,255,0.15), 0 2px 6px rgba(0,0,0,0.35);
-    transition: transform 120ms ease, filter 120ms ease, opacity 160ms ease;
-    cursor: pointer;
-  }
-  .tile.sel { transform: scale(0.92); filter: brightness(1.15); }
-  .tile.clearing { opacity: 0.2; transform: scale(0.6); }
-  .tile.c1 { background: #6ea8fe; }
-  .tile.c2 { background: #ff8fa3; }
-  .tile.c3 { background: #ffd166; }
-  .tile.c4 { background: #7be495; }
-  .tile.c5 { background: #b287ff; }
-  .tile.c6 { background: #5ee6e6; }
-  .tile.c7 { background: #ffb86b; }
-  #gameBottom {
-    display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
-  }
-  #toasts {
-    position: fixed;
-    right: 16px; bottom: 16px;
-    display: grid; gap: 8px;
-    z-index: 50;
-  }
-  .toast {
-    background: #141a33;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--ink);
-    padding: 10px 12px;
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-  }
-  .modal {
-    position: fixed; inset: 0;
-    display: none; place-items: center;
-    background: rgba(0,0,0,0.5);
-    z-index: 60;
-  }
-  .modal.open { display: grid; }
-  .modal-card {
-    width: min(680px, 92vw);
-    background: #11162e;
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 12px;
-    padding: 16px;
-    color: var(--ink);
-  }
-  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .modal-body { max-height: 60vh; overflow:auto; }
-  footer {
-    text-align: center;
-    color: var(--muted);
-    padding: 24px 12px 40px;
-  }
-</style>
+<script>
+
+
+// The function gets called when the window is fully loaded
+window.onload = function() {
+    // Get the canvas and context
+    var canvas = document.getElementById("viewport");
+    var context = canvas.getContext("2d");
+    
+    // Timing and frames per second
+    var lastframe = 0;
+    var fpstime = 0;
+    var framecount = 0;
+    var fps = 0;
+    
+    // Mouse dragging
+    var drag = false;
+    
+    // Level object
+    var level = {
+        x: 250,         // X position
+        y: 113,         // Y position
+        columns: 8,     // Number of tile columns
+        rows: 8,        // Number of tile rows
+        tilewidth: 40,  // Visual width of a tile
+        tileheight: 40, // Visual height of a tile
+        tiles: [],      // The two-dimensional tile array
+        selectedtile: { selected: false, column: 0, row: 0 }
+    };
+    
+    // All of the different tile colors in RGB
+    var tilecolors = [[255, 128, 128],
+                      [128, 255, 128],
+                      [128, 128, 255],
+                      [255, 255, 128],
+                      [255, 128, 255],
+                      [128, 255, 255],
+                      [255, 255, 255]];
+    
+    // Clusters and moves that were found
+    var clusters = [];  // { column, row, length, horizontal }
+    var moves = [];     // { column1, row1, column2, row2 }
+
+    // Current move
+    var currentmove = { column1: 0, row1: 0, column2: 0, row2: 0 };
+    
+    // Game states
+    var gamestates = { init: 0, ready: 1, resolve: 2 };
+    var gamestate = gamestates.init;
+    
+    // Score
+    var score = 0;
+    
+    // Animation variables
+    var animationstate = 0;
+    var animationtime = 0;
+    var animationtimetotal = 0.3;
+    
+    // Show available moves
+    var showmoves = false;
+    
+    // The AI bot
+    var aibot = false;
+    
+    // Game Over
+    var gameover = false;
+    
+    // Gui buttons
+    var buttons = [ { x: 30, y: 240, width: 150, height: 50, text: "New Game"},
+                    { x: 30, y: 300, width: 150, height: 50, text: "Show Moves"},
+                    { x: 30, y: 360, width: 150, height: 50, text: "Enable AI Bot"}];
+    
+    // Initialize the game
+    function init() {
+        // Add mouse events
+        canvas.addEventListener("mousemove", onMouseMove);
+        canvas.addEventListener("mousedown", onMouseDown);
+        canvas.addEventListener("mouseup", onMouseUp);
+        canvas.addEventListener("mouseout", onMouseOut);
+        
+        // Initialize the two-dimensional tile array
+        for (var i=0; i<level.columns; i++) {
+            level.tiles[i] = [];
+            for (var j=0; j<level.rows; j++) {
+                // Define a tile type and a shift parameter for animation
+                level.tiles[i][j] = { type: 0, shift:0 }
+            }
+        }
+        
+        // New game
+        newGame();
+        
+        // Enter main loop
+        main(0);
+    }
+    
+    // Main loop
+    function main(tframe) {
+        // Request animation frames
+        window.requestAnimationFrame(main);
+        
+        // Update and render the game
+        update(tframe);
+        render();
+    }
+    
+    // Update the game state
+    function update(tframe) {
+        var dt = (tframe - lastframe) / 1000;
+        lastframe = tframe;
+        
+        // Update the fps counter
+        updateFps(dt);
+        
+        if (gamestate == gamestates.ready) {
+            // Game is ready for player input
+            
+            // Check for game over
+            if (moves.length <= 0) {
+                gameover = true;
+            }
+            
+            // Let the AI bot make a move, if enabled
+            if (aibot) {
+                animationtime += dt;
+                if (animationtime > animationtimetotal) {
+                    // Check if there are moves available
+                    findMoves();
+                    
+                    if (moves.length > 0) {
+                        // Get a random valid move
+                        var move = moves[Math.floor(Math.random() * moves.length)];
+                        
+                        // Simulate a player using the mouse to swap two tiles
+                        mouseSwap(move.column1, move.row1, move.column2, move.row2);
+                    } else {
+                        // No moves left, Game Over. We could start a new game.
+                        // newGame();
+                    }
+                    animationtime = 0;
+                }
+            }
+        } else if (gamestate == gamestates.resolve) {
+            // Game is busy resolving and animating clusters
+            animationtime += dt;
+            
+            if (animationstate == 0) {
+                // Clusters need to be found and removed
+                if (animationtime > animationtimetotal) {
+                    // Find clusters
+                    findClusters();
+                    
+                    if (clusters.length > 0) {
+                        // Add points to the score
+                        for (var i=0; i<clusters.length; i++) {
+                            // Add extra points for longer clusters
+                            score += 100 * (clusters[i].length - 2);;
+                        }
+                    
+                        // Clusters found, remove them
+                        removeClusters();
+                        
+                        // Tiles need to be shifted
+                        animationstate = 1;
+                    } else {
+                        // No clusters found, animation complete
+                        gamestate = gamestates.ready;
+                    }
+                    animationtime = 0;
+                }
+            } else if (animationstate == 1) {
+                // Tiles need to be shifted
+                if (animationtime > animationtimetotal) {
+                    // Shift tiles
+                    shiftTiles();
+                    
+                    // New clusters need to be found
+                    animationstate = 0;
+                    animationtime = 0;
+                    
+                    // Check if there are new clusters
+                    findClusters();
+                    if (clusters.length <= 0) {
+                        // Animation complete
+                        gamestate = gamestates.ready;
+                    }
+                }
+            } else if (animationstate == 2) {
+                // Swapping tiles animation
+                if (animationtime > animationtimetotal) {
+                    // Swap the tiles
+                    swap(currentmove.column1, currentmove.row1, currentmove.column2, currentmove.row2);
+                    
+                    // Check if the swap made a cluster
+                    findClusters();
+                    if (clusters.length > 0) {
+                        // Valid swap, found one or more clusters
+                        // Prepare animation states
+                        animationstate = 0;
+                        animationtime = 0;
+                        gamestate = gamestates.resolve;
+                    } else {
+                        // Invalid swap, Rewind swapping animation
+                        animationstate = 3;
+                        animationtime = 0;
+                    }
+                    
+                    // Update moves and clusters
+                    findMoves();
+                    findClusters();
+                }
+            } else if (animationstate == 3) {
+                // Rewind swapping animation
+                if (animationtime > animationtimetotal) {
+                    // Invalid swap, swap back
+                    swap(currentmove.column1, currentmove.row1, currentmove.column2, currentmove.row2);
+                    
+                    // Animation complete
+                    gamestate = gamestates.ready;
+                }
+            }
+            
+            // Update moves and clusters
+            findMoves();
+            findClusters();
+        }
+    }
+    
+    function updateFps(dt) {
+        if (fpstime > 0.25) {
+            // Calculate fps
+            fps = Math.round(framecount / fpstime);
+            
+            // Reset time and framecount
+            fpstime = 0;
+            framecount = 0;
+        }
+        
+        // Increase time and framecount
+        fpstime += dt;
+        framecount++;
+    }
+    
+    // Draw text that is centered
+    function drawCenterText(text, x, y, width) {
+        var textdim = context.measureText(text);
+        context.fillText(text, x + (width-textdim.width)/2, y);
+    }
+    
+    // Render the game
+    function render() {
+        // Draw the frame
+        drawFrame();
+        
+        // Draw score
+        context.fillStyle = "#000000";
+        context.font = "24px Verdana";
+        drawCenterText("Score:", 30, level.y+40, 150);
+        drawCenterText(score, 30, level.y+70, 150);
+        
+        // Draw buttons
+        drawButtons();
+        
+        // Draw level background
+        var levelwidth = level.columns * level.tilewidth;
+        var levelheight = level.rows * level.tileheight;
+        context.fillStyle = "#000000";
+        context.fillRect(level.x - 4, level.y - 4, levelwidth + 8, levelheight + 8);
+        
+        // Render tiles
+        renderTiles();
+        
+        // Render clusters
+        renderClusters();
+        
+        // Render moves, when there are no clusters
+        if (showmoves && clusters.length <= 0 && gamestate == gamestates.ready) {
+            renderMoves();
+        }
+        
+        // Game Over overlay
+        if (gameover) {
+            context.fillStyle = "rgba(0, 0, 0, 0.8)";
+            context.fillRect(level.x, level.y, levelwidth, levelheight);
+            
+            context.fillStyle = "#ffffff";
+            context.font = "24px Verdana";
+            drawCenterText("Game Over!", level.x, level.y + levelheight / 2 + 10, levelwidth);
+        }
+    }
+    
+    // Draw a frame with a border
+    function drawFrame() {
+        // Draw background and a border
+        context.fillStyle = "#19e6b9";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "#466880";
+        context.fillRect(1, 1, canvas.width-2, canvas.height-2);
+        
+        // Draw header
+        context.fillStyle = "#19e6b9";
+        context.fillRect(0, 0, canvas.width, 65);
+        
+        // Draw title is here!!!
+        context.fillStyle = "#ffffff";
+        context.font = "24px Verdana";
+        context.fillText("Octogon Match 2025", 10, 25);
+        
+         // Display fps
+        context.fillStyle = "#ffffff";
+        context.font = "12px Verdana";
+        context.fillText("By Stenoip Company ", 13, 40);
+       // Display fps
+        context.fillStyle = "#ffffff";
+        context.font = "12px Verdana";
+        context.fillText("Fps: " + fps, 13, 50);
+    }
+    
+    // Draw buttons
+    function drawButtons() {
+        for (var i=0; i<buttons.length; i++) {
+            // Draw button shape
+            context.fillStyle = "#000000";
+            context.fillRect(buttons[i].x, buttons[i].y, buttons[i].width, buttons[i].height);
+            
+            // Draw button text
+            context.fillStyle = "#ffffff";
+            context.font = "18px Verdana";
+            var textdim = context.measureText(buttons[i].text);
+            context.fillText(buttons[i].text, buttons[i].x + (buttons[i].width-textdim.width)/2, buttons[i].y+30);
+        }
+    }
+    
+    // Render tiles
+    function renderTiles() {
+        for (var i=0; i<level.columns; i++) {
+            for (var j=0; j<level.rows; j++) {
+                // Get the shift of the tile for animation
+                var shift = level.tiles[i][j].shift;
+                
+                // Calculate the tile coordinates
+                var coord = getTileCoordinate(i, j, 0, (animationtime / animationtimetotal) * shift);
+                
+                // Check if there is a tile present
+                if (level.tiles[i][j].type >= 0) {
+                    // Get the color of the tile
+                    var col = tilecolors[level.tiles[i][j].type];
+                    
+                    // Draw the tile using the color
+                    drawTile(coord.tilex, coord.tiley, col[0], col[1], col[2]);
+                }
+                
+                // Draw the selected tile
+                if (level.selectedtile.selected) {
+                    if (level.selectedtile.column == i && level.selectedtile.row == j) {
+                        // Draw a red tile
+                        drawTile(coord.tilex, coord.tiley, 255, 0, 0);
+                    }
+                }
+            }
+        }
+        
+        // Render the swap animation
+        if (gamestate == gamestates.resolve && (animationstate == 2 || animationstate == 3)) {
+            // Calculate the x and y shift
+            var shiftx = currentmove.column2 - currentmove.column1;
+            var shifty = currentmove.row2 - currentmove.row1;
+
+            // First tile
+            var coord1 = getTileCoordinate(currentmove.column1, currentmove.row1, 0, 0);
+            var coord1shift = getTileCoordinate(currentmove.column1, currentmove.row1, (animationtime / animationtimetotal) * shiftx, (animationtime / animationtimetotal) * shifty);
+            var col1 = tilecolors[level.tiles[currentmove.column1][currentmove.row1].type];
+            
+            // Second tile
+            var coord2 = getTileCoordinate(currentmove.column2, currentmove.row2, 0, 0);
+            var coord2shift = getTileCoordinate(currentmove.column2, currentmove.row2, (animationtime / animationtimetotal) * -shiftx, (animationtime / animationtimetotal) * -shifty);
+            var col2 = tilecolors[level.tiles[currentmove.column2][currentmove.row2].type];
+            
+            // Draw a black background
+            drawTile(coord1.tilex, coord1.tiley, 0, 0, 0);
+            drawTile(coord2.tilex, coord2.tiley, 0, 0, 0);
+            
+            // Change the order, depending on the animation state
+            if (animationstate == 2) {
+                // Draw the tiles
+                drawTile(coord1shift.tilex, coord1shift.tiley, col1[0], col1[1], col1[2]);
+                drawTile(coord2shift.tilex, coord2shift.tiley, col2[0], col2[1], col2[2]);
+            } else {
+                // Draw the tiles
+                drawTile(coord2shift.tilex, coord2shift.tiley, col2[0], col2[1], col2[2]);
+                drawTile(coord1shift.tilex, coord1shift.tiley, col1[0], col1[1], col1[2]);
+            }
+        }
+    }
+    
+    // Get the tile coordinate
+    function getTileCoordinate(column, row, columnoffset, rowoffset) {
+        var tilex = level.x + (column + columnoffset) * level.tilewidth;
+        var tiley = level.y + (row + rowoffset) * level.tileheight;
+        return { tilex: tilex, tiley: tiley};
+    }
+    
+    // Draw a tile with a color
+    function drawTile(x, y, r, g, b) {
+        context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+        context.fillRect(x + 2, y + 2, level.tilewidth - 4, level.tileheight - 4);
+    }
+    
+    // Render clusters
+    function renderClusters() {
+        for (var i=0; i<clusters.length; i++) {
+            // Calculate the tile coordinates
+            var coord = getTileCoordinate(clusters[i].column, clusters[i].row, 0, 0);
+            
+            if (clusters[i].horizontal) {
+                // Draw a horizontal line
+                context.fillStyle = "#00ff00";
+                context.fillRect(coord.tilex + level.tilewidth/2, coord.tiley + level.tileheight/2 - 4, (clusters[i].length - 1) * level.tilewidth, 8);
+            } else {
+                // Draw a vertical line
+                context.fillStyle = "#0000ff";
+                context.fillRect(coord.tilex + level.tilewidth/2 - 4, coord.tiley + level.tileheight/2, 8, (clusters[i].length - 1) * level.tileheight);
+            }
+        }
+    }
+    
+    // Render moves
+    function renderMoves() {
+        for (var i=0; i<moves.length; i++) {
+            // Calculate coordinates of tile 1 and 2
+            var coord1 = getTileCoordinate(moves[i].column1, moves[i].row1, 0, 0);
+            var coord2 = getTileCoordinate(moves[i].column2, moves[i].row2, 0, 0);
+            
+            // Draw a line from tile 1 to tile 2
+            context.strokeStyle = "#ff0000";
+            context.beginPath();
+            context.moveTo(coord1.tilex + level.tilewidth/2, coord1.tiley + level.tileheight/2);
+            context.lineTo(coord2.tilex + level.tilewidth/2, coord2.tiley + level.tileheight/2);
+            context.stroke();
+        }
+    }
+    
+    // Start a new game
+    function newGame() {
+        // Reset score
+        score = 0;
+        
+        // Set the gamestate to ready
+        gamestate = gamestates.ready;
+        
+        // Reset game over
+        gameover = false;
+        
+        // Create the level
+        createLevel();
+        
+        // Find initial clusters and moves
+        findMoves();
+        findClusters(); 
+    }
+    
+    // Create a random level
+    function createLevel() {
+        var done = false;
+        
+        // Keep generating levels until it is correct
+        while (!done) {
+        
+            // Create a level with random tiles
+            for (var i=0; i<level.columns; i++) {
+                for (var j=0; j<level.rows; j++) {
+                    level.tiles[i][j].type = getRandomTile();
+                }
+            }
+            
+            // Resolve the clusters
+            resolveClusters();
+            
+            // Check if there are valid moves
+            findMoves();
+            
+            // Done when there is a valid move
+            if (moves.length > 0) {
+                done = true;
+            }
+        }
+    }
+    
+    // Get a random tile
+    function getRandomTile() {
+        return Math.floor(Math.random() * tilecolors.length);
+    }
+    
+    // Remove clusters and insert tiles
+    function resolveClusters() {
+        // Check for clusters
+        findClusters();
+        
+        // While there are clusters left
+        while (clusters.length > 0) {
+        
+            // Remove clusters
+            removeClusters();
+            
+            // Shift tiles
+            shiftTiles();
+            
+            // Check if there are clusters left
+            findClusters();
+        }
+    }
+    
+    // Find clusters in the level
+    function findClusters() {
+        // Reset clusters
+        clusters = []
+        
+        // Find horizontal clusters
+        for (var j=0; j<level.rows; j++) {
+            // Start with a single tile, cluster of 1
+            var matchlength = 1;
+            for (var i=0; i<level.columns; i++) {
+                var checkcluster = false;
+                
+                if (i == level.columns-1) {
+                    // Last tile
+                    checkcluster = true;
+                } else {
+                    // Check the type of the next tile
+                    if (level.tiles[i][j].type == level.tiles[i+1][j].type &&
+                        level.tiles[i][j].type != -1) {
+                        // Same type as the previous tile, increase matchlength
+                        matchlength += 1;
+                    } else {
+                        // Different type
+                        checkcluster = true;
+                    }
+                }
+                
+                // Check if there was a cluster
+                if (checkcluster) {
+                    if (matchlength >= 3) {
+                        // Found a horizontal cluster
+                        clusters.push({ column: i+1-matchlength, row:j,
+                                        length: matchlength, horizontal: true });
+                    }
+                    
+                    matchlength = 1;
+                }
+            }
+        }
+
+        // Find vertical clusters
+        for (var i=0; i<level.columns; i++) {
+            // Start with a single tile, cluster of 1
+            var matchlength = 1;
+            for (var j=0; j<level.rows; j++) {
+                var checkcluster = false;
+                
+                if (j == level.rows-1) {
+                    // Last tile
+                    checkcluster = true;
+                } else {
+                    // Check the type of the next tile
+                    if (level.tiles[i][j].type == level.tiles[i][j+1].type &&
+                        level.tiles[i][j].type != -1) {
+                        // Same type as the previous tile, increase matchlength
+                        matchlength += 1;
+                    } else {
+                        // Different type
+                        checkcluster = true;
+                    }
+                }
+                
+                // Check if there was a cluster
+                if (checkcluster) {
+                    if (matchlength >= 3) {
+                        // Found a vertical cluster
+                        clusters.push({ column: i, row:j+1-matchlength,
+                                        length: matchlength, horizontal: false });
+                    }
+                    
+                    matchlength = 1;
+                }
+            }
+        }
+    }
+    
+    // Find available moves
+    function findMoves() {
+        // Reset moves
+        moves = []
+        
+        // Check horizontal swaps
+        for (var j=0; j<level.rows; j++) {
+            for (var i=0; i<level.columns-1; i++) {
+                // Swap, find clusters and swap back
+                swap(i, j, i+1, j);
+                findClusters();
+                swap(i, j, i+1, j);
+                
+                // Check if the swap made a cluster
+                if (clusters.length > 0) {
+                    // Found a move
+                    moves.push({column1: i, row1: j, column2: i+1, row2: j});
+                }
+            }
+        }
+        
+        // Check vertical swaps
+        for (var i=0; i<level.columns; i++) {
+            for (var j=0; j<level.rows-1; j++) {
+                // Swap, find clusters and swap back
+                swap(i, j, i, j+1);
+                findClusters();
+                swap(i, j, i, j+1);
+                
+                // Check if the swap made a cluster
+                if (clusters.length > 0) {
+                    // Found a move
+                    moves.push({column1: i, row1: j, column2: i, row2: j+1});
+                }
+            }
+        }
+        
+        // Reset clusters
+        clusters = []
+    }
+    
+    // Loop over the cluster tiles and execute a function
+    function loopClusters(func) {
+        for (var i=0; i<clusters.length; i++) {
+            //  { column, row, length, horizontal }
+            var cluster = clusters[i];
+            var coffset = 0;
+            var roffset = 0;
+            for (var j=0; j<cluster.length; j++) {
+                func(i, cluster.column+coffset, cluster.row+roffset, cluster);
+                
+                if (cluster.horizontal) {
+                    coffset++;
+                } else {
+                    roffset++;
+                }
+            }
+        }
+    }
+    
+    // Remove the clusters
+    function removeClusters() {
+        // Change the type of the tiles to -1, indicating a removed tile
+        loopClusters(function(index, column, row, cluster) { level.tiles[column][row].type = -1; });
+
+        // Calculate how much a tile should be shifted downwards
+        for (var i=0; i<level.columns; i++) {
+            var shift = 0;
+            for (var j=level.rows-1; j>=0; j--) {
+                // Loop from bottom to top
+                if (level.tiles[i][j].type == -1) {
+                    // Tile is removed, increase shift
+                    shift++;
+                    level.tiles[i][j].shift = 0;
+                } else {
+                    // Set the shift
+                    level.tiles[i][j].shift = shift;
+                }
+            }
+        }
+    }
+    
+    // Shift tiles and insert new tiles
+    function shiftTiles() {
+        // Shift tiles
+        for (var i=0; i<level.columns; i++) {
+            for (var j=level.rows-1; j>=0; j--) {
+                // Loop from bottom to top
+                if (level.tiles[i][j].type == -1) {
+                    // Insert new random tile
+                    level.tiles[i][j].type = getRandomTile();
+                } else {
+                    // Swap tile to shift it
+                    var shift = level.tiles[i][j].shift;
+                    if (shift > 0) {
+                        swap(i, j, i, j+shift)
+                    }
+                }
+                
+                // Reset shift
+                level.tiles[i][j].shift = 0;
+            }
+        }
+    }
+    
+    // Get the tile under the mouse
+    function getMouseTile(pos) {
+        // Calculate the index of the tile
+        var tx = Math.floor((pos.x - level.x) / level.tilewidth);
+        var ty = Math.floor((pos.y - level.y) / level.tileheight);
+        
+        // Check if the tile is valid
+        if (tx >= 0 && tx < level.columns && ty >= 0 && ty < level.rows) {
+            // Tile is valid
+            return {
+                valid: true,
+                x: tx,
+                y: ty
+            };
+        }
+        
+        // No valid tile
+        return {
+            valid: false,
+            x: 0,
+            y: 0
+        };
+    }
+    
+    // Check if two tiles can be swapped
+    function canSwap(x1, y1, x2, y2) {
+        // Check if the tile is a direct neighbor of the selected tile
+        if ((Math.abs(x1 - x2) == 1 && y1 == y2) ||
+            (Math.abs(y1 - y2) == 1 && x1 == x2)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Swap two tiles in the level
+    function swap(x1, y1, x2, y2) {
+        var typeswap = level.tiles[x1][y1].type;
+        level.tiles[x1][y1].type = level.tiles[x2][y2].type;
+        level.tiles[x2][y2].type = typeswap;
+    }
+    
+    // Swap two tiles as a player action
+    function mouseSwap(c1, r1, c2, r2) {
+        // Save the current move
+        currentmove = {column1: c1, row1: r1, column2: c2, row2: r2};
+    
+        // Deselect
+        level.selectedtile.selected = false;
+        
+        // Start animation
+        animationstate = 2;
+        animationtime = 0;
+        gamestate = gamestates.resolve;
+    }
+    
+    // On mouse movement
+    function onMouseMove(e) {
+        // Get the mouse position
+        var pos = getMousePos(canvas, e);
+        
+        // Check if we are dragging with a tile selected
+        if (drag && level.selectedtile.selected) {
+            // Get the tile under the mouse
+            mt = getMouseTile(pos);
+            if (mt.valid) {
+                // Valid tile
+                
+                // Check if the tiles can be swapped
+                if (canSwap(mt.x, mt.y, level.selectedtile.column, level.selectedtile.row)){
+                    // Swap the tiles
+                    mouseSwap(mt.x, mt.y, level.selectedtile.column, level.selectedtile.row);
+                }
+            }
+        }
+    }
+    
+    // On mouse button click
+    function onMouseDown(e) {
+        // Get the mouse position
+        var pos = getMousePos(canvas, e);
+        
+        // Start dragging
+        if (!drag) {
+            // Get the tile under the mouse
+            mt = getMouseTile(pos);
+            
+            if (mt.valid) {
+                // Valid tile
+                var swapped = false;
+                if (level.selectedtile.selected) {
+                    if (mt.x == level.selectedtile.column && mt.y == level.selectedtile.row) {
+                        // Same tile selected, deselect
+                        level.selectedtile.selected = false;
+                        drag = true;
+                        return;
+                    } else if (canSwap(mt.x, mt.y, level.selectedtile.column, level.selectedtile.row)){
+                        // Tiles can be swapped, swap the tiles
+                        mouseSwap(mt.x, mt.y, level.selectedtile.column, level.selectedtile.row);
+                        swapped = true;
+                    }
+                }
+                
+                if (!swapped) {
+                    // Set the new selected tile
+                    level.selectedtile.column = mt.x;
+                    level.selectedtile.row = mt.y;
+                    level.selectedtile.selected = true;
+                }
+            } else {
+                // Invalid tile
+                level.selectedtile.selected = false;
+            }
+
+            // Start dragging
+            drag = true;
+        }
+        
+        // Check if a button was clicked
+        for (var i=0; i<buttons.length; i++) {
+            if (pos.x >= buttons[i].x && pos.x < buttons[i].x+buttons[i].width &&
+                pos.y >= buttons[i].y && pos.y < buttons[i].y+buttons[i].height) {
+                
+                // Button i was clicked
+                if (i == 0) {
+                    // New Game
+                    newGame();
+                } else if (i == 1) {
+                    // Show Moves
+                    showmoves = !showmoves;
+                    buttons[i].text = (showmoves?"Hide":"Show") + " Moves";
+                } else if (i == 2) {
+                    // AI Bot
+                    aibot = !aibot;
+                    buttons[i].text = (aibot?"Disable":"Enable") + " AI Bot";
+                }
+            }
+        }
+    }
+    
+    function onMouseUp(e) {
+        // Reset dragging
+        drag = false;
+    }
+    
+    function onMouseOut(e) {
+        // Reset dragging
+        drag = false;
+    }
+    
+    // Get the mouse position
+    function getMousePos(canvas, e) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: Math.round((e.clientX - rect.left)/(rect.right - rect.left)*canvas.width),
+            y: Math.round((e.clientY - rect.top)/(rect.bottom - rect.top)*canvas.height)
+        };
+    }
+    
+    // Call init to start the game
+    init();
+};
+</script>
 </head>
 <body>
-
-<div id="hud">
-  <div class="left">
-    <div class="pill"><span class="muted">Level</span> <b id="hudLevel">1</b></div>
-    <div class="pill"><span class="muted">Score</span> <b id="hudScore">0</b></div>
-  </div>
-  <div class="center">Octogon Match</div>
-  <div class="right">
-    <div class="pill">
-      <button class="btn" id="musicToggle">Music: Off</button>
-    </div>
-    <div class="pill">
-      <span class="muted">Energy</span>
-      <b id="hudEnergy">5</b>
-      <span class="muted" id="hudEnergyTimer"></span>
-    </div>
-    <div class="pill">
-      <button class="btn" id="creditsBtn">Credits</button>
-    </div>
-  </div>
-</div>
-
-<div id="wrap">
-  <section id="mapPanel">
-    <div id="mapHeader">
-      <button class="btn" id="prevPage">◀ Prev</button>
-      <div class="muted">Select Level (infinite)</div>
-      <button class="btn" id="nextPage">Next ▶</button>
-    </div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-      <button class="btn" id="watchAdEnergy">Watch ad: +1 Energy</button>
-      <button class="btn" id="watchAdPower">Watch ad: +1 Random Powerup</button>
-    </div>
-    <div id="mapGrid"></div>
-  </section>
-  <section id="gamePanel">
-    <div id="gameTop">
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <div class="pill"><span class="muted">Target</span> <b id="hudTarget">0</b></div>
-        <div class="pill"><span class="muted">Moves</span> <b id="hudMoves">0</b></div>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn" id="btnRestart">Restart</button>
-        <button class="btn" id="btnShuffle">Shuffle (-1 move)</button>
-      </div>
-    </div>
-    <div id="powerups">
-      <button class="pbtn" id="pHammer"><span>Hammer</span><span class="pcount" id="cntHammer">0</span></button>
-      <button class="pbtn" id="pCross"><span>Cross Blast</span><span class="pcount" id="cntCross">0</span></button>
-      <button class="pbtn" id="pColor"><span>Color Nuke</span><span class="pcount" id="cntColor">0</span></button>
-      <span class="muted">Select a powerup, then click a tile to use it. Powerups don't cost moves.</span>
-    </div>
-    <div id="boardWrap">
-      <div id="board"></div>
-    </div>
-    <div id="gameBottom">
-      <div class="muted">Swap adjacent octagons to match 3+. 4-in-a-row grants Cross Blast. 5+ grants Color Nuke.</div>
-      <div style="display:flex; gap:8px;">
-        <button class="btn" id="freeHint">Hint</button>
-      </div>
-    </div>
-  </section>
-</div>
-<div id="toasts"></div>
-<footer>© Stenoip Company</footer>
-
-<div class="modal" id="creditsModal">
-  <div class="modal-card">
-    <div class="modal-head">
-      <div style="font-weight:800">Credits</div>
-      <button class="btn" id="creditsClose">Close</button>
-    </div>
-    <div class="modal-body">
-      <p><b>Game:</b> Octogon Match</p>
-      <p><b>Design & Code:</b> Stenoip Company</p>
-      <p><b>Background Music:</b> Calming Shapes. Music by <a href="https://pixabay.com/users/kokoshungsan-net-26794968/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=125459">Kokoshung San</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=125459">Pixabay</a></p>
-      <p><b>Powerups:</b> Hammer, Cross Blast, Color Nuke</p>
-      <p><b>Energy System:</b> 5 max, +1 every 10 minutes</p>
-      <p><b>Levels:</b> Infinite, procedurally scaled</p>
-      <p><b>Copyright:</b> ©  2025 Stenoip Company</p>
-      <hr/>
-      <p class="muted">Ads: Reward flow below simulates a rewarded experience and grants your chosen reward when complete.</p>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="rewardModal">
-  <div class="modal-card">
-    <div class="modal-head">
-      <div style="font-weight:800">Watch ad to earn reward</div>
-      <button class="btn" id="rewardClose">Close</button>
-    </div>
-    <div class="modal-body">
-      <div id="adContainer" style="height:180px; background:#0b1130; border:1px solid rgba(255,255,255,0.1); border-radius:8px; display:grid; place-items:center; margin-bottom:10px;">
-        <div class="muted" style="text-align:center; padding:8px;">
-          Ad space
-          <br/>
-          <span style="font-size:12px; opacity:.8;">( AdSense unit would render here if configured)</span>
-        </div>
-      </div>
-      <div id="rewardStatus" class="pill" style="margin-bottom:10px;">Time remaining: <b id="rewardTimer">15s</b></div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn" id="btnClaimReward" disabled>Claim reward</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-var maxEnergy = 5;
-var energy = maxEnergy;
-var energyRefillMs = 10 * 60 * 1000;
-var lastEnergyTimestamp = Date.now();
-
-var currentLevel = 1;
-var highestLevel = 1;
-var score = 0;
-
-var mapWindowStart = 1;
-var mapWindowSize = 20;
-
-var invHammer = 0;
-var invCross = 0;
-var invColor = 0;
-
-var musicEnabled = false;
-
-function saveProgress() {
-  try {
-    localStorage.setItem("octogonSaveV2", JSON.stringify({
-      energy: energy,
-      lastEnergyTimestamp: lastEnergyTimestamp,
-      currentLevel: currentLevel,
-      highestLevel: highestLevel,
-      score: score,
-      mapWindowStart: mapWindowStart,
-      invHammer: invHammer,
-      invCross: invCross,
-      invColor: invColor,
-      musicEnabled: musicEnabled
-    }));
-  } catch(e) {}
-}
-
-function loadProgress() {
-  try {
-    var raw = localStorage.getItem("octogonSaveV2");
-    if (!raw) return;
-    var s = JSON.parse(raw);
-    if (typeof s.energy === "number") energy = s.energy;
-    if (typeof s.lastEnergyTimestamp === "number") lastEnergyTimestamp = s.lastEnergyTimestamp;
-    if (typeof s.currentLevel === "number") currentLevel = s.currentLevel;
-    if (typeof s.highestLevel === "number") highestLevel = Math.max(1, s.highestLevel);
-    if (typeof s.score === "number") score = s.score;
-    if (typeof s.mapWindowStart === "number") mapWindowStart = Math.max(1, s.mapWindowStart);
-    if (typeof s.invHammer === "number") invHammer = s.invHammer;
-    if (typeof s.invCross === "number") invCross = s.invCross;
-    if (typeof s.invColor === "number") invColor = s.invColor;
-    if (typeof s.musicEnabled === "boolean") musicEnabled = s.musicEnabled;
-  } catch(e) {}
-}
-
-function formatCountdown(ms) {
-  var s = Math.max(0, Math.ceil(ms/1000));
-  var m = Math.floor(s/60);
-  var r = s%60;
-  return (m>0? (m + "m ") : "") + r + "s";
-}
-
-function updateEnergyTick() {
-  var now = Date.now();
-  if (energy < maxEnergy) {
-    var elapsed = now - lastEnergyTimestamp;
-    var toAdd = Math.floor(elapsed / energyRefillMs);
-    if (toAdd > 0) {
-      energy = Math.min(maxEnergy, energy + toAdd);
-      lastEnergyTimestamp += toAdd * energyRefillMs;
-      toast("Energy refilled +" + toAdd);
-    }
-  }
-  var nextIn = Math.max(0, energyRefillMs - (now - lastEnergyTimestamp));
-  document.getElementById("hudEnergy").textContent = energy;
-  document.getElementById("hudEnergyTimer").textContent =
-    (energy < maxEnergy ? " • +" + formatCountdown(nextIn) : "");
-  saveProgress();
-}
-setInterval(updateEnergyTick, 1000);
-
-var audioCtx = null;
-var musicNodes = null;
-
-function startMusic() {
-  if (audioCtx) return;
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    var url = "calming-shapes-125459.mp3";
-    fetch(url)
-      .then(response => response.arrayBuffer())
-      .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
-      .then(audioBuffer => {
-        var source = audioCtx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.loop = true;
-        var gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.06;
-        source.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        source.start();
-        window._musicSource = source;
-      });
-  } catch(e) {}
-}
-function stopMusic() {
-  if (!audioCtx) return;
-  try {
-    if (window._musicSource) {
-      window._musicSource.stop();
-      window._musicSource = null;
-    }
-    audioCtx.close();
-  } catch(e){}
-  musicNodes = null;
-  audioCtx = null;
-}
-function toggleMusic() {
-  musicEnabled = !musicEnabled;
-  var btn = document.getElementById("musicToggle");
-  btn.textContent = "Music: " + (musicEnabled ? "On" : "Off");
-  if (musicEnabled) startMusic(); else stopMusic();
-  saveProgress();
-}
-document.getElementById("musicToggle").onclick = function() {
-  toggleMusic();
-};
-function initMusicOnLoad() {
-  var btn = document.getElementById("musicToggle");
-  btn.textContent = "Music: " + (musicEnabled ? "On" : "Off");
-}
-
-/* =========================
-   Toasts
-   ========================= */
-function toast(msg) {
-  var box = document.getElementById("toasts");
-  var t = document.createElement("div");
-  t.className = "toast";
-  t.textContent = msg;
-  box.appendChild(t);
-  setTimeout(function(){ t.style.opacity = "0.0"; }, 2400);
-  setTimeout(function(){ if (t && t.parentNode) t.parentNode.removeChild(t); }, 3000);
-}
-
-/* =========================
-   Map & Level functions
-   ========================= */
-function clampMapWindow() {
-  if (highestLevel >= mapWindowStart + mapWindowSize - 1) {
-    mapWindowStart = Math.max(1, highestLevel - mapWindowSize + 1);
-  }
-  if (mapWindowStart < 1) mapWindowStart = 1;
-}
-
-function renderMap() {
-  clampMapWindow();
-  var grid = document.getElementById("mapGrid");
-  grid.innerHTML = "";
-  for (var i=0; i<mapWindowSize; i++) {
-    var lv = mapWindowStart + i;
-    var node = document.createElement("div");
-    node.className = "level-node";
-    node.textContent = lv;
-    if (lv > highestLevel) node.className += " locked";
-    if (lv === currentLevel) node.className += " current";
-    if (lv <= highestLevel) {
-      var dot = document.createElement("div");
-      dot.className = "dot";
-      node.appendChild(dot);
-    }
-    (function(lvv) {
-      node.onclick = function() {
-        if (lvv > highestLevel) { toast("Level locked."); return; }
-        tryStartLevel(lvv);
-      }
-    })(lv);
-    grid.appendChild(node);
-  }
-  document.getElementById("prevPage").disabled = (mapWindowStart === 1);
-}
-
-var board = [];
-var rows = 8;
-var cols = 8;
-var colorsCount = 5;
-var moves = 20;
-var targetScore = 800;
-var chainScoreBase = 10;
-
-var selR = -1, selC = -1;
-var isResolving = false;
-var activePowerup = null;
-
-function setHUD() {
-  document.getElementById("hudLevel").textContent = currentLevel;
-  document.getElementById("hudScore").textContent = score;
-  document.getElementById("hudEnergy").textContent = energy;
-  document.getElementById("hudMoves").textContent = moves;
-  document.getElementById("hudTarget").textContent = targetScore;
-  document.getElementById("cntHammer").textContent = invHammer;
-  document.getElementById("cntCross").textContent = invCross;
-  document.getElementById("cntColor").textContent = invColor;
-}
-
-function paramsForLevel(lv) {
-  var baseRows = 7 + Math.min(3, Math.floor((lv-1)/7));
-  var baseCols = baseRows;
-  var colorN = 5 + Math.min(2, Math.floor((lv-1)/5));
-  var mv = 18 + Math.min(10, Math.floor(lv/3));
-  var tgt = 600 + Math.floor(Math.pow(lv, 1.15) * 60);
-  return { rows: baseRows, cols: baseCols, colors: colorN, moves: mv, target: tgt };
-}
-
-function tryStartLevel(lv) {
-  if (energy <= 0) {
-    toast("You have no more energy to play. Please wait for it to refill.");
-    return;
-  }
-  startLevel(lv);
-}
-
-function startLevel(lv) {
-  currentLevel = lv;
-  score = 0;
-  var p = paramsForLevel(lv);
-  rows = p.rows; 
-  cols = p.cols; 
-  colorsCount = p.colors; 
-  moves = p.moves; 
-  targetScore = p.target;
-  selR = -1; selC = -1; 
-  isResolving = false; 
-  activePowerup = null; 
-  updatePowerupButtons();
-  buildEmptyBoard();
-  fillBoardNoInitialMatches();
-  renderBoard();
-  setHUD();
-  toast("Starting Level " + lv);
-  saveProgress();
-}
-
-function buildEmptyBoard() {
-  board = new Array(rows);
-  for (var r=0; r<rows; r++) {
-    board[r] = new Array(cols);
-    for (var c=0; c<cols; c++) board[r][c] = -1;
-  }
-}
-
-function randColor() {
-  return Math.floor(Math.random() * colorsCount);
-}
-
-function fillBoardNoInitialMatches() {
-  for (var r=0; r<rows; r++) {
-    for (var c=0; c<cols; c++) {
-      do {
-        board[r][c] = randColor();
-      } while ((c>=2 && board[r][c-1]===board[r][c] && board[r][c-2]===board[r][c]) ||
-               (r>=2 && board[r-1][c]===board[r][c] && board[r-2][c]===board[r][c]));
-    }
-  }
-}
-
-function renderBoard() {
-  var grid = document.getElementById("board");
-  grid.style.gridTemplateColumns = "repeat(" + cols + ", 56px)";
-  grid.style.gridTemplateRows = "repeat(" + rows + ", 56px)";
-  grid.innerHTML = "";
-  for (var r=0; r<rows; r++) {
-    for (var c=0; c<cols; c++) {
-      var cell = document.createElement("div");
-      cell.className = "cell";
-      cell.dataset.r = r;
-      cell.dataset.c = c;
-      var tile = document.createElement("div");
-      tile.className = "tile c" + (board[r][c]+1);
-      tile.dataset.r = r;
-      tile.dataset.c = c;
-      cell.appendChild(tile);
-      grid.appendChild(cell);
-    }
-  }
-  hookTileEvents();
-}
-
-function hookTileEvents() {
-  var grid = document.getElementById("board");
-  grid.onclick = function(e) {
-    var t = e.target;
-    if (!t.classList.contains("tile")) return;
-    var r = parseInt(t.dataset.r,10), c = parseInt(t.dataset.c,10);
-    if (activePowerup) {
-      usePowerupOn(r, c);
-      return;
-    }
-    onTileClick(r, c);
-  };
-}
-
-function onTileClick(r, c) {
-  if (isResolving) return;
-  if (selR === -1) {
-    selR = r; selC = c;
-    highlightSelection(true);
-    return;
-  }
-  if (r === selR && c === selC) {
-    highlightSelection(false);
-    selR = selC = -1;
-    return;
-  }
-  if (!adjacent(selR, selC, r, c)) {
-    highlightSelection(false);
-    selR = r; selC = c;
-    highlightSelection(true);
-    return;
-  }
-  swap(selR, selC, r, c);
-  var detail = findMatchesDetailed();
-  if (detail.cells.length === 0) {
-    swap(selR, selC, r, c);
-    wiggle(selR, selC); wiggle(r, c);
-    highlightSelection(false);
-    selR = selC = -1;
-    return;
-  }
-  moves = Math.max(0, moves - 1);
-  setHUD();
-  grantPowerupsFrom(detail.groups);
-  highlightSelection(false);
-  selR = selC = -1;
-  isResolving = true;
-  resolveChain(detail.cells, 1, function() {
-    isResolving = false;
-    checkEndConditions();
-  });
-}
-
-function highlightSelection(on) {
-  var tiles = document.querySelectorAll(".tile");
-  for (var i=0; i<tiles.length; i++) {
-    var t = tiles[i];
-    var r = parseInt(t.dataset.r,10), c = parseInt(t.dataset.c,10);
-    if (r === selR && c === selC) {
-      if (on) t.classList.add("sel"); else t.classList.remove("sel");
-      break;
-    }
-  }
-}
-
-function adjacent(r1, c1, r2, c2) {
-  return (Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1;
-}
-
-function swap(r1, c1, r2, c2) {
-  var tmp = board[r1][c1];
-  board[r1][c1] = board[r2][c2];
-  board[r2][c2] = tmp;
-  var a = tileAt(r1,c1), b = tileAt(r2,c2);
-  if (a) a.className = "tile c" + (board[r1][c1]+1);
-  if (b) b.className = "tile c" + (board[r2][c2]+1);
-}
-
-function tileAt(r, c) {
-  return document.querySelector('.tile[data-r="'+r+'"][data-c="'+c+'"]');
-}
-
-function wiggle(r, c) {
-  var t = tileAt(r, c);
-  if (!t) return;
-  t.style.transform = "scale(0.9) rotate(1deg)";
-  setTimeout(function(){ t.style.transform = ""; }, 120);
-}
-
-function findMatchesDetailed() {
-  var cells = [];
-  var groups = [];
-  for (var r=0; r<rows; r++) {
-    var runLen = 1;
-    for (var c=1; c<=cols; c++) {
-      var same = (c<cols && board[r][c] === board[r][c-1]);
-      if (same) runLen++;
-      if (!same) {
-        if (runLen >= 3) {
-          var g = [];
-          for (var k=0; k<runLen; k++) g.push({r:r, c:c-1-k});
-          groups.push({orient:"row", len:runLen, cells:g});
-          for (var k2=0; k2<g.length; k2++) cells.push(g[k2]);
-        }
-        runLen = 1;
-      }
-    }
-  }
-  for (var c=0; c<cols; c++) {
-    var runv = 1;
-    for (var r=1; r<=rows; r++) {
-      var samev = (r<rows && board[r][c] === board[r-1][c]);
-      if (samev) runv++;
-      if (!samev) {
-        if (runv >= 3) {
-          var gg = [];
-          for (var k=0; k<runv; k++) gg.push({r:r-1-k, c:c});
-          groups.push({orient:"col", len:runv, cells:gg});
-          for (var k2=0; k2<gg.length; k2++) cells.push(gg[k2]);
-        }
-        runv = 1;
-      }
-    }
-  }
-  var seen = {};
-  var uniq = [];
-  for (var i=0; i<cells.length; i++) {
-    var key = cells[i].r + "_" + cells[i].c;
-    if (!seen[key]) { seen[key] = true; uniq.push(cells[i]); }
-  }
-  return { cells: uniq, groups: groups };
-}
-
-function grantPowerupsFrom(groups) {
-  var gaveCross = 0, gaveColor = 0;
-  for (var i=0; i<groups.length; i++) {
-    if (groups[i].len >= 5) {
-      invColor++; gaveColor++;
-    } else if (groups[i].len === 4) {
-      invCross++; gaveCross++;
-    }
-  }
-  if (gaveColor>0) toast("Powerup gained: +" + gaveColor + " Color Nuke");
-  if (gaveCross>0) toast("Powerup gained: +" + gaveCross + " Cross Blast");
-  setHUD(); saveProgress();
-}
-
-function resolveChain(matchCells, chain, done) {
-  for (var i=0; i<matchCells.length; i++) {
-    var rc = matchCells[i];
-    var t = tileAt(rc.r, rc.c);
-    if (t) t.classList.add("clearing");
-  }
-  var gained = matchCells.length * (chainScoreBase + Math.floor(chainScoreBase * 0.25 * (chain-1)));
-  score += gained;
-  setHUD();
-  setTimeout(function() {
-    for (var i=0; i<matchCells.length; i++) {
-      var rc = matchCells[i];
-      board[rc.r][rc.c] = -1;
-    }
-    collapseAndRefill(function(){
-      var next = findMatchesDetailed();
-      if (next.cells.length > 0) {
-        resolveChain(next.cells, chain+1, done);
-      } else {
-        if (typeof done === "function") done();
-      }
-    });
-  }, 180);
-}
-
-function collapseAndRefill(cb) {
-  for (var c=0; c<cols; c++) {
-    var write = rows - 1;
-    for (var r=rows-1; r>=0; r--) {
-      if (board[r][c] !== -1) {
-        board[write][c] = board[r][c];
-        write--;
-      }
-    }
-    for (var r=write; r>=0; r--) board[r][c] = -1;
-  }
-  for (var r=0; r<rows; r++) {
-    for (var c=0; c<cols; c++) {
-      var t = tileAt(r, c);
-      if (board[r][c] === -1) {
-        if (t) { t.className = "tile"; t.style.opacity = "0"; }
-      } else {
-        if (t) t.className = "tile c" + (board[r][c]+1);
-      }
-    }
-  }
-  setTimeout(function() {
-    for (var c=0; c<cols; c++) {
-      for (var r=0; r<rows; r++) {
-        if (board[r][c] === -1) {
-          board[r][c] = randColor();
-          var t = tileAt(r, c);
-          if (t) {
-            t.className = "tile c" + (board[r][c]+1);
-            t.style.opacity = "1";
-            t.style.transform = "scale(0.7)";
-            (function(tt){ setTimeout(function(){ tt.style.transform = ""; }, 80); })(t);
-          }
-        }
-      }
-    }
-    if (typeof cb === "function") cb();
-  }, 120);
-}
-
-function checkEndConditions() {
-  if (score >= targetScore) {
-    onWin();
-    return;
-  }
-  if (moves <= 0) {
-    onLose();
-  }
-}
-
-function onWin() {
-  toast("Level " + currentLevel + " complete!");
-  var nextLevel = currentLevel + 1;
-  if (nextLevel > highestLevel) highestLevel = nextLevel;
-  currentLevel = nextLevel;
-  saveProgress();
-  setTimeout(function() {
-    toast("Proceeding to Level " + nextLevel);
-    renderMap();
-    startLevel(currentLevel);
-  }, 800);
-}
-
-function onLose() {
-  toast("You lost! -1 energy");
-  energy = Math.max(0, energy - 1);
-  lastEnergyTimestamp = Date.now();
-  saveProgress();
-  updateEnergyTick();
-  renderMap();
-}
-
-function updatePowerupButtons() {
-  var ids=["pHammer","pCross","pColor"];
-  for (var i=0;i<ids.length;i++) {
-    document.getElementById(ids[i]).classList.remove("active");
-  }
-  if (activePowerup==="hammer") document.getElementById("pHammer").classList.add("active");
-  if (activePowerup==="cross") document.getElementById("pCross").classList.add("active");
-  if (activePowerup==="color") document.getElementById("pColor").classList.add("active");
-}
-
-document.getElementById("pHammer").onclick = function() {
-  if (invHammer<=0) { toast("No Hammer available"); return; }
-  activePowerup = (activePowerup==="hammer"? null : "hammer");
-  updatePowerupButtons();
-};
-document.getElementById("pCross").onclick = function() {
-  if (invCross<=0) { toast("No Cross Blast available"); return; }
-  activePowerup = (activePowerup==="cross"? null : "cross");
-  updatePowerupButtons();
-};
-document.getElementById("pColor").onclick = function() {
-  if (invColor<=0) { toast("No Color Nuke available"); return; }
-  activePowerup = (activePowerup==="color"? null : "color");
-  updatePowerupButtons();
-};
-
-function usePowerupOn(r, c) {
-  if (isResolving) return;
-  if (activePowerup==="hammer" && invHammer>0) {
-    invHammer--; setHUD(); saveProgress();
-    var cells = [{r:r,c:c}];
-    isResolving=true;
-    resolveChain(cells,1,function(){isResolving=false; checkEndConditions();});
-    toast("Hammer used");
-  } else if (activePowerup==="cross" && invCross>0) {
-    invCross--; setHUD(); saveProgress();
-    var cells=[];
-    for (var cc=0; cc<cols; cc++) cells.push({r:r,c:cc});
-    for (var rr=0; rr<rows; rr++) cells.push({r:rr,c:c});
-    var seen={}, uniq=[];
-    for (var i=0;i<cells.length;i++){ var k=cells[i].r+"_"+cells[i].c; if(!seen[k]){seen[k]=1;uniq.push(cells[i]);}}
-    isResolving=true;
-    resolveChain(uniq,1,function(){isResolving=false; checkEndConditions();});
-    toast("Cross Blast used");
-  } else if (activePowerup==="color" && invColor>0) {
-    invColor--; setHUD(); saveProgress();
-    var color=board[r][c];
-    var cells=[];
-    for (var rr=0; rr<rows; rr++) for (var cc=0; cc<cols; cc++) if (board[rr][cc]===color) cells.push({r:rr,c:cc});
-    isResolving=true;
-    resolveChain(cells,1,function(){isResolving=false; checkEndConditions();});
-    toast("Color Nuke used");
-  }
-  activePowerup=null; updatePowerupButtons();
-}
-
-document.getElementById("freeHint").onclick = function() {
-  if (isResolving) return;
-  var move = findAnyGoodMove();
-  if (!move) { toast("No hint found. Try shuffle."); return; }
-  var a=tileAt(move.a.r, move.a.c);
-  var b=tileAt(move.b.r, move.b.c);
-  if (a) a.classList.add("sel");
-  if (b) b.classList.add("sel");
-  setTimeout(function(){ if(a) a.classList.remove("sel"); if(b) b.classList.remove("sel"); },900);
-};
-
-function findAnyGoodMove() {
-  for (var r=0;r<rows;r++){
-    for (var c=0;c<cols;c++){
-      var here={r:r,c:c};
-      var nb=[{r:r,c:c+1},{r:r+1,c:c}];
-      for (var n=0;n<nb.length;n++){
-        var p=nb[n]; if (p.r>=rows||p.c>=cols) continue;
-        swap(here.r,here.c,p.r,p.c);
-        var d=findMatchesDetailed();
-        swap(here.r,here.c,p.r,p.c);
-        if (d.cells.length>0) return {a:here,b:p};
-      }
-    }
-  }
-  return null;
-}
-
-document.getElementById("prevPage").onclick = function() {
-  if (mapWindowStart > 1) {
-    mapWindowStart = Math.max(1, mapWindowStart - mapWindowSize);
-    saveProgress();
-    renderMap();
-  }
-};
-document.getElementById("nextPage").onclick = function() {
-  mapWindowStart += mapWindowSize;
-  saveProgress();
-  renderMap();
-};
-
-document.getElementById("btnRestart").onclick = function() {
-  if (energy <= 0) {
-    toast("You have no more energy to play. Please wait for it to refill.");
-    return;
-  }
-  toast("Restarting level " + currentLevel);
-  startLevel(currentLevel);
-};
-
-document.getElementById("btnShuffle").onclick = function() {
-  if (isResolving) return;
-  if (moves <= 0) { toast("No moves left."); return; }
-  moves = Math.max(0, moves - 1);
-  var flat = [];
-  for (var r=0; r<rows; r++) for (var c=0; c<cols; c++) flat.push(board[r][c]);
-  for (var i=flat.length-1; i>0; i--) {
-    var j = Math.floor(Math.random() * (i+1));
-    var t = flat[i]; flat[i] = flat[j]; flat[j] = t;
-  }
-  var k=0;
-  for (var rr=0; rr<rows; rr++) for (var cc=0; cc<cols; cc++) board[rr][cc]=flat[k++];
-  renderBoard();
-  setHUD();
-  var d=findMatchesDetailed();
-  if (d.cells.length>0) {
-    isResolving=true;
-    resolveChain(d.cells,1,function(){isResolving=false; checkEndConditions();});
-  } else {
-    checkEndConditions();
-  }
-};
-
-document.getElementById("creditsBtn").onclick = function() {
-  document.getElementById("creditsModal").classList.add("open");
-};
-document.getElementById("creditsClose").onclick = function() {
-  document.getElementById("creditsModal").classList.remove("open");
-};
-
-var pendingReward = null;
-document.getElementById("watchAdEnergy").onclick = function() {
-  if (energy >= maxEnergy) { toast("Energy already full"); return; }
-  openReward("energy");
-};
-document.getElementById("watchAdPower").onclick = function() {
-  openReward("power");
-};
-
-function openReward(kind) {
-  pendingReward=kind;
-  document.getElementById("rewardModal").classList.add("open");
-  startRewardCountdown(15);
-}
-document.getElementById("rewardClose").onclick = function() {
-  document.getElementById("rewardModal").classList.remove("open");
-  pendingReward=null;
-};
-document.getElementById("btnClaimReward").onclick = function() {
-  if (!pendingReward) return;
-  if (pendingReward==="energy") {
-    energy=Math.min(maxEnergy, energy+1);
-    toast("+1 Energy");
-  } else if (pendingReward==="power") {
-    var roll=Math.random();
-    if (roll<0.34) { invHammer++; toast("+1 Hammer"); }
-    else if (roll<0.67) { invCross++; toast("+1 Cross"); }
-    else { invColor++; toast("+1 Color Nuke"); }
-  }
-  setHUD(); saveProgress(); updateEnergyTick();
-  pendingReward=null;
-  document.getElementById("rewardModal").classList.remove("open");
-};
-function startRewardCountdown(t) {
-  var seconds=t;
-  var timerEl=document.getElementById("rewardTimer");
-  var claimBtn=document.getElementById("btnClaimReward");
-  claimBtn.disabled=true;
-  timerEl.textContent=seconds+"s";
-  var intv=setInterval(function(){
-    seconds--;
-    if (seconds<=0) {
-      clearInterval(intv);
-      timerEl.textContent="Done"; claimBtn.disabled=false;
-    } else {
-      timerEl.textContent=seconds+"s";
-    }
-  },1000);
-}
-
-function initUI() {
-  initMusicOnLoad();
-  renderMap();
-  startLevel(currentLevel);
-}
-
-loadProgress();
-updateEnergyTick();
-setHUD();
-initUI();
-
-</script>
-  
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4433722838067397"
-     crossorigin="anonymous"></script>
+<canvas id="viewport" width="640" height="480"></canvas>
 </body>
 </html>
