@@ -1,62 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ferkenne Maps!</title>
-    <link rel="icon" href="/new-swc.png" type="image/png" />
-  <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <link rel="icon" href="/new-swc.png" type="image/png"/>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet"/>
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Cesium.js"></script>
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
-    #cesiumContainer {
-      width: 100%;
-      height: 100vh;
-      display: block;
-    }
+    body, html { margin: 0; padding: 0; overflow: hidden; }
+    #cesiumContainer { width: 100%; height: 100vh; display: block; }
     #routeForm {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 2;
-      background: rgba(255,255,255,0.9);
-      padding: 10px;
-      border-radius: 5px;
-      font-family: sans-serif;
+      position: absolute; top: 10px; left: 10px; z-index: 2;
+      background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px; font-family: sans-serif;
     }
-    #routeForm input, #routeForm button {
-      margin: 5px 0;
-      padding: 5px;
-      width: 200px;
+    #routeForm input, #routeForm button, #routeForm select {
+      margin: 5px 0; padding: 6px; width: 220px;
+    }
+    #controls {
+      position: absolute; top: 220px; left: 10px; z-index: 2;
+      background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px; font-family: sans-serif; width: 280px;
     }
     #instructions {
-      position: absolute;
-      top: 120px;
-      left: 10px;
-      z-index: 2;
-      background: rgba(255,255,255,0.9);
-      padding: 10px;
-      border-radius: 5px;
-      font-family: sans-serif;
-      width: 250px;
+      position: absolute; top: 350px; left: 10px; z-index: 2;
+      background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px; font-family: sans-serif; width: 300px;
     }
+    #instructions select { width: 100%; height: 160px; }
     footer {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(0,0,0,0.5);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 12px;
+      position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.5);
+      color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px;
     }
-    footer a {
-      color: #00ffff;
-    }
+    footer a { color: #00ffff; }
+    .row { display: flex; gap: 8px; align-items: center; }
   </style>
 </head>
 <body>
@@ -64,57 +39,181 @@
 
   <!-- Route form -->
   <form id="routeForm">
-    <label>Start: <input type="text" id="startLocation" placeholder="e.g. Berlin"></label><br>
-    <label>End: <input type="text" id="endLocation" placeholder="e.g. Munich"></label><br>
-    <button type="submit">Get Route</button>
+    <div class="row">
+      <label style="flex:1">Start:
+        <input type="text" id="startLocation" placeholder="e.g. Berlin or lat,lon"/>
+      </label>
+      <button id="locBtn" type="button" title="Use your GPS">📍 Your Location</button>
+    </div>
+    <label>End:
+      <input type="text" id="endLocation" placeholder="e.g. Munich or lat,lon"/>
+    </label>
+    <label>Mode:
+      <select id="mode">
+        <option value="driving-car">🚗 Car</option>
+        <option value="foot-walking">🚶 Walking</option>
+        <option value="cycling-regular">🚴 Cycling</option>
+        <option value="transit">🚌 Mass transit (experimental)</option>
+      </select>
+    </label>
+    <button id="routeBtn" type="submit">Get Route</button>
   </form>
 
-  <!-- Dropdown for instructions -->
+  <!-- Controls -->
+  <div id="controls">
+    <div class="row">
+      <button id="startNavBtn" type="button">▶️ Start navigation</button>
+      <button id="stopNavBtn" type="button">⏹ Stop</button>
+    </div>
+    <div class="row">
+      <label style="flex:1">Voice:
+        <select id="voiceRate">
+          <option value="0.9">Slow</option>
+          <option value="1.0" selected>Normal</option>
+          <option value="1.2">Fast</option>
+        </select>
+      </label>
+      <label style="flex:1">Units:
+        <select id="units">
+          <option value="metric" selected>Metric</option>
+          <option value="imperial">Imperial</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <!-- Turn-by-turn list (read-only preview) -->
   <div id="instructions">
-    <label for="stepsDropdown">Turn-by-turn:</label><br>
-    <select id="stepsDropdown" size="8" style="width:100%"></select><br>
-    <button id="speakBtn" type="button">🔊 Speak Selected</button>
+    <label for="stepsDropdown">Turn-by-turn (preview):</label><br/>
+    <select id="stepsDropdown" size="8"></select>
   </div>
 
   <footer>
     <p>&copy; <span id="year"></span> Stenoip Company. All rights reserved.</p>
-    <p>Powered by <a href="https://cesium.com/platform/cesiumjs/" target="_blank">CesiumJS</a> and 
+    <p>Powered by <a href="https://cesium.com/platform/cesiumjs/" target="_blank">CesiumJS</a> and
        <a href="https://openrouteservice.org/" target="_blank">OpenRouteService</a>.</p>
   </footer>
 
   <script>
     // Cesium Access Token
-    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MDQ0YmNjMy02NDI5LTRjYTItOWZhYS0wYmMxMWVkOGI5MjMiLCJpZCI6MjUyODUxLCJpYXQiOjE3MzA3NjM3MTB9.pi4kOnQvSmZxTAkOELqnouNQi7cVnvJAq7WUWfX-sek';
+    Cesium.Ion.defaultAccessToken =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MDQ0YmNjMy02NDI5LTRjYTItOWZhYS0wYmMxMWVkOGI5MjMiLCJpZCI6MjUyODUxLCJpYXQiOjE3MzA3NjM3MTB9.pi4kOnQvSmZxTAkOELqnouNQi7cVnvJAq7WUWfX-sek';
 
     // Initialize Cesium Viewer
     const viewer = new Cesium.Viewer('cesiumContainer', {
       terrainProvider: Cesium.createWorldTerrain(),
-      locale: 'en-GB'
+      locale: 'en-GB',
+      animation: false,
+      timeline: false
     });
+    viewer.scene.globe.depthTestAgainstTerrain = true;
 
     // ORS API key
-    const apiKey = "5b3ce3597851110001cf6248fd6c09a7da6740f4a155af5b0314ddc4";
+    const apiKey = '5b3ce3597851110001cf6248fd6c09a7da6740f4a155af5b0314ddc4';
 
-    // Geocode function using Nominatim (free OSM geocoder)
+    // State
+    let currentRouteGeoJson = null;
+    let currentSteps = [];
+    let navTimer = null;
+    let carEntity = null;
+    let routePositions = [];
+    let stepAlerts = []; // track which steps have announced pre-turn and turn
+    let simulatedIndex = 0;
+
+    // Utilities
+    function parseLatLon(text) {
+      // Accept "lat,lon" or "lon,lat" heuristically; default to lat,lon
+      if (!text) return null;
+      const m = text.trim().split(',');
+      if (m.length !== 2) return null;
+      const a = parseFloat(m[0]), b = parseFloat(m[1]);
+      if (Number.isNaN(a) || Number.isNaN(b)) return null;
+      // If |a| <= 90 and |b| <= 180, treat as lat,lon; else lon,lat
+      if (Math.abs(a) <= 90 && Math.abs(b) <= 180) return [b, a]; // return [lon, lat]
+      return [a, b];
+    }
+
     async function geocode(place) {
+      // If user provided coordinates, skip geocoding
+      const coords = parseLatLon(place);
+      if (coords) return coords;
+
       const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.length > 0) {
         return [parseFloat(data[0].lon), parseFloat(data[0].lat)]; // [lng, lat]
       } else {
-        throw new Error("Location not found: " + place);
+        throw new Error('Location not found: ' + place);
       }
     }
 
-    // Handle form submission
-    document.getElementById("routeForm").addEventListener("submit", async (e) => {
+    // Haversine distance in meters
+    function distanceMeters(lon1, lat1, lon2, lat2) {
+      const R = 6371000;
+      const toRad = (d) => d * Math.PI / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function formatDistance(meters) {
+      const units = document.getElementById('units').value;
+      if (units === 'imperial') {
+        const feet = meters * 3.28084;
+        if (feet < 1000) return `${Math.round(feet)} feet`;
+        const miles = meters / 1609.344;
+        return `${miles < 1 ? (miles.toFixed(2)) : Math.round(miles)} miles`;
+      } else {
+        if (meters < 1000) return `${Math.round(meters)} metres`;
+        const km = meters / 1000;
+        return `${km < 1 ? (km.toFixed(2)) : Math.round(km)} km`;
+      }
+    }
+
+    // Speech
+    function speak(text) {
+      if (!text) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.pitch = 0.95;
+      utterance.rate = parseFloat(document.getElementById('voiceRate').value || '1.0');
+      speechSynthesis.speak(utterance);
+    }
+
+    // "Your Location" button
+    document.getElementById('locBtn').addEventListener('click', () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const coords = [pos.coords.longitude, pos.coords.latitude];
+          document.getElementById('startLocation').value = `${coords[1]},${coords[0]}`;
+          // Fly camera to current location
+          const p = Cesium.Cartesian3.fromDegrees(coords[0], coords[1], 500);
+          viewer.camera.flyTo({ destination: p, orientation: { pitch: Cesium.Math.toRadians(-30) }});
+        }, (err) => alert('Geolocation error: ' + err.message), {
+          enableHighAccuracy: true, timeout: 8000, maximumAge: 2000
+        });
+      } else {
+        alert('Geolocation not supported.');
+      }
+    });
+
+    // Handle form submission: fetch route
+    document.getElementById('routeForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const startPlace = document.getElementById("startLocation").value;
-      const endPlace = document.getElementById("endLocation").value;
+      stopNavigation();
+
+      const startPlace = document.getElementById('startLocation').value;
+      const endPlace = document.getElementById('endLocation').value;
+      const modeSel = document.getElementById('mode').value;
 
       if (!startPlace || !endPlace) {
-        alert("Please enter both start and end locations.");
+        alert('Please enter both start and end locations.');
         return;
       }
 
@@ -122,15 +221,23 @@
         const startCoords = await geocode(startPlace);
         const endCoords = await geocode(endPlace);
 
-        const orsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.join(",")}&end=${endCoords.join(",")}`;
+        // Map "transit" (experimental) to walking for now
+        const profile = (modeSel === 'transit') ? 'foot-walking' : modeSel;
+        const orsUrl = `https://api.openrouteservice.org/v2/directions/${profile}` +
+                       `?api_key=${apiKey}&start=${startCoords.join(',')}&end=${endCoords.join(',')}`;
 
         const res = await fetch(orsUrl);
         const data = await res.json();
 
-        // Clear old routes
+        if (!data.features || data.features.length === 0) throw new Error('No route found.');
+
+        currentRouteGeoJson = data;
+
+        // Clear old routes/entities
+        viewer.entities.removeAll();
         viewer.dataSources.removeAll();
 
-        // Load new route
+        // Draw route line
         Cesium.GeoJsonDataSource.load(data, {
           stroke: Cesium.Color.RED,
           strokeWidth: 6,
@@ -140,37 +247,229 @@
           viewer.flyTo(ds);
         });
 
-        // Populate dropdown with steps
-        const stepsDropdown = document.getElementById("stepsDropdown");
-        stepsDropdown.innerHTML = ""; // clear old
-        const steps = data.features[0].properties.segments[0].steps;
-        steps.forEach((step, i) => {
-          const option = document.createElement("option");
-          option.value = step.instruction;
-          option.textContent = `${i+1}. ${step.instruction}`;
-          stepsDropdown.appendChild(option);
-        });
+        // Extract geometry coordinates (lon,lat)
+        routePositions = data.features[0].geometry.coordinates.map(c => ({ lon: c[0], lat: c[1] }));
+
+        // Extract steps
+        currentSteps = (data.features[0].properties?.segments?.[0]?.steps) || [];
+        populateStepsDropdown(currentSteps);
+        stepAlerts = currentSteps.map(() => ({ pre: false, turn: false }));
+
+        // Optionally add start/end markers
+        addMarker(startCoords, 'Start');
+        addMarker(endCoords, 'End');
+
+        // If car mode, pre-create car entity at start
+        if (modeSel === 'driving-car') {
+          setupCarEntity(routePositions[0]);
+        } else {
+          carEntity = null; // no car for non-driving modes
+        }
 
       } catch (err) {
         console.error(err);
-        alert("Error: " + err.message);
+        alert('Error: ' + err.message);
       }
     });
 
-    // Speak selected instruction
-    document.getElementById("speakBtn").addEventListener("click", () => {
-      const dropdown = document.getElementById("stepsDropdown");
-      const text = dropdown.value;
-      if (text) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "en-US";
-        utterance.pitch = 0.8; // lower pitch for robotic feel
-        utterance.rate = 0.9;  // slower pace
-        speechSynthesis.speak(utterance);
-      } else {
-        alert("Please select an instruction to speak.");
+    function populateStepsDropdown(steps) {
+      const stepsDropdown = document.getElementById('stepsDropdown');
+      stepsDropdown.innerHTML = '';
+      steps.forEach((step, i) => {
+        const option = document.createElement('option');
+        option.value = step.instruction;
+        option.textContent = `${i + 1}. ${step.instruction}`;
+        stepsDropdown.appendChild(option);
+      });
+    }
+
+    function addMarker(lonlat, label) {
+      const [lon, lat] = lonlat;
+      viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(lon, lat),
+        point: { pixelSize: 8, color: Cesium.Color.AQUA },
+        label: { text: label, font: '14px sans-serif', fillColor: Cesium.Color.WHITE, pixelOffset: new Cesium.Cartesian2(0, -20) }
+      });
+    }
+
+    // 3D car arrow entity, camera follow
+    function setupCarEntity(startPos) {
+      // Use a simple arrow billboard to represent car
+      carEntity = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(startPos.lon, startPos.lat, 5),
+        billboard: {
+          image: 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+              <polygon points="32,4 44,32 32,28 20,32" fill="#00aaff" stroke="#004466" stroke-width="2"/>
+              <rect x="26" y="32" width="12" height="24" fill="#005f99" stroke="#00384d" stroke-width="2"/>
+            </svg>
+          `),
+          scale: 1.0,
+          rotation: 0.0,
+          alignedAxis: Cesium.Cartesian3.UNIT_Z,
+          heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+        }
+      });
+
+      // Switch scene to a low-altitude 3D driving view
+      viewer.scene.morphTo3D();
+      viewer.scene.screenSpaceCameraController.enableTilt = true;
+
+      const camPos = Cesium.Cartesian3.fromDegrees(startPos.lon, startPos.lat, 120);
+      viewer.camera.flyTo({
+        destination: camPos,
+        orientation: {
+          heading: Cesium.Math.toRadians(0),
+          pitch: Cesium.Math.toRadians(-25),
+          roll: 0
+        },
+        duration: 1.2
+      });
+    }
+
+    function updateCarEntity(posA, posB) {
+      if (!carEntity) return;
+      const position = Cesium.Cartesian3.fromDegrees(posA.lon, posA.lat, 5);
+      carEntity.position = position;
+
+      // Compute heading from A to B for arrow rotation
+      const heading = bearingDegrees(posA.lat, posA.lon, posB.lat, posB.lon);
+      carEntity.billboard.rotation = Cesium.Math.toRadians(heading);
+
+      // Camera follow with slight offset ahead
+      const ahead = Cesium.Cartesian3.fromDegrees(posA.lon, posA.lat, 120);
+      viewer.camera.flyTo({
+        destination: ahead,
+        orientation: {
+          heading: Cesium.Math.toRadians(heading),
+          pitch: Cesium.Math.toRadians(-25),
+          roll: 0
+        },
+        duration: 0.8
+      });
+    }
+
+    // Bearing between two points in degrees
+    function bearingDegrees(lat1, lon1, lat2, lon2) {
+      const toRad = d => d * Math.PI / 180;
+      const toDeg = r => r * 180 / Math.PI;
+      const dLon = toRad(lon2 - lon1);
+      const y = Math.sin(dLon) * Math.cos(toRad(lat2));
+      const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+                Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
+      const brng = toDeg(Math.atan2(y, x));
+      return (brng + 360) % 360;
+    }
+
+    // Navigation control
+    document.getElementById('startNavBtn').addEventListener('click', () => {
+      if (!currentRouteGeoJson || routePositions.length < 2) {
+        alert('No route to navigate. Please get a route first.');
+        return;
       }
+
+      const isCar = document.getElementById('mode').value === 'driving-car';
+      if (isCar && !carEntity) {
+        setupCarEntity(routePositions[0]);
+      }
+
+      // Start simulated navigation along the route
+      startNavigation();
     });
+
+    document.getElementById('stopNavBtn').addEventListener('click', stopNavigation);
+
+    function startNavigation() {
+      stopNavigation(); // reset if running
+      simulatedIndex = 0;
+      stepAlerts = currentSteps.map(() => ({ pre: false, turn: false }));
+
+      // Initial instruction
+      if (currentSteps[0] && currentSteps[0].instruction) {
+        speak(currentSteps[0].instruction);
+      }
+
+      // Move every second; adjust speed by mode
+      const mode = document.getElementById('mode').value;
+      const speedMetersPerSec = (mode === 'driving-car') ? 17 : (mode === 'cycling-regular' ? 6 : 1.4); // ~60km/h, 21km/h, 5km/h
+
+      navTimer = setInterval(() => {
+        if (simulatedIndex >= routePositions.length - 1) {
+          speak('You have arrived at your destination.');
+          stopNavigation();
+          return;
+        }
+
+        // Advance by step proportional to speed and segment length
+        const curr = routePositions[simulatedIndex];
+        const next = routePositions[simulatedIndex + 1];
+        const segLen = distanceMeters(curr.lon, curr.lat, next.lon, next.lat);
+
+        // Skip faster through small segments to approximate speed
+        const stepsToAdvance = Math.max(1, Math.floor((speedMetersPerSec / Math.max(segLen, 1)) * 5));
+        simulatedIndex = Math.min(routePositions.length - 2, simulatedIndex + stepsToAdvance);
+
+        const posA = routePositions[simulatedIndex];
+        const posB = routePositions[Math.min(routePositions.length - 1, simulatedIndex + 1)];
+
+        // Update car entity and camera
+        if (document.getElementById('mode').value === 'driving-car') {
+          updateCarEntity(posA, posB);
+        }
+
+        // Check upcoming maneuvers and speak
+        checkAndSpeakGuidance(posA);
+
+      }, 1000);
+    }
+
+    function stopNavigation() {
+      if (navTimer) {
+        clearInterval(navTimer);
+        navTimer = null;
+      }
+    }
+
+    // Guidance logic: speak "In 500 metres, turn left", then "Turn left"
+    function checkAndSpeakGuidance(currentPos) {
+      if (!currentSteps || currentSteps.length === 0) return;
+
+      // ORS steps have way_points: [startIndex, endIndex] referencing geometry indices
+      currentSteps.forEach((step, i) => {
+        const wp = step.way_points || step.wayPoints || null;
+        if (!wp || wp.length < 2) return;
+
+        const endIdx = wp[1];
+        const target = routePositions[Math.min(endIdx, routePositions.length - 1)];
+        const dist = distanceMeters(currentPos.lon, currentPos.lat, target.lon, target.lat);
+
+        // Pre-turn alert threshold
+        const preThreshold = 500; // metres
+        // Turn threshold
+        const turnThreshold = 50; // metres
+
+        // "In 500 metres, ..."
+        if (!stepAlerts[i].pre && dist <= preThreshold && dist > turnThreshold) {
+          const dText = formatDistance(500);
+          speak(`In ${dText}, ${normalizeInstruction(step.instruction)}`);
+          stepAlerts[i].pre = true;
+        }
+
+        // "Turn left/right/..." when close
+        if (!stepAlerts[i].turn && dist <= turnThreshold) {
+          speak(`${normalizeInstruction(step.instruction)}`);
+          stepAlerts[i].turn = true;
+        }
+      });
+    }
+
+    function normalizeInstruction(instr) {
+      if (!instr) return '';
+      // Keep concise: transform "Turn left onto Main Street" -> "Turn left onto Main Street"
+      // If instruction starts with "Continue" or "Head", preserve it.
+      return instr.replace(/^Go\s+straight/i, 'Continue straight')
+                  .replace(/\bmetres\b/gi, 'meters'); // minor normalization
+    }
 
     // Update footer year
     document.getElementById('year').textContent = new Date().getFullYear();
