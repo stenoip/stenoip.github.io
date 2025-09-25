@@ -10,6 +10,30 @@ window.onload = function() {
     var canvas = document.getElementById("viewport");
     var context = canvas.getContext("2d");
 
+    // Audio Elements
+    var bgMusic = document.getElementById("bg-music");
+    var swapSound = new Audio("https://stenoip.github.io/games/octogon-assets/whistle-slide-down-02-350715.mp3");
+    var matchSound = new Audio("https://stenoip.github.io/games/octogon-assets/large-break-363165.mp3");
+    var levelUpSound = new Audio("https://stenoip.github.io/games/octogon-assets/level_up_sfx.mp3");
+    var gameOverSound = new Audio("https://stenoip.github.io/games/octogon-assets/game-over-31-179699.mp3");
+
+    // Load and play music from localStorage
+    if (localStorage.getItem('musicTime')) {
+        bgMusic.currentTime = localStorage.getItem('musicTime');
+    }
+    bgMusic.play().catch(e => console.log("Music play blocked: ", e));
+
+    // Save music time before reload/close
+    window.addEventListener('beforeunload', () => {
+        localStorage.setItem('musicTime', bgMusic.currentTime);
+    });
+
+    // Play a sound effect
+    function playSound(sound) {
+        sound.currentTime = 0;
+        sound.play().catch(e => console.log("Sound effect blocked: ", e));
+    }
+
     // Timing and frames per second
     var lastframe = 0;
     var fpstime = 0;
@@ -31,15 +55,15 @@ window.onload = function() {
         selectedtile: { selected: false, column: 0, row: 0 }
     };
 
-    // Level progression
-    var levels = [
-       //level1
-       { moves: 30, scoreTarget: 1000 },
-       //level2
-       { moves: 25, scoreTarget: 1500 },
-       //level3
-       { moves: 20, scoreTarget: 2500 },
-        // Add more levels here
+   /*This is where you add
+   
+   LEVELS!
+   */
+  var levels = [
+        { moves: 30, scoreTarget: 1000 },
+        { moves: 25, scoreTarget: 1500 },
+        { moves: 20, scoreTarget: 2500 },
+     
     ];
     var currentLevel = 0;
     var movesRemaining = levels[currentLevel].moves;
@@ -90,7 +114,7 @@ window.onload = function() {
     var aibot = false;
 
     // Gui buttons
-    var buttons = [
+   var buttons = [
         { x: 30, y: 330, width: 150, height: 50, text: "New Game" },
         { x: 30, y: 380, width: 150, height: 50, text: "Show Moves" },
         
@@ -144,9 +168,11 @@ window.onload = function() {
                 findMoves();
                 if (moves.length === 0) {
                     gameOver = true;
+                    playSound(gameOverSound);
                 }
-            } else if (score >= levels[currentLevel].scoreTarget) {
+            } else if (score >= levels[currentLevel].scoreTarget && !levelComplete) {
                 levelComplete = true;
+                playSound(levelUpSound);
             }
 
             // Let the AI bot make a move, if enabled
@@ -173,6 +199,7 @@ window.onload = function() {
                             score += 100 * (clusters[i].length - 2);
                         }
                         removeClusters();
+                        playSound(matchSound);
                         animationstate = 1;
                     } else {
                         gamestate = gamestates.ready;
@@ -196,6 +223,7 @@ window.onload = function() {
                     swap(currentmove.column1, currentmove.row1, currentmove.column2, currentmove.row2);
                     findClusters();
                     if (clusters.length > 0) {
+                        playSound(swapSound);
                         animationstate = 0;
                         animationtime = 0;
                         gamestate = gamestates.resolve;
@@ -572,15 +600,14 @@ window.onload = function() {
                         } else if (matchlength === 3) {
                             // Check for L/T shape here
                             let isLorT = false;
-                            // Check for vertical extension on the left
-                            if (i + 1 - matchlength > 0 && j < level.rows - 2 && level.tiles[i + 1 - matchlength - 1][j].type === level.tiles[i][j].type && level.tiles[i + 1 - matchlength - 1][j+1].type === level.tiles[i][j].type) {
-                                isLorT = true;
-                                level.tiles[i][j].special = TILE_TYPE.BOMB;
+                            // Check for vertical extension
+                            if (j > 0 && j < level.rows - 1) {
+                                if (level.tiles[i][j-1].type === level.tiles[i+1-matchlength][j].type && level.tiles[i][j+1].type === level.tiles[i+1-matchlength][j].type) {
+                                    isLorT = true;
+                                }
                             }
-                            // Check for vertical extension on the right
-                            if (i < level.columns-1 && j < level.rows - 2 && level.tiles[i][j].type === level.tiles[i][j+1].type && level.tiles[i][j].type === level.tiles[i][j+2].type) {
-                                isLorT = true;
-                                level.tiles[i][j].special = TILE_TYPE.BOMB;
+                            if (isLorT) {
+                                level.tiles[i + 1 - matchlength][j].special = TILE_TYPE.BOMB;
                             }
                         }
                         
@@ -611,6 +638,18 @@ window.onload = function() {
                             level.tiles[i][j + 1 - matchlength].special = TILE_TYPE.COLOR_BOMB;
                         } else if (matchlength === 4) {
                             level.tiles[i][j + 1 - matchlength].special = TILE_TYPE.STRIPED_V;
+                        } else if (matchlength === 3) {
+                            // Check for L/T shape here
+                            let isLorT = false;
+                            // Check for horizontal extension
+                            if (i > 0 && i < level.columns - 1) {
+                                if (level.tiles[i-1][j].type === level.tiles[i][j+1-matchlength].type && level.tiles[i+1][j].type === level.tiles[i][j+1-matchlength].type) {
+                                    isLorT = true;
+                                }
+                            }
+                            if (isLorT) {
+                                level.tiles[i][j+1-matchlength].special = TILE_TYPE.BOMB;
+                            }
                         }
                         clusters.push({ column: i, row: j + 1 - matchlength, length: matchlength, horizontal: false });
                     }
@@ -663,44 +702,44 @@ window.onload = function() {
     }
 
     function removeClusters() {
-        let tilesToRemove = [];
+        let tilesToRemove = new Set();
         
         loopClusters(function(index, column, row, cluster) {
             let tile = level.tiles[column][row];
             if (tile.special === TILE_TYPE.BOMB) {
-                // Find all tiles in a 3x3 area
                 for (let c = column - 1; c <= column + 1; c++) {
                     for (let r = row - 1; r <= row + 1; r++) {
                         if (c >= 0 && c < level.columns && r >= 0 && r < level.rows) {
-                            tilesToRemove.push({ col: c, row: r });
+                            tilesToRemove.add(`${c},${r}`);
                         }
                     }
                 }
             } else if (tile.special === TILE_TYPE.STRIPED_H) {
                 for (let c = 0; c < level.columns; c++) {
-                    tilesToRemove.push({ col: c, row: row });
+                    tilesToRemove.add(`${c},${row}`);
                 }
             } else if (tile.special === TILE_TYPE.STRIPED_V) {
                 for (let r = 0; r < level.rows; r++) {
-                    tilesToRemove.push({ col: column, row: r });
+                    tilesToRemove.add(`${column},${r}`);
                 }
             } else if (tile.special === TILE_TYPE.COLOR_BOMB) {
                 let colorToRemove = tile.type;
                 for (let c = 0; c < level.columns; c++) {
                     for (let r = 0; r < level.rows; r++) {
                         if (level.tiles[c][r].type === colorToRemove) {
-                            tilesToRemove.push({ col: c, row: r });
+                            tilesToRemove.add(`${c},${r}`);
                         }
                     }
                 }
             } else {
-                tilesToRemove.push({ col: column, row: row });
+                tilesToRemove.add(`${column},${row}`);
             }
         });
-        
-        tilesToRemove.forEach(tilePos => {
-            level.tiles[tilePos.col][tilePos.row].type = TILE_TYPE.EMPTY;
-            level.tiles[tilePos.col][tilePos.row].special = null;
+
+        tilesToRemove.forEach(pos => {
+            let [c, r] = pos.split(',').map(Number);
+            level.tiles[c][r].type = TILE_TYPE.EMPTY;
+            level.tiles[c][r].special = null;
         });
 
         for (var i = 0; i < level.columns; i++) {
@@ -865,5 +904,6 @@ window.onload = function() {
 </head>
 <body>
 <canvas id="viewport" width="640" height="480"></canvas>
+<audio id="bg-music" src="https://stenoip.github.io/games/calming-shapes-125459.mp3" loop></audio>
 </body>
 </html>
