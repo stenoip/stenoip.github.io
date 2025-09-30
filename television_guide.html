@@ -1,151 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Browse our Entertainment and Office Programs(made by coding)</title>
-<link rel="icon" href="/new-swc.png" type="image/png" />
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f7f9fc;
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
+    <meta charset="UTF-8" />
+    <title>Browse our Entertainment and Office Programs(made by coding)</title>
+    <link rel="icon" href="/new-swc.png" type="image/png" />
+    <style>
+        /* --- STAINED GLASS BACKGROUND COLORS --- */
+        :root {
+            --color-black: #1a1a1a;
+            --color-yellow: #ffbf00;
+            --color-green: #38761d;
+            --color-glass-bg: rgba(255, 255, 255, 0.3); /* Translucent background for glass effect */
 
-    h1 {
-      font-size: 1.5rem;
-      color: #2c3e50;
-      margin: 2rem 1rem 1rem;
-    }
+            /* AERO Button Variables (Unchanged) */
+            --bottom-glow: radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.7), transparent);
+            --stripes: none; /* Striped background removed for glass effect */
+        }
 
-    p {
-      margin: 1rem;
-      font-size: 1rem;
-    }
+        /* --- GLASSY BODY BACKGROUND --- */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #fff; /* Changed to white for better contrast on dark/colorful background */
+            min-height: 100vh;
+            /* Layered gradients for a stained-glass appearance */
+            background-color: var(--color-black); /* Fallback */
+            background-image:
+                /* Black diagonal stripes (lead lines) */
+                linear-gradient(45deg, var(--color-black) 25%, transparent 25%, transparent 50%, var(--color-black) 50%, var(--color-black) 75%, transparent 75%, transparent),
+                linear-gradient(-45deg, var(--color-black) 25%, transparent 25%, transparent 50%, var(--color-black) 50%, var(--color-black) 75%, transparent 75%, transparent),
+                /* Large color fields (stained glass) */
+                linear-gradient(to top right, var(--color-yellow), var(--color-green)),
+                linear-gradient(to bottom left, var(--color-green), var(--color-yellow));
+            background-size: 100px 100px; /* Size of the "pane" pattern */
+            background-attachment: fixed; /* Ensures the pattern stays put */
+        }
 
-    a {
-      color: #0078D4;
-      text-decoration: none;
-      font-weight: 500;
-    }
+        /* --- GLASS EFFECT CONTAINER STYLING --- */
+        /* Apply the glass effect to the main content blocks */
+        header, li, footer {
+            /* Glassmorphism Effect */
+            background-color: var(--color-glass-bg) !important; /* Semi-transparent color */
+            backdrop-filter: blur(8px); /* Blur the background behind the element */
+            -webkit-backdrop-filter: blur(8px); /* Safari support */
+            border: 1px solid rgba(255, 255, 255, 0.18); /* Light border */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Shadow for depth */
+        }
 
-    a:hover {
-      text-decoration: underline;
-    }
+        /* Re-style Headers for contrast */
+        h1 {
+            font-size: 1.5rem;
+            color: var(--color-yellow); /* Yellow headings */
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+            margin: 2rem 1rem 1rem;
+        }
 
-    ul {
-      list-style: none;
-      padding-left: 1rem;
-      margin-bottom: 2rem;
-    }
+        p {
+            margin: 1rem;
+            font-size: 1rem;
+            color: #eee;
+        }
 
-    li {
-      background: white;
-      margin: 0.3rem 0;
-      padding: 0.5rem 0.75rem;
-      border-radius: 5px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-      transition: background 0.2s;
-    }
+        /* Re-style Links for contrast */
+        a {
+            color: var(--color-yellow); /* Yellow links */
+            text-decoration: none;
+            font-weight: 500;
+        }
 
-    li:hover {
-      background-color: #eaf2ff;
-    }
+        a:hover {
+            text-decoration: underline;
+            color: #fff;
+        }
 
-    header {
-      background-color: #0078D4;
-      color: white;
-      padding: 1.5rem;
-      text-align: center;
-    }
+        /* List Items - Enhance Glass Effect */
+        ul {
+            list-style: none;
+            padding-left: 1rem;
+            margin-bottom: 2rem;
+        }
 
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      background-color: #ecf0f1;
-      margin-top: 2rem;
-    }
-  </style>
+        li {
+            /* Inherits glass style from above selector */
+            color: white; /* Ensure text is visible */
+            margin: 0.5rem 0;
+            padding: 0.75rem 1rem;
+            border-radius: 10px; /* Slightly larger border radius */
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        li:hover {
+            background-color: rgba(255, 255, 255, 0.5) !important; /* More translucent on hover */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Header - Override default background and adjust text */
+        header {
+            background-color: var(--color-glass-bg); /* Use glass color */
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 10px;
+            margin: 20px auto; /* Center and give margin */
+            width: 90%;
+            max-width: 800px;
+        }
+
+        header h1 {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        header p {
+            margin-top: 1rem;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Footer - Enhance Glass Effect */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            background-color: var(--color-glass-bg); /* Use glass color */
+            margin-top: 2rem;
+            color: #eee;
+        }
+
+        /* Ensure content is centered and readable */
+        .content-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+
+        /* AERO BUTTON STYLES (Kept for consistency with the last request) */
+        button.aero {
+            /* Colors */
+            --hue: 245;
+            --button-background: oklch(75% 0.1 var(--hue) / 0.8);
+            --bg-dark: oklch(45% 0.1 var(--hue) / 0.75);
+            --button-foreground: oklch(15% 0.05 var(--hue));
+            /* Style */
+            background-color: var(--button-background);
+            background: var(--bottom-glow), linear-gradient(to bottom, var(--bg-dark), var(--button-background));
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--button-background);
+            border-radius: 9999px;
+            cursor: pointer;
+            margin: 1em 1ex;
+            padding: 1ex 1em;
+            position: relative;
+            text-shadow: 0 2px .5em #0003;
+            transition: all 300ms;
+            /* Text */
+            color: white;
+            font-family: "Lucida Grande", "Lucida Sans Unicode", "Lunasima", sans-serif;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+            display: inline-block;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        button.aero::after {
+            content: "";
+            position: absolute;
+            top: 4%;
+            left: 0.5em;
+            width: calc(100% - 1em);
+            height: 40%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));
+            border-radius: 9999px;
+            transition: background 400ms;
+        }
+
+        button.aero:hover,
+        button.aero:focus {
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        button.aero:active {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            transform: translateY(1px);
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Welcome to the Guide</h1>
-    <p>Explore the various pages on the SWC. Want to find pages faster? Use the quick search on the <a href="index.html" style="color: #fff; text-decoration: underline;">home page</a>.</p>
-  </header>
+    <div class="content-wrapper">
+        <header>
+            <h1>Welcome to the Guide</h1>
+            <p>
+                Explore the various pages on the SWC. Want to find pages faster?
+                <button class="aero" onclick="window.location.href='index.html'">
+                    Use the Quick Search on the Home Page
+                </button>
+            </p>
+        </header>
 
-  <h1><a href="office/home.html">StenoOffices and Office Tools</a></h1>
+        <h1><a href="office/home.html">StenoOffices and Office Tools</a></h1>
+        <li><a href="praterich/index.html">Try Praterich AI</a></li>
 
-  <li><a href="praterich/index.html">Try Praterich AI</a></li>
-  <h1>Programs and Calculators</h1>
-  <ul>
-    <li><a href="calculator_ti30xiis.html">calculator_ti30xiis.html</a></li>
-    <li><a href="calculator_ti84.html">calculator_ti84.html</a></li>
-    <li><a href="kompmasine.html">kompmasine.html</a></li>
-    <li><a href="kompmasine-functions.html">kompmasine-functions.html</a></li>
-    <li><a href="draw.html">draw.html</a></li>
-    <li><a href="count.html">count.html</a></li>
-    <li><a href="gravity.html">gravity.html</a></li>
-    <li><a href="bot.html">bot.html</a></li>
-    <li><a href="box_model.html">box_model.html</a></li>
-    <li><a href="camera.html">camera.html</a></li>
-    <li><a href="maps2d.html">maps2d.html</a></li>
-  </ul>
+        <h1>Programs and Calculators</h1>
+        <ul>
+            <li><a href="calculator_ti30xiis.html">calculator_ti30xiis.html</a></li>
+            <li><a href="calculator_ti84.html">calculator_ti84.html</a></li>
+            <li><a href="kompmasine.html">kompmasine.html</a></li>
+            <li><a href="kompmasine-functions.html">kompmasine-functions.html</a></li>
+            <li><a href="draw.html">draw.html</a></li>
+            <li><a href="count.html">count.html</a></li>
+            <li><a href="gravity.html">gravity.html</a></li>
+            <li><a href="bot.html">bot.html</a></li>
+            <li><a href="box_model.html">box_model.html</a></li>
+            <li><a href="camera.html">camera.html</a></li>
+            <li><a href="maps2d.html">maps2d.html</a></li>
+        </ul>
 
-  <h1>Entertainment</h1>
-  <ul>
-    <li><a href="windows-xp-simulation.html">NEW! Windows-xp-simulation.html</a></li>
-    <li><a href="games/home.html">StenoTOANSTIK ARCADE</a></li>
-    <li><a href="video.html">StenoVids</a></li>
-    <li><a href="video_plus.html">StenoVids Plus</a></li>
-    <li><a href="flappybird.html">FlappyBird</a></li>
-    <li><a href="tetris.html">StenoTetris</a></li>
-    <li><a href="2048.html">2048</a></li>
-    <li><a href="quiz.html">Zuiz Quiz</a></li>
-    <li><a href="pet.html">Talking Pet</a></li>
-      <li><a href="media.html">StenoMedia</a></li>
+        <h1>Entertainment</h1>
+        <ul>
+            <li><a href="windows-xp-simulation.html">NEW! Windows-xp-simulation.html</a></li>
+            <li><a href="games/home.html">StenoTOANSTIK ARCADE</a></li>
+            <li><a href="video.html">StenoVids</a></li>
+            <li><a href="video_plus.html">StenoVids Plus</a></li>
+            <li><a href="flappybird.html">FlappyBird</a></li>
+            <li><a href="tetris.html">StenoTetris</a></li>
+            <li><a href="2048.html">2048</a></li>
+            <li><a href="quiz.html">Zuiz Quiz</a></li>
+            <li><a href="pet.html">Talking Pet</a></li>
+            <li><a href="media.html">StenoMedia</a></li>
+            <li><a href="comic.html">StenoKomysk(since 2016)</a></li>
+            <li><a href="eggtastic.html">Eggtastic!</a></li>
+        </ul>
 
- 
-    <li><a href="comic.html">StenoKomysk(since 2016)</a></li>
-    <li><a href="eggtastic.html">Eggtastic!</a></li>
-  </ul>
+        <h1>Downloadables</h1>
+        <ul>
+            <li><a href="searxng.html">SearXNG Instructions</a></li>
+            <li><a href="ringzauber.html">Download Ringzauber!</a></li>
+        </ul>
 
-  <h1>Downloadables</h1>
-  <ul>
-    <li><a href="searxng.html">SearXNG Instructions</a></li>
-    <li><a href="ringzauber.html">Download Ringzauber!</a></li>
-  </ul>
+        <h1>Educational & Learning</h1>
+        <ul>
+            <li><a href="quiz.html">Zuiz Quiz</a></li>
+            <li><a href="my-solar-system_en.html">PHet Gravity Simulation</a></li>
+            <li><a href="space-map.html">Solar System Scope</a></li>
+        </ul>
 
-  <h1>Educational & Learning</h1>
-  <ul>
-        <li><a href="quiz.html">Zuiz Quiz</a></li>
-    <li><a href="my-solar-system_en.html">PHet Gravity Simulation</a></li>
-      <li><a href="space-map.html">Solar System Scope</a></li>
-  </ul>
+        <h1>Tools</h1>
+        <ul>
+            <li><a href="maps.html">StenoFerkenne</a></li>
+            <li><a href="space-map.html">Map</a></li>
+            <li><a href="swc.html">swc.html</a></li>
+            <li><a href="clocker.html">Clocker</a></li>
+            <li><a href="compass.html">Compass.html</a></li>
+            <li><a href="testing.html">Testing.html</a></li>
+            <li><a href="blog.html">Blog.html</a></li>
+            <li><a href="boublok.html">Boublok.html</a></li>
+        </ul>
 
-  
-
-  <h1>Tools</h1>
-  <ul>
-  
-    <li><a href="maps.html">StenoFerkenne</a></li>
-    
-    <li><a href="space-map.html">Map</a></li>
-    <li><a href="swc.html">swc.html</a></li>
-    <li><a href="clocker.html">Clocker</a></li>
-    <li><a href="compass.html">Compass.html</a></li>
-    <li><a href="testing.html">Testing.html</a></li>
-
-    <li><a href="blog.html">Blog.html</a></li>
-    <li><a href="boublok.html">Boublok.html</a></li>
-  </ul>
-
-  <footer>
-    &copy; 2025 Stenoip Company. All rights reserved. Website made with Hypertext Markup Language, Cascading Style Sheets and Javascript.
-  </footer>
-
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4433722838067397"
-     crossorigin="anonymous"></script> 
+        <footer>
+            &copy; 2025 Stenoip Company. All rights reserved. Website made with Hypertext Markup Language, Cascading Style Sheets and Javascript.
+        </footer>
+    </div>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4433722838067397"
+        crossorigin="anonymous"></script>
 </body>
 </html>
