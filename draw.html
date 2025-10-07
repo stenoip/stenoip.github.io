@@ -1,67 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link rel="icon" href="/new-swc.png" type="image/png" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/new-swc.png" type="image/png" />
   <title>Draw It</title>
   <style>
     body {
       display: flex;
       flex-direction: column;
       align-items: center;
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
       margin: 0;
       padding: 20px;
     }
 
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+      text-shadow: 1px 1px #fff;
+    }
+
     .toolbar {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      background: #fefefe;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      border: 2px solid #ccc;
     }
 
     canvas {
-      border: 1px solid #000;
+      border: 3px ridge #999;
       background-color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
     button, input[type="color"], input[type="range"], input[type="number"], input[type="file"] {
       padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      background-color: #fff;
+      border-radius: 8px;
+      border: 1px solid #aaa;
+      background: linear-gradient(to bottom, #fff, #e0e0e0);
       cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    button:hover, input[type="color"]:hover, input[type="range"]:hover, input[type="number"]:hover, input[type="file"]:hover {
-      background-color: #e0e0e0;
+    button:hover, input:hover {
+      background: linear-gradient(to bottom, #f0f0f0, #dcdcdc);
+    }
+
+    .toolbar label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
   </style>
 </head>
 <body>
-  <h1>Draw It</h1>
+  <h1> Draw It</h1>
   <div class="toolbar">
-    <button id="pen">Pen</button>
-    <button id="brush">Brush</button>
-    <button id="eraser">Eraser</button>
-    <div>
+    <button id="pen" title="Use pen tool">Pen</button>
+    <button id="brush" title="Use brush tool">Brush</button>
+    <button id="eraser" title="Erase with white">Eraser</button>
+    <div class="group">
       <label for="rPicker">R:</label>
-      <input type="number" id="rPicker" min="0" max="255" value="0">
+      <input type="number" id="rPicker" min="0" max="255" value="0" title="Red value">
       <label for="gPicker">G:</label>
-      <input type="number" id="gPicker" min="0" max="255" value="0">
+      <input type="number" id="gPicker" min="0" max="255" value="0" title="Green value">
       <label for="bPicker">B:</label>
-      <input type="number" id="bPicker" min="0" max="255" value="0">
+      <input type="number" id="bPicker" min="0" max="255" value="0" title="Blue value">
     </div>
-    <input type="range" id="sizePicker" min="1" max="50" value="5">
-    <input type="color" id="bgColorPicker" value="#ffffff">
-    <input type="file" id="imageLoader" name="imageLoader">
-    <button id="savePng">Save as PNG</button>
-    <button id="saveJpg">Save as JPG</button>
-    <button id="saveSvg">Save as SVG</button>
+    <input type="range" id="sizePicker" min="1" max="50" value="5" title="Brush size">
+    <input type="color" id="bgColorPicker" value="#ffffff" title="Canvas background color">
+    <input type="file" id="imageLoader" name="imageLoader" title="Upload image to canvas">
+    <button id="clearCanvas" title="Clear canvas">Clear</button>
+    <button id="togglePaper" title="Toggle paper texture">Paper BG</button>
+    <button id="undo" title="Undo last stroke">Undo</button>
+    <button id="redo" title="Redo last stroke">Redo</button>
+    <button id="saveDrawing" title="Save drawing">Save</button>
   </div>
   <canvas id="drawCanvas"></canvas>
+
   <script>
     const canvas = document.getElementById('drawCanvas');
     const ctx = canvas.getContext('2d');
@@ -72,6 +101,8 @@
     let tool = 'pen';
     let color = '#000000';
     let size = 5;
+    let history = [];
+    let redoStack = [];
 
     const getPosition = (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -83,8 +114,22 @@
       };
     };
 
+    const saveState = () => {
+      history.push(canvas.toDataURL());
+      if (history.length > 50) history.shift();
+      redoStack = [];
+    };
+
+    const restoreState = (stack) => {
+      if (stack.length === 0) return;
+      const img = new Image();
+      img.src = stack.pop();
+      img.onload = () => ctx.drawImage(img, 0, 0);
+    };
+
     const startDrawing = (e) => {
       drawing = true;
+      saveState();
       draw(e);
     };
 
@@ -95,13 +140,10 @@
 
     const draw = (e) => {
       if (!drawing) return;
-
       const { x, y } = getPosition(e);
-
       ctx.lineWidth = size;
       ctx.lineCap = 'round';
       ctx.strokeStyle = color;
-
       ctx.lineTo(x, y);
       ctx.stroke();
       ctx.beginPath();
@@ -111,26 +153,13 @@
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mouseup', endDrawing);
     canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+    canvas.addEventListener('touchend', (e) => { e.preventDefault(); endDrawing(); });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
 
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      startDrawing(e);
-    });
-    canvas.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      endDrawing();
-    });
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      draw(e);
-    });
-
-    document.getElementById('pen').addEventListener('click', () => tool = 'pen');
-    document.getElementById('brush').addEventListener('click', () => tool = 'brush');
-    document.getElementById('eraser').addEventListener('click', () => {
-      tool = 'eraser';
-      color = '#FFFFFF';  // Assuming white background
-    });
+    document.getElementById('pen').onclick = () => { tool = 'pen'; };
+    document.getElementById('brush').onclick = () => { tool = 'brush'; };
+    document.getElementById('eraser').onclick = () => { tool = 'eraser'; color = '#FFFFFF'; };
 
     const updateColor = () => {
       const r = document.getElementById('rPicker').value;
@@ -139,56 +168,47 @@
       color = `rgb(${r},${g},${b})`;
     };
 
-    document.getElementById('rPicker').addEventListener('input', updateColor);
-    document.getElementById('gPicker').addEventListener('input', updateColor);
-    document.getElementById('bPicker').addEventListener('input', updateColor);
-    
-    document.getElementById('sizePicker').addEventListener('input', (e) => {
-      size = e.target.value;
-    });
-    document.getElementById('bgColorPicker').addEventListener('input', (e) => {
-      canvas.style.backgroundColor = e.target.value;
-    });
-    document.getElementById('imageLoader').addEventListener('change', (e) => {
+    document.getElementById('rPicker').oninput = updateColor;
+    document.getElementById('gPicker').oninput = updateColor;
+    document.getElementById('bPicker').oninput = updateColor;
+    document.getElementById('sizePicker').oninput = (e) => size = e.target.value;
+    document.getElementById('bgColorPicker').oninput = (e) => canvas.style.backgroundColor = e.target.value;
+
+    document.getElementById('imageLoader').onchange = (e) => {
       const reader = new FileReader();
       reader.onload = (event) => {
         const img = new Image();
-        img.onload = () => {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        };
+        img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         img.src = event.target.result;
       };
       reader.readAsDataURL(e.target.files[0]);
-    });
+    };
 
-    document.getElementById('savePng').addEventListener('click', () => {
-      const link = document.createElement('a');
-      link.download = 'drawing.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    });
+    document.getElementById('clearCanvas').onclick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.backgroundColor = '#ffffff';
+    };
 
-    document.getElementById('saveJpg').addEventListener('click', () => {
-      const link = document.createElement('a');
-      link.download = 'drawing.jpg';
-      link.href = canvas.toDataURL('image/jpeg');
-      link.click();
-    });
+    let paperOn = false;
+    document.getElementById('togglePaper').onclick = () => {
+      paperOn = !paperOn;
+      canvas.style.backgroundImage = paperOn ? "url('https://www.transparenttextures.com/patterns/paper-fibers.png')" : "none";
+    };
 
-    document.getElementById('saveSvg').addEventListener('click', () => {
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}">
-                     <foreignObject width="100%" height="100%">
-                       <div xmlns="http://www.w3.org/1999/xhtml">
-                         <img src="${canvas.toDataURL('image/png')}" width="100%" height="100%"/>
-                       </div>
-                     </foreignObject>
-                   </svg>`;
-      const blob = new Blob([svg], {type: 'image/svg+xml;charset=utf-8'});
+    document.getElementById('undo').onclick = () => restoreState(history);
+    document.getElementById('redo').onclick = () => restoreState(redoStack);
+
+    document.getElementById('saveDrawing').onclick = () => {
+      const filename = prompt("Enter filename:", "drawing");
+      if (!filename) return;
       const link = document.createElement('a');
-      link.download = 'drawing.svg';
-      link.href = URL.createObjectURL(blob);
+      link.download = `${filename}.png`;
+           link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
       link.click();
-    });
+      document.body.removeChild(link);
+    };
   </script>
+  <p>&copy; 2025 Stenoip Company</p>
 </body>
 </html>
