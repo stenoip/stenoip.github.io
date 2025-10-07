@@ -1,272 +1,384 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>WordIt! by Stenoip Company</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      background-color: #007BFF;
-      color: #FFD700;
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(20, 30px);
-      grid-template-rows: repeat(20, 30px);
-      gap: 3px;
-      justify-content: center;
-      margin: 30px auto;
-    }
-    .cell {
-      background-color: #fff;
-      color: #007BFF;
-      font-weight: bold;
-      font-size: 1em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .selected {
-      background-color: #FFD700;
-      color: #000;
-    }
-    .found {
-      background-color: #28a745;
-      color: #fff;
-    }
-    #score {
-      font-size: 1.2em;
-      margin-top: 20px;
-    }
-    #downloadBtn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1em;
-      background-color: #FFD700;
-      color: #007BFF;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+    <meta charset="UTF-8">
+    <title>WordIt! by Stenoip Company</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background-color: #007BFF;
+            color: #FFD700;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(20, 30px);
+            grid-template-rows: repeat(20, 30px);
+            gap: 3px;
+            justify-content: center;
+            margin: 30px auto;
+        }
+        .cell {
+            background-color: #fff;
+            color: #007BFF;
+            font-weight: bold;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .selected {
+            background-color: #FFD700;
+            color: #000;
+        }
+        .found {
+            background-color: #28a745;
+            color: #fff;
+            animation: pulse 1s ease-in-out infinite alternate;
+        }
+        @keyframes pulse {
+            from { opacity: 1; }
+            to { opacity: 0.8; }
+        }
+        #score {
+            font-size: 1.2em;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #downloadBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #FFD700;
+            color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #downloadBtn:hover {
+            background-color: #ffeea1;
+        }
 
-    @media (max-width: 600px) {
-      .grid {
-        grid-template-columns: repeat(10, 32px);
-        grid-template-rows: repeat(10, 32px);
-        gap: 2px;
-      }
-      .cell {
-        font-size: 0.9em;
-        touch-action: manipulation;
-      }
-      h1 {
-        font-size: 1.6em;
-      }
-    }
-  </style>
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: repeat(10, 32px);
+                grid-template-rows: repeat(10, 32px);
+                gap: 2px;
+            }
+            .cell {
+                font-size: 0.9em;
+                touch-action: manipulation;
+            }
+            h1 {
+                font-size: 1.6em;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>WordIt!</h1>
-  <p>Find all 20 hidden words. No hints. The faster you finish, the higher your score!</p>
-  <div id="score">⏱️ Time: 0s | Score: 1000</div>
-  <div class="grid" id="grid"></div>
-  <button id="downloadBtn" style="display:none;">📤 Download Score</button>
-<p>&copy; Stenoip Company</p>
-  <a href="/index.html">Return to Homepage</a>
-       
-      <script>
-    const gridSize = 20;
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
-    const directions = [
-      [0, 1], [1, 0], [1, 1], [-1, 1],
-      [0, -1], [-1, 0], [-1, -1], [1, -1]
-    ];
+    <h1>WordIt!</h1>
+    <p>Find all 20 hidden words. No hints. The faster you finish, the higher your score!</p>
+    <div id="score">⏱️ Time: 0s | Score: 1000</div>
+    <div class="grid" id="grid"></div>
+    <button id="downloadBtn" style="display:none;">📤 Download Score</button>
+    <p>&copy; Stenoip Company</p>
+    <a href="/index.html">Return to Homepage</a>
+    
+    <script>
+        // --- Global Constants and Variables (using var) ---
+        var gridSize = 20;
+        var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var grid = []; // Initialized in startGame
+        var directions = [
+            [0, 1], [1, 0], [1, 1], [-1, 1], // Right, Down, Down-Right, Up-Right
+            [0, -1], [-1, 0], [-1, -1], [1, -1] // Left, Up, Up-Left, Down-Left
+        ];
 
-    let wordList = [];
-    let foundWords = new Set();
-    let selectedCells = [];
-    let time = 0;
-    let timer;
-    const today = new Date().toISOString().split('T')[0];
-
-    // A large list of common words to pull from
-    const masterWordList = ["WHILE", "ABOUT", "AFTER", "AGAIN", "LATER", "BELOW", "BETTER", "BUILD", "CARRY", "CAUSE", "CHIEF", "CRAFT", "EIGHT", "EVERY", "FRONT", "GREAT", "GROUP", "HEARD", "HEART", "HEAVY", "HOUSE", "LARGE", "LEARN", "LEAVE", "LIGHT", "LITTLE", "LIVING", "MAJOR", "MAKER", "MARCH", "MIGHT", "MONEY", "MOUNT", "MOUSE", "MOVIE", "NIGHT", "OTHER", "OUGHT", "OWNER", "PAPER", "PARTY", "PLACE", "PLANT", "POINT", "POWER", "PRESS", "PRINT", "PUPIL", "QUICK", "QUIET", "QUITE", "RIVER", "ROUND", "SAWDUST", "SCHOOL", "SENTENCE", "SHAPE", "SHEET", "SHORT", "SISTER", "SKETCH", "SLEEP", "SLOWLY", "SMILE", "SOMETIMES", "SOUND", "SPOKE", "SPRING", "SQUARE", "STAMP", "START", "STATE", "STILL", "STONE", "STORE", "STORY", "STREAM", "STREET", "STRONG", "STUDY", "SUBTRACT", "SUDDEN", "SUNLIGHT", "SURPRISE", "SWEEP", "SWEET", "SWIMMER", "SYLLABLE", "TABLE", "TALKED", "TEACHER", "THEN", "THERE", "THESE", "THINK", "THIRD", "THIS", "THOSE", "THOUGH", "THOUSAND", "THROUGH", "TIGER", "TIME", "TODAY", "TOGETHER", "TOLD", "TOMORROW", "TONGUE", "TOWN", "TRAVEL", "TROPICAL", "TROUBLE", "TRULY", "TRUNK", "TRUTH", "TUBE", "TURTLE", "TWENTY", "TYPED", "UNDER", "UNIT", "UNTIL", "UPON", "USUALLY", "VALLEY", "VARIOUS", "VERB", "VISIT", "VOICE", "WALKED", "WANTED", "WARM", "WATCH", "WATER", "WAVE", "WEIGH", "WEIGHT", "WELCOME", "WENT", "WERE", "WEST", "WETLAND", "WHAT", "WHEAT", "WHEEL", "WHEN", "WHERE", "WHICH", "WHILE", "WHITE", "WHOLE", "WHOSE", "WHY", "WILDLIFE", "WILL", "WIND", "WINTER", "WISH", "WITHIN", "WITHOUT", "WOMAN", "WOMEN", "WONDER", "WOODEN", "WORLD", "WOULD", "WRITE", "YARD", "YELLOW", "YOURSELF", "ZEBRA", "ZOO"];
-
-    function notifyUser(message) {
-      if (Notification.permission === 'granted') {
-        new Notification('WordIt!', { body: message });
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            new Notification('WordIt!', { body: message });
-          }
-        });
-      }
-    }
-
-    function updateScore() {
-      const score = Math.max(1000 - time, 0);
-      document.getElementById('score').textContent = `⏱️ Time: ${time}s | Score: ${score}`;
-    }
-
-    // New, deterministic word selection function
-    function selectDailyWords() {
-        const date = new Date(today);
-        let seed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+        var wordList = [];
+        var foundWords = new Set();
+        var selectedCells = [];
+        var time = 0;
+        var timer;
+        var today = new Date().toISOString().split('T')[0];
         
-        function seededRandom() {
-            seed = (seed * 9301 + 49297) % 233280;
-            return seed / 233280;
+        // Date Seed for Deterministic Generation
+        var dateObj = new Date(today);
+        var dateSeed = dateObj.getFullYear() * 10000 + (dateObj.getMonth() + 1) * 100 + dateObj.getDate();
+
+        // A large list of common words to pull from
+        var masterWordList = ["WHILE", "ABOUT", "AFTER", "AGAIN", "LATER", "BELOW", "BETTER", "BUILD", "CARRY", "CAUSE", "CHIEF", "CRAFT", "EIGHT", "EVERY", "FRONT", "GREAT", "GROUP", "HEARD", "HEART", "HEAVY", "HOUSE", "LARGE", "LEARN", "LEAVE", "LIGHT", "LITTLE", "LIVING", "MAJOR", "MAKER", "MARCH", "MIGHT", "MONEY", "MOUNT", "MOUSE", "MOVIE", "NIGHT", "OTHER", "OUGHT", "OWNER", "PAPER", "PARTY", "PLACE", "PLANT", "POINT", "POWER", "PRESS", "PRINT", "PUPIL", "QUICK", "QUIET", "QUITE", "RIVER", "ROUND", "SAWDUST", "SCHOOL", "SENTENCE", "SHAPE", "SHEET", "SHORT", "SISTER", "SKETCH", "SLEEP", "SLOWLY", "SMILE", "SOMETIMES", "SOUND", "SPOKE", "SPRING", "SQUARE", "STAMP", "START", "STATE", "STILL", "STONE", "STORE", "STORY", "STREAM", "STREET", "STRONG", "STUDY", "SUBTRACT", "SUDDEN", "SUNLIGHT", "SURPRISE", "SWEEP", "SWEET", "SWIMMER", "SYLLABLE", "TABLE", "TALKED", "TEACHER", "THEN", "THERE", "THESE", "THINK", "THIRD", "THIS", "THOSE", "THOUGH", "THOUSAND", "THROUGH", "TIGER", "TIME", "TODAY", "TOGETHER", "TOLD", "TOMORROW", "TONGUE", "TOWN", "TRAVEL", "TROPICAL", "TROUBLE", "TRULY", "TRUNK", "TRUTH", "TUBE", "TURTLE", "TWENTY", "TYPED", "UNDER", "UNIT", "UNTIL", "UPON", "USUALLY", "VALLEY", "VARIOUS", "VERB", "VISIT", "VOICE", "WALKED", "WANTED", "WARM", "WATCH", "WATER", "WAVE", "WEIGH", "WEIGHT", "WELCOME", "WENT", "WERE", "WEST", "WETLAND", "WHAT", "WHEAT", "WHEEL", "WHEN", "WHERE", "WHICH", "WHILE", "WHITE", "WHOLE", "WHOSE", "WHY", "WILDLIFE", "WILL", "WIND", "WINTER", "WISH", "WITHIN", "WITHOUT", "WOMAN", "WOMEN", "WONDER", "WOODEN", "WORLD", "WOULD", "WRITE", "YARD", "YELLOW", "YOURSELF", "ZEBRA", "ZOO"];
+
+        // --- Utility Functions ---
+
+        /**
+         * Advanced Seeded Random Number Generator (PRNG)
+         * Ensures the same sequence of "random" numbers for a given seed (date).
+         */
+        function createSeededRandom(seed) {
+            var currentSeed = seed;
+            return function() {
+                // LCG algorithm: X(n+1) = (a * X(n) + c) mod m
+                currentSeed = (currentSeed * 9301 + 49297) % 233280;
+                return currentSeed / 233280; // Return a number between 0 and 1
+            };
+        }
+        var dailyRandom = createSeededRandom(dateSeed);
+
+        function notifyUser(message) {
+            if (window.Notification && Notification.permission !== 'denied') {
+                Notification.requestPermission(function(permission) {
+                    if (permission === 'granted') {
+                        new Notification('WordIt!', { body: message });
+                    }
+                });
+            }
         }
 
-        const shuffledWords = [...masterWordList];
-        for (let i = shuffledWords.length - 1; i > 0; i--) {
-            const j = Math.floor(seededRandom() * (i + 1));
-            [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
+        function updateScore() {
+            // Load time from the global variable updated by the timer
+            var score = Math.max(1000 - time, 0);
+            document.getElementById('score').textContent = '⏱️ Time: ' + time + 's | Score: ' + score;
+            // Save time to local storage for persistence on reload
+            localStorage.setItem('wordItCurrentTime', time);
+        }
+
+        // --- Puzzle Generation (Deterministic) ---
+
+        function selectDailyWords() {
+            var shuffledWords = masterWordList.slice(); // Use a copy
+            // Shuffle the words using the seeded random function
+            for (var i = shuffledWords.length - 1; i > 0; i--) {
+                var j = Math.floor(dailyRandom() * (i + 1));
+                var temp = shuffledWords[i];
+                shuffledWords[i] = shuffledWords[j];
+                shuffledWords[j] = temp;
+            }
+            return shuffledWords.slice(0, 20); // Select the first 20 for the day
+        }
+
+        function placeWords() {
+            // Initialize an empty grid
+            grid = Array(gridSize).fill().map(function() { return Array(gridSize).fill(''); });
+
+            wordList.forEach(function(word) {
+                var placed = false;
+                var attempts = 0;
+                var maxAttempts = 5000; 
+
+                while (!placed && attempts < maxAttempts) {
+                    attempts++;
+                    // Use seeded random for deterministic direction and starting position
+                    var dir = directions[Math.floor(dailyRandom() * directions.length)];
+                    var row = Math.floor(dailyRandom() * gridSize);
+                    var col = Math.floor(dailyRandom() * gridSize);
+                    var fits = true;
+
+                    // Check if the word fits and doesn't conflict
+                    for (var i = 0; i < word.length; i++) {
+                        var r = row + dir[0] * i;
+                        var c = col + dir[1] * i;
+                        if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || (grid[r][c] && grid[r][c] !== word[i])) {
+                            fits = false;
+                            break;
+                        }
+                    }
+
+                    // If it fits, place it
+                    if (fits) {
+                        for (var i = 0; i < word.length; i++) {
+                            var r = row + dir[0] * i;
+                            var c = col + dir[1] * i;
+                            grid[r][c] = word[i];
+                        }
+                        placed = true;
+                    }
+                }
+            });
+        }
+
+        function fillGrid() {
+            // Fill remaining empty cells with random letters (using seeded random)
+            for (var r = 0; r < gridSize; r++) {
+                for (var c = 0; c < gridSize; c++) {
+                    if (!grid[r][c]) {
+                        grid[r][c] = alphabet[Math.floor(dailyRandom() * alphabet.length)];
+                    }
+                }
+            }
+        }
+
+        // --- Game Play and State Management ---
+
+        function renderGrid() {
+            var gridContainer = document.getElementById('grid');
+            gridContainer.innerHTML = '';
+            
+            // Rebuild the foundWords Set from localStorage
+            var storedFoundWords = JSON.parse(localStorage.getItem('wordItFoundWords'));
+            foundWords = storedFoundWords ? new Set(storedFoundWords) : new Set();
+            
+            for (var r = 0; r < gridSize; r++) {
+                for (var c = 0; c < gridSize; c++) {
+                    var cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.textContent = grid[r][c];
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.addEventListener('click', handleClick);
+
+                    // Restore 'found' state from localStorage
+                    if (localStorage.getItem('wordItCellFound_' + r + ',' + c) === 'true') {
+                        cell.classList.add('found');
+                    }
+                    
+                    gridContainer.appendChild(cell);
+                }
+            }
+        }
+
+        function handleClick(e) {
+            // Stop processing if game is finished or cell is already found
+            if (foundWords.size === wordList.length) return;
+
+            var cell = e.target;
+            if (cell.classList.contains('found')) return;
+
+            // Simple selection logic (click to select/deselect)
+            if (cell.classList.contains('selected')) {
+                cell.classList.remove('selected');
+                selectedCells = selectedCells.filter(function(c) { return c !== cell; });
+            } else {
+                cell.classList.add('selected');
+                selectedCells.push(cell);
+            }
+
+            // A word can only be checked if at least two cells are selected
+            if (selectedCells.length >= 2) {
+                checkWord();
+            }
+        }
+
+        function checkWord() {
+            var selectedWord = selectedCells.map(function(c) { return c.textContent; }).join('');
+            var reversed = selectedWord.split('').reverse().join('');
+            var match = wordList.find(function(w) { return w === selectedWord || w === reversed; });
+            
+            if (match && !foundWords.has(match)) {
+                // Word found!
+                foundWords.add(match);
+                localStorage.setItem('wordItFoundWords', JSON.stringify(Array.from(foundWords)));
+                
+                // Mark cells as found and save their state
+                selectedCells.forEach(function(c) {
+                    c.classList.remove('selected');
+                    c.classList.add('found');
+                    localStorage.setItem('wordItCellFound_' + c.dataset.row + ',' + c.dataset.col, 'true');
+                });
+                selectedCells = []; // Clear selection
+
+                if (foundWords.size === wordList.length) {
+                    clearInterval(timer);
+                    var finalScore = Math.max(1000 - time, 0);
+                    localStorage.setItem('wordItCurrentTime', time); // Ensure final time is saved
+                    alert('🎉 You found all words in ' + time + 's! Final Score: ' + finalScore);
+                    notifyUser('🎉 Puzzle complete! Final Score: ' + finalScore);
+                    document.getElementById('downloadBtn').style.display = 'inline-block';
+                    document.getElementById('downloadBtn').onclick = function() { downloadScore(finalScore, time); };
+                }
+            } else if (selectedCells.length > 2) {
+                // Optional: Clear selection if a long, non-word is selected
+                // selectedCells.forEach(function(c) { c.classList.remove('selected'); });
+                // selectedCells = [];
+            }
+        }
+
+        function downloadScore(score, time) {
+            var content = 'WordIt! Score\nDate: ' + today + '\nTime: ' + time + 's\nScore: ' + score + '\n';
+            var blob = new Blob([content], { type: 'text/plain' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'WordIt_Score_' + today + '.txt';
+            link.click();
         }
         
-        return shuffledWords.slice(0, 20);
-    }
+        // --- Initialization ---
 
+        function startGame() {
+            // Load persistent data
+            var storedDate = localStorage.getItem('wordItDate');
+            var storedWords = JSON.parse(localStorage.getItem('wordItWords'));
+            var storedGrid = JSON.parse(localStorage.getItem('wordItGrid'));
+            var storedFoundWords = JSON.parse(localStorage.getItem('wordItFoundWords'));
+            var storedTime = parseInt(localStorage.getItem('wordItCurrentTime') || '0');
 
-    function placeWords() {
-      wordList.forEach(word => {
-        let placed = false;
-        while (!placed) {
-          const dir = directions[Math.floor(Math.random() * directions.length)];
-          const row = Math.floor(Math.random() * gridSize);
-          const col = Math.floor(Math.random() * gridSize);
-          let fits = true;
-          for (let i = 0; i < word.length; i++) {
-            const r = row + dir[0] * i;
-            const c = col + dir[1] * i;
-            if (r < 0 || r >= gridSize || c < 0 || c >= gridSize || (grid[r][c] && grid[r][c] !== word[i])) {
-              fits = false;
-              break;
+            if (storedDate !== today || !storedWords || !storedGrid) {
+                // --- NEW DAY: Generate and Store New Puzzle ---
+
+                // 1. Generate and save the word list
+                wordList = selectDailyWords();
+                localStorage.setItem('wordItWords', JSON.stringify(wordList));
+
+                // 2. Generate and save the letter grid
+                placeWords();
+                fillGrid();
+                localStorage.setItem('wordItGrid', JSON.stringify(grid));
+
+                // 3. Reset game state
+                foundWords = new Set();
+                time = 0;
+
+                // 4. Clear old puzzle state from localStorage
+                localStorage.setItem('wordItDate', today);
+                localStorage.removeItem('wordItFoundWords');
+                localStorage.removeItem('wordItCurrentTime');
+                // Clear all individual cell status markers
+                for(var r=0; r < gridSize; r++) {
+                    for(var c=0; c < gridSize; c++) {
+                        localStorage.removeItem('wordItCellFound_' + r + ',' + c);
+                    }
+                }
+
+                notifyUser("Stenoip Wonder Computer- A new WordIt! puzzle is ready! Beat your last score!");
+            } else {
+                // --- CURRENT DAY: Load Existing Puzzle and State ---
+                wordList = storedWords;
+                grid = storedGrid;
+                foundWords = storedFoundWords ? new Set(storedFoundWords) : new Set();
+                time = storedTime;
             }
-          }
-          if (fits) {
-            for (let i = 0; i < word.length; i++) {
-              const r = row + dir[0] * i;
-              const c = col + dir[1] * i;
-              grid[r][c] = word[i];
+
+            // Render the grid and start the timer
+            renderGrid();
+            updateScore(); // Display initial score
+
+            // Only start the timer if the game is NOT already finished
+            if (foundWords.size !== wordList.length) {
+                timer = setInterval(function() {
+                    time++;
+                    updateScore();
+                }, 1000);
+            } else {
+                // Game is finished, make the download button visible
+                document.getElementById('downloadBtn').style.display = 'inline-block';
+                var finalScore = Math.max(1000 - time, 0);
+                document.getElementById('downloadBtn').onclick = function() { downloadScore(finalScore, time); };
             }
-            placed = true;
-          }
         }
-      });
-    }
 
-    function fillGrid() {
-      for (let r = 0; r < gridSize; r++) {
-        for (let c = 0; c < gridSize; c++) {
-          if (!grid[r][c]) {
-            grid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
-          }
-        }
-      }
-    }
-
-    function renderGrid() {
-      const gridContainer = document.getElementById('grid');
-      gridContainer.innerHTML = '';
-      for (let r = 0; r < gridSize; r++) {
-        for (let c = 0; c < gridSize; c++) {
-          const cell = document.createElement('div');
-          cell.className = 'cell';
-          cell.textContent = grid[r][c];
-          cell.dataset.row = r;
-          cell.dataset.col = c;
-          cell.addEventListener('click', handleClick);
-          gridContainer.appendChild(cell);
-        }
-      }
-    }
-
-    function handleClick(e) {
-      const cell = e.target;
-      if (cell.classList.contains('found')) return;
-
-      if (cell.classList.contains('selected')) {
-        cell.classList.remove('selected');
-        selectedCells = selectedCells.filter(c => c !== cell);
-      } else {
-        cell.classList.add('selected');
-        selectedCells.push(cell);
-      }
-
-      checkWord();
-    }
-
-    function checkWord() {
-      const selectedWord = selectedCells.map(c => c.textContent).join('');
-      const reversed = selectedWord.split('').reverse().join('');
-      const match = wordList.find(w => w === selectedWord || w === reversed);
-      if (match && !foundWords.has(match)) {
-        selectedCells.forEach(c => {
-          c.classList.remove('selected');
-          c.classList.add('found');
-        });
-        foundWords.add(match);
-        selectedCells = [];
-
-        if (foundWords.size === wordList.length) {
-          clearInterval(timer);
-          const finalScore = Math.max(1000 - time, 0);
-          alert(`🎉 You found all words in ${time}s! Final Score: ${finalScore}`);
-          notifyUser(`🎉 Puzzle complete! Final Score: ${finalScore}`);
-          document.getElementById('downloadBtn').style.display = 'inline-block';
-          document.getElementById('downloadBtn').onclick = () => downloadScore(finalScore, time);
-        }
-      }
-    }
-
-    function downloadScore(score, time) {
-      const content = `WordIt! Score\nDate: ${today}\nTime: ${time}s\nScore: ${score}\n`;
-      const blob = new Blob([content], { type: 'text/plain' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `WordIt_Score_${today}.txt`;
-      link.click();
-    }
-
-    async function startGame() {
-      Notification.requestPermission();
-      let storedDate = localStorage.getItem('wordItDate');
-      let storedWords = JSON.parse(localStorage.getItem('wordItWords'));
-
-      if (storedDate !== today || !storedWords) {
-        wordList = selectDailyWords(); // Use the new function
-        localStorage.setItem('wordItDate', today);
-        localStorage.setItem('wordItWords', JSON.stringify(wordList));
-        notifyUser("Stenoip Wonder Computer- A new WordIt! puzzle is ready! Beat your last score!");
-      } else {
-        wordList = storedWords;
-      }
-
-      placeWords();
-      fillGrid();
-      renderGrid();
-
-      timer = setInterval(() => {
-        time++;
-        updateScore();
-      }, 1000);
-    }
-
-    startGame();
-</script>
+        // Start the game initialization
+        startGame();
+    </script>
 </body>
 </html>
