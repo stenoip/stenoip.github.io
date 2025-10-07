@@ -1,105 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" href="/new-swc.png" type="image/png" />
-  <title>StenoOffices – Tools Hub</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f6f9;
-      color: #333;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" href="/new-swc.png" type="image/png" />
+    <title>StenoOffices – Skeuomorphic Tools Hub</title>
+    <style>
+        /* --- FRUTIGER AERO PALETTE --- */
+        :root {
+            --color-aero-blue: #a0c4ff;
+            --color-aero-sky: #6aa8ff;
+            --color-aero-glass-bg: rgba(255, 255, 255, 0.4);
+            --color-text-main: #1a1a1a; /* Darker text for glass contrast */
+            --color-link: #004d99; /* Deep blue link color */
+            --color-highlight: #ffcc00; /* Yellow highlight */
+            --color-shadow-light: rgba(255, 255, 255, 0.9);
+            --color-shadow-dark: rgba(0, 0, 0, 0.4);
+        }
 
-    header {
-      background-color: #2c3e50;
-      color: white;
-      padding: 2rem;
-      text-align: center;
-    }
+        /* --- AERO BODY BACKGROUND (Bright and Glossy) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--color-text-main);
+            min-height: 100vh;
+            /* Aero Sky Background: Gradient with soft texture */
+            background: radial-gradient(circle at top left, var(--color-aero-sky) 0%, var(--color-aero-blue) 100%), 
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.1"><circle cx="50" cy="50" r="45" fill="none" stroke="white" stroke-width="2"/></svg>') fixed;
+            background-size: cover, 50px 50px;
+        }
 
-    main {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
+        /* --- SKEUOMORPHIC HEADER (Glossy Bar) --- */
+       header {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+    color: white;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    box-shadow: 0 4px 15px var(--color-shadow-dark);
+    position: relative;
+    z-index: 10;
+}
 
-    h2 {
-      color: #2c3e50;
-      margin-bottom: 1rem;
-    }
+header h1 {
+    font-size: 2.5rem;
+    text-shadow: 0 3px 6px var(--color-shadow-dark); /* Increased shadow depth */
+    margin: 0 0 0.5rem 0;
+}
 
-    ul {
-      list-style: none;
-      padding: 0;
-    }
+header p {
+    margin: 0;
+    /* ENHANCED CONTRAST/AERO EFFECT HERE */
+    color: #f0f0ff; /* Subtle blue-white tint */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 10px rgba(255, 255, 255, 0.1); /* Stronger dark shadow + subtle white glow */
+    font-weight: 500;
+}
 
-    li {
-      background: white;
-      margin-bottom: 10px;
-      padding: 12px 16px;
-      border-radius: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      transition: background 0.2s;
-    }
+        /* --- GLASSMOPHIC MAIN CONTAINER --- */
+        main {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 10px 15px 30px;
+            
+            /* Glassmorphism Effect */
+            background-color: var(--color-aero-glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 var(--color-shadow-dark);
+            
+            /* Inner Reflection/Highlight */
+            position: relative;
+        }
+        
+        main::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: 1px;
+            height: 20px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), transparent);
+            border-radius: 20px 20px 0 0;
+            pointer-events: none;
+        }
 
-    li:hover {
-      background: #eaf2ff;
-    }
+        h2 {
+            color: var(--color-link);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+            margin: 2rem 0 1rem;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 5px;
+        }
+        
+        p {
+            color: #444;
+            padding: 0 1rem;
+        }
 
-    a {
-      text-decoration: none;
-      color: #0078D4;
-      font-weight: bold;
-    }
+        ul {
+            list-style: none;
+            padding: 0 1rem;
+        }
 
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #ecf0f1;
-      font-size: 0.9rem;
-    }
-  </style>
+        /* --- SKEUOMORPHIC LIST ITEM TILE --- */
+        li {
+            /* Tile appearance */
+            background: linear-gradient(to bottom, #f0f4ff, #e0e8ff); /* Light gradient for depth */
+            margin-bottom: 12px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            
+            /* Skeuomorphic Shadow and Highlight */
+            box-shadow: 
+                inset 0 1px 0 var(--color-shadow-light), /* Top inner highlight */
+                0 3px 8px var(--color-shadow-dark); /* Outer shadow for lift */
+            transition: all 0.2s ease-in-out;
+            
+            display: flex; /* For icon alignment */
+            align-items: center;
+        }
+
+        li:hover {
+            background: linear-gradient(to bottom, #e8f0ff, #d8e0ff);
+            box-shadow: 
+                inset 0 1px 0 var(--color-shadow-light),
+                0 6px 12px rgba(0, 0, 0, 0.5);
+            transform: translateY(-2px); /* Subtle lift on hover */
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--color-link);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            width: 100%; /* Ensure link covers the whole tile content area */
+            text-shadow: 0 0 1px rgba(255, 255, 255, 0.7);
+        }
+
+        a:hover {
+            color: #0078D4;
+        }
+
+        /* --- ICON STYLING (The small Aero button) --- */
+        .link-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 15px;
+            padding: 4px;
+            border-radius: 8px;
+            
+            /* Aero Icon Button Style */
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        
+        /* --- HIGHLIGHT STYLING --- */
+        mark {
+            background-color: var(--color-highlight);
+            color: var(--color-text-main);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* --- DANGER ZONE STYLING (Red Alert Aesthetic) --- */
+        .danger-zone h2 {
+            color: #cc0000;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+            border-bottom: 2px solid #cc0000;
+        }
+
+        .danger-zone li {
+            background: linear-gradient(to bottom, #ffe8e8, #ffc0c0);
+            box-shadow: 
+                inset 0 1px 0 #ffebeb, 
+                0 3px 8px rgba(255, 0, 0, 0.4);
+        }
+        
+        .danger-zone li:hover {
+            background: linear-gradient(to bottom, #ffd0d0, #ffb0b0);
+            transform: translateY(-2px);
+        }
+        
+        .danger-zone a {
+            color: #800000;
+        }
+
+
+        /* --- FOOTER (Aero Glass Look) --- */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+            color: #333;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            margin-top: 2rem;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>StenoOffices</h1>
-    <p>Your hub for productivity and privacy-first tools</p>
-  </header>
+    <header>
+        <h1>StenoOffices </h1>
+        <p>Your hub for productivity and privacy-first tools. </p>
+    </header>
 
-  <main>
-    <h2>Available Tools</h2>
-    <p>Highlighted are the "Main Tools"</p>
-    <ul>
-    <li><a href="typoe.html"><mark>Typoe! PDF notetaker</mark></a></li>
-         <li><a href="graphs.html"><mark>StenoGraphs</mark></a></li>
-      <li><a href="availability.html">Availability Scheduler</a></li>
-      <li><a href="bulk.html">Bulk File Renamer</a></li>
-      <li><a href="csv.html"><mark>StenoCSV. CSV Viewer & Formatter</mark></a></li>
-      <li><a href="office/job_readiness.html">StenoReady. Job Readiness Checklist</a></li>
-      <li><a href="receipt.html"><mark>Invoice Generator</mark></a></li>
-      <li><a href="resume.html">StenoResume. Resume & Profile Formatter</a></li>
-      <li><a href="text_encryption.html">Text Encryption / Decryption Tool</a></li>
-      <li><a href="text_encryption.html">StenoKanban</a></li>
-      <li><a href="text_encryption.html">StenoCopynPaste</a></li>
-      <li><a href="text_encryption.html">StenoCompresser</a></li>
-      
-      
-    </ul>
-    <h2>DANGER ZONE. This programs may crash.</h2>
-    <ul>
-    <li><a href="slides.html"></a><mark>StenoSlides</mark></li>
+    <main>
+        <h2>Available Productivity Tools</h2>
+        <p>Highlighted are the "Main Tools" 🔑</p>
+        <ul>
+            <li>
+                <a href="typoe.html">
+                    <img src="icons/pdf_note.png" alt="PDF Icon" class="link-icon" />
+                    <mark>Typoe! PDF notetaker</mark>
+                </a>
+            </li>
+            <li>
+                <a href="graphs.html">
+                    <img src="icons/chart.png" alt="Chart Icon" class="link-icon" />
+                    <mark>StenoGraphs</mark>
+                </a>
+            </li>
+            <li>
+                <a href="availability.html">
+                    <img src="icons/calendar.png" alt="Calendar Icon" class="link-icon" />
+                    Availability Scheduler
+                </a>
+            </li>
+            <li>
+                <a href="bulk.html">
+                    <img src="icons/rename.png" alt="File Icon" class="link-icon" />
+                    Bulk File Renamer
+                </a>
+            </li>
+            <li>
+                <a href="csv.html">
+                    <img src="icons/spreadsheet.png" alt="Spreadsheet Icon" class="link-icon" />
+                    <mark>StenoCSV. CSV Viewer & Formatter</mark>
+                </a>
+            </li>
+            <li>
+                <a href="office/job_readiness.html">
+                    <img src="icons/checklist.png" alt="Checklist Icon" class="link-icon" />
+                    StenoReady. Job Readiness Checklist
+                </a>
+            </li>
+            <li>
+                <a href="receipt.html">
+                    <img src="icons/invoice.png" alt="Invoice Icon" class="link-icon" />
+                    <mark>Invoice Generator</mark>
+                </a>
+            </li>
+            <li>
+                <a href="resume.html">
+                    <img src="icons/resume.png" alt="Resume Icon" class="link-icon" />
+                    StenoResume. Resume & Profile Formatter
+                </a>
+            </li>
+            <li>
+                <a href="text_encryption.html">
+                    <img src="icons/lock.png" alt="Lock Icon" class="link-icon" />
+                    Text Encryption / Decryption Tool
+                </a>
+            </li>
+            <li>
+                <a href="text_encryption.html">
+                    <img src="icons/kanban.png" alt="Kanban Icon" class="link-icon" />
+                    StenoKanban 
+                </a>
+            </li>
+            <li>
+                <a href="text_encryption.html">
+                    <img src="icons/clipboard.png" alt="Clipboard Icon" class="link-icon" />
+                    StenoCopynPaste 
+                </a>
+            </li>
+            <li>
+                <a href="text_encryption.html">
+                    <img src="icons/compress.png" alt="Compress Icon" class="link-icon" />
+                    StenoCompresser 
+                </a>
+            </li>
+        </ul>
 
-      
-      
-    </ul>
-  </main>
+        <div class="danger-zone">
+            <h2>DANGER ZONE!  These programs may crash.</h2>
+            <ul>
+                <li>
+                    <a href="slides.html">
+                        <img src="icons/warning.png" alt="Warning Icon" class="link-icon" />
+                        <mark>StenoSlides</mark>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </main>
 
-  <footer>
-    &copy; 2025 Stenoip Company. All rights reserved.
-  </footer>
+    <footer>
+        &copy; 2025 Stenoip Company. All rights reserved. 
+    </footer>
 </body>
 </html>
