@@ -2,34 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Browse our Entertainment and Office Programs(made by coding)</title>
+    <title>Browse our Entertainment and Office Programs (Skeuomorphic Stained Glass)</title>
     <link rel="icon" href="/new-swc.png" type="image/png" />
     <style>
         /* --- STAINED GLASS BACKGROUND COLORS --- */
         :root {
             --color-black: #1a1a1a;
-            --color-yellow: #ffbf00;
+            --color-yellow: #ffbf00; /* Primary Accent */
             --color-green: #38761d;
             --color-glass-bg: rgba(255, 255, 255, 0.3); /* Translucent background for glass effect */
+            --color-text-main: #f5f5f5; /* Near white for readability */
+            --color-text-shadow: rgba(0, 0, 0, 0.7); /* Stronger shadow */
 
-            /* AERO Button Variables (Unchanged) */
+            /* AERO Button Variables */
+            --hue: 245;
+            --button-background: oklch(75% 0.1 var(--hue) / 0.8);
+            --bg-dark: oklch(45% 0.1 var(--hue) / 0.75);
             --bottom-glow: radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.7), transparent);
-            --stripes: none; /* Striped background removed for glass effect */
         }
 
         /* --- GLASSY BODY BACKGROUND --- */
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Slightly more Aero font stack */
             margin: 0;
             padding: 0;
-            color: #fff; /* Changed to white for better contrast on dark/colorful background */
+            color: var(--color-text-main);
             min-height: 100vh;
             /* Layered gradients for a stained-glass appearance */
             background-color: var(--color-black); /* Fallback */
             background-image:
                 /* Black diagonal stripes (lead lines) */
-                linear-gradient(45deg, var(--color-black) 25%, transparent 25%, transparent 50%, var(--color-black) 50%, var(--color-black) 75%, transparent 75%, transparent),
-                linear-gradient(-45deg, var(--color-black) 25%, transparent 25%, transparent 50%, var(--color-black) 50%, var(--color-black) 75%, transparent 75%, transparent),
+                linear-gradient(45deg, var(--color-black) 2px, transparent 2px),
+                linear-gradient(-45deg, var(--color-black) 2px, transparent 2px),
                 /* Large color fields (stained glass) */
                 linear-gradient(to top right, var(--color-yellow), var(--color-green)),
                 linear-gradient(to bottom left, var(--color-green), var(--color-yellow));
@@ -37,87 +41,148 @@
             background-attachment: fixed; /* Ensures the pattern stays put */
         }
 
-        /* --- GLASS EFFECT CONTAINER STYLING --- */
-        /* Apply the glass effect to the main content blocks */
-        header, li, footer {
-            /* Glassmorphism Effect */
-            background-color: var(--color-glass-bg) !important; /* Semi-transparent color */
-            backdrop-filter: blur(8px); /* Blur the background behind the element */
-            -webkit-backdrop-filter: blur(8px); /* Safari support */
-            border: 1px solid rgba(255, 255, 255, 0.18); /* Light border */
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Shadow for depth */
+        /* --- GLASS EFFECT CONTAINER STYLING (The main wrapper) --- */
+        .content-wrapper {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 10px;
+            /* Main Content Glass Effect + Subtle Aero Reflection */
+            background-color: rgba(0, 0, 0, 0.4); /* Darker base for contrast */
+            backdrop-filter: blur(15px); /* Stronger blur */
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px; /* Softer rounded corners */
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
+            
+            /* Frutiger Aero Gloss */
+            position: relative;
+            overflow: hidden; /* To contain the gloss reflection */
+        }
+        
+        /* Inner gloss reflection */
+        .content-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 15%; /* Top gloss line */
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+            border-radius: 15px 15px 0 0;
+            pointer-events: none;
         }
 
         /* Re-style Headers for contrast */
         h1 {
-            font-size: 1.5rem;
-            color: var(--color-yellow); /* Yellow headings */
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+            font-size: 1.8rem;
+            color: var(--color-yellow);
+            text-shadow: 0 2px 5px var(--color-text-shadow); /* Applied to all text now */
             margin: 2rem 1rem 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2); /* Subtle separator */
+        }
+
+        p, li {
+            text-shadow: 0 1px 3px var(--color-text-shadow); /* Apply shadow to all text */
         }
 
         p {
             margin: 1rem;
             font-size: 1rem;
-            color: #eee;
+            color: var(--color-text-main);
         }
 
         /* Re-style Links for contrast */
         a {
-            color: var(--color-yellow); /* Yellow links */
+            color: #ffe599; /* Lighter yellow/gold for links */
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            display: flex; /* Allows icon and text alignment */
+            align-items: center;
         }
 
         a:hover {
-            text-decoration: underline;
-            color: #fff;
+            text-decoration: none; /* Keep links clean */
+            color: white;
         }
 
-        /* List Items - Enhance Glass Effect */
+        /* --- ICON STYLING --- */
+        .link-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8)); /* Icon shadow */
+            /* Skeuomorphic/Aero touch for the icon */
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* List Items - Skeuomorphic Tile/Folder Look */
         ul {
             list-style: none;
-            padding-left: 1rem;
+            padding-left: 0;
             margin-bottom: 2rem;
         }
 
         li {
-            /* Inherits glass style from above selector */
-            color: white; /* Ensure text is visible */
-            margin: 0.5rem 0;
-            padding: 0.75rem 1rem;
-            border-radius: 10px; /* Slightly larger border radius */
-            transition: background 0.3s, box-shadow 0.3s;
+            /* Glassmorphism Effect for the "tile" */
+            background-color: rgba(255, 255, 255, 0.1); /* Very light glass background for the tile */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            
+            /* Skeuomorphic Box Style */
+            border-radius: 8px;
+            margin: 10px 10px;
+            padding: 10px 15px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 3px 6px rgba(0, 0, 0, 0.4); /* Inner highlight + outer shadow */
+            transition: all 0.2s ease-in-out;
         }
 
         li:hover {
-            background-color: rgba(255, 255, 255, 0.5) !important; /* More translucent on hover */
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.3) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 5px 10px rgba(0, 0, 0, 0.6);
+            transform: translateY(-2px);
         }
+        
+        /* Specific styling for the single li under StenoOffices */
+        h1 + li {
+             margin: 10px 10px 2rem 10px;
+             /* Ensure single list item looks consistent */
+        }
+
 
         /* Header - Override default background and adjust text */
         header {
-            background-color: var(--color-glass-bg); /* Use glass color */
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
             color: white;
             padding: 1.5rem;
             text-align: center;
             border-radius: 10px;
-            margin: 20px auto; /* Center and give margin */
-            width: 90%;
-            max-width: 800px;
+            margin: 0 auto 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
         header h1 {
             color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            font-size: 2rem;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.9);
+            border-bottom: none;
+            margin: 0;
         }
-
+        
         header p {
             margin-top: 1rem;
             margin-bottom: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            color: white;
         }
 
         /* Footer - Enhance Glass Effect */
@@ -125,139 +190,288 @@
             text-align: center;
             padding: 1rem;
             font-size: 0.9rem;
-            background-color: var(--color-glass-bg); /* Use glass color */
+            background-color: rgba(0, 0, 0, 0.4); /* Darker glass footer */
             margin-top: 2rem;
-            color: #eee;
+            color: #ccc;
+            border-radius: 0 0 15px 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Ensure content is centered and readable */
-        .content-wrapper {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 10px;
-        }
-
-        /* AERO BUTTON STYLES (Kept for consistency with the last request) */
+        /* AERO BUTTON STYLES (Slight adjustments for contrast) */
         button.aero {
-            /* Colors */
-            --hue: 245;
-            --button-background: oklch(75% 0.1 var(--hue) / 0.8);
-            --bg-dark: oklch(45% 0.1 var(--hue) / 0.75);
-            --button-foreground: oklch(15% 0.05 var(--hue));
-            /* Style */
-            background-color: var(--button-background);
+            --button-background: oklch(75% 0.1 210 / 0.8); /* Changed hue to blue for classic Aero */
+            --bg-dark: oklch(45% 0.1 210 / 0.75);
             background: var(--bottom-glow), linear-gradient(to bottom, var(--bg-dark), var(--button-background));
-            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--button-background);
-            border-radius: 9999px;
-            cursor: pointer;
-            margin: 1em 1ex;
-            padding: 1ex 1em;
-            position: relative;
-            text-shadow: 0 2px .5em #0003;
-            transition: all 300ms;
-            /* Text */
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5); /* Added inner highlight */
+            border: 1px solid rgba(255, 255, 255, 0.4);
             color: white;
-            font-family: "Lucida Grande", "Lucida Sans Unicode", "Lunasima", sans-serif;
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-            display: inline-block;
-            font-size: 1rem;
-            text-decoration: none;
         }
-
+        
         button.aero::after {
-            content: "";
-            position: absolute;
-            top: 4%;
-            left: 0.5em;
-            width: calc(100% - 1em);
-            height: 40%;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));
-            border-radius: 9999px;
-            transition: background 400ms;
+            top: 5%; /* Adjusted for better highlight placement */
+            height: 45%;
         }
 
         button.aero:hover,
         button.aero:focus {
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
-        }
-
-        button.aero:active {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-            transform: translateY(1px);
+             box-shadow: 0 6px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.7);
         }
     </style>
 </head>
 <body>
     <div class="content-wrapper">
         <header>
-            <h1>Welcome to the Guide</h1>
+            <h1>Welcome to the SWC Program Guide</h1>
             <p>
-                Explore the various pages on the SWC. Want to find pages faster?
+                Explore the various pages and applications available on the site.
                 <button class="aero" onclick="window.location.href='index.html'">
                     Use the Quick Search on the Home Page
                 </button>
             </p>
         </header>
 
-        <h1><a href="office/home.html">StenoOffices and Office Tools</a></h1>
-        <li><a href="praterich/index.html">Try Praterich AI</a></li>
+        <h1>
+            <a href="office/home.html" style="color: var(--color-yellow);">
+                <img src="icons/office.png" alt="Office Icon" class="link-icon" />
+                StenoOffices and Office Tools
+            </a>
+        </h1>
+        <li>
+            <a href="praterich/index.html">
+                <img src="icons/ai.png" alt="AI Icon" class="link-icon" />
+                Try Praterich AI
+            </a>
+        </li>
 
         <h1>Programs and Calculators</h1>
         <ul>
-            <li><a href="calculator_ti30xiis.html">calculator_ti30xiis.html</a></li>
-            <li><a href="calculator_ti84.html">calculator_ti84.html</a></li>
-            <li><a href="kompmasine.html">kompmasine.html</a></li>
-            <li><a href="kompmasine-functions.html">kompmasine-functions.html</a></li>
-            <li><a href="draw.html">draw.html</a></li>
-            <li><a href="count.html">count.html</a></li>
-            <li><a href="gravity.html">gravity.html</a></li>
-            <li><a href="bot.html">bot.html</a></li>
-            <li><a href="box_model.html">box_model.html</a></li>
-            <li><a href="camera.html">camera.html</a></li>
-            <li><a href="maps2d.html">maps2d.html</a></li>
+            <li>
+                <a href="calculator_ti30xiis.html">
+                    <img src="icons/calc_basic.png" alt="Calculator Icon" class="link-icon" />
+                    calculator_ti30xiis.html
+                </a>
+            </li>
+            <li>
+                <a href="calculator_ti84.html">
+                    <img src="icons/calc_graph.png" alt="Graphing Calculator Icon" class="link-icon" />
+                    calculator_ti84.html
+                </a>
+            </li>
+            <li>
+                <a href="kompmasine.html">
+                    <img src="icons/program.png" alt="Program Icon" class="link-icon" />
+                    kompmasine.html
+                </a>
+            </li>
+            <li>
+                <a href="kompmasine-functions.html">
+                    <img src="icons/functions.png" alt="Functions Icon" class="link-icon" />
+                    kompmasine-functions.html
+                </a>
+            </li>
+            <li>
+                <a href="draw.html">
+                    <img src="icons/draw.png" alt="Draw Icon" class="link-icon" />
+                    draw.html 
+                </a>
+            </li>
+            <li>
+                <a href="count.html">
+                    <img src="icons/counter.png" alt="Counter Icon" class="link-icon" />
+                    count.html 
+                </a>
+            </li>
+            <li>
+                <a href="gravity.html">
+                    <img src="icons/gravity.png" alt="Physics Icon" class="link-icon" />
+                    gravity.html (Physics Demo)
+                </a>
+            </li>
+            <li>
+                <a href="bot.html">
+                    <img src="icons/robot.png" alt="Robot Icon" class="link-icon" />
+                    bot.html 
+                </a>
+            </li>
+            <li>
+                <a href="box_model.html">
+                    <img src="icons/box.png" alt="Box Icon" class="link-icon" />
+                    box_model.html (CSS Box Model Demo)
+                </a>
+            </li>
+            <li>
+                <a href="camera.html">
+                    <img src="icons/camera.png" alt="Camera Icon" class="link-icon" />
+                    camera.html (Webcam Access)
+                </a>
+            </li>
+            <li>
+                <a href="maps2d.html">
+                    <img src="icons/map_2d.png" alt="Map Icon" class="link-icon" />
+                    maps2d.html (2D Map Viewer)
+                </a>
+            </li>
         </ul>
 
         <h1>Entertainment</h1>
         <ul>
-            <li><a href="windows-xp-simulation.html">NEW! Windows-xp-simulation.html</a></li>
-            <li><a href="games/home.html">StenoTOANSTIK ARCADE</a></li>
-            <li><a href="video.html">StenoVids</a></li>
-            <li><a href="video_plus.html">StenoVids Plus</a></li>
-            <li><a href="flappybird.html">FlappyBird</a></li>
-            <li><a href="tetris.html">StenoTetris</a></li>
-            <li><a href="2048.html">2048</a></li>
-            <li><a href="quiz.html">Zuiz Quiz</a></li>
-            <li><a href="pet.html">Talking Pet</a></li>
-            <li><a href="media.html">StenoMedia</a></li>
-            <li><a href="comic.html">StenoKomysk(since 2016)</a></li>
-            <li><a href="eggtastic.html">Eggtastic!</a></li>
+            <li>
+                <a href="windows-xp-simulation.html">
+                    <img src="icons/new_os.png" alt="Windows XP Icon" class="link-icon" />
+                    <span style="color: #66ff66;">NEW!</span> Windows-xp-simulation.html
+                </a>
+            </li>
+            <li>
+                <a href="games/home.html">
+                    <img src="icons/arcade.png" alt="Arcade Icon" class="link-icon" />
+                    StenoTOANSTIK ARCADE
+                </a>
+            </li>
+            <li>
+                <a href="video.html">
+                    <img src="icons/video.png" alt="Video Icon" class="link-icon" />
+                    StenoVids
+                </a>
+            </li>
+            <li>
+                <a href="video_plus.html">
+                    <img src="icons/video_plus.png" alt="Video Plus Icon" class="link-icon" />
+                    StenoVids Plus
+                </a>
+            </li>
+            <li>
+                <a href="flappybird.html">
+                    <img src="icons/bird.png" alt="Flappy Bird Icon" class="link-icon" />
+                    FlappyBird
+                </a>
+            </li>
+            <li>
+                <a href="tetris.html">
+                    <img src="icons/tetris.png" alt="Tetris Icon" class="link-icon" />
+                    StenoTetris
+                </a>
+            </li>
+            <li>
+                <a href="2048.html">
+                    <img src="icons/2048.png" alt="2048 Icon" class="link-icon" />
+                    2048 
+                </a>
+            </li>
+            <li>
+                <a href="quiz.html">
+                    <img src="icons/quiz.png" alt="Quiz Icon" class="link-icon" />
+                    Zuiz Quiz
+                </a>
+            </li>
+            <li>
+                <a href="pet.html">
+                    <img src="icons/pet.png" alt="Pet Icon" class="link-icon" />
+                    Talking Pet
+                </a>
+            </li>
+            <li>
+                <a href="media.html">
+                    <img src="icons/media.png" alt="Media Icon" class="link-icon" />
+                    StenoMedia 
+                </a>
+            </li>
+            <li>
+                <a href="comic.html">
+                    <img src="icons/comic.png" alt="Comic Icon" class="link-icon" />
+                    StenoKomysk (since 2016)
+                </a>
+            </li>
+            <li>
+                <a href="eggtastic.html">
+                    <img src="icons/egg.png" alt="Egg Icon" class="link-icon" />
+                    Eggtastic Video! 
+                </a>
+            </li>
         </ul>
 
         <h1>Downloadables</h1>
         <ul>
-            <li><a href="searxng.html">SearXNG Instructions</a></li>
-            <li><a href="ringzauber.html">Download Ringzauber!</a></li>
+            <li>
+                <a href="searxng.html">
+                    <img src="icons/download.png" alt="Download Icon" class="link-icon" />
+                    SearXNG Instructions
+                </a>
+            </li>
+            <li>
+                <a href="ringzauber.html">
+                    <img src="icons/software.png" alt="Software Icon" class="link-icon" />
+                    Download Ringzauber!
+                </a>
+            </li>
         </ul>
 
         <h1>Educational & Learning</h1>
         <ul>
-            <li><a href="quiz.html">Zuiz Quiz</a></li>
-            <li><a href="my-solar-system_en.html">PHet Gravity Simulation</a></li>
-            <li><a href="space-map.html">Solar System Scope</a></li>
+            <li>
+                <a href="quiz.html">
+                    <img src="icons/quiz.png" alt="Quiz Icon" class="link-icon" />
+                    Zuiz Quiz
+                </a>
+            </li>
+            <li>
+                <a href="my-solar-system_en.html">
+                    <img src="icons/planet.png" alt="Planet Icon" class="link-icon" />
+                    PHet Gravity Simulation
+                </a>
+            </li>
+            <li>
+                <a href="space-map.html">
+                    <img src="icons/space.png" alt="Space Icon" class="link-icon" />
+                    Solar System Scope
+                </a>
+            </li>
         </ul>
 
         <h1>Tools</h1>
         <ul>
-            <li><a href="maps.html">StenoFerkenne</a></li>
-            <li><a href="space-map.html">Map</a></li>
-            <li><a href="swc.html">swc.html</a></li>
-            <li><a href="clocker.html">Clocker</a></li>
-            <li><a href="compass.html">Compass.html</a></li>
-            <li><a href="testing.html">Testing.html</a></li>
-            <li><a href="blog.html">Blog.html</a></li>
-            <li><a href="boublok.html">Boublok.html</a></li>
+            <li>
+                <a href="maps.html">
+                    <img src="icons/gps.png" alt="Maps Icon" class="link-icon" />
+                    StenoFerkenne 
+                </a>
+            </li>
+            <li>
+                <a href="space-map.html">
+                    <img src="icons/map_pointer.png" alt="Map Icon" class="link-icon" />
+                    Map
+                </a>
+            </li>
+            
+            <li>
+                <a href="clocker.html">
+                    <img src="icons/clock.png" alt="Clock Icon" class="link-icon" />
+                    Clocker
+                </a>
+            </li>
+            <li>
+                <a href="compass.html">
+                    <img src="icons/compass.png" alt="Compass Icon" class="link-icon" />
+                    Compass.html
+                </a>
+            </li>
+            <li>
+                <a href="testing.html">
+                    <img src="icons/test.png" alt="Test Tube Icon" class="link-icon" />
+                    Testing.html 
+                </a>
+            </li>
+            <li>
+                <a href="blog.html">
+                    <img src="icons/blog.png" alt="Blog Icon" class="link-icon" />
+                    Blog.html
+                </a>
+            </li>
+            <li>
+                <a href="boublok.html">
+                    <img src="icons/blocks.png" alt="Blocks Icon" class="link-icon" />
+                    Boublok.html 
+                </a>
+            </li>
         </ul>
 
         <footer>
