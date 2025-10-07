@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://stenoip.github.io/new-swc.png" type="image/png" />
+    <title>StenoTextBox</title>
+    <style>
+        /* Existing Global Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+            color: #333;
+        }
+        .ribbon-menu {
+            background-color: #e610a5;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            padding: 5px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .tabs-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            flex-grow: 1;
+        }
+        .tab-button {
+            background-color: transparent;
+            border: none;
+            padding: 10px 15px;
+            font-size: 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            color: #555;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .tab-button:hover {
+            background-color: #f0f0f0;
+        }
+        .tab-button.active {
+            border-color: #0078d7;
+            color: #0078d7;
+        }
+        .tell-me {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            padding-left: 10px;
+        }
+        .tell-me input {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 250px;
+            transition: all 0.2s;
+        }
+        .tell-me input:focus {
+            outline: none;
+            border-color: #0078d7;
+            box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.2);
+        }
+        .tab-panel {
+            display: none;
+            padding: 10px 0;
+            margin-top: 5px;
+        }
+        .tab-panel.active {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .ribbon-group {
+            padding: 0 15px;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+        }
+        .ribbon-group:last-child {
+            border-right: none;
+        }
+        .ribbon-group-title {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            margin-top: 5px;
+            white-space: nowrap;
+        }
+        .ribbon-group-items {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .ribbon-item {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f9f9f9;
+            font-size: 14px;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            flex-shrink: 0;
+        }
+        .ribbon-item:hover {
+            background-color: #e9e9e9;
+        }
+        .ribbon-item:active {
+            transform: scale(0.98);
+        }
+        .ribbon-item.active {
+            background-color: #d1e2f6;
+            border-color: #0078d7;
+        }
+        .document-container {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: calc(100vh - 100px);
+        }
+        
+        /* NEW/MODIFIED EDITOR STYLES */
+        #editor {
+            width: 90%;
+            max-width: 8.5in;
+            min-height: 11in;
+            padding: 5vw;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
+            font-size: 16px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        /* NEW STYLES FOR STENOTEXTBOX CONTENT */
+        .steno-box {
+            position: absolute;
+            min-width: 100px;
+            min-height: 50px;
+            padding: 10px;
+            border: 2px dashed #0078d7;
+            background-color: rgba(255, 255, 255, 0.9);
+            cursor: grab;
+            box-sizing: border-box;
+            /* Remove default CSS resize property */
+            overflow: auto;
+            z-index: 20;
+            user-select: none;
+        }
+
+        .steno-box:focus-within {
+            border: 2px solid #ff4d4d;
+            z-index: 21 !important;
+        }
+        
+        .steno-content {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            cursor: text;
+        }
+        
+        .steno-text {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            outline: none;
+            font-size: 16px;
+            line-height: 1.6;
+            background-color: transparent;
+            box-sizing: border-box;
+            cursor: text;
+        }
+
+        .steno-image, .steno-video {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            user-select: none;
+        }
+        
+        /* RESIZE HANDLES STYLES */
+        .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0078d7;
+            border: 1px solid white;
+            z-index: 30;
+        }
+
+        .handle-tl { top: -5px; left: -5px; cursor: nwse-resize; }
+        .handle-tr { top: -5px; right: -5px; cursor: nesw-resize; }
+        .handle-bl { bottom: -5px; left: -5px; cursor: nesw-resize; }
+        .handle-br { bottom: -5px; right: -5px; cursor: nwse-resize; }
+        
+        /* Existing Canvas Styles */
+        #drawing-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .drawing-canvas-active {
+            cursor: crosshair;
+            pointer-events: auto !important;
+        }
+        
+        /* Other Existing Styles */
+        .spellcheck-highlight {
+            background-color: #fce8e8;
+            border-bottom: 2px solid #ff4d4d;
+        }
+        .theme-select {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .homepage-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-left: 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        .homepage-logo {
+            height: 30px;
+            width: 30px;
+        }
+        @media (max-width: 768px) {
+            .tabs-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .tabs {
+                justify-content: space-between;
+            }
+            .tab-button {
+                flex-grow: 1;
+                text-align: center;
+            }
+            .tell-me {
+                width: 100%;
+                margin: 10px 0;
+                padding: 0;
+            }
+            .tell-me input {
+                width: 100%;
+            }
+            .ribbon-menu {
+                padding: 5px 5px;
+            }
+            .ribbon-group {
+                border-right: none;
+                padding: 10px;
+                border-bottom: 1px solid #e0e0e0;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .tab-panel.active {
+                flex-direction: column;
+                gap: 10px;
+            }
+            #editor {
+                width: 100%;
+                padding: 10px;
+                min-height: 80vh;
+                font-size: 1em;
+            }
+        }
+    </style>
+    <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/spellcheck-js@1.0.1/dist/spellcheck-js.min.js"></script>
+</head>
+<body>
+    <header class="ribbon-menu">
+        <div class="tabs-container">
+            <nav class="tabs">
+                <button class="tab-button" data-tab="file">File</button>
+                <button class="tab-button active" data-tab="home">Home</button>
+                <button class="tab-button" data-tab="insert">Insert</button>
+                <button class="tab-button" data-tab="draw">Draw</button>
+                <button class="tab-button" data-tab="design">Design</button>
+                <button class="tab-button" data-tab="layout">Layout</button>
+                <button class="tab-button" data-tab="references">References</button>
+                <button class="tab-button" data-tab="review">Review</button>
+                <button class="tab-button" data-tab="view">View</button>
+            </nav>
+            <div class="tell-me">
+                <input type="text" placeholder="Tell me what you want to do...">
+            </div>
+            <a href="https://stenoip.github.io" class="homepage-button" title="Go to Homepage">
+                <img src="https://stenoip.github.io/new-swc.png" alt="StenoIP Logo" class="homepage-logo">
+            </a>
+        </div>
+
+        <div id="file-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="openFileBtn">Open .docx</button>
+                    <input type="file" id="fileInput" accept=".docx" style="display: none;">
+                    <button class="ribbon-item" id="saveTxtBtn">Save as .txt</button>
+                    <button class="ribbon-item" id="saveDocxBtn">Save as .docx</button>
+                    <button class="ribbon-item" id="savePdfBtn">Save as .pdf</button>
+                </div>
+                <div class="ribbon-group-title">Document</div>
+            </div>
+        </div>
+
+        <div id="home-panel" class="tab-panel active">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="addTextBoxBtn">Add Text Box </button>
+                    <button class="ribbon-item" data-command="cut">Cut</button>
+                    <button class="ribbon-item" data-command="copy">Copy</button>
+                    <button class="ribbon-item" data-command="paste">Paste</button>
+                </div>
+                <div class="ribbon-group-title">Clipboard / Elements</div>
+            </div>
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <select class="ribbon-item" data-command="fontName">
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    <select class="ribbon-item" data-command="fontSize">
+                        <option value="1">8</option>
+                        <option value="2">10</option>
+                        <option value="3" selected>12</option>
+                        <option value="4">14</option>
+                        <option value="5">18</option>
+                        <option value="6">24</option>
+                        <option value="7">36</option>
+                    </select>
+                    <button class="ribbon-item" data-command="bold"><b>B</b></button>
+                    <button class="ribbon-item" data-command="italic"><i>I</i></button>
+                    <button class="ribbon-item" data-command="underline"><u>U</u></button>
+                </div>
+                <div class="ribbon-group-title">Font (Active Box)</div>
+            </div>
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" data-command="justifyleft">Left</button>
+                    <button class="ribbon-item" data-command="justifycenter">Center</button>
+                    <button class="ribbon-item" data-command="justifyright">Right</button>
+                    <button class="ribbon-item" data-command="justifyfull">Justify</button>
+                </div>
+                <div class="ribbon-group-title">Paragraph (Active Box)</div>
+            </div>
+        </div>
+
+        <div id="insert-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" data-command="insertHTML" data-value="<hr>">Horizontal Line</button>
+                    <button class="ribbon-item" data-command="createLink">Link</button>
+                    <button class="ribbon-item" id="insertImageBtn">Picture Box </button>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <button class="ribbon-item" id="insertVideoBtn">Video Box </button>
+                    <input type="file" id="videoInput" accept="video/*" style="display: none;">
+                    <button class="ribbon-item" id="insertTableBtn">Table Box </button>
+                </div>
+                <div class="ribbon-group-title">Insertions</div>
+            </div>
+        </div>
+
+        <div id="draw-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="penBtn">Pen</button>
+                    <button class="ribbon-item" id="eraserBtn">Eraser</button>
+                    <button class="ribbon-item" id="cursorBtn">Cursor</button>
+                </div>
+                <div class="ribbon-group-title">Tools</div>
+            </div>
+        </div>
+        
+        <div id="design-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <select class="ribbon-item theme-select" id="themeSelect">
+                        <option value="light">Light Theme</option>
+                        <option value="dark">Dark Theme</option>
+                        <option value="blue">Blue Theme</option>
+                    </select>
+                </div>
+                <div class="ribbon-group-title">Themes</div>
+            </div>
+        </div>
+        <div id="layout-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <select class="ribbon-item" id="marginSelect">
+                        <option value="normal">Normal</option>
+                        <option value="narrow">Narrow</option>
+                        <option value="wide">Wide</option>
+                    </select>
+                </div>
+                <div class="ribbon-group-title">Margins</div>
+            </div>
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="orientationBtn">Orientation</button>
+                </div>
+                <div class="ribbon-group-title">Page Setup</div>
+            </div>
+        </div>
+        <div id="references-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="tocBtn">Table of Contents</button>
+                </div>
+                <div class="ribbon-group-title">Table of Contents</div>
+            </div>
+        </div>
+        <div id="review-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="spellCheckBtn">Spelling & Grammar</button>
+                </div>
+                <div class="ribbon-group-title">Proofing</div>
+            </div>
+        </div>
+        <div id="view-panel" class="tab-panel">
+            <div class="ribbon-group">
+                <div class="ribbon-group-items">
+                    <button class="ribbon-item" id="readModeBtn">Read Mode</button>
+                    <button class="ribbon-item" id="printLayoutBtn">Print Layout</button>
+                </div>
+                <div class="ribbon-group-title">Views</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="document-container">
+        <div id="editor">
+            <h1>StenoTextBox</h1>
+            <p>Click "Add Text Box" or "Insert" to begin creating your layout.<br>&copy; Stenoip Company</p>
+        </div>
+        <canvas id="drawing-canvas"></canvas>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var tabButtons = document.querySelectorAll('.tab-button');
+            var tabPanels = document.querySelectorAll('.tab-panel');
+            var editor = document.getElementById('editor');
+            var ribbonMenu = document.querySelector('.ribbon-menu');
+            
+            // File Buttons
+            var fileInput = document.getElementById('fileInput');
+            var openFileBtn = document.getElementById('openFileBtn');
+            var saveTxtBtn = document.getElementById('saveTxtBtn');
+            var saveDocxBtn = document.getElementById('saveDocxBtn');
+            var savePdfBtn = document.getElementById('savePdfBtn');
+            
+            // Home Buttons (New)
+            var addTextBoxBtn = document.getElementById('addTextBoxBtn');
+            
+            // Insert Buttons (Modified)
+            var insertImageBtn = document.getElementById('insertImageBtn');
+            var imageInput = document.getElementById('imageInput');
+            var insertVideoBtn = document.getElementById('insertVideoBtn');
+            var videoInput = document.getElementById('videoInput');
+            var insertTableBtn = document.getElementById('insertTableBtn');
+
+            // Draw Buttons
+            var penBtn = document.getElementById('penBtn');
+            var eraserBtn = document.getElementById('eraserBtn');
+            var cursorBtn = document.getElementById('cursorBtn');
+            var drawingCanvas = document.getElementById('drawing-canvas');
+
+            // Other Buttons
+            var themeSelect = document.getElementById('themeSelect');
+            var marginSelect = document.getElementById('marginSelect');
+            var orientationBtn = document.getElementById('orientationBtn');
+            var tocBtn = document.getElementById('tocBtn');
+            var spellCheckBtn = document.getElementById('spellCheckBtn');
+            var readModeBtn = document.getElementById('readModeBtn');
+            var printLayoutBtn = document.getElementById('printLayoutBtn');
+
+            // --- NEW STENOTEXTBOX LOGIC ---
+            var activeBox = null;
+            var zIndexCounter = 100;
+            var MIN_SIZE = 50; // Minimum size for resizing
+
+            /**
+             * Adds resize handles to a box element.
+             * @param {HTMLElement} box The steno-box element.
+             */
+            function addResizeHandles(box) {
+                var handles = [
+                    { className: 'handle-tl', cursor: 'nwse-resize' },
+                    { className: 'handle-tr', cursor: 'nesw-resize' },
+                    { className: 'handle-bl', cursor: 'nesw-resize' },
+                    { className: 'handle-br', cursor: 'nwse-resize' }
+                ];
+
+                handles.forEach(function(handleData) {
+                    var handle = document.createElement('div');
+                    handle.className = 'resize-handle ' + handleData.className;
+                    handle.style.cursor = handleData.cursor;
+                    
+                    handle.addEventListener('mousedown', function(e) {
+                        e.stopPropagation(); // Prevent drag of the box itself
+                        e.preventDefault();
+
+                        box.style.zIndex = ++zIndexCounter;
+                        var startX = e.clientX;
+                        var startY = e.clientY;
+                        var initialWidth = box.offsetWidth;
+                        var initialHeight = box.offsetHeight;
+                        var initialLeft = box.offsetLeft;
+                        var initialTop = box.offsetTop;
+
+                        function resize(moveEvent) {
+                            var deltaX = moveEvent.clientX - startX;
+                            var deltaY = moveEvent.clientY - startY;
+                            var newWidth = initialWidth;
+                            var newHeight = initialHeight;
+                            var newLeft = initialLeft;
+                            var newTop = initialTop;
+
+                            if (handleData.className.includes('r')) {
+                                newWidth = Math.max(MIN_SIZE, initialWidth + deltaX);
+                            }
+                            if (handleData.className.includes('l')) {
+                                newWidth = Math.max(MIN_SIZE, initialWidth - deltaX);
+                                if (newWidth > MIN_SIZE) {
+                                    newLeft = initialLeft + deltaX;
+                                } else {
+                                    newLeft = initialLeft + (initialWidth - MIN_SIZE);
+                                }
+                            }
+                            if (handleData.className.includes('b')) {
+                                newHeight = Math.max(MIN_SIZE, initialHeight + deltaY);
+                            }
+                            if (handleData.className.includes('t')) {
+                                newHeight = Math.max(MIN_SIZE, initialHeight - deltaY);
+                                if (newHeight > MIN_SIZE) {
+                                    newTop = initialTop + deltaY;
+                                } else {
+                                    newTop = initialTop + (initialHeight - MIN_SIZE);
+                                }
+                            }
+                            
+                            box.style.width = newWidth + 'px';
+                            box.style.height = newHeight + 'px';
+                            box.style.left = newLeft + 'px';
+                            box.style.top = newTop + 'px';
+                        }
+
+                        function stopResize() {
+                            document.removeEventListener('mousemove', resize);
+                            document.removeEventListener('mouseup', stopResize);
+                            saveContent();
+                        }
+
+                        document.addEventListener('mousemove', resize);
+                        document.addEventListener('mouseup', stopResize);
+                    });
+                    
+                    box.appendChild(handle);
+                });
+            }
+
+            function createStenoBox(contentHTML, type) {
+                contentHTML = contentHTML || '<textarea class="steno-content steno-text" placeholder="Type here..."></textarea>';
+                type = type || 'text';
+
+                // Remove initial static content on first box creation
+                if (editor.querySelector('h1')) {
+                    editor.innerHTML = '';
+                }
+
+                var box = document.createElement('div');
+                box.className = 'steno-box';
+                box.innerHTML = contentHTML;
+
+                // Set initial position
+                box.style.left = Math.random() * (editor.clientWidth - 350) + 20 + 'px';
+                box.style.top = Math.random() * (editor.clientHeight - 200) + 20 + 'px';
+                box.style.width = (type === 'image' || type === 'video') ? '200px' : '300px';
+                box.style.height = (type === 'image' || type === 'video') ? 'auto' : '150px';
+
+                // Set z-index to bring it to the front
+                box.style.zIndex = ++zIndexCounter;
+
+                // Add handles
+                addResizeHandles(box);
+
+                // Dragging Logic
+                box.addEventListener('mousedown', function(e) {
+                    // Only start drag if clicking on the box border/padding, not the content or a handle
+                    if (e.target.closest('.steno-box') === box && !e.target.classList.contains('steno-content') && !e.target.classList.contains('resize-handle')) {
+                        e.preventDefault();
+                        activeBox = box;
+                        box.style.zIndex = ++zIndexCounter;
+
+                        var offsetX = e.clientX - box.offsetLeft;
+                        var offsetY = e.clientY - box.offsetTop;
+
+                        function moveBox(moveEvent) {
+                            box.style.left = moveEvent.clientX - offsetX + 'px';
+                            box.style.top = moveEvent.clientY - offsetY + 'px';
+                        }
+
+                        function stopDrag() {
+                            document.removeEventListener('mousemove', moveBox);
+                            document.removeEventListener('mouseup', stopDrag);
+                            saveContent(); // Auto-save after moving
+                        }
+
+                        document.addEventListener('mousemove', moveBox);
+                        document.addEventListener('mouseup', stopDrag);
+                    }
+                });
+                
+                // Clicking on the box activates it for formatting
+                box.addEventListener('click', function() {
+                    activeBox = box;
+                    box.style.zIndex = ++zIndexCounter;
+                });
+
+                editor.appendChild(box);
+                activeBox = box;
+
+                // If it's a text box, immediately focus the content for typing
+                var content = box.querySelector('.steno-content');
+                if (content && content.tagName === 'TEXTAREA') {
+                    content.focus();
+                }
+
+                return box;
+            }
+            
+            // Re-attach drag/resize listeners and handles to loaded boxes
+            function reattachBoxListeners() {
+                editor.querySelectorAll('.steno-box').forEach(function(box) {
+                    if (!box.querySelector('.resize-handle')) {
+                        addResizeHandles(box);
+                    }
+                    
+                    // Re-apply the drag logic on loaded boxes
+                    box.addEventListener('mousedown', function(e) {
+                        if (e.target.closest('.steno-box') === box && !e.target.classList.contains('steno-content') && !e.target.classList.contains('resize-handle')) {
+                            e.preventDefault();
+                            activeBox = box;
+                            box.style.zIndex = ++zIndexCounter;
+
+                            var offsetX = e.clientX - box.offsetLeft;
+                            var offsetY = e.clientY - box.offsetTop;
+
+                            function moveBox(moveEvent) {
+                                box.style.left = moveEvent.clientX - offsetX + 'px';
+                                box.style.top = moveEvent.clientY - offsetY + 'px';
+                            }
+
+                            function stopDrag() {
+                                document.removeEventListener('mousemove', moveBox);
+                                document.removeEventListener('mouseup', stopDrag);
+                                saveContent();
+                            }
+
+                            document.addEventListener('mousemove', moveBox);
+                            document.addEventListener('mouseup', stopDrag);
+                        }
+                    });
+                    
+                    box.addEventListener('click', function() {
+                        activeBox = box;
+                        box.style.zIndex = ++zIndexCounter;
+                    });
+                });
+            }
+
+            // Home Tab: Add Text Box
+            addTextBoxBtn.addEventListener('click', function() {
+                createStenoBox();
+            });
+            
+            // Insert Tab: Image Box
+            insertImageBtn.addEventListener('click', function() {
+                imageInput.click();
+            });
+            imageInput.addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function() {
+                        var img = document.createElement('img');
+                        img.src = reader.result;
+                        img.className = 'steno-content steno-image';
+                        // Create a box with the image inside
+                        createStenoBox(img.outerHTML, 'image').style.width = '200px'; 
+                        activeBox.style.height = 'auto'; // Let height be determined by width
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Insert Tab: Video Box
+            insertVideoBtn.addEventListener('click', function() {
+                videoInput.click();
+            });
+            videoInput.addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function() {
+                        var video = document.createElement('video');
+                        video.src = reader.result;
+                        video.controls = true;
+                        video.className = 'steno-content steno-video';
+                        createStenoBox(video.outerHTML, 'video').style.width = '320px';
+                        activeBox.style.height = '240px';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Insert Tab: Table Box (Simple example)
+            insertTableBtn.addEventListener('click', function() {
+                var tableHtml = '<div class="steno-content" contenteditable="true" style="overflow: auto;">' + 
+                                  '<table border="1" style="width:100%; min-width: 200px;">' +
+                                  '<tr><th>Header 1</th><th>Header 2</th></tr>' +
+                                  '<tr><td>Cell 1</td><td>Cell 2</td></tr>' +
+                                  '</table></div>';
+                createStenoBox(tableHtml, 'table').style.height = 'auto';
+            });
+
+            // --- EXISTING FUNCTION MODIFICATIONS ---
+
+            // Home Tab Functionality (Modified for activeBox)
+            ribbonMenu.addEventListener('click', function(event) {
+                var target = event.target.closest('.ribbon-item');
+                if (!target || !target.dataset.command) return;
+                var command = target.dataset.command;
+                var value = target.value || target.dataset.value;
+
+                // Only apply commands to the active box's editable content
+                if (activeBox) {
+                    var content = activeBox.querySelector('.steno-content, .steno-text');
+                    
+                    // For text formatting, apply to the focused element's selection
+                    if (content && (content.tagName === 'TEXTAREA' || content.getAttribute('contenteditable') === 'true')) {
+                        document.execCommand(command, false, value);
+                    }
+                    // For cut/copy/paste, allow global execution
+                    else if (['cut', 'copy', 'paste'].includes(command.toLowerCase())) {
+                        document.execCommand(command, false, value);
+                    }
+                }
+            });
+            
+            // DOCX Save
+            saveDocxBtn.addEventListener('click', function() {
+                var contentHtml = Array.from(editor.querySelectorAll('.steno-box'))
+                    .map(function(box) {
+                        // Get the content of the box, strip handles for cleaner output
+                        var clone = box.cloneNode(true);
+                        clone.querySelectorAll('.resize-handle').forEach(function(h) { h.remove(); });
+                        var innerContent = clone.innerHTML;
+                        
+                        // Extract numeric values from position/size
+                        var left = parseFloat(box.style.left) || 0;
+                        var top = parseFloat(box.style.top) || 0;
+                        var width = box.style.width || 'auto';
+                        var height = box.style.height || 'auto';
+                        
+                        // Wrap content with positioning styles for DOCX conversion
+                        return `<div style="position: absolute; left: ${left}pt; top: ${top}pt; width: ${width}; height: ${height}; border: 1px dashed #000; padding: 10px;">${innerContent}</div>`;
+                    })
+                    .join('<div style="clear: both; margin-top: 50pt;"></div>'); // Use clearfix/margin to ensure separation
+
+                var content = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' + contentHtml + '</body></html>';
+                var converted = htmlDocx.asBlob(content);
+                saveAs(converted, 'StenoTextBox_document.docx');
+                alert('DOCX saved! Note: Layout precision may vary by word processor.');
+            });
+
+            // TXT Save (Saves inner text of all textareas)
+            saveTxtBtn.addEventListener('click', function() {
+                var textContent = Array.from(editor.querySelectorAll('.steno-text')).map(function(t) {
+                    return '--- BOX CONTENT ---\n' + t.value;
+                }).join('\n\n');
+                var blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+                saveAs(blob, 'StenoTextBox_document.txt');
+            });
+
+
+            // PDF Save (Html2Canvas will capture the entire editor with positioned boxes)
+            savePdfBtn.addEventListener('click', function() {
+                html2canvas(editor, { allowTaint: true, useCORS: true }).then(function(canvas) {
+                    var jsPDF = window.jspdf.jsPDF;
+                    var imgData = canvas.toDataURL('image/png');
+                    var pdf = new jsPDF('p', 'mm', 'a4');
+                    var imgWidth = 210;
+                    var pageHeight = 295;
+                    var imgHeight = canvas.height * imgWidth / canvas.width;
+                    var heightLeft = imgHeight;
+                    var position = 0;
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    pdf.save('StenoTextBox_document.pdf');
+                });
+            });
+
+            // Autoload/Autosave
+            var AUTOSAVE_KEY = 'stenoTextBoxContent';
+            var AUTOSAVE_INTERVAL = 5000;
+
+            function saveContent() {
+                try {
+                    // Temporarily remove handles before saving to avoid duplication on load
+                    editor.querySelectorAll('.resize-handle').forEach(function(h) { h.remove(); });
+                    localStorage.setItem(AUTOSAVE_KEY, editor.innerHTML);
+                    // Re-add handles immediately
+                    editor.querySelectorAll('.steno-box').forEach(addResizeHandles);
+                } catch (e) {
+                    console.error('Could not save to localStorage:', e);
+                }
+            }
+
+            function loadContent() {
+                try {
+                    var savedContent = localStorage.getItem(AUTOSAVE_KEY);
+                    if (savedContent) {
+                        editor.innerHTML = savedContent;
+                        // Recalculate z-index and re-attach listeners/handles
+                        editor.querySelectorAll('.steno-box').forEach(function(box) {
+                            if (parseFloat(box.style.zIndex) > zIndexCounter) {
+                                zIndexCounter = parseFloat(box.style.zIndex);
+                            }
+                        });
+                        reattachBoxListeners();
+                    }
+                } catch (e) {
+                    console.error('Could not load from localStorage:', e);
+                }
+            }
+
+            loadContent();
+            var autosaveTimer = setInterval(saveContent, AUTOSAVE_INTERVAL);
+            window.addEventListener('beforeunload', saveContent);
+
+
+            // --- EXISTING CORE LOGIC (Mostly Unchanged) ---
+            tabButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    tabButtons.forEach(function(btn) { btn.classList.remove('active'); });
+                    tabPanels.forEach(function(panel) { panel.classList.remove('active'); });
+                    button.classList.add('active');
+                    var targetPanel = document.getElementById(button.dataset.tab + '-panel');
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                    }
+                });
+            });
+
+            // Draw Tab Functionality (Unchanged, all vars changed to var)
+            var isDrawing = false;
+            var lastX = 0;
+            var lastY = 0;
+            var mode = 'pen';
+            var ctx = drawingCanvas.getContext('2d');
+            var resizeCanvas = function() {
+                drawingCanvas.width = editor.clientWidth;
+                drawingCanvas.height = editor.clientHeight;
+                ctx.lineWidth = 5;
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+            };
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            drawingCanvas.addEventListener('mousedown', function(e) {
+                isDrawing = true;
+                var rect = drawingCanvas.getBoundingClientRect();
+                lastX = e.clientX - rect.left;
+                lastY = e.clientY - rect.top;
+            });
+            drawingCanvas.addEventListener('mousemove', function(e) {
+                if (!isDrawing) return;
+                var rect = drawingCanvas.getBoundingClientRect();
+                var newX = e.clientX - rect.left;
+                var newY = e.clientY - rect.top;
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(newX, newY);
+                if (mode === 'pen') {
+                    ctx.strokeStyle = '#000';
+                    ctx.globalCompositeOperation = 'source-over';
+                } else if (mode === 'eraser') {
+                    ctx.strokeStyle = '#fff';
+                    ctx.globalCompositeOperation = 'destination-out';
+                }
+                ctx.stroke();
+                lastX = newX;
+                lastY = newY;
+            });
+            drawingCanvas.addEventListener('mouseup', function() { isDrawing = false; });
+            drawingCanvas.addEventListener('mouseout', function() { isDrawing = false; });
+
+            penBtn.addEventListener('click', function() {
+                mode = 'pen';
+                drawingCanvas.classList.add('drawing-canvas-active');
+            });
+            eraserBtn.addEventListener('click', function() {
+                mode = 'eraser';
+                drawingCanvas.classList.add('drawing-canvas-active');
+            });
+            cursorBtn.addEventListener('click', function() {
+                drawingCanvas.classList.remove('drawing-canvas-active');
+            });
+            
+            // Design Tab Functionality (Unchanged)
+            themeSelect.addEventListener('change', function(e) {
+                var theme = e.target.value;
+                document.body.className = '';
+                if (theme === 'dark') {
+                    document.body.style.backgroundColor = '#333';
+                    document.body.style.color = '#f3f3f3';
+                } else if (theme === 'blue') {
+                    document.body.style.backgroundColor = '#f0f8ff';
+                    document.body.style.color = '#00008b';
+                } else {
+                    document.body.style.backgroundColor = '#f3f3f3';
+                    document.body.style.color = '#333';
+                }
+            });
+
+            // Layout Tab Functionality (Unchanged)
+            marginSelect.addEventListener('change', function(e) {
+                var margin = e.target.value;
+                if (margin === 'normal') {
+                    editor.style.padding = '1in';
+                } else if (margin === 'narrow') {
+                    editor.style.padding = '0.5in';
+                } else if (margin === 'wide') {
+                    editor.style.padding = '2in';
+                }
+            });
+            orientationBtn.addEventListener('click', function() {
+                if (editor.style.width === '11in') {
+                    editor.style.width = '8.5in';
+                    editor.style.minHeight = '11in';
+                } else {
+                    editor.style.width = '11in';
+                    editor.style.minHeight = '8.5in';
+                }
+            });
+
+            // References Tab Functionality (Unchanged)
+            tocBtn.addEventListener('click', function() {
+                alert('Table of Contents functionality is not fully supported for a dynamic box layout.');
+            });
+
+            // Review Tab Functionality (Unchanged)
+            spellCheckBtn.addEventListener('click', function() {
+                var activeTextBox = document.activeElement.closest('.steno-text');
+                if (!activeTextBox) {
+                    alert('No text box is currently focused.');
+                    return;
+                }
+                
+                var text = activeTextBox.value;
+                var speller = new SpellCheck();
+                var misspelled = speller.check(text).misspelled;
+                
+                if (misspelled.length > 0) {
+                    alert('Found ' + misspelled.length + ' misspelled words: ' + misspelled.join(', '));
+                } else {
+                    alert('No misspelled words found in the active box!');
+                }
+            });
+
+            // View Tab Functionality (Modified)
+            readModeBtn.addEventListener('click', function() {
+                var allBoxes = editor.querySelectorAll('.steno-box');
+                var isReadMode = allBoxes[0] && allBoxes[0].style.pointerEvents !== 'none';
+                
+                if (isReadMode) {
+                    // Enter Read Mode
+                    editor.style.backgroundColor = '#f5f5f5';
+                    editor.style.boxShadow = 'none';
+                    editor.style.border = 'none';
+                    allBoxes.forEach(function(box) {
+                        box.style.border = 'none';
+                        box.style.pointerEvents = 'none'; // Disable movement/resize
+                        box.querySelectorAll('.resize-handle').forEach(function(h) { h.style.display = 'none'; });
+                        var content = box.querySelector('.steno-content, .steno-text');
+                        if (content) content.disabled = true;
+                    });
+                } else {
+                    // Exit Read Mode (Return to Layout Mode)
+                    editor.style.backgroundColor = 'white';
+                    editor.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+                    editor.style.border = '1px solid #ccc';
+                    allBoxes.forEach(function(box) {
+                        box.style.border = '2px dashed #0078d7';
+                        box.style.pointerEvents = 'auto'; // Enable movement/resize
+                        box.querySelectorAll('.resize-handle').forEach(function(h) { h.style.display = 'block'; });
+                        var content = box.querySelector('.steno-content, .steno-text');
+                        if (content) content.disabled = false;
+                    });
+                }
+            });
+            printLayoutBtn.addEventListener('click', function() { window.print(); });
+
+            // Update font/size selects to reflect current selection (Modified)
+            editor.addEventListener('click', function() {
+                if (activeBox) {
+                    var content = activeBox.querySelector('.steno-content, .steno-text');
+                    if (content) {
+                        var currentFont = document.queryCommandValue('fontName');
+                        var currentSize = document.queryCommandValue('fontSize');
+                        var fontFamilySelect = document.querySelector('[data-command="fontName"]');
+                        if (fontFamilySelect) fontFamilySelect.value = currentFont;
+                        var fontSizeSelect = document.querySelector('[data-command="fontSize"]');
+                        if (fontSizeSelect) fontSizeSelect.value = currentSize;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
