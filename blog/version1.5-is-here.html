@@ -1,134 +1,232 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-* {
-  box-sizing: border-box;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/new-swc.png" type="image/png" />  
+    <title>StenoBlogs - My loooooooong summer of working</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* General Reset and Font */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6; /* Light gray blog background */
+            line-height: 1.7;
+            color: #333;
+        }
 
-/* Add a gray background color with some padding */
-body {
-  font-family: Arial;
-  padding: 20px;
-  background: #f1f1f1;
-}
+        /* --- Global Styles --- */
+        .container {
+            max-width: 800px; /* Narrower for blog-style reading */
+            margin: 0 auto;
+            padding: 20px;
+        }
+        p {
+            font-size: 1.05em;
+            margin-bottom: 20px;
+        }
+        h2, h3, h4 {
+            font-family: 'Playfair Display', serif; /* Serif font for blog headings */
+            color: #1a1a1a;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        h2 {
+            font-size: 2.5em;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #007bff; /* Primary blue for subheadings */
+            font-size: 1.8em;
+        }
 
-/* Header/Blog Title */
-.header {
-  padding: 30px;
-  font-size: 40px;
-  text-align: center;
-  background: white;
-}
+        /* --- Header/Blog Title --- */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+        .blog-logo {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            color: #0056b3;
+            margin: 0;
+        }
+        .blog-meta {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 10px;
+        }
 
-/* Create two unequal columns that floats next to each other */
-/* Left column */
-.leftcolumn {   
-  float: left;
-  width: 75%;
-}
+        /* --- Blog Post Card --- */
+        .post-card {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
 
-/* Right column */
-.rightcolumn {
-  float: left;
-  width: 25%;
-  padding-left: 20px;
-}
+        /* Image Styling */
+        .post-image {
+            margin-bottom: 25px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .post-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
 
-/* Fake image */
-.fakeimg {
-  background-color: #aaa;
-  width: 100%;
-  padding: 20px;
-}
+        /* List Styling */
+        .features-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .features-list li {
+            padding: 8px 0 8px 30px;
+            position: relative;
+            color: #333;
+            border-bottom: 1px dashed #eee;
+        }
+        .features-list li::before {
+            content: '✅'; /* Clear, simple icon */
+            position: absolute;
+            left: 0;
+            font-size: 1.1em;
+        }
+        .features-list li:last-child {
+            border-bottom: none;
+        }
 
-/* Add a card effect for articles */
-.card {
-   background-color: white;
-   padding: 20px;
-   margin-top: 20px;
-}
+        /* Call to Action Box */
+        .cta-box {
+            background-color: #e6f7ff; /* Light blue background */
+            border: 1px solid #b3e0ff;
+            padding: 25px;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .cta-box h4 {
+            color: #007bff;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 0;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #ffc107;
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+        .cta-button:hover {
+            background-color: #e0a800;
+        }
 
-/* Clear floats after the columns */
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
+        /* Contact/Price Highlight */
+        .price-highlight {
+            font-size: 1.4em;
+            color: #28a745;
+            font-weight: 700;
+            text-align: center;
+            padding: 15px 0;
+            margin: 20px 0;
+            border-top: 1px dashed #ccc;
+            border-bottom: 1px dashed #ccc;
+        }
+        .price-highlight span {
+            font-size: 1.6em;
+            color: #dc3545; /* Red accent for the price */
+        }
 
-/* Footer */
-.footer {
-  padding: 20px;
-  text-align: center;
-  background: #ddd;
-  margin-top: 20px;
-}
-
-/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
-@media screen and (max-width: 800px) {
-  .leftcolumn, .rightcolumn {   
-    width: 100%;
-    padding: 0;
-  }
-}
-</style>
+        /* --- Footer --- */
+        .footer {
+            padding: 25px 20px;
+            text-align: center;
+            background: #e9ecef;
+            color: #6c757d;
+            margin-top: 30px;
+            font-size: 0.9em;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
 </head>
 <body>
 
 <div class="header">
-  <h2>My loooooooong summer of working</h2>
+    <div class="blog-logo">StenoBlogs</div>
+    <h1>My loooooooong summer of working</h1>
+    <div class="blog-meta">Posted by the Stenoip Team | Sunday 7th September 2025 | Category: Website</div>
 </div>
 
-<div class="row">
-  <div class="leftcolumn">
-    <div class="card">
-      
-      <h5>Sunday 7th September 2025</h5>
-      <div class="fakeimg" style="height:200px;"><img src="https://stenoip.github.io/praterich/ladypraterich.png"></div>
+<div class="container">
+    <div class="post-card">
+        
+        <h2>Ideas</h2>
 
-      <p>
+          <p>
     Today, I finally finished my website. Well, not really. I am going to take a break. Every day(s) in a week, I will be constantly working on my website. Why? Well it was to develop Praterich of course? 
         <a href="https://stenoip.github.io/praterich">Praterich</a> is my very on A.I chatbot powered by the model Gemini 2.5 flash
         (I will of added GPT-4 but it requires a subscription.<br>
         You may be asking, why am I using Gemini Flash? Should I make why very own? Well first, I do not have a server
         complex in the desert like Google or OpenAI. Second, Microsoft did it with Microsoft Copilot.<br>
         Praterich was a success. She gave correct responses, was able to generate <strong>some</strong> code
-        and was well smart. But, I can image in the year 2034, everyone will be able to make a chatbot. So I decided to go big.
-        
-    
-        
-      </p>
-<div class="fakeimg" style="height:100px;"><img src="/ringzauber.png"></div>
-      <p>That's right, I decided to put Praterich on Ringzauber!<br>
+        and was well smart. But, I can image in the year 2034, everyone will be able to make a chatbot. So I decided to go big.<p>
+
+        <div class="post-image" style="max-height: 400px;">
+            <img src="/ringzauber.ico" alt="Ringzauber Logo">
+        </div>
+
+        <h3>Working</h3>
+       <p>That's right, I decided to put Praterich on Ringzauber!<br>
       It all started when I was in the shower. I thought "What does my browser have that other's don't"?
         I earlier used Google Assistant and I got an idea. What if Praterich can control Ringzauber. And so I started working.<br>
         It took a few months but I am finally finished. Most hurdles where bugs in the code. It took a long time to fix them.<br>
         Unforunately, some bugs remain. During the time I was fixing some bugs, I was saving some of my ideas for another update.<br>
         Still, I was pleased with my work. I called some friends over and they said they liked it. Hopefully, you do too.
         <br> <a href="ringzauber.html">Download here</a>. I suggest filling the Google Forms to tell me your review and how I can fix Ringzauber.
-      </p>
-    </div>
+        
+        
 
+        
+      
+        
 
-    
-    
-    <div class="card">
-      <h2>About Me</h2>
+        <h3>Find Us Here:</h3>
       
-      <p>Obiviously, I can't tell about me. It's the Internet!</p>
+        <div class="cta-box">
+         
+            <p style="margin-top: 15px; margin-bottom: 0;"><small>Email: <a href="mailto:info@jnjapartments.com" style="color: #007bff;">customerserviceforstenoip@gmail.com</a></small></p>
+        </div>
+
     </div>
-    
-    <div class="card">
-      <h3>Follow Me</h3>
-      
-      <p>I don't use Social Media! It TRACKS you!</p>
-    </div>
-  </div>
 </div>
 
 <div class="footer">
-  <h2>Copyright Stenoip Company</h2>
+    <p>Stenoip! Cartoons and phones for you!</p>
+    <p>© 2025 Stenoip Company</p>
 </div>
 
 </body>
