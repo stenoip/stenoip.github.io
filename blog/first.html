@@ -1,117 +1,224 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-* {
-  box-sizing: border-box;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StenoBlogs - Hey grads!</title>
+    <link rel="icon" href="/new-swc.png" type="image/png" />  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* General Reset and Font */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6; /* Light gray blog background */
+            line-height: 1.7;
+            color: #333;
+        }
 
-/* Add a gray background color with some padding */
-body {
-  font-family: Arial;
-  padding: 20px;
-  background: #f1f1f1;
-}
+        /* --- Global Styles --- */
+        .container {
+            max-width: 800px; /* Narrower for blog-style reading */
+            margin: 0 auto;
+            padding: 20px;
+        }
+        p {
+            font-size: 1.05em;
+            margin-bottom: 20px;
+        }
+        h2, h3, h4 {
+            font-family: 'Playfair Display', serif; /* Serif font for blog headings */
+            color: #1a1a1a;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        h2 {
+            font-size: 2.5em;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #007bff; /* Primary blue for subheadings */
+            font-size: 1.8em;
+        }
 
-/* Header/Blog Title */
-.header {
-  padding: 30px;
-  font-size: 40px;
-  text-align: center;
-  background: white;
-}
+        /* --- Header/Blog Title --- */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+        .blog-logo {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            color: #0056b3;
+            margin: 0;
+        }
+        .blog-meta {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 10px;
+        }
 
-/* Create two unequal columns that floats next to each other */
-/* Left column */
-.leftcolumn {   
-  float: left;
-  width: 75%;
-}
+        /* --- Blog Post Card --- */
+        .post-card {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
 
-/* Right column */
-.rightcolumn {
-  float: left;
-  width: 25%;
-  padding-left: 20px;
-}
+        /* Image Styling */
+        .post-image {
+            margin-bottom: 25px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .post-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
 
-/* Fake image */
-.fakeimg {
-  background-color: #aaa;
-  width: 100%;
-  padding: 20px;
-}
+        /* List Styling */
+        .features-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .features-list li {
+            padding: 8px 0 8px 30px;
+            position: relative;
+            color: #333;
+            border-bottom: 1px dashed #eee;
+        }
+        .features-list li::before {
+            content: '✅'; /* Clear, simple icon */
+            position: absolute;
+            left: 0;
+            font-size: 1.1em;
+        }
+        .features-list li:last-child {
+            border-bottom: none;
+        }
 
-/* Add a card effect for articles */
-.card {
-   background-color: white;
-   padding: 20px;
-   margin-top: 20px;
-}
+        /* Call to Action Box */
+        .cta-box {
+            background-color: #e6f7ff; /* Light blue background */
+            border: 1px solid #b3e0ff;
+            padding: 25px;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .cta-box h4 {
+            color: #007bff;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 0;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #ffc107;
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+        .cta-button:hover {
+            background-color: #e0a800;
+        }
 
-/* Clear floats after the columns */
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
+        /* Contact/Price Highlight */
+        .price-highlight {
+            font-size: 1.4em;
+            color: #28a745;
+            font-weight: 700;
+            text-align: center;
+            padding: 15px 0;
+            margin: 20px 0;
+            border-top: 1px dashed #ccc;
+            border-bottom: 1px dashed #ccc;
+        }
+        .price-highlight span {
+            font-size: 1.6em;
+            color: #dc3545; /* Red accent for the price */
+        }
 
-/* Footer */
-.footer {
-  padding: 20px;
-  text-align: center;
-  background: #ddd;
-  margin-top: 20px;
-}
-
-/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
-@media screen and (max-width: 800px) {
-  .leftcolumn, .rightcolumn {   
-    width: 100%;
-    padding: 0;
-  }
-}
-</style>
+        /* --- Footer --- */
+        .footer {
+            padding: 25px 20px;
+            text-align: center;
+            background: #e9ecef;
+            color: #6c757d;
+            margin-top: 30px;
+            font-size: 0.9em;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
 </head>
 <body>
 
 <div class="header">
-  <h2>StenoBlogs</h2>
+    <div class="blog-logo">StenoBlogs</div>
+    <h1>Hey Grads(2025)!</h1>
+    <div class="blog-meta">Posted by the Stenoip Team | 12th July 2025 | Category: Welcome</div>
 </div>
 
-<div class="row">
-  <div class="leftcolumn">
-    <div class="card">
-      <h2>Hey grads!</h2>
-      <h5>Long time no see, 12th July 2025</h5>
-      <div class="fakeimg" style="height:200px;">Image</div>
+<div class="container">
+    <div class="post-card">
+        
+        <h2>Welcome to Stenoip Wonder Computer</h2>
 
-      <p>Thank you for receiving those "Farwell Cards". This is my site. What is it for? I don't know ... yet! I am thinking it should be a Search Engine called <a href = "https://www.google.com/search?q=define+oodles&rlz=1C1CHBF_enUS1168US1168&oq=define+oodles&gs_lcrp=EgZjaHJvbWUyDggAEEUYORhGGPkBGIAEMggIARAAGBYYHjINCAIQABiGAxiABBiKBTINCAMQABiGAxiABBiKBTINCAQQABiGAxiABBiKBTINCAUQABiGAxiABBiKBdIBCDIzMTdqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8">Oodles</a>! Anyways, be sure to check this site every month. I post new things! Don't miss out! And good luck in... err. I can't tell the grade level school we are going to. Because, it's the internet!</p>
+        <p>
+        Thank you for receiving those "Farwell Cards". This is my site. What is it for? I don't know ... yet! I am thinking it should be a Search Engine called <a href = "https://www.google.com/search?q=define+oodles&rlz=1C1CHBF_enUS1168US1168&oq=define+oodles&gs_lcrp=EgZjaHJvbWUyDggAEEUYORhGGPkBGIAEMggIARAAGBYYHjINCAIQABiGAxiABBiKBTINCAMQABiGAxiABBiKBTINCAQQABiGAxiABBiKBTINCAUQABiGAxiABBiKBdIBCDIzMTdqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8">Oodles</a>! Anyways, be sure to check this site every month. I post new things! Don't miss out! And good luck in... err. I can't tell the grade level school we are going to. Because, it's the internet!
+        </p>
+
+        <div class="post-image" style="max-height: 400px;">
+            <img src="https://stenoip.github.io/new-swc.png" alt="placeholder">
+        </div>
+
+        <h3>How to pronounce Stenoip?</h3>
+        <p>
+           I can't believe people pronounce Stenoip Wrong. It is pronounced: <strong>Stick-noh-ikp</strong>. The name originates from a book called a Steno Notebook(also the inspiration of <a href="/office/typoe.html">Typoe</a>). I have hear people saying things from "Steh-noid" to "Steh-no-eye-pee".
+        </p>
+        
+      
+
+       
+
+      
+        
+
+        <h3>Find Us Here:</h3>
+      
+        <div class="cta-box">
+         
+            <p style="margin-top: 15px; margin-bottom: 0;"><small>Email: <a href="mailto:info@jnjapartments.com" style="color: #007bff;">customerserviceforstenoip@gmail.com</a></small></p>
+        </div>
 
     </div>
-
-    <div class="card">
-      <h2>About Me</h2>
-      <div class="fakeimg" style="height:100px;">Image</div>
-      <p>Obiviously, I can't tell about me. It's the Internet!</p>
-    </div>
-    <div class="card">
-      <h3>Popular Post</h3>
-      <div class="fakeimg">Image</div><br>
-      <div class="fakeimg">Image</div><br>
-      <div class="fakeimg">Image</div>
-    </div>
-    <div class="card">
-      <h3>Follow Me</h3>
-      <p>Some text..</p>
-      <p>I don't use Social Media! It TRACKS you!</p>
-    </div>
-  </div>
 </div>
 
 <div class="footer">
-  <h2>Footer</h2>
+    <p>Stenoip! Cartoons and phones for you!</p>
+    <p>© 2025 Stenoip Company</p>
 </div>
 
 </body>
