@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>StenoToanstik Arcade</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="icon" type="image/png" href="/swc.png">
+  <link rel="icon" type="image/png" href="/new-swc.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
     body {
+      background-image: url('https://www.transparenttextures.com/patterns/dark-mosaic.png');
       background-color: #111;
       color: #fff;
       font-family: 'Press Start 2P', cursive;
@@ -16,11 +17,14 @@
       margin: 0;
       overflow-x: hidden;
     }
+
     .header {
-      background: linear-gradient(to right, #ff00cc, #3333ff);
+      background: #000;
       padding: 20px;
-      box-shadow: 0 4px 2px -2px gray;
+      border-bottom: 6px ridge #ff00cc;
+      box-shadow: 0 0 20px #ff00cc;
     }
+
     h1 {
       font-size: 3em;
       margin: 0;
@@ -28,90 +32,123 @@
       letter-spacing: 2px;
       animation: neon 1.5s ease-in-out infinite alternate;
     }
+
     @keyframes neon {
       from {
-        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #ff00cc, 0 0 40px #ff00cc, 0 0 50px #ff00cc, 0 0 60px #ff00cc, 0 0 70px #ff00cc;
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #ff00cc, 0 0 40px #ff00cc;
       }
       to {
-        text-shadow: 0 0 20px #fff, 0 0 30px #ff00cc, 0 0 40px #ff00cc, 0 0 50px #ff00cc, 0 0 60px #ff00cc, 0 0 70px #ff00cc, 0 0 80px #ff00cc;
+        text-shadow: 0 0 20px #fff, 0 0 30px #ff00cc, 0 0 40px #ff00cc, 0 0 50px #ff00cc;
       }
     }
+
     .container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       padding: 20px;
     }
+
     .game {
-      margin: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-      transition: transform 0.2s;
-      background: #222;
+      background: radial-gradient(circle at top center, #444 0%, #222 100%);
+      border: 4px solid #555;
+      border-top: 12px solid #e60000;
+      border-radius: 8px;
+      box-shadow: inset 0 0 10px #000, 0 8px 16px rgba(0,0,0,0.6);
       padding: 20px;
-      border-radius: 10px;
       width: 300px;
+      margin: 20px;
+      position: relative;
+      transition: transform 0.2s;
     }
+
+    .game::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
     .game:hover {
       transform: scale(1.05);
     }
+
+    h2 {
+      background: #000;
+      padding: 10px;
+      border: 2px inset #999;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px #000;
+      font-size: 1em;
+    }
+
     .play-link {
       display: inline-block;
       margin-top: 15px;
-      padding: 10px 20px;
-      background-color: #e60000;
+      padding: 12px 24px;
+      background: linear-gradient(to bottom, #ff4d4d, #b30000);
+      border: 2px solid #800000;
+      border-radius: 50px;
+      box-shadow: 0 4px #400000;
+      font-weight: bold;
+      text-shadow: 1px 1px #000;
       color: #fff;
       text-decoration: none;
-      border-radius: 5px;
-      transition: background-color 0.2s;
+      transition: transform 0.1s;
     }
+
+    .play-link:active {
+      box-shadow: none;
+      transform: translateY(4px);
+    }
+
     .play-link:hover {
-      background-color: #ff0000;
+      background: linear-gradient(to bottom, #ff6666, #cc0000);
     }
   </style>
 </head>
-
 <body>
   <div class="header">
     <h1>StenoToanstik Arcade</h1>
   </div>
   <div class="container">
     <div class="game">
-      <h2>NEW: Frog Crossing</h2>
-      <a href="https://stenoip.github.io/games/frog_krus" target="_blank" class="play-link">Play Game</a>
-    </div>
-     <div class="game">
-      <h2> Ringzauber Cow Game</h2>
+      <h2>NEW: Ringzauber Cow Game</h2>
       <a href="https://stenoip.github.io/games/cow/cow-game" target="_blank" class="play-link">Play Game</a>
     </div>
     <div class="game">
       <h2>Flappybird</h2>
-      <a href = "flappybird.html" target="_blank" class="play-link">Play Game</a>
+      <a href="flappybird.html" target="_blank" class="play-link">Play Game</a>
     </div>
-  <div class="game">
+    <div class="game">
       <h2>StenoTetris</h2>
-      <a href = "tetris.html" target="_blank" class="play-link">Play Game</a>
+      <a href="https://stenoip.github.io/games/tetris" target="_blank" class="play-link">Play Game</a>
     </div>
     <div class="game">
       <h2>Octogon Match</h2>
-      <a href = "https://stenoip.github.io/games/octogon" target="_blank" class="play-link">Play Game</a>
+      <a href="https://stenoip.github.io/games/octogon" target="_blank" class="play-link">Play Game</a>
     </div>
     <div class="game">
       <h2>106 Puzzle</h2>
       <a href="https://editor.p5js.org/stenoip/full/cPRKm8bEP" target="_blank" class="play-link">Play Game</a>
     </div>
-        <div class="game">
+    <div class="game">
       <h2>Worm</h2>
-      <a href = "worm.html" target="_blank" class="play-link">Play Game</a>
+      <a href="worm.html" target="_blank" class="play-link">Play Game</a>
     </div>
     <div class="game">
-      <h2>Word It!| Word Search and Prizes</h2>
+      <h2>Word It! | Word Search and Prizes</h2>
       <a href="https://stenoip.github.io/games/word" target="_blank" class="play-link">Play Game</a>
     </div>
     <div class="game">
       <h2>You vs Bot (Rock, Paper, Scissors)</h2>
       <a href="https://editor.p5js.org/stenoip/full/zcDTOPR4S" target="_blank" class="play-link">Play Game</a>
     </div>
-     <div class="game">
+    <div class="game">
       <h2>Super Car Racer</h2>
       <a href="https://editor.p5js.org/stenoip/full/w3eyrRJ1r" target="_blank" class="play-link">Play Game</a>
     </div>
@@ -119,12 +156,7 @@
       <h2>Tilt Pong</h2>
       <a href="https://editor.p5js.org/stenoip/full/4X27mOrBn" target="_blank" class="play-link">Play Game</a>
     </div>
-   
-    <div class="game">
-      <h2>Worm</h2>
-      <a href = "worm.html" target="_blank" class="play-link">Play Game</a>
-    </div>
+    <p>Copyright 2025 Stenoip Company</p>
   </div>
 </body>
-
 </html>
