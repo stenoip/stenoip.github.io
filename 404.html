@@ -1,41 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="swc_mystery.png" type="image/png" />
-    <title>Page Not Found</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-            background-color: #f0f8ff;
-        }
-        h1 {
-            font-size: 50px;
-            color: #ff6347;
-        }
-        p {
-            font-size: 20px;
-            color: #4682b4;
-        }
-        a {
-            color: #ff4500;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="swc_mystery.png" type="image/png" />
+  <title>404 - Page Not Found</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top left, #b3ecff, #e6fff9, #cce6ff);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 40px 60px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25),
+                  inset 2px 2px 8px rgba(255,255,255,0.8),
+                  inset -2px -2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      animation: popIn 1.2s ease forwards;
+    }
+
+    h1 {
+      font-size: 72px;
+      color: #0078d7;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.3),
+                   0 0 20px rgba(0,200,255,0.6);
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    p {
+      font-size: 22px;
+      color: #004466;
+      margin-bottom: 30px;
+      animation: fadeIn 2s ease forwards;
+    }
+
+    a {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #ffffff, #d0f0ff);
+      box-shadow: inset 2px 2px 6px rgba(255,255,255,0.9),
+                  inset -2px -2px 6px rgba(0,0,0,0.1),
+                  6px 6px 16px rgba(0,0,0,0.3);
+      color: #0078d7;
+      font-weight: bold;
+      text-decoration: none;
+      transition: transform 0.25s ease, box-shadow 0.3s ease;
+    }
+
+    a:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: inset 2px 2px 6px rgba(255,255,255,1),
+                  inset -2px -2px 6px rgba(0,0,0,0.05),
+                  8px 8px 20px rgba(0,0,0,0.4);
+    }
+
+    img {
+      width: 200px;
+      margin-top: 30px;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+      animation: bounce 2.5s infinite;
+    }
+
+    /* Floating bubbles */
+    .bubble {
+      position: absolute;
+      bottom: -150px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(200,255,255,0.3));
+      border-radius: 50%;
+      animation: rise 25s infinite ease-in;
+    }
+
+    .bubble:nth-child(1) { width: 120px; height: 120px; left: 15%; animation-duration: 20s; }
+    .bubble:nth-child(2) { width: 80px; height: 80px; left: 40%; animation-duration: 28s; }
+    .bubble:nth-child(3) { width: 150px; height: 150px; left: 65%; animation-duration: 32s; }
+    .bubble:nth-child(4) { width: 60px; height: 60px; left: 80%; animation-duration: 24s; }
+
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-18px); }
+    }
+
+    @keyframes rise {
+      0% { transform: translateY(0) scale(1); opacity: 0.7; }
+      100% { transform: translateY(-130vh) scale(1.6); opacity: 0; }
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
 </head>
 <body>
-    <h1>404 - Page Not Found</h1>
-    <p>Oops! The page you are looking for does not exist.</p>
-    <p><a href="/">Go to Homepage and find your page here!</a></p>
-    <img src="/swc_mystery.png" alt="404 image">
+  <div class="container">
+    <h1>404</h1>
+    <p>Oops! The page you’re looking for has floated away.</p>
+    <p><a href="/"> Return to Homepage </a></p>
+    <img src="/swc_mystery.png" alt="404 image">
+  </div>
+
+  <!-- Skeuomorphic Aero bubbles -->
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
 </body>
 </html>
