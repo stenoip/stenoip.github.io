@@ -3,34 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="swc_mystery.png" type="image/png" />
+  <link rel="icon" href="/swc_mystery.png" type="image/png" />
   <title>404 - Page Not Found</title>
   <style>
-    body {
+    /* RESET */
+    * {
       margin: 0;
+      padding: 0;
+    }
+
+    /* FRUTIGER AERO BODY STYLES */
+    body {
       font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
       height: 100vh;
-      display: flex;
+      width: 100%;
+      /* Set the body as a flex container to center the text content */
+      display: flex; 
+      flex-direction: column; /* Stack content vertically */
       justify-content: center;
       align-items: center;
-      background: radial-gradient(circle at top left, #b3ecff, #e6fff9, #cce6ff);
+      text-align: center; /* Center text within the body/content */
+      /* Background: Light Aero blue gradient */
+      background: radial-gradient(circle at top left, #a5d8ff, #e6f7ff, #b3ecff);
       overflow: hidden;
       position: relative;
     }
+    
+    /* CANVAS FOR WAVES - Full screen, positioned absolutely, behind content */
+    #myCanvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      filter: url(#shadowed-goo);
+      z-index: 1; /* Below the content */
+    }
+    
+    /* HIDE SVG FILTER DEFINITIONS */
+    svg {
+      display: none;
+    }
 
-    .container {
+    /* NEW STYLES for the FLOATING CONTENT CARD */
+    .floating-content {
+      /* Replaces .container styling */
       background: rgba(255, 255, 255, 0.6);
       backdrop-filter: blur(12px);
       border-radius: 24px;
       padding: 40px 60px;
+      width: 300px; /* Give it a fixed width */
       box-shadow: 0 12px 40px rgba(0,0,0,0.25),
                   inset 2px 2px 8px rgba(255,255,255,0.8),
                   inset -2px -2px 8px rgba(0,0,0,0.1);
-      text-align: center;
       animation: popIn 1.2s ease forwards;
+      z-index: 10; /* Above everything */
+      position: relative;
     }
-
-    h1 {
+    
+    .floating-content h1 {
       font-size: 72px;
       color: #0078d7;
       text-shadow: 0 4px 12px rgba(0,0,0,0.3),
@@ -38,14 +70,14 @@
       margin-bottom: 20px;
       animation: float 3s ease-in-out infinite;
     }
-
-    p {
+    
+    .floating-content p {
       font-size: 22px;
       color: #004466;
       margin-bottom: 30px;
       animation: fadeIn 2s ease forwards;
     }
-
+    
     a {
       display: inline-block;
       padding: 14px 28px;
@@ -59,21 +91,21 @@
       text-decoration: none;
       transition: transform 0.25s ease, box-shadow 0.3s ease;
     }
-
+    
     a:hover {
       transform: translateY(-4px) scale(1.05);
       box-shadow: inset 2px 2px 6px rgba(255,255,255,1),
                   inset -2px -2px 6px rgba(0,0,0,0.05),
                   8px 8px 20px rgba(0,0,0,0.4);
     }
-
+    
     img {
       width: 200px;
       margin-top: 30px;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
       animation: bounce 2.5s infinite;
     }
-
+    
     /* Floating bubbles */
     .bubble {
       position: absolute;
@@ -81,53 +113,154 @@
       background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(200,255,255,0.3));
       border-radius: 50%;
       animation: rise 25s infinite ease-in;
+      z-index: 5; 
     }
-
+    
     .bubble:nth-child(1) { width: 120px; height: 120px; left: 15%; animation-duration: 20s; }
     .bubble:nth-child(2) { width: 80px; height: 80px; left: 40%; animation-duration: 28s; }
     .bubble:nth-child(3) { width: 150px; height: 150px; left: 65%; animation-duration: 32s; }
     .bubble:nth-child(4) { width: 60px; height: 60px; left: 80%; animation-duration: 24s; }
-
+    
     /* Animations */
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-18px); }
-    }
-
-    @keyframes rise {
-      0% { transform: translateY(0) scale(1); opacity: 0.7; }
-      100% { transform: translateY(-130vh) scale(1.6); opacity: 0; }
-    }
-
-    @keyframes popIn {
-      0% { transform: scale(0.8); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+    @keyframes rise { 0% { transform: translateY(0) scale(1); opacity: 0.7; } 100% { transform: translateY(-130vh) scale(1.6); opacity: 0; } }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
   </style>
 </head>
+
 <body>
-  <div class="container">
+  
+  <canvas id="myCanvas"></canvas>
+  
+  <div class="floating-content">
     <p>&copy; Stenoip Company</p>
     <h1>404</h1>
     <p>Oops! The page you’re looking for has floated away.</p>
     <p><a href="/"> Return to Homepage </a></p>
-    <img src="/swc_mystery.png" alt="404 image">
+    <img src="/swc_mystery.png" alt="404 image">
+    <p> Stenoip Wonder Computer</p>
   </div>
 
-  <!-- Skeuomorphic Aero bubbles -->
   <div class="bubble"></div>
   <div class="bubble"></div>
   <div class="bubble"></div>
   <div class="bubble"></div>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+    <defs>
+      <filter id="shadowed-goo">
+        <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -7"
+          result="goo" />
+        <feGaussianBlur in="goo" result="shadow" stdDeviation="3" />
+        <feColorMatrix in="shadow" mode="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 -0.2"
+          result="shadow" />
+        <feOffset in="shadow" dx="1" dy="1" result="shadow" />
+        <feBlend in2="shadow" in="goo" result="goo" />
+        <feBlend in2="goo" in="SourceGraphic" result="mix" />
+      </filter>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -7"
+          result="goo" />
+        <feBlend in2="goo" in="SourceGraphic" result="mix" />
+      </filter>
+    </defs>
+  </svg>
+  
+  <script>
+    var twoPi = Math.PI * 2;
+
+    class App {
+      constructor() {
+        this.canvas = document.getElementById("myCanvas");
+        this.context = this.canvas.getContext("2d");
+        this.height = this.canvas.height = window.innerHeight;
+        this.width = this.canvas.width = window.innerWidth;
+        this.center = { x: this.width / 2, y: this.height / 2 };
+        this.circleContainers = [];
+        window.addEventListener("resize", () => this.resizeCanvas(), false);
+      }
+      resizeCanvas() {
+        this.height = this.canvas.height = window.innerHeight;
+        this.width = this.canvas.width = window.innerWidth;
+        this.center = { x: this.width / 2, y: this.height / 2 };
+        this.circleContainers = [];
+        this.initializeCircleContainers();
+      }
+      initializeCircleContainers() {
+        for (var i = 0; i < this.width + 100; i += 100) {
+          for (var j = 0; j < this.height + 100; j += 100) {
+            var circleContainer = new CircleContainer(this.context, i, j);
+            circleContainer.initializeCircles();
+            this.circleContainers.push(circleContainer);
+          }
+        }
+      }
+      update() { for (var k = 0; k < this.circleContainers.length; k++) { this.circleContainers[k].update(); } }
+      render() {
+        this.context.clearRect(0, 0, this.width, this.height);
+        for (var l = 0; l < this.circleContainers.length; l++) { this.circleContainers[l].render(); }
+      }
+      loop() {
+        this.update();
+        this.render();
+        window.requestAnimationFrame(() => this.loop());
+      }
+    }
+    
+    class CircleContainer {
+      constructor(context, x, y) {
+        this.context = context;
+        this.position = { x, y };
+        this.numberOfCircles = 19;
+        this.circles = [];
+        this.baseRadius = 20;
+        this.bounceRadius = 150;
+        this.singleSlice = twoPi / this.numberOfCircles;
+      }
+      initializeCircles() {
+        for (var m = 0; m < this.numberOfCircles; m++) {
+          this.circles.push(new Circle(this.position.x, this.position.y + Math.random(), this.baseRadius, this.bounceRadius, m * this.singleSlice));
+        }
+      }
+      update() { for (var n = 0; n < this.numberOfCircles; n++) { this.circles[n].update(this.context); } }
+      render() { for (var o = 0; o < this.numberOfCircles; o++) { this.circles[o].render(this.context); } }
+    }
+    
+    class Circle {
+      constructor(x, y, baseRadius, bounceRadius, angleCircle) {
+        this.basePosition = { x, y };
+        this.position = { x, y };
+        this.speed = 0.01;
+        this.baseSize = 10;
+        this.size = 10;
+        this.angle = x + y;
+        this.baseRadius = baseRadius;
+        this.bounceRadius = bounceRadius;
+        this.angleCircle = angleCircle;
+      }
+      update() {
+        this.position.x = this.basePosition.x + Math.cos(this.angleCircle) * (Math.sin(this.angle + this.angleCircle) * this.bounceRadius + this.baseRadius);
+        this.position.y = this.basePosition.y + Math.sin(this.angleCircle) * (Math.sin(this.angle + this.angleCircle) * this.bounceRadius + this.baseRadius);
+        this.size = Math.cos(this.angle) * 8 + this.baseSize;
+        this.angle += this.speed;
+      }
+      render(context) {
+        context.fillStyle = "hsl(190, 100%, " + (50 + this.size * 2) + "%)";
+        context.beginPath();
+        context.arc(this.position.x, this.position.y, this.size, 0, twoPi);
+        context.fill();
+      }
+    }
+    
+    window.onload = function () {
+      var app = new App();
+      app.initializeCircleContainers();
+      app.loop();
+    };
+  </script>
 </body>
 </html>
