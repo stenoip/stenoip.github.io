@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <style>
+    <style>
     html, body {
       margin: 0;
       padding: 0;
@@ -14,30 +13,73 @@
       background-color: black;
     }
     img {
-      width: 100vw;
-      height: 100vh;
+      width: 100%; /* Use 100% of the anchor's size */
+      height: 100%;
       object-fit: cover;
       display: block;
+    }
+    a {
+      /* Make the anchor fill the screen so the image is clickable anywhere */
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
     }
   </style>
 </head>
 <body>
   <script>
-    const gifUrls = [
-      "https://stenoip.github.io/The+Selection+Wheel1.gif",
-      "https://stenoip.github.io/The+Selection+Wheel2.gif",
-      "https://stenoip.github.io/The+Selection+Wheel3.gif",
-      "https://stenoip.github.io/The+Selection+Wheel4.gif",
-      "https://stenoip.github.io/The+Selection+Wheel5.gif",
-      "https://stenoip.github.io/The+Selection+Wheel6.gif"
+    // Array of objects, each containing a GIF URL and its corresponding destination link.
+    var linksData = [
+      { 
+        gifUrl: "https://stenoip.github.io/The+Selection+Wheel1.gif", 
+        destinationUrl: "https://https://stenoip.github.io/praterich" 
+      },
+      { 
+        gifUrl: "https://stenoip.github.io/The+Selection+Wheel2.gif", 
+        destinationUrl: "https://stenoip.github.io/searxng" 
+      },
+      { 
+        gifUrl: "https://stenoip.github.io/The+Selection+Wheel3.gif", 
+        destinationUrl: "https://stenoip.github.io/ringzauber" 
+      },
+      { 
+        gifUrl: "https://stenoip.github.io/The+Selection+Wheel4.gif", 
+        destinationUrl: "https://stenoip.github.io/maps" 
+      },
+      { 
+        gifUrl: "https://stenoip.github.io/The+Selection+Wheel5.gif", 
+        destinationUrl: "https://stenoip.github.io/office/home" 
+      },
+      { 
+        gifUrl: "https://stenoip.github.io/The+Selection+Wheel6.gif", 
+        destinationUrl: "https://stenoip.github.io/comic" 
+      }
     ];
 
-    const randomIndex = Math.floor(Math.random() * gifUrls.length);
-    const selectedGif = gifUrls[randomIndex];
+    // Select a random item (which is an object with both URLs)
+    var randomIndex = Math.floor(Math.random() * linksData.length);
+    var selectedItem = linksData[randomIndex];
+    var selectedGif = selectedItem.gifUrl;
+    var selectedLink = selectedItem.destinationUrl;
 
-    const img = document.createElement("img");
-    img.src = selectedGif;
-    document.body.appendChild(img);
+    // 1. Create the <a> (anchor/link) element
+    var a = document.createElement("a");
+    a.href = selectedLink; // Set the destination URL
+    
+    // Optional: open the link in a new tab
+    // a.target = "_blank"; 
+
+    // 2. Create the <img> element
+    var img = document.createElement("img");
+    img.src = selectedGif; // Set the GIF source
+    
+    // 3. Append the <img> into the <a>
+    a.appendChild(img);
+    
+    // 4. Append the <a> (which now contains the <img>) to the body
+    document.body.appendChild(a);
   </script>
 </body>
 </html>
