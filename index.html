@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -331,6 +332,54 @@
             color: rgb(0, 0, 238);
             text-decoration: underline;
         }
+       
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3; /* Blue when on */
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 20px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
     </style>
 </head>
 <body>
@@ -387,8 +436,8 @@
             <h2>The Bulletin Board!</h2>
             <ul>
                 <li><span class="highlight">Breaking News!</span> <mark>Ringzauber 1.5 is coming out now! <a href="ringzauber.html">Learn more</a></mark></li>
-                <li>Access **Private Programs Online** through our <a href="television_guide.html">Television Guide</a>.</li>
-                <li><span class="highlight">Privacy Commitment:</span> Stenoip Wonder Computer provides the latest advanced tech for free without any of your history being known.</li>
+                <li>Access Private Programs Online through our <a href="television_guide.html">Television Guide</a>.</li>
+                <li><span class="highlight">New Games:</span> Frog Crossing and StenoTetris are  now <a href="games/home.html">available</a>. </li>
                 <li><span class="highlight">Suggested AI:</span> Meet <mark><a href="https://stenoip.github.io/praterich">Lady Praterich, an AI chatbot and SWC assistant.</a></mark></li>
             </ul>
         </div>
@@ -397,8 +446,8 @@
             Visit the Learn Center
         </button>
 
-        <h3 class="text-center mt-6">Interactive Widget: Rotating Graphics</h3>
-        <iframe src="https://stenoip.github.io/wheel_gifs" height="500px" width="100%" class="rounded-lg shadow-md mt-4 mb-4"></iframe>
+        <h3 class="text-center mt-6">Wheel of Stenoip</h3>
+        <iframe src="https://stenoip.github.io/wheel_gifs" height="900px" width="100%" class="rounded-lg shadow-md mt-4 mb-4"></iframe>
 
         <h3 class="text-center mt-6 mb-3">Weather & News (Powered by Tomorrow.io)</h3>
         <p class="text-center mb-4">Visit the Learn Center for the News and Weather</p>
@@ -406,7 +455,7 @@
             </div>
 
         <div class="footer">
-            <p>Version 1.07 &copy; Stenoip Company</p>
+            <p>Version 1.08 &copy; Stenoip Company</p>
             <p><a href="copyright.html">View our terms.</a></p>
             <p>WHY ARE THERE ADS! We have ads to fund our projects and earn money. Read our <a href="privacy.html">Privacy and Policy</a> (at the top) for more info.</p>
         </div>
