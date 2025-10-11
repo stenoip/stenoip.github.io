@@ -1,86 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+  <meta charset="UTF-8">
+  <title>Wheel of Stenoip</title>
+  <!-- Copyright Stenoip Company
+  view copyright -----> https://stenoip.github.io/copyright
+  -->
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      background-color: black;
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #f9d423, #ff4e50);
+      color: #fff;
     }
-    img {
-      width: 100%; /* Use 100% of the anchor's size */
-      height: 100%;
-      object-fit: cover;
-      display: block;
+    canvas {
+      margin-top: 20px;
+      background: #222;
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
-    a {
-      /* Make the anchor fill the screen so the image is clickable anywhere */
-      display: block;
-      width: 100vw;
-      height: 100vh;
-      margin: 0;
-      padding: 0;
+    #spinBtn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: #fff;
+      color: #ff4e50;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #spinBtn:hover {
+      background: #ff4e50;
+      color: #fff;
+    }
+    /* Modal styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #fff;
+      color: #333;
+      padding: 2em;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .modal-content img {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1em;
+    }
+    .modal-content h2 {
+      margin: 0.5em 0;
+    }
+    .modal-content button {
+      margin-top: 1em;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #ff4e50;
+      color: #fff;
+      cursor: pointer;
+    }
+    footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #eee;
     }
   </style>
 </head>
 <body>
+  <h1>Wheel of Stenoip</h1>
+  <canvas id="wheel" width="600" height="600"></canvas><br>
+  <button id="spinBtn">SPIN</button>
+
+  <!-- Modal -->
+  <div id="winnerModal" class="modal">
+    <div class="modal-content">
+      <img id="winnerIcon" src="" alt="icon">
+      <h2 id="winnerTitle"></h2>
+      <button id="goBtn">Go</button>
+    </div>
+  </div>
+
+  <footer>Copyright Stenoip Company</footer>
+
   <script>
-    // Array of objects, each containing a GIF URL and its corresponding destination link.
-    var linksData = [
-      { 
-         gifUrl: "https://stenoip.github.io/The+Selection+Wheel1.gif", 
-         destinationUrl: "https://stenoip.github.io/praterich" 
-       },
-      { 
-         gifUrl: "https://stenoip.github.io/The+Selection+Wheel2.gif", 
-         destinationUrl: "https://stenoip.github.io/searxng" 
-       },
-      { 
-         gifUrl: "https://stenoip.github.io/The+Selection+Wheel3.gif", 
-         destinationUrl: "https://stenoip.github.io/ringzauber" 
-       },
-      { 
-         gifUrl: "https://stenoip.github.io/The+Selection+Wheel4.gif", 
-         destinationUrl: "https://stenoip.github.io/maps" 
-       },
-      { 
-         gifUrl: "https://stenoip.github.io/The+Selection+Wheel5.gif", 
-         destinationUrl: "https://stenoip.github.io/office/home" 
-       },
-      { 
-         gifUrl: "https://stenoip.github.io/The+Selection+Wheel6.gif", 
-         destinationUrl: "https://stenoip.github.io/comic" 
-       }
+    var canvas = document.getElementById("wheel");
+    var ctx = canvas.getContext("2d");
+    var spinBtn = document.getElementById("spinBtn");
+
+    var modal = document.getElementById("winnerModal");
+    var winnerIcon = document.getElementById("winnerIcon");
+    var winnerTitle = document.getElementById("winnerTitle");
+    var goBtn = document.getElementById("goBtn");
+
+    var items = [
+      {title:"2048", icon:"icons/2048.png", link:"https://stenoip.github.io/games/2048"},
+      {title:"Flappy Bird", icon:"icons/bird.png", link:"https://stenoip.github.io/flappybird"},
+      {title:"StenoBlogs", icon:"icons/blog.png", link:"https://stenoip.github.io/blog"},
+      {title:"Bot", icon:"icons/bot.png", link:"https://stenoip.github.io/bot"},
+      {title:"Calculator", icon:"icons/calculator.png", link:"https://stenoip.github.io/kompmasine.html"},
+      {title:"Camera", icon:"icons/camera.png", link:"https://stenoip.github.io/camera"},
+      {title:"Clocker", icon:"icons/clocker.png", link:"https://stenoip.github.io/clocker"},
+      {title:"Boublok Coding", icon:"icons/coding.png", link:"https://stenoip.github.io/boublok"},
+      {title:"Super Komysk", icon:"icons/comic.png", link:"https://stenoip.github.io/comic"},
+      {title:"Infinity Counter", icon:"icons/counter.png", link:"https://stenoip.github.io/count"},
+      {title:"Draw It!", icon:"icons/draw.png", link:"https://stenoip.github.io/draw"},
+      {title:"Eggtastic Video", icon:"icons/egg.png", link:"https://stenoip.github.io/eggtastic.html"},
+      {title:"StenoToanstik Arcade", icon:"icons/games.png", link:"https://stenoip.github.io/games"},
+      {title:"Ferkenne Maps", icon:"icons/maps.png", link:"https://stenoip.github.io/maps"},
+      {title:"Media", icon:"icons/media.png", link:"https://stenoip.github.io/media"},
+      {title:"StenoOffice", icon:"icons/office.png", link:"https://stenoip.github.io/office"},
+      {title:"Pet", icon:"icons/pet.png", link:"https://stenoip.github.io/pet"},
+      {title:"Praterich AI", icon:"icons/praterich.png", link:"https://stenoip.github.io/praterich"},
+      {title:"Zuiz Quiz", icon:"icons/quiz.png", link:"https://stenoip.github.io/quiz"},
+      {title:"Testing", icon:"icons/testing.png", link:"https://stenoip.github.io/testing"},
+      {title:"Video", icon:"icons/video.png", link:"https://stenoip.github.io/video"},
+      {title:"Video Plus", icon:"icons/video_plus.png", link:"https://stenoip.github.io/video_plus"}
     ];
 
-    // Select a random item (which is an object with both URLs)
-    var randomIndex = Math.floor(Math.random() * linksData.length);
-    var selectedItem = linksData[randomIndex];
-    var selectedGif = selectedItem.gifUrl;
-    var selectedLink = selectedItem.destinationUrl;
+    var numSlices = items.length;
+    var sliceAngle = 2 * Math.PI / numSlices;
+    var startAngle = 0;
+    var spinVelocity = 0;
+    var spinning = false;
+    var winner = null;
 
-    // 1. Create the <a> (anchor/link) element
-    var a = document.createElement("a");
-    a.href = selectedLink; // Set the destination URL
-        
-    // **Modification:** Add target="_blank" to open the link in a new tab
-    a.target = "_blank"; 
-    
-    // 2. Create the <img> element
-    var img = document.createElement("img");
-    img.src = selectedGif; // Set the GIF source
-        
-    // 3. Append the <img> into the <a>
-    a.appendChild(img);
-        
-    // 4. Append the <a> (which now contains the <img>) to the body
-    document.body.appendChild(a);
-  </script>
+    function drawWheel() {
+      var radius = canvas.width/2;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      for(var i=0;i<numSlices;i++){
+        var angle = startAngle + i*sliceAngle;
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, angle, angle+sliceAngle);
+        ctx.fillStyle = i%2===0 ? "#ff6f61" : "#6b5b95";
+        ctx.fill();
+
+        // Draw text labels spaced
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(angle + sliceAngle/2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = (numSlices > 12 ? "12px Arial" : "16px Arial");
+        ctx.fillText(items[i].title, radius-10, 5);
+        ctx.restore();
+      }
+
+      // Pointer
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.moveTo(radius-15, 10);
+      ctx.lineTo(radius+15, 10);
+      ctx.lineTo(radius, 50);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function animate() {
+      if(spinVelocity > 0.002){
+        startAngle += spinVelocity;
+        spinVelocity *= 0.985; // friction
+        drawWheel();
+        requestAnimationFrame(animate);
+      } else {
+        spinning = false;
+        // Determine winner
+        var degrees = startAngle * 180/Math.PI + 90;
+        var arcd = 360 / numSlices;
+        var index = Math.floor((360 - (degrees % 360)) / arcd) % numSlices;
+        winner = items[index];
+        showModal(winner);
+      }
+    }
+
+    function showModal(item){
+      winnerIcon.src = item.icon;
+      winnerTitle.textContent = "You won: " + item.title;
+      modal.style.display = "flex";
+      goBtn.onclick = function() {
+        window.open(item.link, "_blank");
+        modal.style.display = "none";
+      };
+    }
+
+    spinBtn.addEventListener("click", function() {
+      if(spinning) return;
+      spinning = true;
+      numSlices = items.length;
+      sliceAngle = 2 * Math.PI / numSlices;
+      spinVelocity = (Math.random() * 0.3) + 0.25;
+      animate();
+    });
+
+    drawWheel();
+</script>
 </body>
 </html>
