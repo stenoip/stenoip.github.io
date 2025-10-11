@@ -57,7 +57,20 @@ const links = [
     { name: 'Blogs', url: 'blog.html' },
     { name: 'Boublok Coding', url: 'boublok.html' } // Already exists, kept for completeness
 ];
+function loadBulletinBoard() {
+    const bulletinContent = `
+        <li><span class="highlight">Breaking News!</span> <mark>Ringzauber 1.5 is coming out now! <a href="ringzauber.html">Learn more</a></mark></li>
+        <li>Access Private Programs Online through our <a href="television_guide.html">Television Guide</a>.</li>
+        <li><span class="highlight">New Games:</span> Frog Crossing and StenoTetris are now <a href="games/home.html">available</a>. </li>
+        <li><span class="highlight">Suggested AI:</span> Meet <mark><a href="https://stenoip.github.io/praterich">Lady Praterich, an AI chatbot and SWC assistant.</a></mark></li>
+        <li><span class="highlight">New Update:</span> Version ${document.querySelector('.footer p').textContent.match(/Version ([\d\.]+)/)[1]} brings improved search suggestions!</li> 
+    `;
 
+    const bulletinList = document.getElementById('bulletin-list');
+    if (bulletinList) {
+        bulletinList.innerHTML = bulletinContent;
+    }
+}
         // --- SEARCH FUNCTIONALITY ---
         function search() {
             const query = document.getElementById('search-input').value.trim();
@@ -162,7 +175,7 @@ const links = [
                 document.getElementById('launch-screen').style.display = 'flex';
                 document.getElementById('intro-video').style.display = 'none';
             }
-
+ loadBulletinBoard();
             // --- TOMORROW.IO WIDGET LOADER ---
             (function (d, s, id) {
                 if (d.getElementById(id)) {
