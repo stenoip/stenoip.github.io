@@ -5,7 +5,7 @@ This file provides functionality for index.html(homepage)!
 */
 // This array now explicitly represents the available "coding programs" in the TV Guide,
 // compiled from both the previous list and the links from the Guide page.
-const links = [
+var links = [
     // Existing Items
     { name: 'Anniversary', url: 'anniversary.html' },
     { name: 'The Data Store(Datenspeicher)', url: 'download.html' },
@@ -58,6 +58,29 @@ const links = [
     { name: 'Boublok Coding', url: 'boublok.html' } // Already exists, kept for completeness
 ];
 
+
+// Add new notifications here. They must be objects with 'title', 'body', and 'id'.
+// The 'id' prevents the notification from being shown more than once per session.
+var NOTIFICATION_DATA = [
+    { 
+        id: 1, 
+        title: 'New Game Alert! ', 
+        body: 'Frog Crossing has landed in the StenoTOANSTIK ARCADE! Try it now!',
+        link: 'games/home.html'
+    },
+    { 
+        id: 2, 
+        title: 'Version Update!', 
+        body: 'Version 1.11 is here with improved search suggestions!',
+        link: 'blog.html'
+    },
+    // Add subsequent notifications below this line.
+];
+
+// Storage for already-shown notification IDs for the current session
+var shownNotificationIds = [];
+var LAST_NOTIFICATION_ID = 0; // Tracks the last ID shown to the user
+
 // --- NOTIFICATION FUNCTIONALITY ---
 function requestNotificationPermission() {
     // 1. Check if the browser supports notifications
@@ -67,8 +90,8 @@ function requestNotificationPermission() {
     }
 
     // 2. Request permission from the user
-    Notification.requestPermission().then(permission => {
-        const notifyBtn = document.getElementById('notification-button');
+    Notification.requestPermission().then(function(permission) {
+        var notifyBtn = document.getElementById('notification-button');
         
         if (permission === 'granted') {
             // Permission granted
@@ -89,19 +112,52 @@ function requestNotificationPermission() {
     });
 }
 
-function showNotification(title, body) {
+function showNotification(title, body, link) {
     if (Notification.permission === 'granted') {
-        new Notification(title, {
+        var notification = new Notification(title, {
             body: body,
-            icon: 'new-swc.png', // Ensure you have this icon file
+            icon: 'new-swc.png', 
             vibrate: [200, 100, 200]
         });
+        
+        // Handle click event to open the linked page
+        notification.onclick = function() {
+            if (link) {
+                window.open(link, '_blank');
+            }
+            notification.close();
+        };
     }
 }
 
+//  FUNCTION TO CHECK FOR NEW NOTIFICATIONS 
+function checkForNewNotifications() {
+    // Only proceed if permission is granted
+    if (Notification.permission !== 'granted') {
+        return;
+    }
+
+    var newNotifications = NOTIFICATION_DATA.filter(function(n) {
+        // Show if ID is greater than the last one we showed AND it hasn't been shown this session
+        return n.id > LAST_NOTIFICATION_ID && shownNotificationIds.indexOf(n.id) === -1;
+    });
+
+    if (newNotifications.length > 0) {
+        // Get the newest notification
+        var newest = newNotifications.pop();
+        
+        showNotification(newest.title, newest.body, newest.link);
+        
+        // Update trackers
+        LAST_NOTIFICATION_ID = newest.id;
+        shownNotificationIds.push(newest.id);
+    }
+}
+
+
 function loadBulletinBoard() {
-    const bulletinContent = `
-        <li><span class="highlight">Breaking News!</span> <mark>Ringzauber 1.5 is coming out now! <a href="ringzauber.html">Learn more</a></mark></li>
+    var bulletinContent = `
+        <li><span class="highlight">Breaking News!</span> The first Lytze the Fuzbal Comic is out. Search "Comic" and check it out!</li>
         <li>Access Private Programs Online through our <a href="television_guide.html">Television Guide</a>.</li>
         <li><span class="highlight">New Games:</span> Frog Crossing and StenoTetris are now <a href="games/home.html">available</a>. </li>
         <li><span class="highlight">Suggested AI:</span> Meet <mark><a href="https://stenoip.github.io/praterich">Lady Praterich, an AI chatbot and SWC assistant.</a></mark></li>
@@ -109,27 +165,27 @@ function loadBulletinBoard() {
         <li><span class="highlight">Stay Updated:</span> <a href="#" onclick="requestNotificationPermission(); return false;">Click here to sign up for notifications!</a></li>
     `;
 
-    const bulletinList = document.getElementById('bulletin-list');
+    var bulletinList = document.getElementById('bulletin-list');
     if (bulletinList) {
         bulletinList.innerHTML = bulletinContent;
     }
 }
         // --- SEARCH FUNCTIONALITY ---
         function search() {
-            const query = document.getElementById('search-input').value.trim();
+            var query = document.getElementById('search-input').value.trim();
             if (!query) return;
 
-            const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
+            var matchedLink = links.find(function(link) { return link.name.toLowerCase().includes(query.toLowerCase()); });
             if (matchedLink) {
                 window.location.href = matchedLink.url + (matchedLink.url.includes('?') ? '&' : '?') + 'q=' + encodeURIComponent(query);
             } else {
-                alert(`No exact app match for "${query}" in the Television Guide. Try searching for one of the suggested items.`);
+                alert('No exact app match for "' + query + '" in the Television Guide. Try searching for one of the suggested items.');
             }
         }
 
         function showSuggestions() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const suggestionsContainer = document.getElementById('suggestions');
+            var query = document.getElementById('search-input').value.toLowerCase();
+            var suggestionsContainer = document.getElementById('suggestions');
             suggestionsContainer.innerHTML = '';
 
             if (query.length < 2) {
@@ -137,13 +193,13 @@ function loadBulletinBoard() {
                 return;
             }
 
-            const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
+            var filteredLinks = links.filter(function(link) { return link.name.toLowerCase().includes(query); });
 
             if (filteredLinks.length > 0) {
-                filteredLinks.slice(0, 5).forEach(link => {
-                    const suggestion = document.createElement('div');
+                filteredLinks.slice(0, 5).forEach(function(link) {
+                    var suggestion = document.createElement('div');
                     suggestion.textContent = link.name;
-                    suggestion.onclick = () => {
+                    suggestion.onclick = function() {
                         document.getElementById('search-input').value = link.name;
                         search();
                     };
@@ -166,14 +222,14 @@ function loadBulletinBoard() {
         }
 
         function startExperience() {
-            const introToggle = document.getElementById('introToggle');
+            var introToggle = document.getElementById('introToggle');
             document.getElementById('launch-screen').style.display = 'none';
 
             if (introToggle.checked) {
-                const video = document.getElementById('intro-video');
+                var video = document.getElementById('intro-video');
                 video.muted = false;
                 video.style.display = 'block';
-                video.play().catch(error => console.log("Video play failed:", error));
+                video.play().catch(function(error) { console.log("Video play failed:", error); });
                 document.getElementById('skip-btn').style.display = 'block';
             } else {
                 showMainContent();
@@ -187,9 +243,9 @@ function loadBulletinBoard() {
         document.getElementById('intro-video').addEventListener('ended', showMainContent);
 
         // --- TOGGLE STATE & PAGE LOAD (Unchanged) ---
-        const introToggle = document.getElementById('introToggle');
+        var introToggle = document.getElementById('introToggle');
 
-        const savedIntroState = localStorage.getItem('introVideoEnabled');
+        var savedIntroState = localStorage.getItem('introVideoEnabled');
         if (savedIntroState === null) {
             introToggle.checked = true;
         } else {
@@ -218,10 +274,10 @@ function loadBulletinBoard() {
                 document.getElementById('launch-screen').style.display = 'flex';
                 document.getElementById('intro-video').style.display = 'none';
             }
- loadBulletinBoard();
+            loadBulletinBoard();
 
             // Initial check for notification status to update the button
-            const notifyBtn = document.getElementById('notification-button');
+            var notifyBtn = document.getElementById('notification-button');
             if (notifyBtn) {
                 if ('Notification' in window) {
                     if (Notification.permission === 'granted') {
@@ -232,10 +288,14 @@ function loadBulletinBoard() {
                         notifyBtn.disabled = true;
                     }
                 } else {
-                     // Hide or disable the button if not supported
-                     notifyBtn.style.display = 'none';
+                    // Hide or disable the button if not supported
+                    notifyBtn.style.display = 'none';
                 }
             }
+            
+            // START 15-MINUTE POLLING FOR NEW NOTIFICATIONS 
+            // 15 minutes = 15 * 60 * 1000 milliseconds = 900000ms
+            setInterval(checkForNewNotifications, 900000);
             
             // --- TOMORROW.IO WIDGET LOADER ---
             // Note: This loader script was moved here from the HTML for better organization.
@@ -246,8 +306,8 @@ function loadBulletinBoard() {
                     }
                     return;
                 }
-                const fjs = d.getElementsByTagName(s)[0];
-                const js = d.createElement(s);
+                var fjs = d.getElementsByTagName(s)[0];
+                var js = d.createElement(s);
                 js.id = id;
                 js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
                 fjs.parentNode.insertBefore(js, fjs);
