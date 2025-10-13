@@ -57,6 +57,48 @@ const links = [
     { name: 'Blogs', url: 'blog.html' },
     { name: 'Boublok Coding', url: 'boublok.html' } // Already exists, kept for completeness
 ];
+
+// --- NOTIFICATION FUNCTIONALITY ---
+function requestNotificationPermission() {
+    // 1. Check if the browser supports notifications
+    if (!('Notification' in window)) {
+        alert('This browser does not support desktop notifications.');
+        return;
+    }
+
+    // 2. Request permission from the user
+    Notification.requestPermission().then(permission => {
+        const notifyBtn = document.getElementById('notification-button');
+        
+        if (permission === 'granted') {
+            // Permission granted
+            notifyBtn.textContent = 'Notifications ACTIVE';
+            notifyBtn.disabled = true;
+            // Optional: Show a quick welcome notification
+            showNotification('Welcome to SWC!', 'You will now receive updates on new games and features!');
+
+        } else if (permission === 'denied') {
+            // Permission denied
+            notifyBtn.textContent = 'Notifications BLOCKED';
+            notifyBtn.disabled = true;
+            alert('Notifications have been blocked. Check your browser settings to enable them.');
+        } else {
+            // Permission default/ignored
+            notifyBtn.textContent = 'Sign Up for Notifications';
+        }
+    });
+}
+
+function showNotification(title, body) {
+    if (Notification.permission === 'granted') {
+        new Notification(title, {
+            body: body,
+            icon: 'new-swc.png', // Ensure you have this icon file
+            vibrate: [200, 100, 200]
+        });
+    }
+}
+
 function loadBulletinBoard() {
     const bulletinContent = `
         <li><span class="highlight">Breaking News!</span> <mark>Ringzauber 1.5 is coming out now! <a href="ringzauber.html">Learn more</a></mark></li>
@@ -64,6 +106,7 @@ function loadBulletinBoard() {
         <li><span class="highlight">New Games:</span> Frog Crossing and StenoTetris are now <a href="games/home.html">available</a>. </li>
         <li><span class="highlight">Suggested AI:</span> Meet <mark><a href="https://stenoip.github.io/praterich">Lady Praterich, an AI chatbot and SWC assistant.</a></mark></li>
         <li><span class="highlight">New Update:</span> Version ${document.querySelector('.footer p').textContent.match(/Version ([\d\.]+)/)[1]} brings improved search suggestions!</li> 
+        <li><span class="highlight">Stay Updated:</span> <a href="#" onclick="requestNotificationPermission(); return false;">Click here to sign up for notifications!</a></li>
     `;
 
     const bulletinList = document.getElementById('bulletin-list');
@@ -176,7 +219,26 @@ function loadBulletinBoard() {
                 document.getElementById('intro-video').style.display = 'none';
             }
  loadBulletinBoard();
+
+            // Initial check for notification status to update the button
+            const notifyBtn = document.getElementById('notification-button');
+            if (notifyBtn) {
+                if ('Notification' in window) {
+                    if (Notification.permission === 'granted') {
+                        notifyBtn.textContent = 'Notifications ACTIVE';
+                        notifyBtn.disabled = true;
+                    } else if (Notification.permission === 'denied') {
+                        notifyBtn.textContent = 'Notifications BLOCKED';
+                        notifyBtn.disabled = true;
+                    }
+                } else {
+                     // Hide or disable the button if not supported
+                     notifyBtn.style.display = 'none';
+                }
+            }
+            
             // --- TOMORROW.IO WIDGET LOADER ---
+            // Note: This loader script was moved here from the HTML for better organization.
             (function (d, s, id) {
                 if (d.getElementById(id)) {
                     if (window.__TOMORROW__) {
