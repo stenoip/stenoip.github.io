@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -423,9 +422,7 @@ input:checked + .slider:before {
                 </label>
             </div>
         </div>
- <h3 class="text-center mt-6">Wheel of Stenoip</h3>
-        <iframe src="https://stenoip.github.io/wheel_gifs" height="900px" width="100%" class="rounded-lg shadow-md mt-4 mb-4"></iframe>
-<br>
+
         <h2> Television Guide (Coding Programs Quick Search)</h2>
         <p>Use the search bar below to quickly find programs like 'Flappy Bird', 'Boublok Coding' or 'StenoOffices' available in our Guide.</p>
         <div class="search-bar">
@@ -436,6 +433,16 @@ input:checked + .slider:before {
             <div class="suggestions" id="suggestions" style="display: none;"></div>
         </div>
         <p class="text-center">For the full list, visit the <a href="television_guide.html">Television Guide</a> page.</p>
+        
+         <h3 class="text-center mt-6">Wheel of Stenoip</h3>
+        <iframe src="https://stenoip.github.io/wheel_gifs" height="900px" width="100%" class="rounded-lg shadow-md mt-4 mb-4"></iframe>
+<br>
+        <p>For news and weather...</p> 
+        <button class="learn-centre-btn aero" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
+            Visit the Learn Center
+        </button>
+
+        <br>
         <hr class="my-6">
 <div class="bulletin-board">
     <h2>The Bulletin Board!</h2>
@@ -443,18 +450,55 @@ input:checked + .slider:before {
         </ul>
 </div>
 
-        <button class="learn-centre-btn aero" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
-            Visit the Learn Center
-        </button>
-
+      
        
         <h3 class="text-center mt-6 mb-3">Weather & News (Powered by Tomorrow.io)</h3>
-        <p class="text-center mb-4">Visit the Learn Center for the News and Weather</p>
+        <p class="text-center mb-4">Visit the Learn Center for more the News and Weather</p>
         <div data-id="0" data-module_id="100" data-theme="dark" data-primary_color="#515c6d" data-language="en" style="min-height: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-            </div>
+          <script>
+        // Script for Weather.io widget. Not to be merged with script.js
+              (function(d, s, id) {
+            if (d.getElementById(id)) {
+                if (window.__TOMORROW__) {
+                    window.__TOMORROW__.renderWidget();
+                }
+                return;
+            }
+            var fjs = d.getElementsByTagName(s)[0];
+            var js = d.createElement(s);
+            js.id = id;
+            js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
+
+            fjs.parentNode.insertBefore(js, fjs);
+        })(document, 'script', 'tomorrow-sdk');
+        </script>
+
+        <div class="tomorrow"
+           data-location-id="122795"
+           data-language="EN"
+           data-unit-system="METRIC"
+           data-skin="light"
+           data-widget-type="aqiMini"
+           style="padding-bottom:22px;position:relative;"
+        >
+          <a
+            href="https://weather.tomorrow.io/"
+            rel="nofollow noopener noreferrer"
+            target="_blank"
+            style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;"
+          >
+            <img
+              alt="Powered by Tomorrow.io"
+              src="https://weather-website-client.tomorrow.io/img/powered-by.svg"
+              width="250"
+              height="18"
+            />
+          </a>
+        </div>  
+        </div>
 
         <div class="footer">
-            <p>Version 1.10 &copy; Stenoip Company</p>
+            <p>Version 1.11 &copy; Stenoip Company</p>
             <p><a href="copyright.html">View our terms.</a></p>
             <p>WHY ARE THERE ADS! We have ads to fund our projects and earn money. Read our <a href="privacy.html">Privacy and Policy</a> (at the top) for more info.</p>
         </div>
