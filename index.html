@@ -379,6 +379,64 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+/* --- NOTIFICATION BUTTON STYLES  */
+
+/* Define the Green Hue Variables specifically for the notification button ID */
+#notification-button {
+    /* These specific variables now override any general --hue variables */
+    --hue: 120; /* Green hue */
+    --button-background: oklch(75% 0.1 var(--hue) / 0.9); 
+    --bg-dark: oklch(50% 0.1 var(--hue) / 0.8);
+    
+    /* Make it a unique, rounded-square shape to look like a system tray icon */
+    border-radius: 12px; 
+    
+    /* Stronger visual distinction */
+    box-shadow: 
+        0 4px 6px rgba(0, 0, 0, 0.5), 
+        inset 0 0 15px rgba(255, 255, 255, 0.4), 
+        inset 0 0 5px rgba(0, 0, 0, 0.5); 
+
+
+    background-image: 
+        url('http://t3.gstatic.com/images?q=tbn:ANd9GcQVu2oItd5qyej8ltvLMu0-Ewmt5ZS7O8h-N3nBSv1hfhx9Aq7I0MDvvAFwNPLq_HhUzgnl2Q_H'), 
+        var(--bottom-glow), 
+        linear-gradient(to bottom, var(--bg-dark), var(--button-background));
+        
+    background-size: 30px 30px, auto, auto; 
+    background-repeat: no-repeat;
+    background-position: 15px center, center, center; 
+    padding: 15px 30px 15px 55px; /* Space for the icon */
+    
+    display: block;
+    margin: 20px auto;
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: white; 
+    border: 1px solid rgba(255, 255, 255, 0.6); 
+    transition: all 0.15s ease-in-out;
+}
+
+/* Hover effect */
+#notification-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 6px 8px rgba(0, 0, 0, 0.6), 
+        inset 0 0 20px rgba(255, 255, 255, 0.6), 
+        inset 0 0 7px rgba(0, 0, 0, 0.7);
+}
+
+/* Style for when notifications are active or blocked */
+#notification-button:disabled {
+    cursor: default;
+    opacity: 0.9;
+    /* Use a gray/dark background to show it's inactive */
+    background: oklch(40% 0.05 0 / 0.8); /* Direct color override */
+    box-shadow: none;
+    transform: none;
+    padding-left: 30px; /* Remove icon padding when disabled, as the icon image is gone */
+}
     </style>
 </head>
 <body>
@@ -437,73 +495,39 @@ input:checked + .slider:before {
          <h3 class="text-center mt-6">Wheel of Stenoip</h3>
         <iframe src="https://stenoip.github.io/wheel_gifs" height="900px" width="100%" class="rounded-lg shadow-md mt-4 mb-4"></iframe>
 <br>
-        <p>For news and weather...</p> 
-        <button class="learn-centre-btn aero" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
-            Visit the Learn Center
-        </button>
-
-        <br>
         <hr class="my-6">
 <div class="bulletin-board">
     <h2>The Bulletin Board!</h2>
     <ul id="bulletin-list">
         </ul>
 </div>
+<hr>
+<button 
+    class="aero notification-btn" 
+    id="notification-button" 
+    onclick="requestNotificationPermission()">
+    Sign Up for Notifications
+</button>
+<hr>
+  <br>
+  <p>For news and weather...</p>
+        <button class="learn-centre-btn aero" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
+            Visit the Learn Center
+        </button>
 
-      
-       
+       <br>
         <h3 class="text-center mt-6 mb-3">Weather & News (Powered by Tomorrow.io)</h3>
-        <p class="text-center mb-4">Visit the Learn Center for more the News and Weather</p>
+        <p class="text-center mb-4">Visit the Learn Center for the News and Weather</p>
         <div data-id="0" data-module_id="100" data-theme="dark" data-primary_color="#515c6d" data-language="en" style="min-height: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-          <script>
-        // Script for Weather.io widget. Not to be merged with script.js
-              (function(d, s, id) {
-            if (d.getElementById(id)) {
-                if (window.__TOMORROW__) {
-                    window.__TOMORROW__.renderWidget();
-                }
-                return;
-            }
-            var fjs = d.getElementsByTagName(s)[0];
-            var js = d.createElement(s);
-            js.id = id;
-            js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
-
-            fjs.parentNode.insertBefore(js, fjs);
-        })(document, 'script', 'tomorrow-sdk');
-        </script>
-
-        <div class="tomorrow"
-           data-location-id="122795"
-           data-language="EN"
-           data-unit-system="METRIC"
-           data-skin="light"
-           data-widget-type="aqiMini"
-           style="padding-bottom:22px;position:relative;"
-        >
-          <a
-            href="https://weather.tomorrow.io/"
-            rel="nofollow noopener noreferrer"
-            target="_blank"
-            style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;"
-          >
-            <img
-              alt="Powered by Tomorrow.io"
-              src="https://weather-website-client.tomorrow.io/img/powered-by.svg"
-              width="250"
-              height="18"
-            />
-          </a>
-        </div>  
-        </div>
+            </div>
 
         <div class="footer">
-            <p>Version 1.11 &copy; Stenoip Company</p>
+            <p>Version 1.12 &copy; Stenoip Company</p>
             <p><a href="copyright.html">View our terms.</a></p>
             <p>WHY ARE THERE ADS! We have ads to fund our projects and earn money. Read our <a href="privacy.html">Privacy and Policy</a> (at the top) for more info.</p>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="https://stenoip.github.io/script.js"></script>
 </body>
 </html>
