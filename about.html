@@ -8,7 +8,7 @@
     <style>
         /* FRUTIGER AERO AESTHETIC STYLES */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
-        
+
         body {
             /* Simulating an Aero background - bright, perhaps with soft gradients or clouds */
             font-family: 'Roboto', Arial, sans-serif;
@@ -21,7 +21,6 @@
             padding: 0;
             color: #333;
         }
-
         /* Glassmorphism Container */
         .container {
             width: 90%;
@@ -33,11 +32,11 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 15px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            
+
             padding: 40px;
             margin: 60px 0; /* Increased margin for better visual break */
         }
-        
+
         /* Header Bar - Cleaned up and Aero-themed */
         .header {
             position: fixed;
@@ -49,7 +48,8 @@
             background: linear-gradient(180deg, rgba(0, 150, 255, 0.8), rgba(0, 100, 200, 0.9));
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             z-index: 10;
-            text-align: right;
+            /* --- MODIFICATION: Align header content to the left --- */
+            text-align: left;
             box-sizing: border-box;
             font-size: 16px;
         }
@@ -58,14 +58,29 @@
             color: #ffffff;
             text-decoration: none;
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
-            margin-left: 20px;
+            margin-right: 20px; /* Changed from margin-left to margin-right for left alignment */
             padding: 5px 0;
             transition: color 0.3s;
+            display: inline-flex; /* Allows icon and text to align */
+            align-items: center; /* Vertically centers icon and text */
         }
-        
+
         .header a:hover {
             color: #ccffff;
             text-decoration: underline;
+        }
+        
+        /* --- NEW CSS: Style for the Home icon --- */
+        .home-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            /* Use the path provided by the user */
+            background: url('/new-swc.png') no-repeat center center;
+            background-size: contain;
+            /* Fallback/Placeholder if image doesn't load to show an area */
+            border: 1px solid transparent; 
         }
 
         /* Navigation Style - Only used in the header now */
@@ -104,7 +119,7 @@
             font-size: 16px;
             margin-bottom: 8px;
         }
-        
+
         /* Image and Media Styling */
         .carousel img {
             width: 100%;
@@ -113,7 +128,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
             margin-bottom: 20px;
         }
-        
+
         /* Canva iFrame - Give it a slight Aero lift */
         .canva-embed {
              border-radius: 10px;
@@ -133,11 +148,11 @@
 <body>
     <header class="header">
         <nav>
-            <span class="menuItems"><a href="index.html">Home</a></span>
+            <span class="menuItems"><a href="index.html"><span class="home-icon"></span>Home</a></span>
             <span class="menuItems"><a href="about.html">About Us</a></span>
             </nav>
     </header>
-    
+
     <div class="container" id="main-content">
         <h1>Stenoip Wonder Computer: Our Mission</h1>
         <hr>
@@ -146,21 +161,19 @@
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPWfp3LQW1pOPD1MqocR2sHjLcxG8rY_Il0Q&s" alt="Modern computer interface with a focus on privacy.">
             <p>At Stenoip Company, we are dedicated to creating a next-generation tech company—one that is not only innovative but fundamentally user-centric. Our commitment is to provide a platform that is better than the status quo, offering powerful tools and keeping you entertained, all while safeguarding your digital life. Visit our Terms and Contact pages via the <a href="index.html">home page.</a> Our headquarters is proudly located in North America.</p>
         </div>
-        
+
         <h2>Empowering the User: Privacy First</h2>
         <p>Big tech corporations often monetize your personal data and track your activity. Stenoip Wonder Computer is built on a foundation of trust, providing advanced, free technology where your history remains your own. </p>
-        
+
         <p>We are committed to making a safe and private environment for all users. Did we mention the built-in entertainment options?</p>
-        
+
         <img src="https://stenoip.github.io/products.png" alt="A graphic illustrating Stenoip's various software products and services." height="20%" width="100%">
-        
+
         <h2>What is Stenoip Wonder Computer? A Web Portal</h2>
         <p>A website that offers diverse functions like maps, web-based tools, games, news and office applications is called <strong>a web portal</strong>. These platforms act as a unified, customizable starting point for users to access various services from a single location. Examples include Google and Microsoft's unified interfaces.</p>
-        
+
         <p>Stenoip Wonder Computer is the ultimate web portal choice, offering this same powerful functionality with a singular focus on your privacy and digital freedom. We believe you shouldn't have to choose between advanced tools and your own security.</p>
-
         <hr>
-
         <div style="position: relative; width: 100%; height: 0; padding-top: 56.25%; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); border-radius: 8px; overflow: hidden;" class="canva-embed">
             <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
                 src="https://www.canva.com/design/DAGxlQovwG8/vBiNLqANTktLdGCRIPPrlA/watch?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
