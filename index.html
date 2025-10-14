@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="icon" href="new-swc.png" type="image/png" />
     <title>Stenoip Wonder Computer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         /* BASE & FONT STYLES */
         @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
@@ -27,7 +28,8 @@
             min-height: 100vh;
             overflow-x: hidden;
             padding-bottom: 50px;
-        }
+       padding-top: 60px;   
+      }
 
         /* AERO BUTTON STYLES */
         button.aero {
@@ -127,17 +129,7 @@
         }
 
         /* MAIN CONTAINER & LAYOUT */
-        .container {
-            width: 95%;
-            max-width: 1200px;
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            margin-top: 20px;
-            border-radius: 10px;
-            flex-grow: 1;
-            box-sizing: border-box;
-        }
+        
 
         /* HEADER & NAVIGATION STYLES */
         .header {
@@ -459,16 +451,9 @@ input:checked + .slider:before {
     
     <div id="main-content" class="container" style="display: none;">
 
-        <nav class="w-full bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg mb-6">
-            <ul class="flex flex-col sm:flex-row justify-around items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                <li><a href="index.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">Home</a></li>
-                <li><a href="about.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">About</a></li>
-                <li><a href="copyright.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">Terms</a></li>
-                <li><a href="contact.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">Contact</a></li>
-                <li><a href="privacy.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">Privacy Policy</a></li>
-                <li><a href="blog.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">Blog</a></li>
-            </ul>
-        </nav>
+        
+     <!--Selection Menu --> <div id="header-placeholder"></div>
+      
 
         <div class="header">
             <h1>Stenoip Wonder Computer</h1>
@@ -522,12 +507,14 @@ input:checked + .slider:before {
             </div>
 
         <div class="footer">
-            <p>Version 1.12 &copy; Stenoip Company</p>
+            <p>Version 1.13 &copy; Stenoip Company</p>
             <p><a href="copyright.html">View our terms.</a></p>
             <p>WHY ARE THERE ADS! We have ads to fund our projects and earn money. Read our <a href="privacy.html">Privacy and Policy</a> (at the top) for more info.</p>
         </div>
     </div>
 
-    <script src="https://stenoip.github.io/script.js"></script>
+<!--JAVASCRIPT TAGS -->  
+    <script src="/script.js"></script>
+  <script src="/load-header.js"></script>
 </body>
 </html>
