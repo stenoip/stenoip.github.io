@@ -64,9 +64,9 @@ var links = [
 var NOTIFICATION_DATA = [
     { 
         id: 1, 
-        title: 'New Game Alert! ', 
-        body: 'Frog Crossing has landed in the StenoTOANSTIK ARCADE! Try it now!',
-        link: 'games/home.html'
+        title: 'New Comic! ', 
+        body: 'Lytze the Fuzbal s adventures begin!',
+        link: 'comic.html'
     },
     { 
         id: 2, 
