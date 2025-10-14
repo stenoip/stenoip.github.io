@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    /* FRUTIGER AERO AESTHETIC STYLES FOR HEADER ONLY */
+
+    /* Header Bar - Cleaned up and Aero-themed */
+    .menu-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 15px 30px;
+        /* Bright Cyan/Blue for Aero headers */
+        background: linear-gradient(180deg, rgba(0, 150, 255, 0.8), rgba(0, 100, 200, 0.9));
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+        text-align: left;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    .menu-header a {
+        color: #ffffff;
+        text-decoration: none;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+        margin-right: 20px;
+        padding: 5px 0;
+        transition: color 0.3s;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .menu-header a:hover {
+        color: #ccffff;
+        text-decoration: underline;
+    }
+    
+    /* Style for the Home icon */
+    .home-icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin-right: 6px;
+        /* Use the path provided by the user */
+        background: url('/new-swc.png') no-repeat center center;
+        background-size: contain;
+        border: 1px solid transparent; 
+    }
+
+    /* Navigation Style */
+    .menuItems {
+        display: inline-block;
+    }
+</style>
+
+<header class="menu-header">
+    <nav>
+        <span class="menuItems"><a href="index.html"><span class="home-icon"></span>Home</a></span>
+        <span class="menuItems"><a href="about.html">About Us</a></span>
+    </nav>
+</header>
+
+
+    
+</body>
+</html>
