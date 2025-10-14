@@ -15,21 +15,17 @@
             text-align: center;
             padding: 40px 20px;
             margin: 0;
-        }
-
-        /* Main Container: Stronger Glassmorphism */
-        .container {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             padding: 40px;
-            border-radius: 25px; /* Softer, more glassy corners */
+          
             /* Stronger 3D effect with multiple shadows */
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-            border: 2px solid rgba(255, 255, 255, 0.8);
+          
             margin: auto;
             max-width: 900px;
         }
+
+        
 
         /* Headings: More color and shadow */
         h1 {
@@ -94,13 +90,14 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    
+    <div id="header-placeholder"></div>
         <h1>Stenoip Copyright & Legal Terms</h1>
 
         <h2>Copyright Notice</h2>
         <div class="card">
             <div class="section">
-                <p><strong>© 2025 StenoipCompany. All rights reserved.</strong></p>
+                <p><strong>© 2025 Stenoip Company. All rights reserved.</strong></p>
                 <p>All content published on this website, including but not limited to text, images, graphics, software, and intellectual property, is protected under international copyright laws.</p>
                 <p>Any unauthorised reproduction, distribution, or modification of any materials without prior written permission from StenoipCompany is strictly prohibited. Violators may be subject to legal action.</p>
             </div>
@@ -111,7 +108,7 @@
         <h2>MIT License</h2>
         <div class="card">
             <div class="section">
-                <p>Copyright (c) 2025 StenoipCompany</p>
+                <p>Copyright (c) 2025 Stenoip Company</p>
                 <p>Permission is granted, free of charge, to any individual obtaining a copy of this software and its associated documentation files to use, modify, merge, publish, distribute, sublicense, and sell copies of the software without restriction. This license applies worldwide, ensuring open access while maintaining the integrity of intellectual property rights. However, any individual or organisation using this software must acknowledge the original author and retain the copyright notice within all substantial portions of the software.</p>
                 <p>The software is provided "as is," without warranty of any kind, whether expressed or implied. This includes, but is not limited to, warranties of merchantability, fitness for a particular purpose, and non-infringement. Under no circumstances shall the authors or copyright holders be held liable for any damages, claims, or issues arising from the use or inability to use the software. By accepting this license, users acknowledge that they bear full responsibility for the consequences of software use.</p>
                 <p>Failure to comply with the terms of this license will result in legal penalties. Unauthorised reproduction, distribution, or commercial exploitation of the software outside permitted usage will incur **fines starting at TTD$33,800.00** per violation (Varies by your local nation). Repeat infringements or intentional misuse may lead to permanent revocation of rights and prosecution under applicable copyright laws. StenoipCompany reserves the right to take legal action against any entity found guilty of violating these terms.</p>
@@ -139,6 +136,7 @@
             </div>
         </div>
 
-    </div>
+   
+     <script src="/load-header.js"></script>
 </body>
 </html>
