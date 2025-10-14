@@ -7,7 +7,7 @@
  <link rel="icon" href="new-swc.png" type="image/png" />
   <style>
     body {
-   
+    padding-top: 60px; 
     }
 
     #pet {
@@ -38,10 +38,12 @@
   </style>
 </head>
 <body>
+  <div id="header-placeholder"></div>
   <h1> Talk to Your Dog!</h1>
   <div id="pet" title="Say something to me!"></div>
   <p id="transcript">Waiting to hear you...</p>
 <p>Copyright Stenoip Co, 2025</p>
+<script src="/load-header.js"></script>
   <script>
     const petDiv = document.getElementById('pet');
     const transcript = document.getElementById('transcript');
