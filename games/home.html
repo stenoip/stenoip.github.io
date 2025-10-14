@@ -1,12 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">  
   <title>StenoToanstik Arcade</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="icon" type="image/png" href="/new-swc.png">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+<style>
+    /* FRUTIGER AERO AESTHETIC STYLES FOR HEADER ONLY */
+
+    /* Header Bar - Cleaned up and Aero-themed */
+    .menu-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 30px;
+    
+    /* 1. INCREASED TRANSPARENCY for the background. 
+       Changed alpha values from (0.7, 0.8) to (0.2, 0.4) 
+       to allow content underneath to be visible and blurred. */
+    background: linear-gradient(180deg, rgba(160, 0, 0, 0.2), rgba(120, 0, 0, 0.4));
+    
+    /* 2. Add the glassy blur and saturation effect */
+    backdrop-filter: blur(5px) saturate(1.5);
+    -webkit-backdrop-filter: blur(5px) saturate(1.5);
+    
+    
+    /* Keep other essential styles */
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+    z-index: 10;
+    text-align: left;
+    box-sizing: border-box;
+    font-size: 16px;
+    
+}
+
+    .menu-header a {
+        color: #ffffff;
+        text-decoration: none;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+        margin-right: 20px;
+        padding: 5px 0;
+        transition: color 0.3s;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .menu-header a:hover {
+        color: #ccffff;
+        text-decoration: underline;
+    }
+    
+    /* Style for the Home icon */
+    .home-icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin-right: 6px;
+      
+        /* NOTE: Assuming the URL for the background image is valid and accessible */
+        background: url('https://stenoip.github.io/new-swc.png') no-repeat center center;
+        background-size: contain;
+        border: 1px solid transparent; 
+    }
+
+    /* Navigation Style */
+    .menuItems {
+        display: inline-block;
+    }
+    
+       
+       
+       
+       @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
     body {
       background-image: url('https://www.transparenttextures.com/patterns/dark-mosaic.png');
@@ -109,10 +175,25 @@
     .play-link:hover {
       background: linear-gradient(to bottom, #ff6666, #cc0000);
     }
-  </style>
+       
+   
+</style>
 </head>
 <body>
-  <div class="header">
+
+<header class="menu-header">
+    <nav>
+        <span class="menuItems"><a href="/index.html"><span class="home-icon"></span>Home</a></span>
+        <span class="menuItems"><a href="/about.html">About Us</a></span>
+        <span class="menuItems"><a href="/copyright.html">Terms</a></span>  
+        <span class="menuItems"><a href="/copyright.html">Programs</a></span>  
+        <span class="menuItems"><a href="/privacy.html">Privacy and Policy</a></span> 
+        <span class="menuItems"><a href="/blog.html">Blogs</a></span>
+    </nav>
+</header>
+<br><br><br><br><br><br>
+
+ <div class="header">
     <h1>StenoToanstik Arcade</h1>
   </div>
   <div class="container">
@@ -161,6 +242,8 @@
       <a href="https://editor.p5js.org/stenoip/full/4X27mOrBn" target="_blank" class="play-link">Play Game</a>
     </div>
     <p>Copyright 2025 Stenoip Company</p>
-  </div>
+
+
+
 </body>
 </html>
