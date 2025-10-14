@@ -19,6 +19,7 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    padding-top: 60px; 
   }
   .editor-buttons {
     display: flex;
@@ -96,7 +97,8 @@
 </style>
 </head>
 <body>
-  <div class="editor-buttons">
+ <div id="header-placeholder"></div> 
+ <div class="editor-buttons">
     <button onclick="runCode()">Run</button>
     <button onclick="saveCode()">Save</button>
     <button id="switch-btn" onclick="switchEditor()">Switch to p5.js</button>
@@ -349,5 +351,7 @@ document.addEventListener('keydown', (e) => {
 runCode();
 
 </script>
+
+  <script src="/load-header.js"></script>
 </body>
 </html>
