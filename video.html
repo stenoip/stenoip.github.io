@@ -27,6 +27,7 @@
             margin: 0;
             padding: 0;
             transition: all 0.3s ease-in-out;
+             padding-top: 60px; 
         }
         body.dark-mode {
             background-color: var(--bg-color-dark);
@@ -109,26 +110,13 @@
             color: var(--date-text-dark);
         }
     </style>
-    <script>
-        function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
-            const header = document.querySelector('header');
-            const footer = document.querySelector('footer');
-            const videoBoxes = document.querySelectorAll('.video-box');
-            const datePlaceholders = document.querySelectorAll('.date-placeholder');
-            
-            header.classList.toggle('dark-mode');
-            footer.classList.toggle('dark-mode');
-            videoBoxes.forEach(box => box.classList.toggle('dark-mode'));
-            datePlaceholders.forEach(date => date.classList.toggle('dark-mode'));
-        }
-    </script>
+  
 </head>
 <body>
     <header>
         <h1>StenoVids</h1>
     </header>
+     <div id="header-placeholder"></div>
     <div class="container">
         <div class="theme-switch">
             <input type="checkbox" id="theme-switch" onclick="toggleTheme()">
@@ -260,16 +248,18 @@
         </div>
     </div>
     <footer>
-        &copy; Stenoip Company, 23rd December 2024
+        &copy; Stenoip Company, 23rd December 2024 - 14th October 2025
     </footer>
+   <script src="/load-header.js"></script>
+
     <script>
         function toggleTheme() {
-            const body = document.body;
+           var body = document.body;
             body.classList.toggle('dark-mode');
-            const header = document.querySelector('header');
-            const footer = document.querySelector('footer');
-            const videoBoxes = document.querySelectorAll('.video-box');
-            const datePlaceholders = document.querySelectorAll('.date-placeholder');
+            var header = document.querySelector('header');
+            var footer = document.querySelector('footer');
+            var videoBoxes = document.querySelectorAll('.video-box');
+            var datePlaceholders = document.querySelectorAll('.date-placeholder');
             
             header.classList.toggle('dark-mode');
             footer.classList.toggle('dark-mode');
