@@ -1,0 +1,73 @@
+<style>
+/* FRUTIGER AERO AESTHETIC STYLES FOR HEADER ONLY */
+
+/* Header Bar - Cleaned up and Aero-themed */
+.menu-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 30px;
+    
+    /* 1. INCREASED TRANSPARENCY for the background.  */
+    background: linear-gradient(180deg, rgba(160, 0, 0, 0.2), rgba(120, 0, 0, 0.4));
+    
+    /* 2. Add the glassy blur and saturation effect */
+    backdrop-filter: blur(5px) saturate(1.5);
+    -webkit-backdrop-filter: blur(5px) saturate(1.5);
+    
+    
+    /* Keep other essential styles */
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+    z-index: 10;
+    text-align: left;
+    box-sizing: border-box;
+    font-size: 16px;
+    
+}
+
+.menu-header a {
+    color: #ffffff;
+    text-decoration: none;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+    margin-right: 20px;
+    padding: 5px 0;
+    transition: color 0.3s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.menu-header a:hover {
+    color: #ccffff;
+    text-decoration: underline;
+}
+
+/* Style for the Home icon */
+.home-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    
+    /* NOTE: Assuming the URL for the background image is valid and accessible */
+    background: url('https://stenoip.github.io/new-swc.png') no-repeat center center;
+    background-size: contain;
+    border: 1px solid transparent; 
+}
+
+/* Navigation Style */
+.menuItems {
+    display: inline-block;
+}
+</style>
+
+<header class="menu-header">
+    <nav>
+        <span class="menuItems"><a href="/index.html"><span class="home-icon"></span>Home</a></span>
+        <span class="menuItems"><a href="/about.html">About Us</a></span>
+        <span class="menuItems"><a href="/copyright.html">Terms</a></span>  
+        <span class="menuItems"><a href="/television_guide.html">Programs</a></span>  
+        <span class="menuItems"><a href="/privacy.html">Privacy and Policy</a></span> 
+        <span class="menuItems"><a href="/blog.html">Blogs</a></span>
+    </nav>
+</header>
