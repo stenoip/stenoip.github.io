@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>StenoVids Plus (Private YouTube Watcher)</title>
+    <title>StenoVids Plus | Private YouTube Watcher</title>
   <link rel="icon" href="/new-swc.png" type="image/png" /> 
   <style>
         /* --- FRUTIGER AERO VARIABLES --- */
@@ -28,6 +28,7 @@
                         radial-gradient(circle at 80% 20%, #ccffcc 0%, transparent 20%);
             background-attachment: fixed;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+         padding-top: 60px; 
         }
 
         /* --- GLASSMOPHISM CONTAINERS (Header, Footer, Cards) --- */
@@ -178,6 +179,7 @@
     </style>
 </head>
 <body>
+    <div id="header-placeholder"></div>
     <header>
         <h2>StenoVids Plus</h2>
         <p>Watch videos online that are private and appropriate for people under 18.</p>
@@ -205,9 +207,10 @@
     <footer>
         Copyright 2025, Stenoip Company. All rights reserved.
     </footer>
+   <script src="/load-header.js"></script>
     <script>
-        // Note: The apiKey remains visible in the HTML/JavaScript for context but should be protected in a real application.
-        const apiKey = "AIzaSyBJ9awb9K-MM8WdCXKehSfA49Id4CGyFiA";
+        
+        var apiKey = "AIzaSyBJ9awb9K-MM8WdCXKehSfA49Id4CGyFiA";
         let nextPageToken = "";
         let currentQuery = "";
         let currentOrder = "";
