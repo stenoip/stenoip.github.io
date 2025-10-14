@@ -8,7 +8,11 @@
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet"/>
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Cesium.js"></script>
   <style>
-    body, html { margin: 0; padding: 0; overflow: hidden; }
+    body, html { 
+      margin: 0; 
+      padding: 0; 
+      overflow: hidden; 
+    }
     #cesiumContainer { width: 100%; height: 100vh; display: block; }
     #routeForm {
       position: absolute; top: 10px; left: 10px; z-index: 2;
@@ -35,6 +39,8 @@
   </style>
 </head>
 <body>
+     <div id="header-placeholder"></div>
+
   <div id="cesiumContainer"></div>
 
   <!-- Route form -->
@@ -94,6 +100,7 @@
        <a href="https://openrouteservice.org/" target="_blank">OpenRouteService</a>.</p>
   </footer>
 
+  <script src="/load-header.js"></script>
   <script>
     // Cesium Access Token
     Cesium.Ion.defaultAccessToken =
