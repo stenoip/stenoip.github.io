@@ -12,6 +12,7 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             text-align: center;
+             padding-top: 60px; 
         }
 
         .container {
@@ -63,6 +64,7 @@
     </style>
 </head>
 <body>
+      <div id="header-placeholder"></div>
     <div class="container">
         <h1>Kompmasine - Function Plotter</h1>
         <canvas id="graphCanvas" width="600" height="400"></canvas>
@@ -75,6 +77,7 @@
             Note: You can enter functions like <code>sin(x)</code>, <code>cos(x)</code>, <code>tan(x)</code>, <code>3.14</code> (for π), and standard arithmetic operations. Use multiplication explicitly as <code>*</code> if needed.
         </div>
     </div>
+   <script src="/load-header.js"></script>
     <script>
         let chart;
 
