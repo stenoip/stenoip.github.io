@@ -15,6 +15,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            padding-top: 60px; 
         }
 
         .calculator {
@@ -89,6 +90,7 @@
     </style>
 </head>
 <body>
+   <div id="header-placeholder"></div>
     <div class="calculator">
         <div class="display" id="display">0</div>
         <div class="keys">
@@ -235,5 +237,7 @@ function calculateMode() {
     document.getElementById('display').innerText = modes.length === data.length ? 'No mode' : modes.join(', ');
 }
 </script>
+
+        <script src="/load-header.js"></script>
 </body>
 </html>
