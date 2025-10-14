@@ -13,6 +13,7 @@
     align-items: center;
     padding: 20px;
     background-color: #f0f0f0;
+     padding-top: 60px; 
   }
   #calendar {
     margin-bottom: 20px;
@@ -139,16 +140,18 @@
 
 
 
-
 </head>
 <body>
-<h1>Clocker</h1>
-<div id="calendar"></div>
+
+  <div id="header-placeholder"></div>
+  <h1>Clocker</h1>
+
+  <div id="calendar"></div>
 <div id="date-info"></div>
 <canvas id="canvas" width="400" height="400" style="background-color:#333">
 
 </canvas>
-
+<script src="/load-header.js"></script>
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
