@@ -35,6 +35,8 @@
     </style>
 </head>
 <body>
+    <div id="header-placeholder"></div>
+   
     <div class="counter">0</div>
     <div class="controls">
         <label for="rate">Rate (numbers per second): </label>
@@ -43,6 +45,8 @@
         <button id="pauseButton">Pause</button>
     </div>
     <div class="word-form">Zero</div>
+    <script src="/load-header.js"></script>
+
     <script>
         let count = 0;
         let interval = 1000 / parseNumber(document.getElementById('rate').value);
