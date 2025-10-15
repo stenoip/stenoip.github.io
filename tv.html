@@ -1,204 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stenoip Wonder Computer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Google Sans', sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            margin-top: 20px;
-            border-radius: 10px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .search-bar {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            position: relative;
-            width: 100%;
-        }
-        .search-bar input {
-            padding: 15px;
-            width: 70%;
-            font-size: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-        .search-bar button {
-            padding: 15px;
-            font-size: 20px;
-            border: none;
-            background-color: #0078d4;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .search-bar button:hover {
-            background-color: #005ba1;
-        }
-        .suggestions {
-            position: absolute;
-            top: 50px;
-            left: 0;
-            width: 70%;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1;
-        }
-        .suggestions div {
-            padding: 15px;
-            cursor: pointer;
-        }
-        .suggestions div:hover {
-            background-color: #f0f0f0;
-        }
-        .links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .links button {
-            padding: 20px 40px;
-            font-size: 20px;
-            cursor: pointer;
-            border: none;
-            background-color: #0078d4;
-            color: white;
-            border-radius: 5px;
-            margin: 10px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        .links button:hover {
-            background-color: #005ba1;
-            transform: translateY(-3px);
-        }
-    </style>
-    <script>
-        const links = [
-            { name: 'Camera', url: 'https://stenoip.github.io/swc/camera' },
-            { name: 'Clocker', url: 'https://stenoip.github.io/swc/clocker' },
-            { name: 'Draw', url: 'https://stenoip.github.io/swc/draw' },
-            { name: 'Games', url: 'https://stenoip.github.io/swc/games' },
-            { name: 'Maps', url: 'https://stenoip.github.io/swc/maps' },
-            { name: 'Media', url: 'https://stenoip.github.io/swc/media' },
-            { name: 'Minecraft 1.9', url: 'https://stenoip.github.io/swc/mineraft1-9' },
-            { name: 'Pet', url: 'https://stenoip.github.io/swc/pet' },
-            { name: 'Phone', url: 'https://stenoip.github.io/swc/phone' },
-            { name: 'Sir Praterich', url: 'https://stenoip.github.io/swc/sir praterich' },
-            { name: 'Space Map', url: 'https://stenoip.github.io/swc/space-map' },
-            { name: 'Testing', url: 'https://stenoip.github.io/swc/testing' },
-            { name: 'Typoe', url: 'https://stenoip.github.io/swc/typoe' },
-            { name: 'Video', url: 'https://stenoip.github.io/swc/video' },
-            { name: 'Quiz', url: 'https://stenoip.github.io/swc/quiz' },
-            { name: 'FlappyBird', url: 'https://stenoip.github.io/swc/flappybird' },
-            { name: 'Old Stenoip', url: 'https://stenoip.github.io/swc/anniversary' },
-            { name: 'Javascript: Foram Dash', url: 'https://stenoip.github.io/swc/p5/foramdash' },
-            { name: 'Javascript: Car', url: 'https://stenoip.github.io/swc/p5/car' },
-            { name: 'Javascript:Draw It', url: 'https://stenoip.github.io/p5/drawing' },
-            { name: 'Javascript: Tomato', url: 'https://stenoip.github.io/swc/p5/tomato' },
-            { name: 'Javascript: Tafeltennis', url: 'https://stenoip.github.io/swc/p5/tafeltennis' },
-            { name: 'Function Plot', url: 'https://stenoip.github.io/swc/kompmasine-functions' },
-            { name: 'Kompmasine Calculator', url: 'https://stenoip.github.io/swc/kompmasine' },
-            { name: 'Boublok Coding', url: 'https://stenoip.github.io/swc/boublok' },
-            { name: 'Tetris', url: 'https://stenoip.github.io/swc/tetris' }
-        ];
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StenoTV</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at center, #555 0%, #111 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-shadow: inset 0 0 120px rgba(0,0,0,0.7);
+         padding-top: 60px; 
+    }
 
-        document.addEventListener('keydown', (event) => {
-            const key = event.key;
-            const focusedElement = document.activeElement;
-            const focusableElements = document.querySelectorAll('button, input');
+    header {
+      background: linear-gradient(to bottom, #777, #333);
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #f0f0f0;
+      text-shadow: 2px 2px 3px #000;
+      border-bottom: 4px solid #222;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+    }
 
-            let currentIndex = Array.from(focusableElements).indexOf(focusedElement);
+    #video-container {
+      margin-top: 2rem;
+      width: 90%;
+      max-width: 820px;
+      border: 16px solid #444;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #222, #111);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 10px 40px rgba(0,0,0,0.8);
+      overflow: hidden;
+      position: relative;
+    }
 
-            switch (key) {
-                case 'ArrowUp':
-                    if (currentIndex > 0) {
-                        focusableElements[currentIndex - 1].focus();
-                    }
-                    break;
-                case 'ArrowDown':
-                    if (currentIndex < focusableElements.length - 1) {
-                        focusableElements[currentIndex + 1].focus();
-                    }
-                    break;
-                case 'Enter':
-                    focusedElement.click();
-                    break;
-                default:
-                    break;
-            }
-        });
+    video, iframe {
+      width: 100%;
+      height: 460px;
+      border: none;
+      background-color: #000;
+      display: block;
+    }
 
-        function search() {
-            const query = document.getElementById('search-input').value;
-            const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
-            if (matchedLink) {
-                window.location.href = matchedLink.url + '?q=' + encodeURIComponent(query);
-            }
-        }
+    #status {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      color: #0f0;
+      text-shadow: 1px 1px 2px #000;
+    }
 
-        function showSuggestions() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const suggestionsContainer = document.getElementById('suggestions');
-            suggestionsContainer.innerHTML = '';
-            const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
-            filteredLinks.forEach(link => {
-                const suggestion = document.createElement('div');
-                suggestion.textContent = link.name;
-                suggestion.onclick = () => {
-                    document.getElementById('search-input').value = link.name;
-                    search();
-                };
-                suggestionsContainer.appendChild(suggestion);
-            });
-            suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
-        }
-    </script>
+    footer {
+      margin-top: auto;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #aaa;
+      background-color: #222;
+      width: 100%;
+      text-align: center;
+      border-top: 3px solid #444;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.6);
+    }
+
+    @media (max-width: 600px) {
+      video, iframe {
+        height: 260px;
+      }
+    }
+  </style>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Stenoip Wonder Computer</h1>
-        </div>
-        <div class="search-bar">
-            <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search...">
-            <button onclick="search()">Search</button>
-            <div class="suggestions" id="suggestions" style="display:none;"></div>
-        </div>
-        <div class="links">
-            <button onclick="window.location.href='https://stenoip.github.io/swc/camera'">Camera</button>
-            <button onclick="window.location.href='https://stenoip.github.io/swc/clocker'">Clocker</button>
-            <button onclick="window.location.href='https://stenoip.github.io/swc/draw'">Draw</button>
-            <button onclick="window.location.href='https://stenoip.github.io/swc/games'">Games</button>
-            <button onclick="window.location.href='https://stenoip.github.io/swc/maps'">Maps</button>
-            <!-- Add more buttons as needed -->
-        </div>
-    </div>
+  
+    
+    <!-- Menu Bar, Do not remove--><div id="header-placeholder"></div> 
+    
+    <header> StenoTV</header>
+  <div id="video-container">
+    <div id="player"></div>
+  </div>
+  <div id="status">Checking schedule...</div>
+  <footer>© 2025 Stenoip Company. All rights reserved.</footer>
+
+  <script>
+    var schedule = [
+      {
+        start: "10:25:00",
+        end: "10:50:00",
+        type: "youtube",
+        url: "https://www.youtube.com/watch?v=Yr5GQgkBbSk"
+      },
+      {
+        start: "10:50:00",
+        end: "11:00:00",
+        type: "uploaded",
+        url: "movie.mp4"
+      }
+    ];
+
+    var fallbackVideo = {
+      type: "uploaded",
+      url: "videos/be-right-back.mp4"
+    };
+
+    var ytPlayer = null;
+
+    function getCurrentTime() {
+      var now = new Date();
+      return now.toTimeString().slice(0, 8); // HH:MM:SS
+    }
+
+    function timeToSeconds(timeStr) {
+      var parts = timeStr.split(":");
+      return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+    }
+
+    function findScheduledVideo(currentTime) {
+      var currentSeconds = timeToSeconds(currentTime);
+      return schedule.find(function(item) {
+        var start = timeToSeconds(item.start);
+        var end = timeToSeconds(item.end);
+        return currentSeconds >= start && currentSeconds < end;
+      });
+    }
+
+    function extractYouTubeID(url) {
+      var match = url.match(/(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([^\?&"'>]+)/);
+      return match ? match[1] : null;
+    }
+
+    function loadVideo(video, offsetSeconds) {
+      var container = document.getElementById("player");
+      container.innerHTML = "";
+
+      if (video.type === "youtube") {
+        var videoId = extractYouTubeID(video.url);
+        container.innerHTML = '<div id="ytplayer"></div>';
+        window.onYouTubeIframeAPIReady = function () {
+          ytPlayer = new YT.Player("ytplayer", {
+            height: "460",
+            width: "100%",
+            videoId: videoId,
+            playerVars: {
+              autoplay: 1,
+              start: offsetSeconds
+            },
+            events: {
+              onReady: function () {
+                document.getElementById("status").textContent = "YouTube video is now playing from " + Math.floor(offsetSeconds/60) + "m " + (offsetSeconds%60) + "s.";
+              }
+            }
+          });
+        };
+      } else if (video.type === "live") {
+        var iframe = document.createElement("iframe");
+        iframe.src = video.url + "?autoplay=1";
+        iframe.allow = "autoplay; encrypted-media";
+        iframe.setAttribute("allowfullscreen", "true");
+        container.appendChild(iframe);
+        document.getElementById("status").textContent = "Live stream is now playing.";
+      } else if (video.type === "uploaded") {
+        var vid = document.createElement("video");
+        vid.src = video.url;
+        vid.controls = true;
+        vid.autoplay = true;
+        vid.muted = false; // not muted by default
+        container.appendChild(vid);
+
+        vid.addEventListener("canplay", function () {
+          var safeTime = Math.min(offsetSeconds, vid.duration - 1);
+          vid.currentTime = safeTime;
+          document.getElementById("status").textContent = "Scheduled video is now playing from " + Math.floor(safeTime/60) + "m " + Math.floor(safeTime%60) + "s.";
+        });
+      }
+    }
+
+    function checkSchedule() {
+      var currentTime = getCurrentTime();
+      var video = findScheduledVideo(currentTime);
+      if (video) {
+        var offset = timeToSeconds(currentTime) - timeToSeconds(video.start);
+        loadVideo(video, offset);
+      } else {
+        loadVideo(fallbackVideo, 0);
+        document.getElementById("status").textContent = "No scheduled video. Showing standby video.";
+      }
+    }
+
+    checkSchedule();
+    setInterval(checkSchedule, 60000);
+  </script>
+     <script src="/load-header.js"></script>
 </body>
-[_{{{CITATION{{{_1{](https://github.com/buribalazs/smooth-drag-order/tree/7b40d21d076c3e31765f61481f537beaf4c5ec9f/README.md)
 </html>
