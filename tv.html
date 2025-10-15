@@ -88,116 +88,173 @@
     <div id="player"></div>
   </div>
   <div id="status">Checking schedule...</div>
+ <div id="countdown" style="margin-top: 0.5rem; font-size: 1rem; color: #ccc;"></div>
+
+<div id="schedule-panel" style="margin-top: 1rem; font-size: 0.95rem; color: #bbb;">
+  <strong>Today's Schedule:</strong>
+  <ul id="schedule-list" style="list-style: none; padding-left: 0;"></ul>
+</div>
+
+<div id="standby-overlay" style="position:absolute;top:10px;right:10px;color:#0f0;font-size:1rem;text-shadow:1px 1px 2px #000;display:none;">Standby Mode</div>
+
+  
   <footer>© 2025 Stenoip Company. All rights reserved.</footer>
 
-  <script>
-    var schedule = [
-      {
-        start: "10:25:00",
-        end: "10:50:00",
-        type: "youtube",
-        url: "intro.mp4"
-      },
-      {
-        start: "10:50:00",
-        end: "11:00:00",
-        type: "uploaded",
-        url: "intro.mp4"
-      }
-    ];
-
-    var fallbackVideo = {
+ <script>
+  var schedule = [
+    {
+      start: "10:25:00",
+      end: "10:50:00",
+      type: "youtube",
+      url: "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+    },
+    {
+      start: "10:50:00",
+      end: "11:00:00",
       type: "uploaded",
-      url: "videos/be-right-back.mp4"
-    };
-
-    var ytPlayer = null;
-
-    function getCurrentTime() {
-      var now = new Date();
-      return now.toTimeString().slice(0, 8); // HH:MM:SS
+      url: "intro.mp4"
     }
+  ];
 
-    function timeToSeconds(timeStr) {
-      var parts = timeStr.split(":");
-      return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
-    }
+  var fallbackVideo = {
+    type: "uploaded",
+    url: "videos/be-right-back.mp4"
+  };
 
-    function findScheduledVideo(currentTime) {
-      var currentSeconds = timeToSeconds(currentTime);
-      return schedule.find(function(item) {
-        var start = timeToSeconds(item.start);
-        var end = timeToSeconds(item.end);
-        return currentSeconds >= start && currentSeconds < end;
+  var ytPlayer = null;
+
+  function getCurrentTime() {
+    var now = new Date();
+    return now.toTimeString().slice(0, 8); // HH:MM:SS
+  }
+
+  function timeToSeconds(timeStr) {
+    var parts = timeStr.split(":");
+    return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+  }
+
+  function findScheduledVideo(currentTime) {
+    var currentSeconds = timeToSeconds(currentTime);
+    return schedule.find(function(item) {
+      var start = timeToSeconds(item.start);
+      var end = timeToSeconds(item.end);
+      return currentSeconds >= start && currentSeconds < end;
+    });
+  }
+
+  function getNextScheduledVideo(currentTime) {
+    var currentSeconds = timeToSeconds(currentTime);
+    return schedule.find(item => timeToSeconds(item.start) > currentSeconds);
+  }
+
+  function extractYouTubeID(url) {
+    var match = url.match(/(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([^\?&"'>]+)/);
+    return match ? match[1] : null;
+  }
+
+  function loadVideo(video, offsetSeconds) {
+    var container = document.getElementById("player");
+    container.innerHTML = "";
+
+    // Standby overlay toggle
+    var standbyOverlay = document.getElementById("standby-overlay");
+    standbyOverlay.style.display = (video === fallbackVideo) ? "block" : "none";
+
+    if (video.type === "youtube") {
+      var videoId = extractYouTubeID(video.url);
+      container.innerHTML = '<div id="ytplayer"></div>';
+      window.onYouTubeIframeAPIReady = function () {
+        ytPlayer = new YT.Player("ytplayer", {
+          height: "460",
+          width: "100%",
+          videoId: videoId,
+          playerVars: {
+            autoplay: 1,
+            start: offsetSeconds
+          },
+          events: {
+            onReady: function () {
+              document.getElementById("status").textContent = "YouTube video is now playing from " + Math.floor(offsetSeconds/60) + "m " + (offsetSeconds%60) + "s.";
+            }
+          }
+        });
+      };
+    } else if (video.type === "live") {
+      var iframe = document.createElement("iframe");
+      iframe.src = video.url + "?autoplay=1";
+      iframe.allow = "autoplay; encrypted-media";
+      iframe.setAttribute("allowfullscreen", "true");
+      container.appendChild(iframe);
+      document.getElementById("status").textContent = "Live stream is now playing.";
+    } else if (video.type === "uploaded") {
+      var vid = document.createElement("video");
+      vid.src = video.url;
+      vid.controls = true;
+      vid.autoplay = true;
+      vid.muted = false;
+
+      if (video === fallbackVideo) {
+        vid.loop = true;
+      }
+
+      container.appendChild(vid);
+
+      vid.addEventListener("canplay", function () {
+        var safeTime = Math.min(offsetSeconds, vid.duration - 1);
+        vid.currentTime = safeTime;
+        document.getElementById("status").textContent = (video === fallbackVideo)
+          ? "No scheduled video. Showing standby video."
+          : "Scheduled video is now playing from " + Math.floor(safeTime/60) + "m " + Math.floor(safeTime%60) + "s.";
       });
     }
+  }
 
-    function extractYouTubeID(url) {
-      var match = url.match(/(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([^\?&"'>]+)/);
-      return match ? match[1] : null;
+  function checkSchedule() {
+    var currentTime = getCurrentTime();
+    var video = findScheduledVideo(currentTime);
+    if (video) {
+      var offset = timeToSeconds(currentTime) - timeToSeconds(video.start);
+      loadVideo(video, offset);
+    } else {
+      loadVideo(fallbackVideo, 0);
     }
+  }
 
-    function loadVideo(video, offsetSeconds) {
-      var container = document.getElementById("player");
-      container.innerHTML = "";
+  function updateCountdown() {
+    var currentTime = getCurrentTime();
+    var nextVideo = getNextScheduledVideo(currentTime);
+    var countdownEl = document.getElementById("countdown");
 
-      if (video.type === "youtube") {
-        var videoId = extractYouTubeID(video.url);
-        container.innerHTML = '<div id="ytplayer"></div>';
-        window.onYouTubeIframeAPIReady = function () {
-          ytPlayer = new YT.Player("ytplayer", {
-            height: "460",
-            width: "100%",
-            videoId: videoId,
-            playerVars: {
-              autoplay: 1,
-              start: offsetSeconds
-            },
-            events: {
-              onReady: function () {
-                document.getElementById("status").textContent = "YouTube video is now playing from " + Math.floor(offsetSeconds/60) + "m " + (offsetSeconds%60) + "s.";
-              }
-            }
-          });
-        };
-      } else if (video.type === "live") {
-        var iframe = document.createElement("iframe");
-        iframe.src = video.url + "?autoplay=1";
-        iframe.allow = "autoplay; encrypted-media";
-        iframe.setAttribute("allowfullscreen", "true");
-        container.appendChild(iframe);
-        document.getElementById("status").textContent = "Live stream is now playing.";
-      } else if (video.type === "uploaded") {
-        var vid = document.createElement("video");
-        vid.src = video.url;
-        vid.controls = true;
-        vid.autoplay = true;
-        vid.muted = false; // not muted by default
-        container.appendChild(vid);
-
-        vid.addEventListener("canplay", function () {
-          var safeTime = Math.min(offsetSeconds, vid.duration - 1);
-          vid.currentTime = safeTime;
-          document.getElementById("status").textContent = "Scheduled video is now playing from " + Math.floor(safeTime/60) + "m " + Math.floor(safeTime%60) + "s.";
-        });
-      }
+    if (nextVideo) {
+      var secondsUntilStart = timeToSeconds(nextVideo.start) - timeToSeconds(currentTime);
+      var minutes = Math.floor(secondsUntilStart / 60);
+      var seconds = secondsUntilStart % 60;
+      countdownEl.textContent = `Next video starts in ${minutes}m ${seconds}s`;
+    } else {
+      countdownEl.textContent = "No upcoming videos.";
     }
+  }
 
-    function checkSchedule() {
-      var currentTime = getCurrentTime();
-      var video = findScheduledVideo(currentTime);
-      if (video) {
-        var offset = timeToSeconds(currentTime) - timeToSeconds(video.start);
-        loadVideo(video, offset);
-      } else {
-        loadVideo(fallbackVideo, 0);
-        document.getElementById("status").textContent = "No scheduled video. Showing standby video.";
-      }
-    }
+  function renderSchedule() {
+    var list = document.getElementById("schedule-list");
+    list.innerHTML = "";
+    schedule.forEach(item => {
+      var li = document.createElement("li");
+      li.textContent = `${item.start} - ${item.end} (${item.type})`;
+      list.appendChild(li);
+    });
+  }
 
-    checkSchedule();
-    setInterval(checkSchedule, 60000);
-  </script>
+  // Initial load
+  checkSchedule();
+  renderSchedule();
+  updateCountdown();
+
+  // Refresh every minute for schedule, every second for countdown
+  setInterval(checkSchedule, 60000);
+  setInterval(updateCountdown, 1000);
+</script>
+
      <script src="/load-header.js"></script>
 </body>
 </html>
