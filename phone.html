@@ -20,7 +20,10 @@
         .middle i { position: absolute; left: 430px; top: 2px; color: gray; }
         .geeks:after { content: ""; display: table; clear: both; }
         .bar { width: 15px; height: 3px; margin: 3px 0; display: block; background-color: #aaa; }
-        .body { padding: 15px; }
+        .body { 
+            padding: 15px; 
+            padding-top: 60px;
+        }
         
         /* Button-19 styles omitted for brevity */
         .p1 { font-family: "Times New Roman", Times, serif; }
@@ -173,6 +176,7 @@
     </style>
 </head>
 <body>
+    <div id="header-placeholder"></div>
     <input type="text" id="phoneNumberInput" placeholder="Enter number..." readonly>
 
     <div class="phone">
@@ -362,5 +366,6 @@
         // Initial render when the page loads
         renderHistory();
     </script>
+      <script src="/load-header.js"></script>
 </body>
 </html>
