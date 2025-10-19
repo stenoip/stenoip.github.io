@@ -157,12 +157,13 @@ function checkForNewNotifications() {
 
 function loadBulletinBoard() {
     var bulletinContent = `
+        <li><span class="highlight">An Infomation Buffet!</span> Search the internet and generate HTML site info with <a href="https://stenoip.github.io/oodles" >Oodles Search!</a></li>
         <li><span class="highlight">Breaking News!</span> The first Lytze the Fuzbal Comic is out. Search "Comic" and check it out!</li>
         <li>Access Private Programs Online through our <a href="television_guide.html">Television Guide</a>.</li>
         <li><span class="highlight">New Games:</span> Frog Crossing and StenoTetris are now <a href="games/home.html">available</a>. </li>
         <li><span class="highlight">Suggested AI:</span> Meet <mark><a href="https://stenoip.github.io/praterich">Lady Praterich, an AI chatbot and SWC assistant.</a></mark></li>
         <li><span class="highlight">New Update:</span> Version ${document.querySelector('.footer p').textContent.match(/Version ([\d\.]+)/)[1]} brings improved search suggestions!</li> 
-        <li><span class="highlight">Stay Updated:</span> <a href="#" onclick="requestNotificationPermission(); return false;">Click here to sign up for notifications!</a></li>
+       
     `;
 
     var bulletinList = document.getElementById('bulletin-list');
