@@ -3,70 +3,167 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Worm</title>
+  <title>The Earthworm Game</title>
   <style>
     body {
-      background-color: #222;
+      background-color: #1a1a1a;
       color: #fff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Consolas', 'Courier New', monospace;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
-      overflow: hidden; /* Disable scroll */
+      overflow-y: auto;
+      padding: 10px;
     }
 
     canvas {
-      background-color: #111;
-      border: 2px solid #fff;
-      touch-action: manipulation; /* Improves responsiveness */
+      background-color: #000;
+      border: 4px solid #cc3366; /* Deep Pink/Magenta border */
+      box-shadow: 0 0 20px #cc336677;
+      touch-action: manipulation;
+      max-width: 100%;
+      height: auto;
     }
 
     #scoreboard {
-      margin: 10px 0;
-      font-size: 1.2em;
-    }
-
-    button {
-      padding: 8px 16px;
-      background-color: #444;
-      border: none;
-      color: white;
-      cursor: pointer;
-      margin: 5px;
-    }
-
-    button:hover {
-      background-color: #666;
+      margin: 15px 0;
+      font-size: 1.4em;
+      text-align: center;
     }
 
     #controls {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: 10px;
+      margin-top: 15px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .game-options {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #333;
+      border: 1px solid #cc3366;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s, box-shadow 0.2s;
+      font-size: 1em;
+      flex-grow: 1;
+      margin: 0 5px;
+    }
+
+    button:hover {
+      background-color: #cc3366;
+      color: #1a1a1a;
+      box-shadow: 0 0 8px #cc3366;
+    }
+
+    #start-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 20;
+    }
+
+    #start-screen h1 {
+        color: #cc3366;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+    }
+
+    #difficulty-mode-buttons button {
+        margin: 10px;
+        padding: 12px 25px;
+    }
+
+    #difficulty-mode-buttons .active {
+        background-color: #cc3366;
+        color: #1a1a1a;
+        font-weight: bold;
     }
 
     .mobile-controls {
       display: grid;
-      grid-template-columns: repeat(3, 60px);
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-top: 10px;
+      width: 100%;
+      max-width: 300px;
     }
 
     .mobile-controls button {
       height: 60px;
-      font-size: 1.5em;
+      font-size: 1.8em;
+      border-radius: 5px;
+    }
+
+    #gameOverScreen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      color: white;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 10;
+    }
+
+    #gameOverScreen h2 {
+      color: #cc3366;
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+
+    #copyright {
+        margin-top: 20px;
+        font-size: 0.8em;
+        color: #777;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            justify-content: flex-start;
+            padding-top: 20px;
+        }
+        canvas {
+            width: 90vw;
+            height: 90vw;
+        }
     }
   </style>
 </head>
 <body>
   <canvas id="game" width="400" height="400"></canvas>
-  <div id="scoreboard">Score: 0 | High Score: 0</div>
+  
+  <div id="scoreboard">Score: 0 | High Score: 0 | Speed: Paused</div>
+
   <div id="controls">
-    <button id="togglePause">Pause</button>
+    <div class="game-options">
+        <button id="togglePause">Start</button>
+    </div>
     <div class="mobile-controls">
       <div></div>
       <button id="up">↑</button>
@@ -77,36 +174,68 @@
     </div>
   </div>
 
+  <div id="start-screen">
+    <h1>THE EARTHWORM GAME</h1>
+    <p>Select Difficulty:</p>
+    <div id="difficulty-mode-buttons">
+        <button id="easy-btn" data-speed="150" data-name="Easy" class="active">Easy</button>
+        <button id="medium-btn" data-speed="100" data-name="Medium">Medium</button>
+        <button id="hard-btn" data-speed="70" data-name="Hard">Hard</button>
+    </div>
+    <p style="margin-top: 20px; color: #cc3366;">Use Arrows or W/A/S/D to move.</p>
+  </div>
+
+  <div id="gameOverScreen">
+    <h2>WORM DOWN!</h2>
+    <p id="finalScore"></p>
+    <button id="restartButton">Try Again?</button>
+  </div>
+
+  <div id="copyright">Copyright Stenoip Company</div>
+  
   <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
-    const scoreboard = document.getElementById("scoreboard");
-    const pauseBtn = document.getElementById("togglePause");
-    const upBtn = document.getElementById("up");
-    const downBtn = document.getElementById("down");
-    const leftBtn = document.getElementById("left");
-    const rightBtn = document.getElementById("right");
+    // --- Variable Declarations (using var) ---
+    var canvas = document.getElementById("game");
+    var ctx = canvas.getContext("2d");
+    var scoreboard = document.getElementById("scoreboard");
+    var pauseBtn = document.getElementById("togglePause");
+    var restartBtn = document.getElementById("restartButton");
+    var gameOverScreen = document.getElementById("gameOverScreen");
+    var startScreen = document.getElementById("start-screen");
 
-    const scale = 20;
-    const rows = canvas.height / scale;
-    const columns = canvas.width / scale;
+    var upBtn = document.getElementById("up");
+    var downBtn = document.getElementById("down");
+    var leftBtn = document.getElementById("left");
+    var rightBtn = document.getElementById("right");
 
-    let snake;
-    let fruit;
-    let direction = { x: 1, y: 0 };
-    let gameInterval;
-    let score = 0;
-    let highScore = localStorage.getItem("snakeHighScore") || 0;
-    let isPaused = false;
+    var difficultyButtons = document.querySelectorAll('#difficulty-mode-buttons button');
 
-    class Snake {
-      constructor() {
-        this.body = [{ x: 5, y: 5 }];
-        this.length = 1;
-      }
+    var scale = 20;
+    var rows = canvas.height / scale;
+    var columns = canvas.width / scale;
 
-      move() {
-        const head = {
+    var worm; // Changed from snake
+    var fruit;
+    var direction = { x: 1, y: 0 };
+    var gameInterval;
+    var score = 0;
+    var highScore = localStorage.getItem("wormHighScore") || 0; // Changed storage key
+    var isPaused = true;
+    var isGameRunning = false;
+
+    // Difficulty and speed variables
+    var baseSpeed = 150;
+    var currentSpeed = baseSpeed;
+    var levelUpThreshold = 5;
+    var difficultyName = "Easy";
+
+    // --- Worm Class --- (Changed from Snake Class)
+    var Worm = function() {
+      this.body = [{ x: 5, y: 5 }];
+      this.length = 1;
+
+      this.move = function() {
+        var head = {
           x: this.body[0].x + direction.x,
           y: this.body[0].y + direction.y
         };
@@ -115,117 +244,227 @@
         if (head.x === fruit.x && head.y === fruit.y) {
           score++;
           generateFruit();
+          checkLevelUp();
         } else {
           this.body.pop();
         }
-      }
+      };
 
-      checkCollision() {
-        const head = this.body[0];
+      this.checkCollision = function() {
+        var head = this.body[0];
         if (
           head.x < 0 || head.y < 0 ||
           head.x >= columns || head.y >= rows ||
-          this.body.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
+          this.body.slice(1).some(function(segment) {
+            return segment.x === head.x && segment.y === head.y;
+          })
         ) {
-          resetGame();
+          endGame();
         }
-      }
+      };
 
-      draw() {
-        ctx.fillStyle = "#0f0";
-        this.body.forEach(segment => {
-          ctx.fillRect(segment.x * scale, segment.y * scale, scale - 2, scale - 2);
+      this.draw = function() {
+        ctx.fillStyle = "#ff6699"; // Earthworm body color (lighter pink)
+        // Draw body segments
+        this.body.forEach(function(segment, index) {
+          ctx.fillRect(segment.x * scale, segment.y * scale, scale - 1, scale - 1);
         });
-      }
-    }
+
+        // Draw eyes on the head
+        var head = this.body[0];
+        ctx.fillStyle = "#fff"; // White eyes
+        var eyeSize = 3;
+        var eyeOffset = scale / 4;
+        
+        // Calculate eye positions based on direction
+        if (direction.x !== 0) { // Moving horizontally (left/right)
+            var y1 = head.y * scale + eyeOffset;
+            var y2 = head.y * scale + scale - eyeSize - eyeOffset;
+            var x = head.x * scale + (direction.x > 0 ? scale - eyeSize - 1 : 1);
+            ctx.fillRect(x, y1, eyeSize, eyeSize);
+            ctx.fillRect(x, y2, eyeSize, eyeSize);
+        } else { // Moving vertically (up/down)
+            var x1 = head.x * scale + eyeOffset;
+            var x2 = head.x * scale + scale - eyeSize - eyeOffset;
+            var y = head.y * scale + (direction.y > 0 ? scale - eyeSize - 1 : 1);
+            ctx.fillRect(x1, y, eyeSize, eyeSize);
+            ctx.fillRect(x2, y, eyeSize, eyeSize);
+        }
+      };
+    };
+
+    // --- Core Game Functions ---
 
     function generateFruit() {
-      fruit = {
-        x: Math.floor(Math.random() * columns),
-        y: Math.floor(Math.random() * rows)
-      };
+      do {
+        fruit = {
+          x: Math.floor(Math.random() * columns),
+          y: Math.floor(Math.random() * rows)
+        };
+      } while (worm.body.some(function(segment) { 
+        return segment.x === fruit.x && segment.y === fruit.y;
+      }));
     }
 
     function drawFruit() {
-      ctx.fillStyle = "#f00";
+      ctx.fillStyle = "#0f0"; // Green food for contrast
       ctx.fillRect(fruit.x * scale, fruit.y * scale, scale, scale);
     }
 
+    function checkLevelUp() {
+      if (score > 0 && score % levelUpThreshold === 0) {
+        var level = Math.floor(score / levelUpThreshold);
+        var newInterval = Math.max(40, baseSpeed - (level * 5));
+        
+        if (newInterval < currentSpeed) {
+            currentSpeed = newInterval;
+            restartGameInterval();
+        }
+      }
+    }
+
+    function setDifficulty(speed, name, setActive) {
+        baseSpeed = parseInt(speed);
+        difficultyName = name;
+        
+        if (setActive) {
+            difficultyButtons.forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            setActive.classList.add('active');
+        }
+    }
+
+    function startGame() {
+        if (isGameRunning) return;
+        
+        startScreen.style.display = "none";
+        isGameRunning = true;
+        isPaused = false;
+        
+        currentSpeed = baseSpeed; 
+
+        worm = new Worm(); 
+        direction = { x: 1, y: 0 };
+        generateFruit();
+        pauseBtn.innerText = "Pause";
+        
+        restartGameInterval();
+        updateScoreboard();
+    }
+
+    function restartGameInterval() {
+        clearInterval(gameInterval);
+        gameInterval = setInterval(gameLoop, currentSpeed);
+    }
+	
     function updateScoreboard() {
-      scoreboard.innerText = `Score: ${score} | High Score: ${highScore}`;
+      var level = isGameRunning ? Math.floor(score / levelUpThreshold) + 1 : 1;
+      var status = isPaused ? "Paused" : (difficultyName + " (Lvl " + level + ")");
+      scoreboard.innerText = "Score: " + score + " | High Score: " + highScore + " | Speed: " + status;
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);
+
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("wormHighScore", highScore); // Changed storage key
+      }
+      
+      document.getElementById("finalScore").innerText = "Final Score: " + score + " | High Score: " + highScore;
+      gameOverScreen.style.display = "flex";
+      isPaused = true;
+      isGameRunning = false;
+      pauseBtn.innerText = "Start";
+      updateScoreboard();
     }
 
     function resetGame() {
-      alert("Game over!");
-      if (score > highScore) {
-        highScore = score;
-        localStorage.setItem("snakeHighScore", highScore);
-      }
+      gameOverScreen.style.display = "none";
+      startScreen.style.display = "flex";
+      
       score = 0;
-      snake = new Snake();
-      direction = { x: 1, y: 0 };
-      generateFruit();
+      currentSpeed = baseSpeed; 
+
+      isPaused = true;
+      isGameRunning = false;
+      
       updateScoreboard();
     }
 
     function gameLoop() {
       if (!isPaused) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        snake.move();
-        snake.checkCollision();
-        snake.draw();
+        worm.move(); // Changed from snake.move()
+        worm.checkCollision(); // Changed from snake.checkCollision()
+        worm.draw(); // Changed from snake.draw()
         drawFruit();
         updateScoreboard();
       }
     }
 
-    function startGame() {
-      snake = new Snake();
-      generateFruit();
-      updateScoreboard();
-      gameInterval = setInterval(gameLoop, 100);
+    function togglePause() {
+        if (!isGameRunning) {
+            startGame();
+            return;
+        }
+
+        isPaused = !isPaused;
+        pauseBtn.innerText = isPaused ? "Resume" : "Pause";
+        updateScoreboard();
     }
 
-    window.addEventListener("keydown", e => {
+    // --- Event Listeners ---
+    
+    // Keyboard Controls
+    window.addEventListener("keydown", function(e) {
+      if (isPaused && e.key !== " ") return;
+
       switch (e.key) {
         case "ArrowUp":
+        case "w":
+          e.preventDefault();
           if (direction.y === 0) direction = { x: 0, y: -1 };
           break;
         case "ArrowDown":
+        case "s":
+          e.preventDefault();
           if (direction.y === 0) direction = { x: 0, y: 1 };
           break;
         case "ArrowLeft":
+        case "a":
           if (direction.x === 0) direction = { x: -1, y: 0 };
           break;
         case "ArrowRight":
+        case "d":
           if (direction.x === 0) direction = { x: 1, y: 0 };
           break;
         case " ":
+          e.preventDefault();
           togglePause();
           break;
       }
     });
 
+    // Button Controls
     pauseBtn.addEventListener("click", togglePause);
-    upBtn.addEventListener("click", () => {
-      if (direction.y === 0) direction = { x: 0, y: -1 };
-    });
-    downBtn.addEventListener("click", () => {
-      if (direction.y === 0) direction = { x: 0, y: 1 };
-    });
-    leftBtn.addEventListener("click", () => {
-      if (direction.x === 0) direction = { x: -1, y: 0 };
-    });
-    rightBtn.addEventListener("click", () => {
-      if (direction.x === 0) direction = { x: 1, y: 0 };
+    restartBtn.addEventListener("click", resetGame);
+
+    upBtn.addEventListener("click", function() { if (!isPaused && direction.y === 0) direction = { x: 0, y: -1 }; });
+    downBtn.addEventListener("click", function() { if (!isPaused && direction.y === 0) direction = { x: 0, y: 1 }; });
+    leftBtn.addEventListener("click", function() { if (!isPaused && direction.x === 0) direction = { x: -1, y: 0 }; });
+    rightBtn.addEventListener("click", function() { if (!isPaused && direction.x === 0) direction = { x: 1, y: 0 }; });
+
+    // Difficulty Buttons
+    difficultyButtons.forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            setDifficulty(btn.dataset.speed, btn.dataset.name, btn);
+        });
     });
 
-    function togglePause() {
-      isPaused = !isPaused;
-      pauseBtn.innerText = isPaused ? "Resume" : "Pause";
-    }
-
-    startGame();
+    // Initial setup to display the start screen
+    resetGame();
   </script>
 </body>
 </html>
