@@ -1,417 +1,640 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="new-swc.png" type="image/png" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Clocker</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    background-color: #f0f0f0;
-     padding-top: 60px; 
-  }
-  #calendar {
-    margin-bottom: 20px;
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  table, th, td {
-    border: 1px solid black;
-  }
-  th, td {
-    padding: 8px;
-    text-align: center;
-  }
-  th {
-    background-color: #4CAF50;
-    color: white;
-  }
-  td {
-    background-color: #f9f9f9;
-  }
-  .holiday {
-    background-color: #FFD700;
-  }
-  .current-date {
-    background-color: #FF6347;
-  }
-  #analog-clock {
-    width: 300px;
-    height: 300px;
-    border: 5px solid black;
-    border-radius: 50%;
-    position: relative;
-    background-color: #fff;
-    margin-bottom: 20px;
-  }
-  .hand {
-    position: absolute;
-    width: 50%;
-    height: 2px;
-    background-color: black;
-    transform-origin: 100%;
-    top: 50%;
-  }
-  #hour-hand {
-    height: 4px;
-  }
-  #minute-hand {
-    height: 2px;
-  }
-  #second-hand {
-    height: 1px;
-    background-color: red;
-  }
-  .minute-line, .hour-line {
-    position: absolute;
-    width: 2px;
-    background-color: black;
-    transform-origin: bottom center;
-    top: 0%;
-    left: 50%;
-  }
-  .minute-line {
-    height: 10px;
-  }
-  .hour-line {
-    height: 20px;
-  }
-  .number {
-    position: absolute;
-    font-size: 1.2em;
-    transform: translate(-50%, -50%);
-  }
-  .number-1 { top: 15%; left: 75%; }
-  .number-2 { top: 25%; left: 85%; }
-  .number-3 { top: 50%; left: 90%; }
-  .number-4 { top: 75%; left: 85%; }
-  .number-5 { top: 85%; left: 75%; }
-  .number-6 { top: 90%; left: 50%; }
-  .number-7 { top: 85%; left: 25%; }
-  .number-8 { top: 75%; left: 15%; }
-  .number-9 { top: 50%; left: 10%; }
-  .number-10 { top: 25%; left: 15%; }
-  .number-11 { top: 15%; left: 25%; }
-  .number-12 { top: 0%; left: 50%; }
-  #digital-clock, #timer, #stopwatch, #world-clock {
-    font-size: 2em;
-    margin-bottom: 20px;
-    text-align: center;
-    background-color: #eef;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  #timer, #stopwatch {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  input, button {
-    padding: 10px;
-    margin: 5px;
-    font-size: 1em;
-    border: none;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  input {
-    width: 60px;
-    text-align: center;
-  }
-  button {
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #45a049;
-  }
-</style>
+  <link rel="icon" href="new-swc.png" type="image/png" />
+  <style>
+    /* Font for digital display - If you don't have 'Digital-7.ttf', it will fall back to monospace */
+    /* You can get 'Digital-7' from websites like dafont.com and place the .ttf file in the same directory as this HTML */
+    @font-face {
+      font-family: 'Digital-7';
+      src: url('Digital-7.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background: #f4f1e9;
+      color: #333;
+    padding-top: 60px; 
+      
+    }
+
+    .header {
+      background: url('calender_leather_header.png') no-repeat center center;
+      background-size: cover;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      position: relative; /* For the subtle border below */
+      z-index: 2; /* Ensure it stays above other elements */
+    }
+
+    .header button {
+      background: #5a3e2b;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 5px;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+
+    /* New main title style */
+    .main-title {
+      font-family: 'Times New Roman', serif;
+      font-size: 3.5em; /* Larger title */
+      color: #5a3e2b; /* Matches button color, looks rich */
+      text-align: center;
+      margin: 40px auto 20px auto; /* More spacing */
+      text-shadow: 2px 2px 3px rgba(0,0,0,0.2);
+      letter-spacing: 2px;
+      max-width: 1000px;
+    }
+
+    /* --- Clock Dashboard Styles --- */
+    .clock-dashboard {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      max-width: 1000px;
+      margin: 20px auto; /* Adjusted margin since ripped paper is gone */
+      padding: 15px;
+      background: linear-gradient(180deg, #d3c4a2, #c7b58c); /* Warm, slightly textured background */
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset 0 0 15px rgba(0,0,0,0.3);
+    }
+
+    /* General Skeuomorphic Panel Styling */
+    .skeuo-panel {
+      background: linear-gradient(145deg, #e0e0e0, #ffffff); /* Light grey, slightly raised effect */
+      border-radius: 15px;
+      box-shadow: 8px 8px 16px rgba(0,0,0,0.2), -8px -8px 16px rgba(255,255,255,0.8), inset 0 0 0 1px rgba(255,255,255,0.5);
+      padding: 20px;
+      margin: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      flex-basis: calc(33.333% - 30px); /* Approx 3 per row (accounting for margin) */
+      min-width: 250px; /* Minimum width before wrapping */
+      box-sizing: border-box;
+      position: relative; /* For the glass overlay */
+    }
+
+    .panel-title {
+      font-family: 'Times New Roman', serif;
+      font-size: 1.4em;
+      color: #555;
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.7);
+      margin-bottom: 0;
+      text-align: center;
+    }
+
+    /* Analog Clock Specifics */
+    .analog-clock {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #f0e6d6 0%, #e0d0c0 100%); /* Creamy face */
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.3);
+      border: 5px solid #a0a0a0; /* Metallic bezel effect */
+      overflow: hidden; /* Keep hands within bounds */
+    }
+
+    /* Glass overlay for analog clock */
+    .analog-clock::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      box-shadow: inset 0 0 10px rgba(255,255,255,0.5), inset 0 0 20px rgba(0,0,0,0.1);
+      background: radial-gradient(circle at 50% 15%, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+      pointer-events: none; /* Allow clicks to pass through */
+    }
+
+    .center-dot {
+      width: 15px;
+      height: 15px;
+      background-color: #333;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      box-shadow: inset 0 2px 3px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.8);
+    }
+    .hour-hand, .minute-hand, .second-hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+      border-radius: 2px;
+      box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+      z-index: 8;
+      transition: transform 0.05s linear; /* Smooth movement */
+    }
+    .hour-hand {
+      width: 4px;
+      height: 60px;
+      background: linear-gradient(to right, #666, #333, #666);
+    }
+    .minute-hand {
+      width: 3px;
+      height: 85px;
+      background: linear-gradient(to right, #555, #222, #555);
+    }
+    .second-hand {
+      width: 1.5px;
+      height: 90px;
+      background-color: #e74c3c; /* Red for second hand */
+      border-radius: 1px;
+      z-index: 9;
+    }
+
+    /* Analog Clock Number Styles */
+    .analog-clock .number {
+      position: absolute;
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #333;
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.7);
+      transform: translate(-50%, -50%); /* Center the number itself */
+      z-index: 7;
+    }
+    .analog-clock .number.n12 { top: 20px; left: 100px; }
+    .analog-clock .number.n1  { top: 31px; left: 140px; }
+    .analog-clock .number.n2  { top: 60px; left: 169px; }
+    .analog-clock .number.n3  { top: 100px; left: 180px; }
+    .analog-clock .number.n4  { top: 140px; left: 169px; }
+    .analog-clock .number.n5  { top: 169px; left: 140px; }
+    .analog-clock .number.n6  { top: 180px; left: 100px; }
+    .analog-clock .number.n7  { top: 169px; left: 60px; }
+    .analog-clock .number.n8  { top: 140px; left: 31px; }
+    .analog-clock .number.n9  { top: 100px; left: 20px; }
+    .analog-clock .number.n10 { top: 60px; left: 31px; }
+    .analog-clock .number.n11 { top: 31px; left: 60px; }
 
 
+    /* Digital Clock & World Clock Display Screens */
+    .skeuo-display {
+      background: linear-gradient(160deg, #3a3a3a, #1a1a1a); /* Dark, recessed display */
+      border-radius: 8px;
+      padding: 10px 15px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 2px 5px rgba(0,0,0,0.3);
+      color: #0f0; /* Green digital digits */
+      font-family: 'Digital-7', monospace; /* Fallback to monospace */
+      font-size: 2em;
+      text-shadow: 0 0 8px rgba(0,255,0,0.7); /* Glow effect */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+    }
 
+    /* Main Digital Clock specifics */
+    .digital-clock {
+      font-size: 3em;
+      letter-spacing: 2px;
+      line-height: 1.1; /* Adjust for stacked text */
+    }
+    #digitalDate {
+      font-size: 0.5em;
+      margin-top: 5px;
+      color: #0c0;
+      text-shadow: 0 0 5px rgba(0,200,0,0.5);
+    }
 
+    /* World Clock Layout */
+    .world-clock-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Responsive grid for small clocks */
+      gap: 10px;
+      width: 100%;
+    }
+    .world-clock-item {
+      font-size: 1.2em;
+      padding: 8px;
+      min-height: auto; /* Override skeuo-display min-height for compactness */
+    }
+    .world-clock-city {
+      font-size: 0.8em;
+      color: #0c0;
+      text-shadow: 0 0 5px rgba(0,200,0,0.5);
+      margin-bottom: 3px;
+    }
+    .world-clock-time {
+      letter-spacing: 1px;
+    }
 
+    /* --- Calendar Styles (retained) --- */
+    .calendar {
+      max-width: 700px;
+      margin: 20px auto;
+      background: #fff;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .calendar-header {
+      text-align: center;
+      font-size: 24px;
+      padding: 15px;
+      background: #fdf6e3;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+    }
+
+    .day-name, .day {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      border-right: 1px solid #eee;
+      position: relative;
+      min-height: 60px;
+      cursor: pointer;
+    }
+
+    .day-name {
+      background: #f0e6d6;
+      font-weight: bold;
+      cursor: default;
+    }
+
+    .day:last-child, .day-name:last-child {
+      border-right: none;
+    }
+
+    .holiday {
+      background: #ffe4e1;
+      color: #b22222;
+      font-weight: bold;
+      cursor: default;
+    }
+
+    .day .label {
+      font-size: 12px;
+      margin-top: 4px;
+      color: #555;
+    }
+
+    .day .note {
+      font-size: 11px;
+      margin-top: 2px;
+      color: #777;
+    }
+
+    /* --- Responsive Adjustments --- */
+    @media (max-width: 1024px) {
+      .skeuo-panel {
+        flex-basis: calc(50% - 30px); /* 2 per row */
+      }
+      .clock-dashboard {
+        max-width: 700px; /* Align with calendar max-width */
+      }
+    }
+
+    @media (max-width: 768px) {
+      .skeuo-panel {
+        flex-basis: calc(100% - 30px); /* 1 per row */
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .main-title {
+        font-size: 2.5em;
+      }
+      .analog-clock {
+        width: 160px;
+        height: 160px;
+        border-width: 4px;
+      }
+      .hour-hand { height: 50px; }
+      .minute-hand { height: 70px; }
+      .second-hand { height: 75px; }
+      .analog-clock .number {
+        font-size: 0.9em;
+      }
+      .analog-clock .number.n12 { top: 16px; left: 80px; } /* Adjust for 160px clock (center 80px, radius ~65px) */
+      .analog-clock .number.n1  { top: 24px; left: 112px; }
+      .analog-clock .number.n2  { top: 48px; left: 135px; }
+      .analog-clock .number.n3  { top: 80px; left: 144px; }
+      .analog-clock .number.n4  { top: 112px; left: 135px; }
+      .analog-clock .number.n5  { top: 135px; left: 112px; }
+      .analog-clock .number.n6  { top: 144px; left: 80px; }
+      .analog-clock .number.n7  { top: 135px; left: 48px; }
+      .analog-clock .number.n8  { top: 112px; left: 24px; }
+      .analog-clock .number.n9  { top: 80px; left: 16px; }
+      .analog-clock .number.n10 { top: 48px; left: 24px; }
+      .analog-clock .number.n11 { top: 24px; left: 48px; }
+
+      .skeuo-display {
+        font-size: 1.5em;
+        min-height: 60px;
+      }
+      .digital-clock {
+        font-size: 2.5em;
+      }
+      .world-clock-grid {
+        grid-template-columns: 1fr; /* Stack vertically */
+      }
+    }
+  </style>
 </head>
 <body>
-
   <div id="header-placeholder"></div>
-  <h1>Clocker</h1>
+  <div class="header">
+    <button onclick="prevMonth()">◀ Prev</button>
+    <button onclick="nextMonth()">Next ▶</button>
+  </div>
 
-  <div id="calendar"></div>
-<div id="date-info"></div>
-<canvas id="canvas" width="400" height="400" style="background-color:#333">
+  <h1 class="main-title">Clocker</h1>
 
-</canvas>
-<script src="/load-header.js"></script>
-<script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-let radius = canvas.height / 2;
-ctx.translate(radius, radius);
-radius = radius * 0.90
-setInterval(drawClock, 1000);
+  <!-- Clock Dashboard Section -->
+  <div class="clock-dashboard">
+    <div class="clock-panel skeuo-panel">
+      <h3 class="panel-title">Analog Clock</h3>
+      <div class="analog-clock">
+        <div class="center-dot"></div>
+        <div class="hour-hand" id="hourHand"></div>
+        <div class="minute-hand" id="minuteHand"></div>
+        <div class="second-hand" id="secondHand"></div>
+        <!-- Clock numbers -->
+        <div class="number n12">12</div>
+        <div class="number n1">1</div>
+        <div class="number n2">2</div>
+        <div class="number n3">3</div>
+        <div class="number n4">4</div>
+        <div class="number n5">5</div>
+        <div class="number n6">6</div>
+        <div class="number n7">7</div>
+        <div class="number n8">8</div>
+        <div class="number n9">9</div>
+        <div class="number n10">10</div>
+        <div class="number n11">11</div>
+      </div>
+    </div>
 
-function drawClock() {
-  drawFace(ctx, radius);
-  drawNumbers(ctx, radius);
-  drawTime(ctx, radius);
-}
+    <div class="clock-panel skeuo-panel">
+      <h3 class="panel-title">Digital Clock</h3>
+      <div class="digital-clock skeuo-display">
+        <span id="digitalTime"></span>
+        <span id="digitalDate"></span>
+      </div>
+    </div>
 
-function drawFace(ctx, radius) {
-  const grad = ctx.createRadialGradient(0,0,radius*0.95, 0,0,radius*1.05);
-  grad.addColorStop(0, '#333');
-  grad.addColorStop(0.5, 'white');
-  grad.addColorStop(1, '#333');
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, 2*Math.PI);
-  ctx.fillStyle = 'white';
-  ctx.fill();
-  ctx.strokeStyle = grad;
-  ctx.lineWidth = radius*0.1;
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(0, 0, radius*0.1, 0, 2*Math.PI);
-  ctx.fillStyle = '#333';
-  ctx.fill();
-}
+    <div class="clock-panel skeuo-panel world-clock-panel">
+      <h3 class="panel-title">World Clock</h3>
+      <div id="worldClockContainer" class="world-clock-grid">
+        <!-- World clocks will be populated here by JS -->
+      </div>
+    </div>
+  </div>
+  <!-- End Clock Dashboard Section -->
 
-function drawNumbers(ctx, radius) {
-  ctx.font = radius*0.15 + "px arial";
-  ctx.textBaseline="middle";
-  ctx.textAlign="center";
-  for(let num = 1; num < 13; num++){
-    let ang = num * Math.PI / 6;
-    ctx.rotate(ang);
-    ctx.translate(0, -radius*0.85);
-    ctx.rotate(-ang);
-    ctx.fillText(num.toString(), 0, 0);
-    ctx.rotate(ang);
-    ctx.translate(0, radius*0.85);
-    ctx.rotate(-ang);
-  }
-}
+  <div class="calendar">
+    <div class="calendar-header" id="monthYear"></div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+  </div>
 
-function drawTime(ctx, radius){
-    const now = new Date();
-    let hour = now.getHours();
-    let minute = now.getMinutes();
-    let second = now.getSeconds();
-    //hour
-    hour=hour%12;
-    hour=(hour*Math.PI/6)+
-    (minute*Math.PI/(6*60))+
-    (second*Math.PI/(360*60));
-    drawHand(ctx, hour, radius*0.5, radius*0.07);
-    //minute
-    minute=(minute*Math.PI/30)+(second*Math.PI/(30*60));
-    drawHand(ctx, minute, radius*0.8, radius*0.07);
-    // second
-    second=(second*Math.PI/30);
-    drawHand(ctx, second, radius*0.9, radius*0.02);
-}
+  <script>
+    // Predefined holidays
+    const holidays = {
+      '2025-12-25': 'Christmas',
+      '2025-11-27': 'Thanksgiving',
+      '2025-07-04': 'Independence Day',
+      '2025-01-01': 'New Year\'s Day'
+    };
 
-function drawHand(ctx, pos, length, width) {
-    ctx.beginPath();
-    ctx.lineWidth = width;
-    ctx.lineCap = "round";
-    ctx.moveTo(0,0);
-    ctx.rotate(pos);
-    ctx.lineTo(0, -length);
-    ctx.stroke();
-    ctx.rotate(-pos);
-}
-</script>
-<div id="digital-clock"></div>
-<button onclick="toggleTimeFormat()">Toggle AM/PM and Military</button>
-<div id="timer">
-  <input type="number" id="timer-hours" placeholder="Hours">
-  <input type="number" id="timer-minutes" placeholder="Minutes">
-  <input type="number" id="timer-seconds" placeholder="Seconds">
-  <button onclick="startTimer()">Start Timer</button>
-  <button onclick="resetTimer()">Reset Timer</button>
-  <div id="timer-display"></div>
-</div>
-<div id="stopwatch">
-  <button onclick="startStopwatch()">Start Stopwatch</button>
-  <button onclick="stopStopwatch()">Stop Stopwatch</button>
-  <button onclick="resetStopwatch()">Reset Stopwatch</button>
-  <div id="stopwatch-display">00:00:00</div>
-</div>
-<div id="world-clock"></div>
-<div id="world-clock"></div>
+    // Initial plans (will be loaded into userNotes if no stored notes exist)
+    const initialPlans = {
+      '2025-10-31': 'Halloween party at 8pm' // Example plan not overlapping with holiday
+    };
 
-<script>
-  const holidays = [
-    // Canadian holidays
-    { date: '2025-01-01', name: "New Year's Day" },
-    { date: '2025-04-18', name: 'Good Friday' },
-    { date: '2025-04-21', name: 'Easter Monday' },
-    { date: '2025-05-19', name: 'Victoria Day' },
-    { date: '2025-07-01', name: 'Canada Day' },
-    { date: '2025-09-01', name: 'Labour Day' },
-    { date: '2025-10-13', name: 'Thanksgiving' },
-    { date: '2025-12-25', name: 'Christmas Day' },
-    { date: '2025-12-26', name: 'Boxing Day' },
-    // Seventh-day Adventist holidays
-    { date: '2025-04-22', name: 'First Day of Unleavened Bread' },
-    { date: '2025-04-29', name: 'Last Day of Unleavened Bread' },
-    { date: '2025-05-17', name: 'Pentecost' },
-    { date: '2025-10-03', name: 'Feast of Trumpets' },
-    { date: '2025-10-12', name: 'Day of Atonement' },
-    { date: '2025-10-17', name: 'First Day of Feast of Tabernacles' },
-    { date: '2025-10-24', name: 'Last Great Day' }
-  ];
+    let currentDate = new Date();
+    let userNotes = {}; // Object to store user-added notes
 
-  const currentDate = new Date();
-
-  function generateCalendar(year, month) {
-    const calendar = document.getElementById('calendar');
-    const now = new Date(year, month - 1);
-    const daysInMonth = new Date(year, month, 0).getDate();
-    const firstDay = new Date(year, month - 1, 1).getDay();
-    let table = '<h2>' + now.toLocaleString('default', { month: 'long' }) + ' ' + year + '</h2>';
-    table += '<table><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr><tr>';
-    for (let i = 0; i < firstDay; i++) {
-      table += '<td></td>';
-    }
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const holiday = holidays.find(holiday => holiday.date === dateStr);
-      const className = holiday ? 'holiday' : '';
-      const isCurrentDate = dateStr === `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-      const currentClass = isCurrentDate ? 'current-date' : '';
-      table += `<td class="${className} ${currentClass}">${day}</td>`;
-      if ((day + firstDay) % 7 === 0 && day !== daysInMonth) {
-        table += '</tr><tr>';
+    // --- Local Storage Functions ---
+    function initNotes() {
+      const storedNotes = localStorage.getItem('calendarNotes');
+      if (storedNotes) {
+        userNotes = JSON.parse(storedNotes);
+      } else {
+        // Use initialPlans if no notes are stored yet
+        userNotes = { ...initialPlans };
+        saveNotes();
       }
     }
-    table += '</tr></table>';
-    calendar.innerHTML = table;
-  }
 
-  generateCalendar(currentDate.getFullYear(), currentDate.getMonth() + 1);
+    function saveNotes() {
+      localStorage.setItem('calendarNotes', JSON.stringify(userNotes));
+    }
 
-  function updateDateInfo() {
-    const dateInfo = document.getElementById('date-info');
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const formattedDate = currentDate.toLocaleDateString(undefined, options);
-    const numeralDate = `${String(currentDate.getDate()).padStart(2, '0')}/${String(currentDate.getMonth() + 1).padStart(2, '0')}/${currentDate.getFullYear()}`;
-    dateInfo.innerHTML = `<p>${formattedDate}</p><p>${numeralDate}</p>`;
-  }
+    // --- Calendar Rendering ---
+    function renderCalendar(date) {
+      const monthYear = document.getElementById('monthYear');
+      const calendarGrid = document.getElementById('calendarGrid');
+      calendarGrid.innerHTML = ''; // Clear previous grid
 
-  updateDateInfo();
+      const month = date.getMonth();
+      const year = date.getFullYear();
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // Analog clock
-  const hourHand = document.getElementById('hour-hand');
-  const minuteHand = document.getElementById('minute-hand');
-  const secondHand = document.getElementById('second-hand');
+      monthYear.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
 
-  function updateAnalogClock() {
-    const now = new Date();
-    const seconds = now.getSeconds();
-    const minutes = now.getMinutes();
-    const hours = now.getHours();
-    const secondDeg = ((seconds / 60) * 360) + 90;
-    const minuteDeg = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
-    const hourDeg = ((hours / 12) * 360) + ((minutes / 60) * 30) + 90;
-    secondHand.style.transform = `rotate(${secondDeg}deg)`;
-    minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
-    hourHand.style.transform = `rotate(${hourDeg}deg)`;
-  }
-  setInterval(updateAnalogClock, 1000);
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      dayNames.forEach(day => {
+        const div = document.createElement('div');
+        div.className = 'day-name';
+        div.textContent = day;
+        calendarGrid.appendChild(div);
+      });
 
-  // Digital clock
-  const digitalClock = document.getElementById('digital-clock');
-  let isMilitary = true;
+      // Add empty divs for days before the 1st of the month
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'day';
+        calendarGrid.appendChild(empty);
+      }
 
-  function updateDigitalClock() {
-    const now = new Date();
-    let timeString = isMilitary ? now.toLocaleTimeString('en-GB') : now.toLocaleTimeString('en-US');
-    digitalClock.innerHTML = timeString;
-  }
-  setInterval(updateDigitalClock, 1000);
+      // Add actual day numbers
+      for (let d = 1; d <= daysInMonth; d++) {
+        const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const div = document.createElement('div');
+        div.className = 'day';
+        div.dataset.fullDate = fullDate;
 
-  function toggleTimeFormat() {
-    isMilitary = !isMilitary;
-    updateDigitalClock();
-  }
+        const dayNumberSpan = document.createElement('span');
+        dayNumberSpan.textContent = d;
+        div.appendChild(dayNumberSpan);
 
-  // Timer
-  let timer;
-  const timerDisplay = document.getElementById('timer-display');
+        const label = document.createElement('div');
+        label.className = 'label';
+        div.appendChild(label);
 
-  function startTimer() {
-    const hours = document.getElementById('timer-hours').value || 0;
-    const minutes = document.getElementById('timer-minutes').value || 0;
-    const seconds = document.getElementById('timer-seconds').value || 0;
-    const totalSeconds = (+hours * 3600) + (+minutes * 60) + (+seconds);
+        const note = document.createElement('div');
+        note.className = 'note';
+        div.appendChild(note);
 
-    const endTime = Date.now() + (totalSeconds * 1000);
+        if (holidays[fullDate]) {
+          div.classList.add('holiday');
+          label.textContent = holidays[fullDate];
+          div.style.cursor = 'default'; // Make holidays not clickable for notes
+        } else {
+          // Only show user notes if it's not a holiday
+          if (userNotes[fullDate]) {
+            note.textContent = userNotes[fullDate];
+          }
+          // Enable clicking for non-holiday days to add/edit notes
+          div.onclick = handleDayClick;
+        }
 
-    function updateTimer() {
-      const remainingSeconds = Math.floor((endTime - Date.now()) / 1000);
-      if (remainingSeconds < 0) {
-        clearInterval(timer);
-        timerDisplay.innerHTML = 'Time\'s up!';
+        calendarGrid.appendChild(div);
+      }
+    }
+
+    // --- Calendar Event Handlers ---
+    function handleDayClick(event) {
+      const clickedDayElement = event.currentTarget;
+      const fullDate = clickedDayElement.dataset.fullDate;
+
+      if (holidays[fullDate]) {
+        alert('You cannot add notes to holidays, Praterich apologizes!');
         return;
       }
-      const hrs = Math.floor(remainingSeconds / 3600);
-      const mins = Math.floor((remainingSeconds % 3600) / 60);
-      const secs = remainingSeconds % 60;
-      timerDisplay.innerHTML = `${hrs}h ${mins}m ${secs}s`;
+
+      const existingNote = userNotes[fullDate] || '';
+      const newNote = prompt(`Enter note for ${fullDate}:`, existingNote);
+
+      if (newNote !== null) { // User didn't cancel the prompt
+        if (newNote.trim() === '') {
+          delete userNotes[fullDate]; // Remove note if input is empty
+        } else {
+          userNotes[fullDate] = newNote.trim();
+        }
+        saveNotes();
+        renderCalendar(currentDate); // Re-render to show updated notes
+      }
     }
-    clearInterval(timer);
-    timer = setInterval(updateTimer, 1000);
-    updateTimer();
-  }
 
-  function resetTimer() {
-    clearInterval(timer);
-    timerDisplay.innerHTML = '';
-  }
+    function prevMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar(currentDate);
+    }
 
-  // Stopwatch
-  let stopwatchInterval;
-  const stopwatchDisplay = document.getElementById('stopwatch-display');
-  let stopwatchElapsedTime = 0;
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar(currentDate);
+    }
 
-  function startStopwatch() {
-    const startTime = Date.now() - stopwatchElapsedTime;
-    stopwatchInterval = setInterval(() => {
-      stopwatchElapsedTime = Date.now() - startTime;
-      const mins = Math.floor((stopwatchElapsedTime / 60000) % 60);
-      const secs = Math.floor((stopwatchElapsedTime / 1000) % 60);
-      const millis = Math.floor((stopwatchElapsedTime % 1000) / 10);
-      stopwatchDisplay.innerHTML = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}:${String(millis).padStart(2, '0')}`;
-    }, 10);
-  }
+    // --- Clock Logic ---
+    const analogHourHand = document.getElementById('hourHand');
+    const analogMinuteHand = document.getElementById('minuteHand');
+    const analogSecondHand = document.getElementById('secondHand');
+    const digitalTimeDisplay = document.getElementById('digitalTime');
+    const digitalDateDisplay = document.getElementById('digitalDate');
+    const worldClockContainer = document.getElementById('worldClockContainer');
 
-  function stopStopwatch() {
-    clearInterval(stopwatchInterval);
-  }
+    const timeZones = [
+      { city: 'New York', tz: 'America/New_York' },
+      { city: 'London', tz: 'Europe/London' },
+      { city: 'Paris', tz: 'Europe/Paris' },
+      { city: 'Dubai', tz: 'Asia/Dubai' },
+      { city: 'Kolkata', tz: 'Asia/Kolkata' },
+      { city: 'Tokyo', tz: 'Asia/Tokyo' },
+      { city: 'Sydney', tz: 'Australia/Sydney' },
+      { city: 'Los Angeles', tz: 'America/Los_Angeles' }
+    ];
 
-  function resetStopwatch() {
-    clearInterval(stopwatchInterval);
-    stopwatchElapsedTime = 0;
-    stopwatchDisplay.innerHTML = '00:00:00';
-  }
+    function updateAnalogClock() {
+      const now = new Date();
+      const seconds = now.getSeconds();
+      const minutes = now.getMinutes();
+      const hours = now.getHours();
 
-  // World clock
-  const worldClock = document.getElementById('world-clock');
-  function updateWorldClock() {
-    const now = new Date();
-    worldClock.innerHTML = `Tokyo: ${now.toLocaleTimeString('en-UK', { timeZone: 'Asia/Tokyo' })} | London: ${now.toLocaleTimeString('en-UK', { timeZone: 'Europe/London' })} | New York: ${now.toLocaleTimeString('en-UK', { timeZone: 'America/New_York' })}`;
-  }
-  setInterval(updateWorldClock, 1000);
-</script>
+      const secondDegrees = (seconds / 60) * 360;
+      const minuteDegrees = ((minutes + seconds / 60) / 60) * 360;
+      const hourDegrees = ((hours % 12 + minutes / 60) / 12) * 360;
+
+      analogSecondHand.style.transform = `rotate(${secondDegrees}deg)`;
+      analogMinuteHand.style.transform = `rotate(${minuteDegrees}deg)`;
+      analogHourHand.style.transform = `rotate(${hourDegrees}deg)`;
+    }
+
+    function updateDigitalClock() {
+      const now = new Date();
+      // Using 'en-GB' locale for 'Day, DD Mon' format, and hour12: false for 24-hour time.
+      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      const dateOptions = { weekday: 'short', day: 'numeric', month: 'short' }; /* Order matters for locale */
+
+      digitalTimeDisplay.textContent = now.toLocaleTimeString('en-US', timeOptions);
+      digitalDateDisplay.textContent = now.toLocaleDateString('en-GB', dateOptions); // Changed locale for format
+    }
+
+    function updateWorldClock() {
+      worldClockContainer.innerHTML = ''; // Clear existing clocks
+
+      timeZones.forEach(zone => {
+        const now = new Date();
+        const timeOptions = {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+          timeZone: zone.tz
+        };
+        const localTime = now.toLocaleTimeString('en-US', timeOptions);
+
+        const clockDiv = document.createElement('div');
+        clockDiv.className = 'world-clock-item skeuo-display';
+        clockDiv.innerHTML = `
+            <div class="world-clock-city">${zone.city}</div>
+            <div class="world-clock-time">${localTime}</div>
+        `;
+        worldClockContainer.appendChild(clockDiv);
+      });
+    }
+
+    function initializeClocks() {
+      updateAnalogClock();
+      updateDigitalClock();
+      updateWorldClock();
+      setInterval(() => {
+        updateAnalogClock();
+        updateDigitalClock();
+        updateWorldClock();
+      }, 1000); // Update all clocks every second
+    }
+
+    // --- Initialization ---
+    initNotes(); // Load notes from storage or use initial plans
+    renderCalendar(currentDate); // Render the calendar on page load
+    initializeClocks(); // Start the clocks!
+  </script>
+  <script src="/load-header.js"></script>
 </body>
 </html>
