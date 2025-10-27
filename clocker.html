@@ -420,13 +420,48 @@
   </div>
 <p>&copy; 2025 Stenoip Company</p>
   <script>
-    // Predefined holidays
     const holidays = {
-      '2025-12-25': 'Christmas',
-      '2025-11-27': 'Thanksgiving',
-     
-      '2025-01-01': 'New Year\'s Day'
-    };
+ 
+    '2025-01-01': 'New Year\'s Day', // US, CA, TT
+    '2025-11-27': 'Thanksgiving', // US
+    '2025-12-25': 'Christmas', // US, CA, TT
+
+    // US Holidays
+    '2025-01-20': 'Martin Luther King, Jr. Day', // US
+    '2025-02-17': 'Washington\'s Birthday (Presidents\' Day)', // US
+    '2025-05-26': 'Memorial Day', // US
+    '2025-06-19': 'Juneteenth National Independence Day', // US
+    '2025-07-04': 'Independence Day (US)', // US
+    '2025-09-01': 'Labor Day (US, CA)', // US, CA
+    '2025-10-13': 'Columbus Day', // US
+    '2025-11-11': 'Veterans Day', // US
+
+    // Canadian Holidays
+    '2025-02-17': 'Family Day/Islander Day/Heritage Day/Louis Riel Day (Canada)', // CA (Provincial)
+    '2025-04-18': 'Good Friday (CA)', // CA (National)
+    '2025-05-19': 'Victoria Day', // CA (Federal, most provinces)
+    '2025-07-01': 'Canada Day', // CA
+    '2025-08-04': 'Civic Holiday (Canada - most provinces)', // CA (Provincial)
+    '2025-09-30': 'National Day for Truth and Reconciliation', // CA (Federal, some provinces)
+    '2025-10-13': 'Thanksgiving (Canada)', // CA
+    '2025-11-11': 'Remembrance Day', // CA
+    '2025-12-26': 'Boxing Day (CA, TT)', // CA (Federal, some provinces), TT
+
+    // Trinidad and Tobago Holidays (TT)
+    '2025-03-03': 'Carnival Monday (TT)', // TT (De facto holiday)
+    '2025-03-04': 'Carnival Tuesday (TT)', // TT (De facto holiday)
+    '2025-03-31': 'Eid-ul-Fitr (TT)', // TT (Tentative date based on some sources)
+    '2025-04-18': 'Good Friday (TT)', // TT
+    '2025-04-21': 'Easter Monday (TT)', // TT
+    '2025-05-30': 'Indian Arrival Day', // TT
+    '2025-06-19': 'Corpus Christi (TT)', // TT
+    '2025-06-20': 'Labour Day (TT)', // TT (Observed, as it conflicts with Corpus Christi in some sources)
+    '2025-08-01': 'Emancipation Day (TT)', // TT
+    '2025-09-01': 'Independence Day Observed (TT)', // TT (Observed, as 31 Aug is a Sunday)
+    '2025-09-24': 'Republic Day (TT)', // TT
+    '2025-10-20': 'Divali (TT)', // TT (Tentative date)
+    '2025-12-26': 'Boxing Day (TT, CA)' // TT, CA
+};
 
     // Initial plans (will be loaded into userNotes if no stored notes exist)
     const initialPlans = {
