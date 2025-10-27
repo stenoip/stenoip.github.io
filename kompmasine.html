@@ -3,241 +3,457 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="swc.png">
-
-    <title>Kompmasine - Advanced Scientific Calculator</title>
+    <title>Kompmasine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* CSS from previous step is included here for completeness */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            padding-top: 60px; 
+            min-height: 100vh;
+            background-color: #2c2c2e; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            color: white;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .calculator {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
+        .calculator-wrapper {
+            width: 375px; 
+            height: 812px; 
+            background-color: black; 
+            border-radius: 30px; 
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); 
+            position: relative; /* Needed for absolute positioning of copyright */
         }
 
-        .display {
-            width: 100%;
-            height: 50px;
-            background-color: #222;
-            color: #fff;
-            text-align: right;
-            padding: 10px;
-            font-size: 24px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        /* --- Copyright Styling --- */
+        .copyright {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4); /* Subtle white */
+            z-index: 10;
         }
 
-        .keys {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
+        /* --- Top Bar Styling (Status Bar) --- */
+        .calculator-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: black;
+            height: 44px; 
+            font-size: 1.1rem;
+            font-weight: 600; 
+            letter-spacing: -0.5px; 
         }
 
-        button {
-            padding: 15px;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
+        .top-bar-left, .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+        }
+
+        /* Menu Icon (Hamburger) */
+        .menu-icon {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly; 
+            align-items: center;
+            width: 38px;
+            height: 38px;
+            background-color: #636363; 
+            border-radius: 50%; 
             cursor: pointer;
-            background-color: #f4f4f4;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.1), inset 0 -1px 2px rgba(0,0,0,0.3);
+        }
+        .menu-icon span {
+            display: block;
+            width: 18px; 
+            height: 2px;
+            background-color: white;
         }
 
-        button:hover {
-            background-color: #ddd;
+        /* Signal Icon (Cellular Bars) */
+        .signal-icon {
+            display: flex;
+            align-items: flex-end; 
+            gap: 2px;
+            height: 17px; 
+        }
+        .signal-icon span {
+            display: block;
+            width: 3px;
+            background-color: white;
+            border-radius: 1px;
+        }
+        .signal-icon span:nth-child(1) { height: 8px; }
+        .signal-icon span:nth-child(2) { height: 11px; }
+        .signal-icon span:nth-child(3) { height: 14px; }
+        .signal-icon span:nth-child(4) { height: 17px; }
+
+        /* WiFi Icon */
+        .wifi-icon {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            transform: rotate(45deg); 
+        }
+        .wifi-icon .arc {
+            position: absolute;
+            border: 2px solid white;
+            border-color: white transparent transparent transparent; 
+            border-radius: 50%;
+        }
+        .wifi-icon .arc1 { width: 10px; height: 10px; top: 6px; left: 4px; }
+        .wifi-icon .arc2 { width: 14px; height: 14px; top: 4px; left: 2px; }
+        .wifi-icon .arc3 { width: 18px; height: 18px; top: 2px; left: 0px; }
+        .wifi-icon .wifi-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: white;
+            border-radius: 50%;
+            bottom: 2px;
+            left: 8px;
+            transform: rotate(-45deg); 
         }
 
-        .operator {
-            background-color: #ff9500;
-            color: #fff;
+        /* Battery Icon */
+        .battery-icon {
+            position: relative;
+            width: 28px;
+            height: 14px;
+            border: 1px solid white;
+            border-radius: 3px;
+            margin-left: 5px;
+            display: flex;
+            justify-content: flex-end; 
+            align-items: center;
+        }
+        .battery-cap {
+            position: absolute;
+            right: -3px; 
+            top: 3px;
+            width: 2px;
+            height: 8px;
+            background-color: white;
+            border-radius: 0 2px 2px 0;
+        }
+        .battery-level {
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            bottom: 1px;
+            background-color: white;
+            border-radius: 1px;
+            width: calc(27% - 2px); 
+        }
+        .battery-percent {
+            position: relative;
+            font-size: 0.7em; 
+            color: white;
+            right: 3px; 
+            line-height: 1;
+            z-index: 1; 
         }
 
-        .operator:hover {
-            background-color: #e68900;
+        /* --- Calculator Display --- */
+        .calculator-display {
+            background-color: #d9d9c8; 
+            color: #32442c; 
+            font-size: 7rem; 
+            font-weight: 300; 
+            text-align: right;
+            padding: 20px 20px;
+            flex-grow: 1; 
+            display: flex;
+            align-items: flex-end; 
+            justify-content: flex-end; 
+            letter-spacing: -2px; 
+            font-family: 'Helvetica Neue', 'Arial', sans-serif; 
+            word-wrap: break-word;
+            overflow: hidden;
         }
 
-        .equal {
-            background-color: #007bff;
-            color: #fff;
+        /* --- Calculator Buttons Grid --- */
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(6, minmax(65px, 1fr)); 
+            gap: 12px; 
+            padding: 15px; 
+            flex-shrink: 0; 
+            background-color: #252525; 
+            border-radius: 0 0 30px 30px; 
         }
 
-        .equal:hover {
-            background-color: #0056b3;
+        .button {
+            width: 100%;
+            height: 100%; 
+            border: none;
+            border-radius: 18px; 
+            font-size: 2.5rem;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none; 
+            transition: filter 0.1s ease, box-shadow 0.1s ease; 
+            font-weight: 400; 
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.1), 
+                        inset 0 -2px 5px rgba(0, 0, 0, 0.3), 
+                        0 3px 6px rgba(0, 0, 0, 0.2); 
         }
 
-        .clear {
-            background-color: #ff3b30;
-            color: #fff;
+        /* Specific button colors based on the image */
+        .button-memory {
+            background-color: #636363; 
         }
 
-        .clear:hover {
-            background-color: #c5281b;
+        .button-operator {
+            background-color: #9f9f9f; 
         }
 
-        .extra-buttons, .prob-buttons, .stat-buttons {
-            display: none;
+        .button-number {
+            background-color: #3d3d3d; 
+        }
+
+        .button-equals {
+            background-color: #ff9500; 
+            grid-row: span 2; 
+        }
+
+        .button-zero {
+            grid-column: span 2; 
+        }
+
+        /* Active state for buttons (when pressed) */
+        .button:active {
+            filter: brightness(0.85); 
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4); 
         }
     </style>
 </head>
 <body>
-   <div id="header-placeholder"></div>
-    <div class="calculator">
-        <div class="display" id="display">0</div>
-        <div class="keys">
-            <button class="clear" onclick="clearDisplay()">C</button>
-            <button onclick="appendToDisplay('(')">(</button>
-            <button onclick="appendToDisplay(')')">)</button>
-            <button class="operator" onclick="appendToDisplay('/')">/</button>
-            <button class="operator" onclick="appendToDisplay('%')">%</button>
-            <button onclick="appendToDisplay('7')">7</button>
-            <button onclick="appendToDisplay('8')">8</button>
-            <button onclick="appendToDisplay('9')">9</button>
-            <button class="operator" onclick="appendToDisplay('*')">*</button>
-            <button class="operator" onclick="appendToDisplay('sqrt(')">√</button>
-            <button onclick="appendToDisplay('4')">4</button>
-            <button onclick="appendToDisplay('5')">5</button>
-            <button onclick="appendToDisplay('6')">6</button>
-            <button class="operator" onclick="appendToDisplay('-')">-</button>
-            <button class="operator" onclick="appendToDisplay('**')">x^y</button>
-            <button onclick="appendToDisplay('1')">1</button>
-            <button onclick="appendToDisplay('2')">2</button>
-            <button onclick="appendToDisplay('3')">3</button>
-            <button class="operator" onclick="appendToDisplay('+')">+</button>
-            <button class="operator" onclick="appendToDisplay('exp(')">e^x</button>
-            <button onclick="appendToDisplay('0')">0</button>
-            <button onclick="appendToDisplay('.')">.</button>
-            <button class="equal" onclick="calculateResult()">=</button>
-            <button onclick="toggleExtraButtons()">Extra</button>
-            <button class="operator" onclick="appendToDisplay('10**')">10^x</button>
-            <button class="extra-buttons" onclick="toggleProbButtons()">Prb</button>
-            <button class="extra-buttons" onclick="toggleStatButtons()">Stat</button>
-            <button class="extra-buttons operator" onclick="appendPiToDisplay()">𝝅</button>
-            <button class="extra-buttons operator" onclick="appendToDisplay('E')">e</button>
-            <button class="extra-buttons operator" onclick="appendToDisplay('sin(')">sin</button>
-            <button class="extra-buttons operator" onclick="appendToDisplay('cos(')">cos</button>
-            <button class="extra-buttons operator" onclick="appendToDisplay('tan(')">tan</button>
-            <button class="extra-buttons operator" onclick="appendToDisplay('log(')">log</button>
-            <button class="extra-buttons operator" onclick="appendToDisplay('ln(')">ln</button>
-            <button class="prob-buttons" onclick="appendToDisplay('nPr(')">nPr</button>
-            <button class="prob-buttons" onclick="appendToDisplay('nCr(')">nCr</button>
-            <button class="prob-buttons" onclick="appendToDisplay('factorial(')">!</button>
-            <button class="prob-buttons" onclick="toggleProbButtons()">Back</button>
-            <button class="stat-buttons" onclick="enterData()">Enter Data</button>
-            <button class="stat-buttons" onclick="calculateMean()">Mean</button>
-            <button class="stat-buttons" onclick="calculateMedian()">Median</button>
-            <button class="stat-buttons" onclick="calculateMode()">Mode</button>
-            <button class="stat-buttons" onclick="toggleStatButtons()">Back</button>
+    <div class="calculator-wrapper">
+        <div class="copyright">
+            © 2025 Stenoip Company
+        </div>
+        
+        <div class="calculator-top-bar">
+            <div class="top-bar-left">
+                <div class="menu-icon">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="time">8:13</div>
+            </div>
+            <div class="top-bar-right">
+                <div class="signal-icon">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <div class="wifi-icon">
+                    <div class="arc arc1"></div>
+                    <div class="arc arc2"></div>
+                    <div class="arc arc3"></div>
+                    <div class="wifi-dot"></div>
+                </div>
+                <div class="battery-icon">
+                    <div class="battery-level"></div>
+                    <div class="battery-cap"></div>
+                    <span class="battery-percent">27</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="calculator-display" id="display">
+            0
+        </div>
+
+        <div class="calculator-buttons">
+            <button class="button button-memory" onclick="buttonClick('clearDisplay')">mc</button>
+            <button class="button button-memory" onclick="buttonClick('clearDisplay')">m+</button>
+            <button class="button button-memory" onclick="buttonClick('clearDisplay')">m-</button>
+            <button class="button button-memory" onclick="buttonClick('clearDisplay')">mr</button>
+
+            <button class="button button-operator" onclick="buttonClick('clearDisplay')">c</button>
+            <button class="button button-operator" onclick="buttonClick('toggleSign')">+/-</button>
+            <button class="button button-operator" onclick="buttonClick('appendOperator', '/')">÷</button>
+            <button class="button button-operator" onclick="buttonClick('appendOperator', '*')">x</button>
+
+            <button class="button button-number" onclick="buttonClick('appendNumber', '7')">7</button>
+            <button class="button button-number" onclick="buttonClick('appendNumber', '8')">8</button>
+            <button class="button button-number" onclick="buttonClick('appendNumber', '9')">9</button>
+            <button class="button button-operator" onclick="buttonClick('appendOperator', '-')">-</button>
+
+            <button class="button button-number" onclick="buttonClick('appendNumber', '4')">4</button>
+            <button class="button button-number" onclick="buttonClick('appendNumber', '5')">5</button>
+            <button class="button button-number" onclick="buttonClick('appendNumber', '6')">6</button>
+            <button class="button button-operator" onclick="buttonClick('appendOperator', '+')">+</button>
+
+            <button class="button button-number" onclick="buttonClick('appendNumber', '1')">1</button>
+            <button class="button button-number" onclick="buttonClick('appendNumber', '2')">2</button>
+            <button class="button button-number" onclick="buttonClick('appendNumber', '3')">3</button>
+            <button class="button button-equals" onclick="buttonClick('calculateResult')">=</button>
+
+            <button class="button button-number button-zero" onclick="buttonClick('appendNumber', '0')">0</button>
+            <button class="button button-number" onclick="buttonClick('appendNumber', '.')">.</button>
         </div>
     </div>
+
     <script>
+        
+        const display = document.getElementById('display');
+        
+        
+        var currentInput = '0';
+        var previousValue = null;
+        var operation = null;
+        var waitingForNewInput = true;
+
+        // --- Core Calculator Logic ---
+
+        function updateDisplay() {
+            var maxLen = 10; // Changed to var
+            if (currentInput.length > maxLen) {
+                // Changed to var
+                var num = parseFloat(currentInput); 
+                if (!isNaN(num)) {
+                    display.textContent = num.toPrecision(maxLen - 3); 
+                } else {
+                    display.textContent = currentInput.substring(0, maxLen);
+                }
+            } else {
+                display.textContent = currentInput;
+            }
+        }
+
+        function appendNumber(num) {
+            if (waitingForNewInput) {
+                currentInput = num === '.' ? '0.' : num;
+                waitingForNewInput = false;
+            } else {
+                if (num === '.' && currentInput.includes('.')) return;
+                currentInput += num;
+            }
+            updateDisplay();
+        }
+
         function clearDisplay() {
-            document.getElementById('display').innerText = '0';
+            currentInput = '0';
+            previousValue = null;
+            operation = null;
+            waitingForNewInput = true;
+            updateDisplay();
         }
 
-        function appendToDisplay(value) {
-            const display = document.getElementById('display');
-            if (display.innerText === '0') {
-                display.innerText = value;
-            } else {
-                display.innerText += value;
-            }
+        function toggleSign() {
+            currentInput = (parseFloat(currentInput) * -1).toString();
+            updateDisplay();
         }
 
-        function appendPiToDisplay() {
-            const display = document.getElementById('display');
-            if (display.innerText === '0') {
-                display.innerText = '𝝅';
-            } else {
-                display.innerText += '𝝅';
+        function appendOperator(nextOperation) {
+            // Changed to var
+            var inputValue = parseFloat(currentInput); 
+
+            if (previousValue === null && !isNaN(inputValue)) {
+                previousValue = inputValue;
+            } else if (operation) {
+                // Changed to var
+                var result = performCalculation(); 
+                currentInput = result.toString();
+                previousValue = result;
             }
+
+            waitingForNewInput = true;
+            operation = nextOperation;
+            updateDisplay();
+        }
+
+        function performCalculation() {
+            // Changed to var
+            var inputValue = parseFloat(currentInput); 
+            if (operation === '+') {
+                return previousValue + inputValue;
+            } else if (operation === '-') {
+                return previousValue - inputValue;
+            } else if (operation === '*') {
+                return previousValue * inputValue;
+            } else if (operation === '/') {
+                if (inputValue === 0) {
+                    alert('Error: Division by zero');
+                    clearDisplay();
+                    return 0;
+                }
+                return previousValue / inputValue;
+            }
+            return inputValue;
         }
 
         function calculateResult() {
-            const display = document.getElementById('display');
-            let expression = display.innerText.replace(/\^/g, '**').replace(/𝝅/g, 'Math.PI').replace(/E/g, 'Math.E').replace(/sin/g, 'Math.sin').replace(/cos/g, 'Math.cos').replace(/tan/g, 'Math.tan').replace(/log/g, 'Math.log10').replace(/ln/g, 'Math.log').replace(/sqrt/g, 'Math.sqrt').replace(/exp/g, 'Math.exp').replace(/pow/g, 'Math.pow').replace(/factorial/g, 'factorial');
-            try {
-                display.innerText = eval(expression);
-            } catch (error) {
-                display.innerText = 'Error';
+            if (previousValue === null || operation === null) {
+                return; 
+            }
+
+            // Changed to var
+            var result = performCalculation(); 
+            result = parseFloat(result.toFixed(8));
+
+            currentInput = result.toString();
+            operation = null;
+            previousValue = null;
+            waitingForNewInput = true;
+            updateDisplay();
+        }
+
+        // --- Haptic Feedback Function ---
+
+        function vibrateDevice() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(50); 
             }
         }
 
-        function toggleExtraButtons() {
-            const extraButtons = document.querySelectorAll('.extra-buttons');
-            extraButtons.forEach(button => button.style.display = button.style.display === 'none' ? 'block' : 'none');
+        // --- Master Button Click Handler ---
+
+        function buttonClick(action, value = null) {
+            vibrateDevice();
+
+            if (action === 'appendNumber') {
+                appendNumber(value);
+            } else if (action === 'appendOperator') {
+                appendOperator(value);
+            } else if (action === 'clearDisplay') {
+                clearDisplay();
+            } else if (action === 'toggleSign') {
+                toggleSign();
+            } else if (action === 'calculateResult') {
+                calculateResult();
+            }
         }
 
-        function toggleProbButtons() {
-            const probButtons = document.querySelectorAll('.prob-buttons');
-            probButtons.forEach(button => button.style.display = button.style.display === 'none' ? 'block' : 'none');
-            toggleExtraButtons();
-        }
-
-        function toggleStatButtons() {
-            const statButtons = document.querySelectorAll('.stat-buttons');
-            statButtons.forEach(button => button.style.display = button.style.display === 'none' ? 'block' : 'none');
-            toggleExtraButtons();
-        }
-
-        function factorial(n) {
-            return n ? n * factorial(n - 1) : 1;
-        }
-
-        function enterData() {
-            const data = prompt('Enter numbers separated by commas:');
-            const numbers = data.split(',').map(Number);
-            localStorage.setItem('data', JSON.stringify(numbers));
-        }
-
-        function calculateMean() {
-            const data = JSON.parse(localStorage.getItem('data') || '[]');
-            const sum = data.reduce((a, b) => a + b, 0);
-            const mean = sum / data.length;
-            document.getElementById('display').innerText = mean;
-        }
-
-      function calculateMedian() {
-    const data = JSON.parse(localStorage.getItem('data') || '[]');
-    data.sort((a, b) => a - b);
-    let median;
-    if (data.length % 2 === 0) {
-        median = (data[data.length / 2 - 1] + data[data.length / 2]) / 2;
-    } else {
-        median = data[(data.length - 1) / 2];
-    }
-    document.getElementById('display').innerText = median;
-}
-
-function calculateMode() {
-    const data = JSON.parse(localStorage.getItem('data') || '[]');
-    const frequency = {};
-    let maxFreq = 0;
-    let modes = [];
-
-    data.forEach(num => {
-        frequency[num] = (frequency[num] || 0) + 1;
-        if (frequency[num] > maxFreq) {
-            maxFreq = frequency[num];
-            modes = [num];
-        } else if (frequency[num] === maxFreq) {
-            modes.push(num);
-        }
-    });
-
-    document.getElementById('display').innerText = modes.length === data.length ? 'No mode' : modes.join(', ');
-}
-</script>
-
-        <script src="/load-header.js"></script>
+        // Initialize display
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDisplay();
+        });
+    </script>
 </body>
 </html>
