@@ -6,11 +6,10 @@
   <title>Clocker</title>
   <link rel="icon" href="new-swc.png" type="image/png" />
   <style>
-    /* Font for digital display - If you don't have 'Digital-7.ttf', it will fall back to monospace */
-    /* You can get 'Digital-7' from websites like dafont.com and place the .ttf file in the same directory as this HTML */
+  
     @font-face {
       font-family: 'Digital-7';
-      src: url('Digital-7.ttf') format('truetype');
+      src: url('') format('truetype');
       font-weight: normal;
       font-style: normal;
     }
@@ -419,7 +418,7 @@
     <div class="calendar-header" id="monthYear"></div>
     <div class="calendar-grid" id="calendarGrid"></div>
   </div>
-
+<p>&copy; 2025 Stenoip Company</p>
   <script>
     // Predefined holidays
     const holidays = {
@@ -431,7 +430,7 @@
 
     // Initial plans (will be loaded into userNotes if no stored notes exist)
     const initialPlans = {
-      '2025-10-31': 'Halloween party at 8pm' // Example plan not overlapping with holiday
+      '2025-10-31': 'Halloween party at 8pm' y
     };
 
     let currentDate = new Date();
