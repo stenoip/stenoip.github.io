@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/new-swc.png" type="image/png" />  
+    <title>StenoBlogs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* General Reset and Font */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6; /* Light gray blog background */
+            line-height: 1.7;
+            color: #333;
+        }
+
+        /* --- Global Styles --- */
+        .container {
+            max-width: 800px; /* Narrower for blog-style reading */
+            margin: 0 auto;
+            padding: 20px;
+        }
+        p {
+            font-size: 1.05em;
+            margin-bottom: 20px;
+        }
+        h2, h3, h4 {
+            font-family: 'Playfair Display', serif; /* Serif font for blog headings */
+            color: #1a1a1a;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        h2 {
+            font-size: 2.5em;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #007bff; /* Primary blue for subheadings */
+            font-size: 1.8em;
+        }
+
+        /* --- Header/Blog Title --- */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+        .blog-logo {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            color: #0056b3;
+            margin: 0;
+        }
+        .blog-meta {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 10px;
+        }
+
+        /* --- Blog Post Card --- */
+        .post-card {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Image Styling */
+        .post-image {
+            margin-bottom: 25px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .post-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* List Styling */
+        .features-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .features-list li {
+            padding: 8px 0 8px 30px;
+            position: relative;
+            color: #333;
+            border-bottom: 1px dashed #eee;
+        }
+        .features-list li::before {
+            content: '✅'; /* Clear, simple icon */
+            position: absolute;
+            left: 0;
+            font-size: 1.1em;
+        }
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Call to Action Box */
+        .cta-box {
+            background-color: #e6f7ff; /* Light blue background */
+            border: 1px solid #b3e0ff;
+            padding: 25px;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .cta-box h4 {
+            color: #007bff;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 0;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #ffc107;
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+        .cta-button:hover {
+            background-color: #e0a800;
+        }
+
+        /* Contact/Price Highlight */
+        .price-highlight {
+            font-size: 1.4em;
+            color: #28a745;
+            font-weight: 700;
+            text-align: center;
+            padding: 15px 0;
+            margin: 20px 0;
+            border-top: 1px dashed #ccc;
+            border-bottom: 1px dashed #ccc;
+        }
+        .price-highlight span {
+            font-size: 1.6em;
+            color: #dc3545; /* Red accent for the price */
+        }
+
+        /* --- Footer --- */
+        .footer {
+            padding: 25px 20px;
+            text-align: center;
+            background: #e9ecef;
+            color: #6c757d;
+            margin-top: 30px;
+            font-size: 0.9em;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="blog-logo">StenoBlogs</div>
+    <h1>ChatGPT stole my idea!</h1>
+    <div class="blog-meta">Posted by the Stenoip Team | 31st October , 2025 | Category: Browser</div>
+</div>
+
+<div class="container">
+    <div class="post-card">
+        
+        <h2>What???</h2>
+
+        <p>
+        That's right, ChatGPT (and Perplexity) have stolen my idea. How they this is? I have no idea.
+        </p>
+
+        <div class="post-image" style="max-height: 400px;">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_0AhFPSQay_nvcOU72n1U1f-UXE9a1Uso3HImQkgtgg&s=10" alt="Stock photo of Altas">
+        </div>
+
+        <h3>Who was first?</h3>
+        <p>Okay, it might of been a coincidence. ChatGPT released Altas Browser on the 21st of October 2025.
+        Perplexity released theirs on 2nd October 2025.  I however, released Ringzauber on the <strong>13th of September this year!</strong>
+        So while tech nerds are flooding to test out ChatGPT and Perplexity's "awesome" browsers, I am left in the dust.
+        </p>
+        
+        <div class="post-image" style="max-height: 400px;">
+            <img src="/ringzauber.ico" alt="Ringzauber Logo">
+        </div>
+
+        
+<h2>Hope</h2>
+
+        <p>
+        Even though Big Tech has prevailed once again, I still have a shot. I am pretty sure that
+          ChatGPT and Perplexity will collect your data. Also, both browsers have rate limits on their
+          free tier.
+        </p>
+      
+        
+
+        <h3>Find Us Here:</h3>
+      
+        <div class="cta-box">
+         
+            <p style="margin-top: 15px; margin-bottom: 0;"><small>Email: <a href="mailto:info@jnjapartments.com" style="color: #007bff;">customerserviceforstenoip@gmail.com</a></small></p>
+        </div>
+
+    </div>
+</div>
+
+<div class="footer">
+    <p>Stenoip! Cartoons and phones for you!</p>
+    <p>© 2025 Stenoip Company</p>
+</div>
+
+</body>
+</html>
