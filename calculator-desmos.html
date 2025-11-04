@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kompmasine</title>
+  <link rel="icon" href="new-swc.png" type="image/png" />
+  <style>
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', 'Frutiger', sans-serif;
+      background: linear-gradient(to bottom right, #cceeff, #99ccff);
+      color: #003366;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      background-color: #cc0000; /* Red header */
+      color: white;
+      font-size: 2em;
+      font-weight: bold;
+    
+      box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    #calculator {
+      flex: 1;
+      margin: 0;
+      border: none;
+    }
+
+  /* Orange footer */
+  footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #ff9900; 
+      color: white;
+      font-size: 0.9em;
+      box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <header>Kompmasine Demos</header>
+
+  <div id="calculator"></div>
+
+  <footer>&copy; 2025 Stenoip Company. All rights reserved.</footer>
+
+  <script src="https://www.desmos.com/api/v1.11/calculator.js?apiKey=f61bd79c5d394c148dbf09edf65bdf92"></script>
+  <script>
+    var elt = document.getElementById('calculator');
+    var calculator = Desmos.GraphingCalculator(elt);
+  </script>
+</body>
+</html>
