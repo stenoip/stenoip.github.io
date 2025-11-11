@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <p id="counter">0</p>
+  <button id="incBtn">Increase</button>
+
+  <script>
+    let count = 0;
+    document.getElementById("incBtn").addEventListener("click", function() {
+      count++;
+      document.getElementById("counter").textContent = count;
+    });
+  </script>
+</body>
+</html>
