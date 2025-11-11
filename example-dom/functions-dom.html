@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JavaScript Variables and Functions</title>
+</head>
+<body>
+  <h2>Welcome!</h2>
+  <p id="greeting">Click the button to see a message.</p>
+  <button id="showMessageBtn">Show Message</button>
+
+  <script>
+    // Declare a variable using 'var'
+    var userName = "New Coder";
+
+    // Define a function that uses the variable
+    function showGreeting() {
+      var message = "Hello, " + userName + "! Welcome to JavaScript.";
+      document.getElementById("greeting").textContent = message;
+    }
+
+    // Add event listener to button
+    document.getElementById("showMessageBtn").addEventListener("click", showGreeting);
+  </script>
+</body>
+</html>
