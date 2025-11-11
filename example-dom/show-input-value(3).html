@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <input type="text" id="nameInput" placeholder="Enter your name">
+  <button id="showBtn">Show Name</button>
+  <p id="output"></p>
+
+  <script>
+    document.getElementById("showBtn").addEventListener("click", function() {
+      const name = document.getElementById("nameInput").value;
+      document.getElementById("output").textContent = "Hello, " + name + "!";
+    });
+  </script>
+</body>
+</html>
