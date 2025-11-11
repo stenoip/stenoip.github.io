@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <p id="text">Hello, world!</p>
+  <button id="changeBtn">Change Text</button>
+
+  <script>
+    document.getElementById("changeBtn").addEventListener("click", function() {
+      document.getElementById("text").textContent = "Text has been changed!";
+    });
+  </script>
+</body>
+</html>
