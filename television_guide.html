@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Browse our Entertainment and Office Programs </title>
+    <title>Tools, Games, and Archive of Programs </title>
     <link rel="icon" href="/new-swc.png" type="image/png" />
     <style>
     /* --- STAINED GLASS BACKGROUND COLORS --- */
@@ -216,8 +215,9 @@
 
         /* AERO BUTTON STYLES (Slight adjustments for contrast) */
         button.aero {
-            --button-background: oklch(75% 0.1 210 / 0.8); /* Changed hue to blue for classic Aero */
-            --bg-dark: oklch(45% 0.1 210 / 0.75);
+            --hue: 210; /* Changed hue to blue for classic Aero */
+            --button-background: oklch(75% 0.1 var(--hue) / 0.8);
+            --bg-dark: oklch(45% 0.1 var(--hue) / 0.75);
             background: var(--bottom-glow), linear-gradient(to bottom, var(--bg-dark), var(--button-background));
             box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5); /* Added inner highlight */
             border: 1px solid rgba(255, 255, 255, 0.4);
@@ -241,11 +241,11 @@
    
     <div class="content-wrapper">
         <header>
-            <h1>Welcome to the SWC Program Guide</h1>
+            <h1>Archive: Apps, Tools, and Classic Programs</h1>
             <p>
-                Explore the various pages and applications available on the site.
+                These are the legacy apps, calculators, and games from the StenoKonnect archive.
                 <button class="aero" onclick="window.location.href='index.html'">
-                    Use the Quick Search on the Home Page
+                    Back to StenoKonnect Home (AI & Privacy)
                 </button>
             </p>
         </header>
@@ -256,13 +256,6 @@
                 StenoOffices and Office Tools
             </a>
         </h1>
-        <li>
-            <a href="praterich/index.html">
-                <img src="icons/praterich.png" alt="AI Icon" class="link-icon" />
-                Try Praterich AI
-            </a>
-        </li>
-
         <h1>Programs and Calculators</h1>
         <ul>
             <li>
@@ -413,13 +406,7 @@
                     SearXNG Instructions
                 </a>
             </li>
-            <li>
-                <a href="ringzauber.html">
-                    <img src="/ringzauber.ico" alt="Ringzauber Browser Icon" class="link-icon" />
-                    Download Ringzauber Browser!
-                </a>
-            </li>
-        </ul>
+            </ul>
 
         <h1>Educational & Learning</h1>
         <ul>
