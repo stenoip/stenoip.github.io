@@ -4,147 +4,198 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="new-swc.png" />
-  <title>Download Ringzauber</title>
+  <title>Ringzauber: Gain the Digital Advantage</title>
   <style>
+    /* -------------------------------------- */
+    /* NEW CSS: Professionalism + Subtle Frutiger Aero */
+    /* -------------------------------------- */
+    :root {
+      /* Base Colors (Trust & Security) */
+      --color-primary-blue: #1769FF; /* Professional Blue */
+      --color-secondary-green: #4CAF50; /* Security Green */
+      --color-text-dark: #212529;
+      --color-border-glass: rgba(255, 255, 255, 0.4); /* Light border for gloss */
+      --shadow-aero-float: 0 6px 15px rgba(0, 0, 0, 0.2); /* Soft shadow for "floating" */
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      background: url('https://www.transparenttextures.com/patterns/black-linen.png');
-      color: #333;
+      /* Soft Gradient Background (Aero Ambient Feel) */
+      background: linear-gradient(135deg, #E6F0FF 0%, #FFFFFF 100%);
+      min-height: 100vh;
+      color: var(--color-text-dark);
+      line-height: 1.6;
     }
 
+    .container {
+        padding: 30px;
+        max-width: 900px;
+        margin: auto;
+    }
+
+    /* Aero Header - Glossy Gradient */
     header {
-      background: linear-gradient(to right, #3a34eb, #5f5fff);
-      padding: 20px;
+      background: linear-gradient(to bottom, #5f5fff, var(--color-primary-blue));
+      padding: 30px 20px;
       text-align: center;
       color: #fff;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      border-bottom: 4px ridge #fff;
+      box-shadow: var(--shadow-aero-float);
+      border-bottom: 1px solid var(--color-border-glass);
     }
 
+    header h1 {
+        font-size: 2.5em;
+        margin-bottom: 5px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Soft text shadow */
+    }
+
+    /* Aero Navigation - Solid Contrast */
     nav {
       display: flex;
       justify-content: center;
-      background-color: #0056b3;
-      padding: 10px;
-      box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
+      background-color: #34495E;
+      padding: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     nav a {
       color: #fff;
-      margin: 0 15px;
+      margin: 0 20px;
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 500;
+      transition: color 0.2s;
     }
 
     nav a:hover {
-      text-decoration: underline;
+      color: #AED6F1;
     }
 
-    .container {
-      padding: 30px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .carousel {
-      display: flex;
-      overflow-x: auto;
+    /* Main Section - Glassmorphism Effect */
+    .section {
+      /* Translucent white background */
+      background-color: rgba(255, 255, 255, 0.7); 
+      /* The actual glass effect */
+      backdrop-filter: blur(8px); 
+      -webkit-backdrop-filter: blur(8px);
+      
+      padding: 25px;
+      border-radius: 15px; /* Softer corners */
+      box-shadow: var(--shadow-aero-float);
       margin-bottom: 30px;
-      padding: 10px;
-      background: #eee;
-      border-radius: 10px;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+      border: 1px solid var(--color-border-glass);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle Inner Gloss Highlight (Aero Touch) */
+    .section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 10%;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+        border-radius: 15px 15px 0 0;
+        pointer-events: none;
+    }
+
+
+    .section h2 {
+      margin-top: 0;
+      color: var(--color-primary-blue);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding-bottom: 10px;
+      font-size: 1.8em;
+      font-weight: 600;
+    }
+    
+    .carousel {
+      /* Also glassmorphism for carousel */
+      background-color: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border: 1px solid var(--color-border-glass);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      padding: 15px;
+      margin-bottom: 30px;
+      overflow-x: auto;
+      display: flex;
     }
 
     .carousel img {
       width: 200px;
-      margin-right: 15px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      margin-right: 20px;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.6); /* Soft inner border */
+      transition: transform 0.3s ease;
     }
-
-    .section {
-      background: linear-gradient(to bottom, #fff, #f0f0f0);
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-      margin-bottom: 40px;
-      border: 1px solid #ccc;
-    }
-
-    .section h2 {
-      margin-top: 0;
-      color: #222;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 10px;
-    }
-
+    
     details {
-      background: #f9f9f9;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid var(--color-border-glass);
+      border-radius: 10px;
       padding: 15px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    summary {
-      font-weight: bold;
-      cursor: pointer;
-    }
-
+    /* Button Base Style - Aero Gloss and Depth */
     .button, .download-1-5 {
       display: inline-block;
       margin: 10px 5px;
-      padding: 12px 24px;
+      padding: 14px 30px;
       color: #fff;
-      font-weight: bold;
+      font-weight: 700;
       text-decoration: none;
-      border-radius: 50px;
-      box-shadow: 0 4px #333;
-      transition: transform 0.2s;
+      border-radius: 8px; /* Slightly softer radius */
+      border: 1px solid rgba(255, 255, 255, 0.6); /* Highlight border */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Deeper shadow for float */
+      transition: all 0.2s ease;
+      cursor: pointer;
     }
 
-    .button {
-      background: linear-gradient(to bottom, #007bff, #0056b3);
-      border: 2px solid #004080;
-    }
-
-    .button:hover {
-      background: linear-gradient(to bottom, #3399ff, #007bff);
-    }
-
+    /* Main CTA: Security Green Gloss */
     .download-1-5 {
-      background: linear-gradient(to bottom, #ff6347, #ff4500);
-      border: 2px solid #cc3300;
-      animation: colorChange 3s infinite, growShrink 2s infinite;
+      background: linear-gradient(to bottom, #6CD071, var(--color-secondary-green));
+      font-size: 1.3em;
+    }
+    .download-1-5:hover {
+      background: linear-gradient(to top, #6CD071, #43A047);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.35);
     }
 
-    @keyframes colorChange {
-      0% { background-color: #ff4500; }
-      50% { background-color: #ff6347; }
-      100% { background-color: #ff4500; }
+    /* Secondary Blue Buttons Gloss */
+    .button {
+      background: linear-gradient(to bottom, #499AFB, var(--color-primary-blue));
+    }
+    .button:hover {
+      background: linear-gradient(to top, #499AFB, #0056b3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
 
-    @keyframes growShrink {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
 
     footer {
-      background-color: #3a34eb;
+      background-color: var(--color-primary-blue);
       text-align: center;
-      padding: 15px;
+      padding: 20px;
       color: #fff;
       font-size: 14px;
-      border-top: 4px ridge #fff;
+      margin-top: 40px;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     }
 
     a {
-      color: #0056b3;
+      color: var(--color-primary-blue);
+      text-decoration: none;
     }
 
     a:hover {
@@ -154,8 +205,8 @@
 </head>
 <body>
   <header>
-    <h1>Ringzauber</h1>
-    <p>Your private, AI-powered browser</p>
+    <h1>Ringzauber: Your Digital Advantage</h1>
+    <p>Stop Being Tracked. Start Browsing with Control.</p>
   </header>
 
   <nav>
@@ -167,41 +218,50 @@
 
   <div class="container">
     <div class="section">
-      <p>Ringzauber is a private browser made with Python that does not save your history. It is easy to use by anyone and available for Windows 7, 8.1, 10 and 11.</p>
+      <p>
+        Ringzauber is the private browser designed for those who know better. Made with Python, it doesn't save your history, doesn't sell your data and is engineered for Windows 7, 8.1, 10 and 11.
+      </p>
+      
+      <h2>Your Private Weapon of Choice</h2>
+      <ul class="features">
+        <li>Full Control: You decide what stays and what goes. Ringzauber is designed to give *you* the power back.</li>
+        <li>Praterich Plus Integration: The only browser with an integrated, privacy-focused AI assistant that works like a powerful extension, without the surveillance.</li>
+        <li>Open-Source Core: Best paired with the decentralized <a href="https://github.com/searxng/searxng">SearXNG</a> search engine (Instructions <a href="searxng.html">here</a>).</li>
+      </ul>
     </div>
 
     <div class="carousel">
       <img src="https://stenoip.github.io/ringzauber.png" alt="Ringzauber Logo" />
     </div>
 
-    <div class="section">
-      <p>Best used with <a href="https://github.com/searxng/searxng">SearXNG</a> (note: we did not create this). Download SearXNG in your terminal. Instructions <a href="searxng.html">here</a>.</p>
-    </div>
-
     <details>
-      <summary>About Ringzauber</summary>
-      <p>Ringzauber is a private and simple browser committed to making your web experience easier. It’s as homemade as your first batch of cookies and continuously updated.</p>
+      <summary>What Makes Ringzauber Different?</summary>
+      <p>Ringzauber is a simple, private browser created by a small team committed to digital rights. It’s built on open principles and continuously updated to deliver a secure, easy web experience, unlike the massive browsers that treat your data as profit.</p>
     </details>
 
     <details>
-      <summary>What's New in Ringzauber 1.5</summary>
-      <p>To celebrate the release of SWC version 1.00, we present Ringzauber 1.5! This version features Praterich Plus, an AI that acts like a Chrome Extension and helps perform tasks for you. Read more in our <a href="blog/version1.5-is-here.html">blog</a>.</p>
+      <summary>Ringzauber 1.5: The Security Upgrade</summary>
+      <p>Version 1.5 is here! The major feature is Praterich Plus, an integrated AI extension that performs tasks for you without sending your browsing data back to a mega-corp. Read more about gaining this edge in our <a href="blog/version1.5-is-here.html">blog post</a>.</p>
     </details>
 
-    <div class="section" id="warning">
-      <h2>⚠️ Warning</h2>
-      <p>Windows may display Ringzauber as malicious. <a href="privacy.html#About Ringzauber">Please read our Privacy Policy.</a></p>
+    <div class="section" id="security-checkpoint">
+      <h2>The Security Checkpoint</h2>
+      <p>
+        Your operating system doesn't understand true privacy. Because Ringzauber is an independent, non-mainstream program, Windows will likely flag it as "unrecognized" or "malicious."
+        This is the test: Users who are serious about their privacy will follow the simple steps in the video below to bypass this warning.
+        <a href="privacy.html#About Ringzauber">Learn why this happens in our Privacy Policy.</a>
+      </p>
       <img src="Screenshot_20250813_200414_Chrome.png" alt="Windows Warning Screenshot" style="width:100%; border-radius:8px; margin-top:10px;" />
-      <p>Watch this video about how to download Ringzauber. This is important (Speaker may be needed):</p>
+      <p>Watch the necessary video below to complete the download (Speaker may be needed):</p>
       <div style="position: relative; width: 100%; height: 0; padding-top: 56.25%; overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em;">
         <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none;" src="https://www.canva.com/design/DAGy_u_TQAU/DkMOOuwwQOiVp6TnpO3L0A/watch?embed" allowfullscreen></iframe>
       </div>
-      <a href="https://www.canva.com/design/DAGy_u_TQAU/DkMOOuwwQOiVp6TnpO3L0A/watch" target="_blank" rel="noopener">How to Download Ringzauber 1.5</a> by Stenoip Media
+      <a href="https://www.canva.com/design/DAGy_u_TQAU/DkMOOuwwQOiVp6TnpO3L0A/watch" target="_blank" rel="noopener">Video Guide: How to Pass the Security Gauntlet (Ringzauber 1.5)</a> by Stenoip Media
     </div>
 
-       <h2> Download Now!</h2>
+    <h2> Ready to Take Control? Download Now!</h2>
     <a href="https://drive.google.com/file/d/1euOGnabj6ULBD7E1WTZaMvv1VfLI4oPy/view" class="download-1-5">
-      Ringzauber Browser version 1.5 Besser
+      Ringzauber Browser 1.5 BESSER (Recommended)
     </a>
     <br />
     <a href="https://drive.google.com/drive/folders/1SfcprFhW9uFGJ2fGA56gEvMJdEdHo2Ml?usp=sharing" class="button">
@@ -211,15 +271,15 @@
       Ringzauber Browser Penguin (for Chromebooks)
     </a>
     <a href="https://drive.google.com/file/d/1kGswsvTJjdyueLFhQ4EkSCLPKy1i3rha/view?usp=sharing" class="button">
-      Ringzauber Browser version 1.4
+      Ringzauber Browser version 1.4 (Legacy)
     </a>
     <p style="margin-top: 20px;">
-      ⚠️ <strong>Note:</strong> Some common browser features like camera access and full screen may not work. Ringzauber is currently in its <strong>beta</strong> phase.
+       Note: Ringzauber is actively developed in beta. Some features (camera access, full screen) may be disabled to prioritize security and privacy.
     </p>
   </div>
 
   <div class="container">
-    <p> Finished downloading? Head back to the <a href="index.html">Stenoip Wonder Computer</a> (pronounced: <em>Stick-noh-ikp</em>) to explore more!</p>
+    <p> Finished installing your private weapon? Head back to the <a href="index.html">StenoKonnect</a> homepage to explore more!</p>
   </div>
 
   <footer>
