@@ -27,16 +27,15 @@
             min-height: 100vh;
             overflow-x: hidden;
             padding-bottom: 50px;
-       padding-top: 60px;   
-      }
+            padding-top: 60px;   
+        }
 
         /* AERO BUTTON STYLES */
         button.aero {
             /* Colors */
-            --hue: 245; /* Blue hue */
+            --hue: 245; /* Default Blue hue */
             --button-background: oklch(75% 0.1 var(--hue) / 0.8);
             --bg-dark: oklch(45% 0.1 var(--hue) / 0.75);
-            --button-foreground: oklch(15% 0.05 var(--hue));
             /* Style */
             background-color: var(--button-background);
             background: var(--bottom-glow), linear-gradient(to bottom, var(--bg-dark), var(--button-background));
@@ -50,11 +49,9 @@
             text-shadow: 0 2px .5em #0003;
             transition: all 300ms;
             /* Text */
-            color: var(--button-foreground);
+            color: white; /* Force white text for better contrast */
             font-family: "Lucida Grande", "Lucida Sans Unicode", "Lunasima", sans-serif;
             font-weight: 700;
-            /* Ensure text is readable */
-            color: white; /* Force white text for better contrast */
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
         }
 
@@ -82,7 +79,7 @@
 
         /* --- END AERO BUTTON STYLES --- */
 
-        /* INTRO & LAUNCH STYLES */
+        /* INTRO & LAUNCH STYLES (Kept for continuity) */
         .intro-video {
             position: fixed;
             top: 0;
@@ -127,29 +124,23 @@
             background-color: rgb(57, 103, 204);
         }
 
-        /* MAIN CONTAINER & LAYOUT */
-        
-
-        /* HEADER & NAVIGATION STYLES */
+        /* HEADER & NAVIGATION STYLES (UPDATED FOR NEW FOCUS) */
         .header {
             background-color: rgba(238, 255, 0); /* Yellow Band Color */
-            padding: 10px 20px;
+            padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
             box-sizing: border-box;
+            text-align: center;
+            display: block; 
         }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 36px;
             color: black;
             font-weight: bold;
             margin: 0;
             padding: 5px 0;
-            order: 1;
         }
 
         .intro-toggle-container {
@@ -158,24 +149,14 @@
             gap: 10px;
             font-size: 14px;
             color: black;
-            order: 2;
+            justify-content: center;
+            margin-top: 15px;
         }
 
-        /* Toggle Switch (slider styles omitted for brevity, keeping original functionality) */
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { /* ... your slider styles ... */ }
-
         /* TYPOGRAPHY IN MAIN CONTENT */
-        #main-content h1 { font-size: 32px; margin-bottom: 15px; color: #333; }
-        #main-content h2 { font-size: 28px; margin-bottom: 12px; color: #444; }
+        #main-content h2 { font-size: 20px; color: #555; margin-top: 0; }
         #main-content h3 { font-size: 24px; margin-bottom: 10px; color: #555; }
-        #main-content h4 { font-size: 20px; margin-bottom: 8px; color: #666; }
-        #main-content h5 { font-size: 18px; margin-bottom: 6px; color: #777; }
-        #main-content h6 { font-size: 16px; margin-bottom: 4px; color: #888; }
         #main-content p { font-size: 16px; line-height: 1.6; margin-bottom: 1em; color: #333; }
-        #main-content ul { list-style-type: disc; margin-left: 20px; }
-        #main-content li { margin-bottom: 5px; }
 
         /* LINK STYLING */
         #main-content a, nav a {
@@ -187,99 +168,15 @@
             color: rgb(0, 0, 238);
             text-decoration: underline;
         }
-        nav a {
-            color: rgb(255, 255, 255) !important;
-        }
-        nav a:hover {
-            color: rgb(255, 255, 255) !important;
-        }
 
-        /* SEARCH BAR & BUTTONS */
-        .search-bar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 30px;
-            position: relative;
-            width: 100%;
-        }
-        .search-bar-inner {
-            display: flex;
-            width: 90%;
-            max-width: 700px;
-            justify-content: center;
-            align-items: center;
-        }
-        .search-bar input {
-            padding: 12px 20px;
-            width: 70%;
-            max-width: 500px;
-            font-size: 16px;
-            border: 1px solid rgb(204, 204, 204);
-            border-radius: 24px;
-            margin-right: 10px;
-            outline: none;
-            transition: box-shadow 0.3s, border-color 0.3s;
-        }
-        .search-bar input:focus {
-            border-color: rgb(66, 133, 244);
-            box-shadow: 0 0 5px rgba(66, 133, 244, 0.5);
-        }
-        .search-bar button.aero {
-            margin: 0;
-            font-size: 16px;
-            padding: 12px 25px;
-        }
-        .suggestions {
-            position: absolute;
-            top: 50px;
-            width: calc(70% + 10px); /* Adjust width to cover input + margin */
-            max-width: 500px;
-            background: white;
-            border: 1px solid rgb(204, 204, 204);
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-            left: 50%;
-            transform: translateX(calc(-50% - 40px)); /* Center it under the input, assuming button is 80px wide + 10px margin */
-        }
-        @media (max-width: 768px) {
-            .search-bar-inner {
-                flex-direction: column;
-            }
-            .search-bar input {
-                width: 90%;
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
-            .search-bar button.aero {
-                width: 90%;
-            }
-            .suggestions {
-                width: 90%;
-                top: 45px;
-                transform: translateX(-50%);
-            }
-        }
-        /* LEARN CENTER BUTTON */
-        .learn-centre-btn {
-            display: block;
-            margin: 20px auto;
-            font-size: 22px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        /* BULLETIN BOARD STYLES (Kept as is) */
+        /* BULLETIN BOARD STYLES */
         .bulletin-board {
             border: 2px dashed rgb(255, 165, 0);
             padding: 15px;
             margin: 25px 0;
             background-color: rgb(255, 255, 224);
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         }
         .bulletin-board h2 {
             color: rgb(255, 140, 0);
@@ -323,111 +220,112 @@
             text-decoration: underline;
         }
        
+        /* TOGGLE STYLES */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
 
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
 
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
+        input:checked + .slider {
+            background-color: #2196F3; /* Blue when on */
+        }
 
-input:checked + .slider {
-    background-color: #2196F3; /* Blue when on */
-}
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
 
-input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-}
+        input:checked + .slider:before {
+            -webkit-transform: translateX(20px);
+            -ms-transform: translateX(20px);
+            transform: translateX(20px);
+        }
 
-input:checked + .slider:before {
-    -webkit-transform: translateX(20px);
-    -ms-transform: translateX(20px);
-    transform: translateX(20px);
-}
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 20px;
+        }
 
-/* Rounded sliders */
-.slider.round {
-    border-radius: 20px;
-}
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        /* --- NOTIFICATION BUTTON STYLES  */
 
-.slider.round:before {
-    border-radius: 50%;
-}
-/* --- NOTIFICATION BUTTON STYLES  */
-
-/* Define the Green Hue Variables specifically for the notification button ID */
-#notification-button {
-    /* These specific variables now override any general --hue variables */
-    --hue: 120; /* Green hue */
-    --button-background: oklch(75% 0.1 var(--hue) / 0.9); 
-    --bg-dark: oklch(50% 0.1 var(--hue) / 0.8);
-    
-    /* Make it a unique, rounded-square shape to look like a system tray icon */
-    border-radius: 12px; 
-    
-    /* Stronger visual distinction */
-    box-shadow: 
-        0 4px 6px rgba(0, 0, 0, 0.5), 
-        inset 0 0 15px rgba(255, 255, 255, 0.4), 
-        inset 0 0 5px rgba(0, 0, 0, 0.5); 
+        #notification-button {
+            /* These specific variables now override any general --hue variables */
+            --hue: 120; /* Green hue */
+            --button-background: oklch(75% 0.1 var(--hue) / 0.9); 
+            --bg-dark: oklch(50% 0.1 var(--hue) / 0.8);
+            
+            /* Make it a unique, rounded-square shape to look like a system tray icon */
+            border-radius: 12px; 
+            
+            /* Stronger visual distinction */
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.5), 
+                inset 0 0 15px rgba(255, 255, 255, 0.4), 
+                inset 0 0 5px rgba(0, 0, 0, 0.5); 
 
 
-    background-image: 
-        url('http://t3.gstatic.com/images?q=tbn:ANd9GcQVu2oItd5qyej8ltvLMu0-Ewmt5ZS7O8h-N3nBSv1hfhx9Aq7I0MDvvAFwNPLq_HhUzgnl2Q_H'), 
-        var(--bottom-glow), 
-        linear-gradient(to bottom, var(--bg-dark), var(--button-background));
-        
-    background-size: 30px 30px, auto, auto; 
-    background-repeat: no-repeat;
-    background-position: 15px center, center, center; 
-    padding: 15px 30px 15px 55px; /* Space for the icon */
-    
-    display: block;
-    margin: 20px auto;
-    font-size: 18px;
-    text-transform: uppercase;
-    font-weight: bold;
-    color: white; 
-    border: 1px solid rgba(255, 255, 255, 0.6); 
-    transition: all 0.15s ease-in-out;
-}
+            background-image: 
+                url('http://t3.gstatic.com/images?q=tbn:ANd9GcQVu2oItd5qyej8ltvLMu0-Ewmt5ZS7O8h-N3nBSv1hfhx9Aq7I0MDvvAFwNPLq_HhUzgnl2Q_H'), 
+                var(--bottom-glow), 
+                linear-gradient(to bottom, var(--bg-dark), var(--button-background));
+                
+            background-size: 30px 30px, auto, auto; 
+            background-repeat: no-repeat;
+            background-position: 15px center, center, center; 
+            padding: 15px 30px 15px 55px; /* Space for the icon */
+            
+            display: block;
+            margin: 20px auto;
+            font-size: 18px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: white; 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            transition: all 0.15s ease-in-out;
+        }
 
-/* Hover effect */
-#notification-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 
-        0 6px 8px rgba(0, 0, 0, 0.6), 
-        inset 0 0 20px rgba(255, 255, 255, 0.6), 
-        inset 0 0 7px rgba(0, 0, 0, 0.7);
-}
+        /* Hover effect */
+        #notification-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                0 6px 8px rgba(0, 0, 0, 0.6), 
+                inset 0 0 20px rgba(255, 255, 255, 0.6), 
+                inset 0 0 7px rgba(0, 0, 0, 0.7);
+        }
 
-/* Style for when notifications are active or blocked */
-#notification-button:disabled {
-    cursor: default;
-    opacity: 0.9;
-    /* Use a gray/dark background to show it's inactive */
-    background: oklch(40% 0.05 0 / 0.8); /* Direct color override */
-    box-shadow: none;
-    transform: none;
-    padding-left: 30px; /* Remove icon padding when disabled, as the icon image is gone */
-}
+        /* Style for when notifications are active or blocked */
+        #notification-button:disabled {
+            cursor: default;
+            opacity: 0.9;
+            /* Use a gray/dark background to show it's inactive */
+            background: oklch(40% 0.05 0 / 0.8); /* Direct color override */
+            box-shadow: none;
+            transform: none;
+            padding-left: 30px; /* Remove icon padding when disabled, as the icon image is gone */
+        }
     </style>
 </head>
 <body>
@@ -444,19 +342,14 @@ input:checked + .slider:before {
 
     <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
-
-
-<!--Main Content -->
-    
-    <div id="main-content" class="container" style="display: none;">
+<div id="main-content" class="container" style="display: none;">
 
         
-     <!--Selection Menu --> <div id="header-placeholder"></div>
+     <div id="header-placeholder"></div>
       
-
         <div class="header">
-            <h1>StenoKonnect</h1>
-            <p>Formerly <a href="the-rename.html">Stenoip Wonder Computer Computer</a></p>
+            <h1 style="font-size: 36px; margin-bottom: 5px;">StenoKonnect</h1>
+            <h2 style="font-size: 20px; color: #555; margin-top: 0;">The Private Ecosystem. AI Powered. We Don't Track You.</h2>
             <div class="intro-toggle-container">
                 <span>Intro Video:</span>
                 <label class="switch">
@@ -465,53 +358,57 @@ input:checked + .slider:before {
                 </label>
             </div>
         </div>
-
-        <h2> Television Guide (Powered by Oodles Search)</h2>
-        <p>Find all the pages on our <a href="https://stenoip.github.io/oodles/search.html?q=define%20web%20portal&type=web&page=1">web portal</a></p>
-        <div class="search-bar">
-            <div class="search-bar-inner">
-                <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search TV Guide (e.g., Flappy Bird)..." />
-                <button class="aero" onclick="search()">Search</button>
-            </div>
-            <div class="suggestions" id="suggestions" style="display: none;"></div>
-        </div>
-        <p class="text-center">For the full list, visit the <a href="television_guide.html">Television Guide</a> page.</p>
         
-         <h3 class="text-center mt-6">Wheel of Stenoip</h3>
-        <iframe src="https://stenoip.github.io/wheel_gifs" height="900px" width="100%" class="rounded-lg shadow-md mt-4 mb-4"></iframe>
-<br>
-        <hr class="my-6">
-<div class="bulletin-board">
-    <h2>The Bulletin Board!</h2>
-    <ul id="bulletin-list">
-        </ul>
-</div>
-<hr>
-<button 
-    class="aero notification-btn" 
-    id="notification-button" 
-    onclick="requestNotificationPermission()">
-    Sign Up for Notifications
-</button>
-<hr>
- 
-        <h3 class="text-center mt-6 mb-3">Weather & News (Powered by Tomorrow.io)</h3>
-        <p class="text-center mb-4">Visit the Learn Center for the News and Weather</p>
-        <div data-id="0" data-module_id="100" data-theme="dark" data-primary_color="#515c6d" data-language="en" style="min-height: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-           <button class="learn-centre-btn aero" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
-            Visit the Learn Center
-        </button>    
+        <hr style="width: 100%; border-top: 2px solid rgba(0,0,0,0.1); margin: 30px 0;">
+    
+        <div style="text-align: center; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; width: 80%; max-width: 600px;">
+            <button class="aero" style="--hue: 20; font-size: 24px; padding: 15px 40px; margin-bottom: 20px; width: 100%;" onclick="window.location.href='https://stenoip.github.io/praterich';">
+                 Try Praterich AI Now (The Brain)
+            </button>
+            <button class="aero" style="--hue: 120; font-size: 24px; padding: 15px 40px; width: 100%;" onclick="window.location.href='ringzauber.html';">
+                Download Ringzauber (The Shield)
+            </button>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 30px; background-color: #fff8dc; padding: 20px; border-radius: 8px; width: 80%; max-width: 600px; border: 1px solid #ddd;">
+            <h3>Powered by Oodles Search</h3>
+            <p style="margin-bottom: 15px;">Your search for <strong>unbiased results</strong> and <strong>privacy</strong> starts here. Oodles is the private default search engine for Ringzauber.</p>
+            <button class="aero" style="--hue: 45; font-size: 18px; padding: 10px 20px;" onclick="window.location.href='https://stenoip.github.io/oodles';">
+                 Start Oodles Search (The Truth)
+            </button>
+        </div>
+        
+        <hr style="width: 100%; border-top: 2px solid rgba(0,0,0,0.1); margin: 30px 0;">
+        
+        <div class="bulletin-board" style="width: 80%; max-width: 600px;">
+            <h2>News and Updates</h2>
+            <ul id="bulletin-list">
+                 </ul>
         </div>
 
+        <button 
+            class="aero notification-btn" 
+            id="notification-button" 
+            onclick="requestNotificationPermission()">
+            Sign Up for Notifications
+        </button>
+        <hr style="width: 100%; border-top: 2px solid rgba(0,0,0,0.1); margin: 30px 0;">
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <p style="margin-bottom: 10px; font-size: 14px;">Need the old apps, calculators or games?</p>
+            <button class="aero" style="--hue: 245; font-size: 16px; padding: 10px 20px; border-radius: 8px;" onclick="window.location.href='television_guide.html';">
+                Explore Our Other Apps & Tools (Archive)
+            </button>
+        </div>
+        
         <div class="footer">
-            <p>Version 1.15 &copy; Stenoip Company</p>
+            <p>Version 1.16 &copy; Stenoip Company</p>
             <p><a href="copyright.html">View our terms.</a></p>
             <p>WHY ARE THERE ADS! We have ads to fund our projects and earn money. Read our <a href="privacy.html">Privacy and Policy</a> (at the top) for more info.</p>
         </div>
     </div>
 
-<!--JAVASCRIPT TAGS(DO NOT DELETE!) -->  
-    <script src="/script.js"></script>
-  <script src="/load-header.js"></script>
+<script src="script.js"></script>
+  <script src="load-header.js"></script>
 </body>
 </html>
