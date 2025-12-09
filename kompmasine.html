@@ -9,9 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS from previous step is included here for completeness */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
-
+        
+        /* --- Base Layout --- */
         body {
             margin: 0;
             display: flex;
@@ -35,7 +35,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); 
-            position: relative; /* Needed for absolute positioning of copyright */
+            position: relative;
         }
 
         /* --- Copyright Styling --- */
@@ -45,7 +45,7 @@
             left: 50%;
             transform: translateX(-50%);
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.4); /* Subtle white */
+            color: rgba(255, 255, 255, 0.4); 
             z-index: 10;
         }
 
@@ -81,6 +81,7 @@
             cursor: pointer;
             box-shadow: inset 0 1px 2px rgba(255,255,255,0.1), inset 0 -1px 2px rgba(0,0,0,0.3);
         }
+
         .menu-icon span {
             display: block;
             width: 18px; 
@@ -95,12 +96,14 @@
             gap: 2px;
             height: 17px; 
         }
+
         .signal-icon span {
             display: block;
             width: 3px;
             background-color: white;
             border-radius: 1px;
         }
+
         .signal-icon span:nth-child(1) { height: 8px; }
         .signal-icon span:nth-child(2) { height: 11px; }
         .signal-icon span:nth-child(3) { height: 14px; }
@@ -116,15 +119,18 @@
             align-items: flex-end;
             transform: rotate(45deg); 
         }
+
         .wifi-icon .arc {
             position: absolute;
             border: 2px solid white;
             border-color: white transparent transparent transparent; 
             border-radius: 50%;
         }
+
         .wifi-icon .arc1 { width: 10px; height: 10px; top: 6px; left: 4px; }
         .wifi-icon .arc2 { width: 14px; height: 14px; top: 4px; left: 2px; }
         .wifi-icon .arc3 { width: 18px; height: 18px; top: 2px; left: 0px; }
+        
         .wifi-icon .wifi-dot {
             position: absolute;
             width: 2px;
@@ -148,6 +154,7 @@
             justify-content: flex-end; 
             align-items: center;
         }
+
         .battery-cap {
             position: absolute;
             right: -3px; 
@@ -157,6 +164,7 @@
             background-color: white;
             border-radius: 0 2px 2px 0;
         }
+
         .battery-level {
             position: absolute;
             left: 1px;
@@ -166,6 +174,7 @@
             border-radius: 1px;
             width: calc(27% - 2px); 
         }
+
         .battery-percent {
             position: relative;
             font-size: 0.7em; 
@@ -219,8 +228,8 @@
             user-select: none; 
             transition: filter 0.1s ease, box-shadow 0.1s ease; 
             font-weight: 400; 
-            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.1), 
-                        inset 0 -2px 5px rgba(0, 0, 0, 0.3), 
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.1),
+                        inset 0 -2px 5px rgba(0, 0, 0, 0.3),
                         0 3px 6px rgba(0, 0, 0, 0.2); 
         }
 
@@ -258,8 +267,7 @@
         <div class="copyright">
             © 2025 Stenoip Company
         </div>
-        
-        <div class="calculator-top-bar">
+                <div class="calculator-top-bar">
             <div class="top-bar-left">
                 <div class="menu-icon">
                     <span></span><span></span><span></span>
@@ -318,11 +326,8 @@
             <button class="button button-number" onclick="buttonClick('appendNumber', '.')">.</button>
         </div>
     </div>
-
     <script>
-        
         const display = document.getElementById('display');
-        
         
         var currentInput = '0';
         var previousValue = null;
@@ -330,11 +335,9 @@
         var waitingForNewInput = true;
 
         // --- Core Calculator Logic ---
-
         function updateDisplay() {
-            var maxLen = 10; // Changed to var
+            var maxLen = 10;
             if (currentInput.length > maxLen) {
-                // Changed to var
                 var num = parseFloat(currentInput); 
                 if (!isNaN(num)) {
                     display.textContent = num.toPrecision(maxLen - 3); 
@@ -371,13 +374,10 @@
         }
 
         function appendOperator(nextOperation) {
-            // Changed to var
             var inputValue = parseFloat(currentInput); 
-
             if (previousValue === null && !isNaN(inputValue)) {
                 previousValue = inputValue;
             } else if (operation) {
-                // Changed to var
                 var result = performCalculation(); 
                 currentInput = result.toString();
                 previousValue = result;
@@ -387,9 +387,40 @@
             operation = nextOperation;
             updateDisplay();
         }
+        
+        // Use a safe wrapper for evaluation
+        function safeEval(expression) {
+            try {
+                // Replace calculator symbols with JS operators
+                let sanitized = expression
+                    .replace(/x/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/,/g, ''); // Remove thousands commas if present
+                
+                // Check if the expression contains any arithmetic operators (+, -, *, /)
+                if (!/[\+\-\*\/]/.test(sanitized)) {
+                    // If only a number (e.g., "42"), return the number itself
+                    return parseFloat(sanitized);
+                }
+
+                // Use the Function constructor for evaluation, isolating it from global scope
+                // This is generally safer than direct eval()
+                let result = new Function('return ' + sanitized)();
+                
+                // Return result, checking for infinity/NaN
+                if (!isFinite(result)) {
+                    return 'Error';
+                }
+                
+                // Fix floating point issues for display (e.g., 0.1 + 0.2 = 0.30000000000000004)
+                return parseFloat(result.toFixed(10));
+                
+            } catch (e) {
+                return 'Error';
+            }
+        }
 
         function performCalculation() {
-            // Changed to var
             var inputValue = parseFloat(currentInput); 
             if (operation === '+') {
                 return previousValue + inputValue;
@@ -399,9 +430,8 @@
                 return previousValue * inputValue;
             } else if (operation === '/') {
                 if (inputValue === 0) {
-                    alert('Error: Division by zero');
-                    clearDisplay();
-                    return 0;
+                    // Alert is handled in calculateResult for safety
+                    return 'Error';
                 }
                 return previousValue / inputValue;
             }
@@ -413,8 +443,14 @@
                 return; 
             }
 
-            // Changed to var
             var result = performCalculation(); 
+            
+            if (result === 'Error') {
+                 alert('Error: Division by zero');
+                 clearDisplay();
+                 return;
+            }
+
             result = parseFloat(result.toFixed(8));
 
             currentInput = result.toString();
@@ -425,7 +461,6 @@
         }
 
         // --- Haptic Feedback Function ---
-
         function vibrateDevice() {
             if ('vibrate' in navigator) {
                 navigator.vibrate(50); 
@@ -433,7 +468,6 @@
         }
 
         // --- Master Button Click Handler ---
-
         function buttonClick(action, value = null) {
             vibrateDevice();
 
@@ -450,8 +484,38 @@
             }
         }
 
-        // Initialize display
+        // --- AUTO-EVALUATION LOGIC ON LOAD ---
+        function autoProcessQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+            
+            if (query) {
+                // Decode the URL query and clean it (e.g., replace plus signs used in query params)
+                let expression = decodeURIComponent(query).trim();
+                
+                if (expression.length > 0) {
+                    // Check if it's likely a calculation (contains operators or parentheses)
+                    if (/[0-9\.\+\-\*\/x÷()]/.test(expression)) {
+                        let result = safeEval(expression);
+                        
+                        // Set the display to the result
+                        if (result !== 'Error') {
+                            currentInput = result.toString();
+                            waitingForNewInput = true; // Ready for a new number input after calculation
+                        } else {
+                            currentInput = 'Error';
+                        }
+                    } else {
+                        // If it's just text or a single number without operations, just show it
+                        currentInput = expression;
+                    }
+                }
+            }
+        }
+
+        // Initialize display and process URL query
         document.addEventListener('DOMContentLoaded', function() {
+            autoProcessQuery();
             updateDisplay();
         });
     </script>
