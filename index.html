@@ -494,6 +494,16 @@ input:checked + .slider:before {
     box-shadow: 0 0 20px gold;
     transform: translateY(-3px);
 }
+      @keyframes fall {
+    0% {
+        transform: translateY(-10px);
+        opacity: 0.2;
+    }
+    100% {
+        transform: translateY(110vh);
+        opacity: 1;
+    }
+}
     </style>
 </head>
 
@@ -577,5 +587,6 @@ input:checked + .slider:before {
     
     <script src="https://stenoip.github.io/script.js"></script>
     <script src="/load-header.js"></script>
+  <script src="/snow.js"></script>
 </body>
 </html>
