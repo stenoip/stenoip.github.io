@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="icon" href="new-swc.png" type="image/png" />
-    <title>StenoKonnect</title>
+    <title>StenoKonnect – Christmas Edition</title>
 
     <style>
-        /* BASE & FONT STYLES */
+           /* BASE & FONT STYLES */
         @font-face {
     font-family: 'Frutiger';
     src: url('fonts/Frutiger.ttf') format('truetype');
@@ -26,7 +25,11 @@
 
         body {
             font-family: 'Frutiger', sans-serif;
-            background-color: rgb(255, 191, 0); /* Main Background Color */
+            background: url('https://www.capturelandscapes.com/wp-content/uploads/2016/11/knuten-sunstar-sunrise-1.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -139,7 +142,7 @@
 
         /* HEADER & NAVIGATION STYLES */
         .header {
-            background-color: rgba(238, 255, 0); /* Yellow Band Color */
+            background-color: rgba(3, 255, 150); 
             padding: 10px 20px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -435,8 +438,65 @@ input:checked + .slider:before {
     transform: none;
     padding-left: 30px; /* Remove icon padding when disabled, as the icon image is gone */
 }
+
+        .christmas-banner {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .christmas-banner img {
+            max-width: 350px;
+            width: 80%;
+        }
+
+        .christmas-divider {
+            display: block;
+            margin: 25px auto;
+            width: 250px;
+        }
+
+        .christmas-decoration {
+            display: block;
+            margin: 15px auto;
+            width: 200px;
+        }
+        iframe {
+    border: 4px solid gold !important;
+    border-radius: 15px;
+}
+
+
+
+.browse-programmes-container {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.browse-programmes-btn {
+    display: inline-block;
+    padding: 15px 35px;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(to bottom, #ff4d4d, #aa0000);
+    border: 3px solid gold;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 0 15px gold;
+    transition: 0.2s ease-in-out;
+    text-shadow: 0 0 5px black;
+    font-family: "Mountains of Christmas", cursive;
+}
+
+.browse-programmes-btn:hover {
+    background: linear-gradient(to bottom, #ff6666, #cc0000);
+    box-shadow: 0 0 20px gold;
+    transform: translateY(-3px);
+}
     </style>
 </head>
+
 <body>
 
     <div class="launch-screen" id="launch-screen" onclick="startExperience()">
@@ -446,26 +506,26 @@ input:checked + .slider:before {
     <video id="intro-video" class="intro-video" autoplay playsinline muted>
         <source src="https://stenoip.github.io/intro-christmas.mp4" type="video/mp4" />
         <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
     </video>
 
     <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
-
-
-<!--Main Content -->
-    
+    <!-- MAIN CONTENT -->
     <div id="main-content" class="container" style="display: none;">
 
-        
-     <!--Selection Menu --> <div id="header-placeholder"></div>
-      
+ <!--Selection Menu --> <div id="header-placeholder"></div>
+
+        <!-- Christmas Banner -->
+        <div class="christmas-banner">
+            <img src="https://blog.aweber.com/wp-content/uploads/2023/09/3.gif" alt="Merry Christmas!">
+        </div>
 
         <div class="header">
-            <h1>StenoKonnect</h1>
-            <p>Formerly <a href="the-rename.html">Stenoip Wonder Computer Computer</a></p>
+            <h1> StenoKonnect – Christmas Edition </h1>
+            <p>Formerly <a href="the-rename.html">Stenoip Wonder Computer</a></p>
+
             <div class="intro-toggle-container">
-                <span>NEW Intro Video for Christmas! Try it:</span>
+                <span>NEW Christmas Intro Video! Try it:</span>
                 <label class="switch">
                     <input type="checkbox" id="introToggle">
                     <span class="slider round"></span>
@@ -473,52 +533,49 @@ input:checked + .slider:before {
             </div>
         </div>
 
-        <h2> Television Guide (Powered by Oodles Search)</h2>
-        <p>Find all the pages on our <a href="https://stenoip.github.io/oodles/search.html?q=define%20web%20portal&type=web&page=1">web portal</a></p>
-        <div class="search-bar">
-            <div class="search-bar-inner">
-                <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search TV Guide (e.g., Flappy Bird)..." />
-                <button class="aero" onclick="search()">Search</button>
-            </div>
-            <div class="suggestions" id="suggestions" style="display: none;"></div>
-        </div>
-        <p class="text-center">For the full list, visit the <a href="television_guide.html">Television Guide</a> page.</p>
+        <!-- Christmas Decoration -->
+        <img class="christmas-decoration" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnD4JS7QX0MecCNQFKs09KBtVNkCWju0mXpg&s">
+
         
-         <h3 class="text-center mt-6">Wheel of Stenoip</h3>
-        <iframe src="https://stenoip.github.io/wheel_gifs" height="900px" width="100%" class="rounded-lg shadow-md mt-4 mb-4"></iframe>
-<br>
-        <hr class="my-6">
-<div class="bulletin-board">
-    <h2>The Bulletin Board!</h2>
-    <ul id="bulletin-list">
-        </ul>
+
+
+<div class="browse-programmes-container">
+    <a href="television_guide.html" class="browse-programmes-btn">
+         Games, Office, Calculators and More
+    </a>
 </div>
-<hr>
-<button 
-    class="aero notification-btn" 
-    id="notification-button" 
-    onclick="requestNotificationPermission()">
-    Sign Up for Notifications
-</button>
-<hr>
- 
+
+      
+<h3 class="text-center mt-6"> Santa Tracker & Christmas Countdown </h3>
+
+<iframe 
+    src="https://stenoip.github.io/santa/" 
+    style="width: 100%; height: 900px; border: none; border-radius: 12px; box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);"
+></iframe>
+
+
+    
+
         <h3 class="text-center mt-6 mb-3">Weather & News (Powered by Tomorrow.io)</h3>
-        <p class="text-center mb-4">Visit the Learn Center for the News and Weather</p>
-        <div data-id="0" data-module_id="100" data-theme="dark" data-primary_color="#515c6d" data-language="en" style="min-height: 400px; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-           <button class="learn-centre-btn aero" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
+        <button class="learn-centre-btn aero" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
             Visit the Learn Center
-        </button>    
-        </div>
+        </button>
+
+        <button 
+            class="aero notification-btn" 
+            id="notification-button" 
+            onclick="requestNotificationPermission()">
+            Sign Up for Notifications
+        </button>
 
         <div class="footer">
-            <p>Version 1.20 &copy; Stenoip Company</p>
+            <p>Version 1.21 &copy; Stenoip Company. Christmas Edition</p>
             <p><a href="copyright.html">View our terms.</a></p>
-            <p>WHY ARE THERE ADS! We have ads to fund our projects and earn money. Read our <a href="privacy.html">Privacy and Policy</a> (at the top) for more info.</p>
         </div>
     </div>
 
-<!--JAVASCRIPT TAGS(DO NOT DELETE!) -->  
-    <script src="/script.js"></script>
-  <script src="/load-header.js"></script>
+    
+    <script src="https://stenoip.github.io/script.js"></script>
+    <script src="/load-header.js"></script>
 </body>
 </html>
