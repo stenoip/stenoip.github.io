@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Ringzauber Browser 1.6 Trailer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         /* Fullscreen body with background image */
         body {
             margin: 0;
             padding: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -19,13 +20,14 @@
             background-repeat: no-repeat;
             text-align: center;
             color: white;
-            overflow: hidden;
+            overflow-x: hidden;
+            font-family: sans-serif;
         }
 
         /* Title overlay */
         h1 {
-            font-size: 3em;
-            margin: 0.2em 0;
+            font-size: 6vw; /* scales with viewport width */
+            margin: 0.5em 0 0.2em 0;
             text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
             background-color: rgba(0,0,0,0.3);
             padding: 0.2em 0.5em;
@@ -34,7 +36,7 @@
 
         /* Subtitle */
         p {
-            font-size: 1.5em;
+            font-size: 4vw;
             margin: 0.2em 0 1em 0;
             text-shadow: 1px 1px 6px rgba(0,0,0,0.7);
             background-color: rgba(0,0,0,0.2);
@@ -44,20 +46,21 @@
 
         /* Video trailer styling */
         video {
-            max-width: 80%;
+            width: 90%; /* responsive width */
+            max-width: 720px;
             height: auto;
-            border: none;
-            margin-bottom: 20px;
             border-radius: 10px;
+            margin-bottom: 20px;
         }
 
         /* Download link styling */
         a {
             text-decoration: none;
             color: white;
-            font-size: 1.5em;
+            font-size: 5vw;
+            max-font-size: 24px;
             background-color: rgba(0,0,0,0.6);
-            padding: 15px 30px;
+            padding: 12px 24px;
             border-radius: 10px;
             transition: background-color 0.3s, transform 0.3s;
         }
@@ -66,6 +69,13 @@
             background-color: rgba(255,255,255,0.8);
             color: black;
             transform: scale(1.05);
+        }
+
+        /* Optional: improve text sizing on very small devices */
+        @media (max-width: 400px) {
+            h1 { font-size: 8vw; }
+            p { font-size: 5vw; }
+            a { font-size: 6vw; padding: 10px 20px; }
         }
     </style>
 </head>
