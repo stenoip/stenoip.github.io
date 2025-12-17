@@ -26,7 +26,7 @@
 
         /* Title overlay */
         h1 {
-            font-size: 6vw; /* scales with viewport width */
+            font-size: 6vw;
             margin: 0.5em 0 0.2em 0;
             text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
             background-color: rgba(0,0,0,0.3);
@@ -46,7 +46,7 @@
 
         /* Video trailer styling */
         video {
-            width: 90%; /* responsive width */
+            width: 90%;
             max-width: 720px;
             height: auto;
             border-radius: 10px;
@@ -71,7 +71,7 @@
             transform: scale(1.05);
         }
 
-        /* Optional: improve text sizing on very small devices */
+        /* Small screens adjustments */
         @media (max-width: 400px) {
             h1 { font-size: 8vw; }
             p { font-size: 5vw; }
@@ -83,8 +83,14 @@
 
     <h1>Ringzauber Browser 1.6</h1>
     <p>The ultimate browsing experience is here!</p>
-    <video src="Ringzauber 1.6 intro.mp4" controls autoplay loop></video>
+    <video id="trailer" src="Ringzauber 1.6 intro.mp4" controls autoplay loop></video>
     <a href="ringzauber.html">Download Now</a>
+
+    <script>
+        // Set video playback speed to 1.5× by default
+        var video = document.getElementById('trailer');
+        video.playbackRate = 1.25;
+    </script>
 
 </body>
 </html>
