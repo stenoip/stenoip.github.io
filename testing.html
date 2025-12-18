@@ -1,695 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <link rel="icon" href="new-swc.png" type="image/png" />
-  <title>Stenoip Wonder Computer</title>
-   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-       /* General Styles */
-body {
-    font-family: 'Google Sans', sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    overflow-x: hidden; /* Prevent horizontal scroll only */
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="icon" href="new-swc.png" type="image/png" />
+    <title>StenoKonnect</title>
 
+    <style>
+        /* BASE & FONT STYLES */
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
 
-}
+        :root {
+            --bottom-glow: radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.7), transparent);
+        }
 
-/* Fullscreen video styling */
-.intro-video {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensure video scales properly */
-    z-index: 10;
-}
-
-/* Green Screen for launch */
-.launch-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: green;
-    color: white;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    z-index: 15;
-}
-
-/* Hide content initially */
-#main-content {
-    display: none;
-}
-
-/* Header styles */
-.header {
-    font-size: 13px;
-    text-align: right;
-    padding: 22px 10px;
-    background-color: rgba(240, 191, 111, 255);
-    width: 100%; /* Ensure header is full width */
-    box-sizing: border-box;
-}
-
-.menuItems {
-    font-size: 13px;
-    padding: 0 20px;
-    display: inline-block;
-}
-
-.header a {
-    text-decoration: none;
-    color: rgb(0, 0, 0);
-}
-
-.header a:hover {
-    text-decoration: underline;
-}
-
-/* Dropdown styling */
-.menu {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-content {
-    width: 270px;
-    padding: 28px;
-    border: 1px solid rgb(220, 225, 229);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
-    display: none;
-    position: absolute;
-    z-index: 1;
-    right: 0;
-    background-color: rgb(255, 255, 255);
-}
-
-.menuItems:hover .dropdown-content {
-    display: block;
-}
-
-.appLogo {
-    text-align: center;
-    display: inline-block;
-    width: 86px;
-    padding: 5px;
-}
-
-.menuItemLogo {
-    width: 50px;
-    height: 50px;
-}
-
-.caption {
-    text-align: center;
-}
-
-.container {
-    width: 80%;
-    max-width: 1200px;
-    background-color: white;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    border-radius: 10px;
-
-}
-
-
-.search {
-    font-size: 14px;
-    padding: 12px 20px;
-    width: 90%;
-    max-width: 600px; /* Limit width for larger screens */
-    color: rgb(51, 51, 51);
-    border: 1px solid rgb(223, 225, 229);
-    border-radius: 24px;
-    outline: none;
-    background-color: rgb(241, 243, 244);
-    margin: 0 auto;
-    display: block;
-}
-
-.search:focus {
-    border-color: rgb(66, 133, 244);
-}
-
-.search-results {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 10px;
-    background-color: rgb(255, 255, 255);
-    border: 1px solid rgb(223, 225, 229);
-    border-radius: 5px;
-    display: none;
-    margin-top: 10px;
-}
-
-.result-item {
-    padding: 8px;
-    cursor: pointer;
-}
-
-.result-item:hover {
-    background-color: rgb(241, 243, 244);
-}
-
-/* Button styles */
-.btns {
-    margin: 7px 0;
-    padding: 20px 40px;
-    font-size: 18px;
-    color: rgb(95, 99, 104);
-    background-color: rgb(248, 249, 250);
-    border: 1px solid rgb(223, 225, 229);
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.btns:hover {
-    background-color: rgb(241, 243, 244);
-}
-
-/* Learn Centre Button (larger and center-aligned) */
-.learn-centre-btn {
-    margin: 20px 0;
-    padding: 20px 50px;
-    font-size: 22px;
-    background-color: rgb(66, 133, 244);
-    color: rgb(255, 255, 255);
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-}
-
-.learn-centre-btn:hover {
-    background-color: rgb(57, 103, 204);
-}
-
-/* Skip button styles */
-.skip-btn {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    padding: 10px 20px;
-    background-color: rgb(66, 133, 244);
-    color: rgb(255, 255, 255);
-    border: none;
-    border-radius: 20px;
-    font-size: 16px;
-    cursor: pointer;
-    z-index: 20;
-}
-
-.skip-btn:hover {
-    background-color: rgb(57, 103, 204);
-}
-
-/* Intro Toggle Switch Styles */
-.intro-toggle-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; /* Align to the right in the header */
-    gap: 10px;
-    padding: 10px;
-    font-size: 14px;
-    color: black;
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 20px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-  border-radius: 20px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 2px;
-  bottom: 2px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-  border-radius: 50%;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(20px);
-  -ms-transform: translateX(20px);
-  transform: translateX(20px);
-}
-
-
-/* Media queries for responsiveness */
-@media (max-width: 768px) {
-    .header {
-        font-size: 12px;
-        padding: 10px;
-    }
-
-    .search {
-        width: 90%;
-        font-size: 16px;
-    }
-
-    .container {
-        padding: 80px 10px;
-    }
-
-    .learn-centre-btn {
-        padding: 18px 40px;
-        font-size: 18px;
-    }
-
-    .skip-btn {
-        bottom: 10px;
-        left: 10px;
-        padding: 8px 15px;
-        font-size: 14px;
-    }
-
-    .footer {
-        font-size: 10px;
-        padding: 15px;
-    }
-
-    /* Remove any unwanted overflow */
-    body, html {
-        width: 100%;
-        height: 100%;
-        overflow-x: hidden;
-    }
-
-    .intro-toggle-container {
-        justify-content: center; /* Center on smaller screens */
-    }
-}
-
-/* Landscape and other larger screens adjustments */
-@media (max-width: 1024px) and (min-width: 769px) {
-    .search {
-        width: 70%;
-    }
-
-    .learn-centre-btn {
-        padding: 20px 45px;
-        font-size: 20px;
-    }
-}
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
         body {
             font-family: 'Google Sans', sans-serif;
-            background-color: #f0f0f0;
+            background-color: rgb(255, 191, 0); 
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+            padding-top: 60px;   
         }
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            margin-top: 20px;
-            border-radius: 10px;
+
+        /* AERO BUTTON STYLES */
+        button.aero {
+            --hue: 245; 
+            --button-background: oklch(75% 0.1 var(--hue) / 0.8);
+            --bg-dark: oklch(45% 0.1 var(--hue) / 0.75);
+            background: var(--bottom-glow), linear-gradient(to bottom, var(--bg-dark), var(--button-background));
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--button-background);
+            border-radius: 9999px;
+            cursor: pointer;
+            margin: 1em 1ex;
+            padding: 1ex 1em;
+            position: relative;
+            text-shadow: 0 2px .5em #0003;
+            transition: all 300ms;
+            color: white; 
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
         }
+
+        button.aero::after {
+            content: "";
+            position: absolute;
+            top: 4%; left: 0.5em; width: calc(100% - 1em); height: 40%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));
+            border-radius: 9999px;
+        }
+
+        /* INTRO & LAUNCH STYLES */
+        .intro-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; }
+        .launch-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: green; color: white; text-align: center; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 15; }
+        .skip-btn { position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; background-color: rgb(66, 133, 244); color: white; border: none; border-radius: 20px; cursor: pointer; z-index: 20; }
+
+        /* PORTAL STRUCTURE */
+        .container { width: 90%; max-width: 800px; }
+        
         .header {
+            background-color: rgba(238, 255, 0);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             text-align: center;
-            margin-bottom: 20px;
         }
-        .search-bar {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
+
+        /* PORTAL HUB STYLES */
+        .portal-hub {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin: 30px 0;
+        }
+
+        .hub-card {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            text-decoration: none;
+            color: black;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .hub-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.5); }
+
+        /* CHATBOT IFRAME CONTAINER */
+        .ai-assistant-container {
+            width: 100%;
+            height: 450px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            border: 2px solid #10a37f;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin: 30px 0;
             position: relative;
         }
-        .search-bar input {
-            padding: 10px;
-            width: 70%;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-        .search-bar button {
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            background-color: #0078d4;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .search-bar button:hover {
-            background-color: #005ba1;
-        }
-        .suggestions {
-            position: absolute;
-            top: 40px;
-            left: 0;
-            width: 70%;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1;
-        }
-        .suggestions div {
-            padding: 10px;
-            cursor: pointer;
-        }
-        .suggestions div:hover {
-            background-color: #f0f0f0;
-        }
-        .news {
-            margin-bottom: 20px;
-        }
-        .news h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #0078d4;
-        }
-        .news iframe {
-            width: 100%;
-            height: 400px;
-            border: none;
-            border-radius: 10px;
-        }
-        .ads {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .ads img {
-            width: 48%;
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-        .ads img:hover {
-            transform: scale(1.05);
-        }
-        .links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-        }
-        .links button {
-            padding: 15px 30px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            background-color: #0078d4;
-            color: white;
-            border-radius: 5px;
-            margin: 5px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        .links button:hover {
-            background-color: #005ba1;
-            transform: translateY(-3px);
-            }
 
-  </style>
+        .ai-assistant-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .bulletin-board {
+            border: 2px dashed rgb(255, 165, 0);
+            padding: 15px;
+            margin: 25px 0;
+            background-color: rgb(255, 255, 224);
+            border-radius: 8px;
+        }
+
+        .footer { width: 100%; text-align: center; padding: 20px; font-size: 12px; background-color: rgba(255, 255, 255, 0.8); margin-top: 20px; }
+
+        /* TOGGLE */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #2196F3; }
+        input:checked + .slider:before { transform: translateX(20px); }
+    </style>
 </head>
 <body>
 
-  <div class="launch-screen" id="launch-screen" onclick="startExperience()">
-    Click to Launch
-  </div>
+    <div class="launch-screen" id="launch-screen" onclick="startExperience()">Click to Launch</div>
 
-  <video id="intro-video" class="intro-video" autoplay playsinline muted>
-    <source src="https://stenoip.github.io/intro.mp4" type="video/mp4" />
-    <source src="https://stenoip.github.io/intro_short.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
+    <video id="intro-video" class="intro-video" autoplay playsinline muted>
+        <source src="https://stenoip.github.io/intro.mp4" type="video/mp4" />
+    </video>
 
-  <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
+    <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
-  <div id="main-content" style="display: none;">
+    <div id="main-content" class="container" style="display: none;">
+        
+        <div id="header-placeholder"></div>
 
-  <nav class="w-full max-w-4xl bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg">
-        <ul class="flex flex-col sm:flex-row justify-around items-center space-y-3 sm:space-y-0 sm:space-x-4">
-            <li>
-                <a href="index.html" class="block px-5 py-2 text-white font-semibold rounded-full bg-red-900 hover:bg-red-700 transition-colors duration-300 shadow-md">
-                    Home
-                </a>
-            </li>
-            <li>
-                <a href="about.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    About
-                </a>
-            </li>
-            <li>
-                <a href="terms.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    Terms
-                </a>
-            </li>
-            <li>
-                <a href="contact.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    Contact
-                </a>
-            </li>
-            <li>
-                <a href="blog.html" class="block px-4 py-2 text-white hover:text-red-200 transition-colors duration-300">
-                    Blog
-                </a>
-            </li>
-        </ul>
-    </nav>
-<br>
-      <div class="header">
-        <h1 class="block px-10 py-10 text-black font-bold">Stenoip Wonder Computer</h1>
-        <div class="intro-toggle-container">
-            <span>Intro Video:</span>
-            <label class="switch">
-                <input type="checkbox" id="introToggle">
-                <span class="slider round"></span>
-            </label>
+        <div class="header">
+            <h1 style="margin:0;">StenoKonnect</h1>
+            <p>The Solar System's best web portal</p>
+            <div class="intro-toggle-container">
+                <span>Intro Video:</span>
+                <label class="switch">
+                    <input type="checkbox" id="introToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
         </div>
-      </div>
-      <div class="search-bar">
-        <input type="text" id="search-input" oninput="showSuggestions()" placeholder="Search..." />
 
-        <button onclick="search()">Search</button>
-        <div class="suggestions" id="suggestions" style="display: none;"></div>
-      </div>
-<script async src="https://cse.google.com/cse.js?cx=63de7b7e7f71042d6"></script>
-        <div class="gcse-search"></div>
-      <button class="learn-centre-btn" onclick="window.location.href='https://stenoip.github.io/learn-centre';">
-        Learn Center
-      </button>
+        <div class="portal-hub">
+            <a href="television_guide.html" class="hub-card">
+                <h2>Program Guide</h2>
+                <p>Access the full library of applications, games and calculators.</p>
+            </a>
+            <a href="office/home.html" class="hub-card">
+                <h2>StenoOffices</h2>
+                <p>Professional tools, documents and productivity software.</p>
+            </a>
+            <a href="https://stenoip.github.io/learn-centre" class="hub-card">
+                <h2>Learn Centre</h2>
+                <p>Explore educational resources, news and weather updates.</p>
+            </a>
+        </div>
 
-      <div class="footer">
-        <p>Version 0.79 &copy; Stenoip Company</p>
-      </div>
-<p>New update for Ringzauber! <a href="download.html">Version 1.4</a></p>
+        <h3 style="text-align:center; color: #10a37f;">Need Help? Ask Praterich Navigator</h3>
+        <div class="ai-assistant-container">
+            <iframe src="ai-helper.html" title="StenoKonnect AI Helper"></iframe>
+        </div>
 
-      <div class="tomorrow" data-location-id="122795,052149,064500,050388,072102,015101"
-        data-language="EN" data-unit-system="METRIC" data-skin="light" data-widget-type="aqi6"
-        style="padding-bottom:22px;position:relative;">
-        <a href="https://www.tomorrow.io/weather-api/" target="_blank" style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;">
-          <img src="https://weather-website-client.tomorrow.io/img/powered-by.svg" width="250" height="18" alt="Powered by Tomorrow.io">
-        </a>
-      </div>
+        <h3 style="text-align:center;">Wheel of Stenoip</h3>
+        <iframe src="https://stenoip.github.io/wheel_gifs" height="600px" width="100%" style="border-radius:12px; border:none;"></iframe>
 
-      <div class="tomorrow" data-location-id="122795" data-language="EN" data-unit-system="METRIC"
-        data-skin="light" data-widget-type="upcoming" style="padding-bottom:22px;position:relative;">
-        <a href="https://www.tomorrow.io/weather-api/" target="_blank" style="position: absolute; bottom: 0; transform: translateX(-50%); left: 50%;">
-          <img src="https://weather-website-client.tomorrow.io/img/powered-by.svg" width="250" height="18" alt="Powered by Tomorrow.io">
-        </a>
-      </div>
+        <div class="bulletin-board">
+            <h2 style="text-align: center; color: rgb(255, 140, 0);">The Bulletin Board!</h2>
+            <ul id="bulletin-list"></ul>
+        </div>
+
+        <button class="aero" id="notification-button" style="display:block; margin: 20px auto;" onclick="requestNotificationPermission()">
+            Sign Up for Notifications
+        </button>
+
+        <div class="footer">
+            <p>Version (TESTING.HTML) &copy; Stenoip Company</p>
+            <p><a href="copyright.html">View our terms.</a>  <a href="privacy.html">Privacy Policy</a></p>
+        </div>
     </div>
 
-  <script>
-// Links used for search suggestions
-    const links = [
-      { name: '2048', url: '2048.html' },
-      { name: 'Anniversary', url: 'anniversary.html' },
-      { name: 'Boublok Coding', url: 'boublok.html' },
-      { name: 'TI 30XS', url: 'calculator_ti30xiis.html' },
-      { name: 'TI 84', url: 'calculator_ti84.html' },
-      { name: 'Camera', url: 'camera.html' },
-      { name: 'Clocker', url: 'clocker.html' },
-      { name: 'Comics!', url: 'comic.html' },
-      { name: 'The Data Store(Datenspeicher)', url: 'download.html' },
-      { name: 'MailSteno(WIP)', url: 'email.html' },
-      { name: 'Flappy Bird', url: 'flappybird.html' },
-      { name: 'StenoipToanielstik(Games)', url: 'game.html' },
-      { name: 'Gravity Simulation', url: 'gravity.html' },
-      { name: 'StenoVids', url: 'video.html' },
-      { name: 'Tetris', url: 'tetris.html' }
-    ];
-
-    // Search navigation
-    function search() {
-      const query = document.getElementById('search-input').value;
-      const matchedLink = links.find(link => link.name.toLowerCase().includes(query.toLowerCase()));
-      if (matchedLink) {
-        window.location.href = matchedLink.url + '?q=' + encodeURIComponent(query);
-      }
-    }
-
-    // Search suggestions
-    function showSuggestions() {
-      const query = document.getElementById('search-input').value.toLowerCase();
-      const suggestionsContainer = document.getElementById('suggestions');
-      suggestionsContainer.innerHTML = '';
-      const filteredLinks = links.filter(link => link.name.toLowerCase().includes(query));
-      filteredLinks.forEach(link => {
-        const suggestion = document.createElement('div');
-        suggestion.textContent = link.name;
-        suggestion.onclick = () => {
-          document.getElementById('search-input').value = link.name;
-          search();
-        };
-        suggestionsContainer.appendChild(suggestion);
-      });
-      suggestionsContainer.style.display = filteredLinks.length ? 'block' : 'none';
-    }
-
-    // Function to show main content and hide intro elements
-    function showMainContent() {
-        document.getElementById('intro-video').style.display = 'none';
-        document.getElementById('launch-screen').style.display = 'none';
-        document.getElementById('skip-btn').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
-        document.body.style.overflow = 'auto'; // Enable scrolling
-    }
-
-    // This function is still used when "Click to Launch" is pressed manually.
-    function startExperience() {
-        const introToggle = document.getElementById('introToggle');
-        document.getElementById('launch-screen').style.display = 'none';
-
-        if (introToggle.checked) { // If switch is ON (intro enabled)
-            const video = document.getElementById('intro-video');
-            video.muted = false; // Unmute if the user is explicitly starting the video
-            video.style.display = 'block';
-            video.play(); // Make sure the video plays
-            document.getElementById('skip-btn').style.display = 'block'; // Show skip button
-        } else { // If switch is OFF (intro disabled)
-            showMainContent();
-        }
-    }
-
-    // Skip video
-   function skipVideo() {
-    const video = document.getElementById('intro-video');
-    video.pause();
-    video.currentTime = 0;
-    showMainContent();
-}
-
-// Event listener for when video ends
-document.getElementById('intro-video').addEventListener('ended', function () {
-    showMainContent();
-});
-
-// Handle the intro toggle switch state
-const introToggle = document.getElementById('introToggle');
-
-// Load saved state from localStorage (default to OFF if not found)
-const savedIntroState = localStorage.getItem('introVideoEnabled');
-if (savedIntroState === null) {
-    introToggle.checked = false; // Default to OFF if no state is saved
-} else {
-    introToggle.checked = (savedIntroState === 'true');
-}
-
-// Save state when toggle changes
-introToggle.addEventListener('change', function() {
-    localStorage.setItem('introVideoEnabled', this.checked);
-    // If the user turns the toggle OFF while the video is playing, stop it and show content
-    if (!this.checked && document.getElementById('intro-video').style.display === 'block') {
-        skipVideo();
-    } else if (this.checked && document.getElementById('main-content').style.display === 'block') {
-        // If the user turns the toggle ON after main content is shown, hide main content and prepare video
-        document.getElementById('main-content').style.display = 'none';
-        document.getElementById('intro-video').style.display = 'block';
-        document.getElementById('skip-btn').style.display = 'block';
-        document.getElementById('intro-video').load(); // Reload video to ensure it's at the start
-        document.getElementById('intro-video').muted = true; // Keep muted until user explicitly plays or un-mutes
-    }
-});
-
-// --- NEW/MODIFIED LOGIC FOR IMMEDIATE DISPLAY ON LOAD ---
-// This part ensures that if the intro is toggled off, the main content shows immediately on page load.
-document.addEventListener('DOMContentLoaded', function() {
-    // If the intro is off by default or was set off by the user, show main content directly.
-    // This happens immediately when the page content is loaded.
-    if (!introToggle.checked) {
-        showMainContent();
-    } else {
-        // If intro is enabled, show the "Click to Launch" screen initially.
-        // The user will then click it to start the video.
-        document.getElementById('launch-screen').style.display = 'flex';
-        // Make sure video is hidden and muted until launched
-        document.getElementById('intro-video').style.display = 'none';
-        document.getElementById('intro-video').muted = true;
-    }
-});
-
-
-    // Load Tomorrow.io widget
-    (function (d, s, id) {
-      if (d.getElementById(id)) {
-        if (window.__TOMORROW__) {
-          window.__TOMORROW__.renderWidget();
-        }
-        return;
-      }
-      const fjs = d.getElementsByTagName(s)[0];
-      const js = d.createElement(s);
-      js.id = id;
-      js.src = "https://www.tomorrow.io/v1/widget/sdk/sdk.bundle.min.js";
-      fjs.parentNode.insertBefore(js, fjs);
-    })(document, 'script', 'tomorrow-sdk');
-  </script>
+    <script src="script.js"></script>
+    <script src="load-header.js"></script>
 </body>
 </html>
