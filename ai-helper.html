@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        html, body { 
+            height: 100%; 
+            width: 100%; 
+            overflow: hidden; 
+            background: #ffffff; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+
+        #chat-window { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            scroll-behavior: smooth;
+        }
+        
+        .message-wrapper { 
+            width: 100%; 
+            max-width: 750px; 
+            margin: 0 auto 20px auto; 
+            line-height: 1.6; 
+            font-size: 15px;
+        }
+        
+        .user-msg { font-weight: 600; color: #111; margin-bottom: 4px; padding-bottom: 5px; border-bottom: 1px solid #f9f9f9; }
+        .ai-msg { color: #374151; }
+        
+        .ai-msg a {
+            color: #10a37f;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 2px 6px;
+            background: rgba(16, 163, 127, 0.05);
+            border-radius: 6px;
+            border: 1px solid rgba(16, 163, 127, 0.1);
+            display: inline-block;
+        }
+
+        .ai-msg a:hover { background: #10a37f; color: #fff; }
+        
+        #input-area { border-top: 1px solid #f0f0f0; padding: 15px; background: #fff; }
+        .input-box { max-width: 750px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-end; position: relative; }
+        
+        textarea { 
+            flex: 1; border: 1px solid #e0e0e0; border-radius: 15px; padding: 12px 15px; 
+            resize: none; max-height: 150px; font-size: 15px; outline: none; background: #f9f9f9;
+        }
+        
+        button { 
+            background: #10a37f; color: white; border: none; border-radius: 12px; 
+            width: 42px; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        
+        button:disabled { background: #e0e0e0; }
+
+        #typing { 
+            position: absolute; top: -22px; left: 5px; font-size: 11px; 
+            color: #10a37f; font-weight: 600; display: none; 
+        }
+
+        .brand-footer { text-align: center; font-size: 10px; color: #bbb; padding-top: 8px; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="chat-window"></div>
+    <div id="input-area">
+        <div class="input-box">
+            <div id="typing">Praterich is indexing StenoKonnect...</div>
+            <textarea id="user-input" rows="1" placeholder="Search for a specific program or tool..."></textarea>
+            <button id="send-btn" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+        <div class="brand-footer">STENOIP COMPANY • STENOKONNECT NAVIGATOR v1.0</div>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://praterich.vercel.app/api/praterich";
+    
+    // Detailed list of all provided programs and links
+    const systemInstruction = `You are Praterich, the specialized AI navigator for StenoKonnect by Stenoip. 
+    A user will ask for a program; you must provide the exact link. 
+    
+    STENOKONNECT DIRECTORY:
+    - Desmos Calculator: https://stenoip.github.io/calculator-desmos.html
+    - TI-30XIIS: calculator_ti30xiis.html
+    - TI-84: calculator_ti84.html
+    - Kompmasine: kompmasine.html (Functions: kompmasine-functions.html)
+    - Draw Tool: draw.html
+    - Phone: phone.html
+    - Counter: count.html
+    - Bot: bot.html
+    - Box Model: box_model.html
+    - Camera: camera.html
+    - Windows XP Simulation: windows-xp-simulation.html
+    - StenoTOANSTIK Arcade: games/home.html
+    - StenoVids: video.html (Plus version: video_plus.html)
+    - FlappyBird: https://stenoip.github.io/games/flappybird.html
+    - StenoTetris: games/tetris.html
+    - 2048: games/2048.html
+    - Zuiz Quiz: quiz.html
+    - Talking Pet: pet.html
+    - StenoMedia: media.html
+    - StenoKomysk (Comic): comic.html
+    - Eggtastic Video: eggtastic.html
+    - SearXNG Instructions: searxng.html
+    - PHet Gravity Sim: my-solar-system_en.html
+    - Solar System Scope: space-map.html
+    - StenoFerkenne Maps: maps.html
+    - Clocker: clocker.html
+    - Compass: compass.html
+    - Testing Tool: testing.html
+    - Blog: blog.html
+    - Boublok (Blocks): boublok.html
+    - StenoTextbox: textbox.html
+    - Typoe PDF: typoe.html
+    - StenoGraphs: graphs.html
+    - Availability Scheduler: availability.html
+    - Bulk Renamer: bulk.html
+    - StenoCSV: csv.html
+    - StenoReady Checklist: office/job_readiness.html
+    - Invoice Generator: receipt.html
+    - StenoResume: resume.html
+    - Text Encryption/Decryption/Kanban/CopyPaste/Compresser: text_encryption.html
+    - StenoSlides (Warning: Danger Zone): slides.html
+    - Frog Crossing: https://stenoip.github.io/games/frog_krus
+    - Cow Game: https://stenoip.github.io/games/cow/cow-game
+    - Octogon Match: https://stenoip.github.io/games/octogon
+    - 106 Puzzle: https://editor.p5js.org/stenoip/full/cPRKm8bEP
+    - Worm: worm.html
+    - Word It!: https://stenoip.github.io/games/word
+    - Rock Paper Scissors: https://editor.p5js.org/stenoip/full/zcDTOPR4S
+    - Super Car Racer: https://editor.p5js.org/stenoip/full/w3eyrRJ1r
+    - Tilt Pong: https://editor.p5js.org/stenoip/full/4X27mOrBn
+
+    INSTRUCTIONS:
+    - Provide the direct link in Markdown format: [Tool Name](URL).
+    - If someone asks for "Calculators", list the TI-84, TI-30XIIS, and Desmos individually.
+    - If they ask for "StenoOffices", list the productivity tools.
+    - Be conversational but precise. Use metric. No Oxford commas.
+    
+    If they are bored. You must hook them in and be a salesman for Stenoip Company.
+    `;
+
+    const chatWindow = document.getElementById('chat-window');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const typing = document.getElementById('typing');
+
+    let messages = [{ role: "model", parts: [{ text: "Hey! I'm ready to help you find any program on StenoKonnect. What are you looking for?" }] }];
+
+    function renderMessage(text, role) {
+        const div = document.createElement('div');
+        div.className = 'message-wrapper';
+        div.innerHTML = `<div class="${role === 'user' ? 'user-msg' : 'ai-msg'}">${marked.parse(text)}</div>`;
+        chatWindow.appendChild(div);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    renderMessage(messages[0].parts[0].text, 'model');
+
+    userInput.addEventListener('input', () => {
+        sendBtn.disabled = !userInput.value.trim();
+        userInput.style.height = 'auto';
+        userInput.style.height = (userInput.scrollHeight) + 'px';
+    });
+
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        userInput.value = '';
+        userInput.style.height = 'auto';
+        sendBtn.disabled = true;
+
+        renderMessage(text, 'user');
+        messages.push({ role: "user", parts: [{ text }] });
+        typing.style.display = 'block';
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: messages,
+                    system_instruction: { parts: [{ text: systemInstruction }] }
+                })
+            });
+
+            const data = await response.json();
+            typing.style.display = 'none';
+
+            if (data.text) {
+                renderMessage(data.text, 'model');
+                messages.push({ role: "model", parts: [{ text: data.text }] });
+            }
+        } catch (error) {
+            typing.style.display = 'none';
+            renderMessage("Error finding that link. Try again!", 'model');
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+</script>
+
+</body>
+</html>
