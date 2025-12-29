@@ -1,1482 +1,373 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>StenoSlides</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="icon" href="/new-swc.png" type="image/png" />
-  <style>
-  /* ---------- Base / theme ---------- */
-  :root{
-    --accent:#0078d7;
-    --bg:#f3f3f3;
-    --text:#333;
-    --panel:#fff;
-    --muted:#888;
-    --border:#e0e0e0;
-    --soft:#f9f9f9;
-    --soft2:#f0f0f0;
-    --warn:#ff4d4d;
-    --thumb-bg:#fafafa;
-    --grid:#eaeaea;
-  }
-  *{box-sizing:border-box}
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg);
-    color: var(--text);
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StenoSlides - Stenoip Company</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <style>
+        :root { --office-blue: rgb(255,150,80); --ribbon-gray: #f3f2f1; --border-color: #edebe9; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #444; }
+        
+        /* Layout */
+        .app-container { display: grid; grid-template-rows: 30px auto 1fr; grid-template-columns: 220px 1fr; height: 100vh; }
+        .title-bar { grid-column: 1 / -1; background: var(--office-blue); color: #fff; padding: 5px 15px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Ribbon */
+        .ribbon { grid-column: 1 / -1; background: var(--ribbon-gray); border-bottom: 1px solid #ccc; z-index: 20; }
+        .ribbon-tabs { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
+        .tab-btn { padding: 8px 15px; border: none; background: none; cursor: pointer; font-size: 12px; }
+        .tab-btn.active { border-bottom: 3px solid var(--office-blue); font-weight: bold; }
+        .ribbon-content { display: none; padding: 5px 10px; align-items: center; overflow-x: auto; }
+        .ribbon-content.active { display: flex; }
+        .control-group { display: flex; flex-direction: column; align-items: center; border-right: 1px solid #ccc; padding: 0 10px; margin-right: 5px; height: 60px; justify-content: center; }
+        .group-label { font-size: 9px; color: #777; margin-top: 2px; }
+        .btn-tool { background: none; border: 1px solid transparent; padding: 4px; cursor: pointer; border-radius: 3px; font-size: 11px; display: flex; flex-direction: column; align-items: center; min-width: 50px; }
+        .btn-tool:hover { background: #d1d1d1; }
+        .btn-tool i { font-size: 16px; margin-bottom: 2px; color: var(--office-blue); }
 
-  /* ---------- Ribbon ---------- */
-  .ribbon-menu {
-    background-color: #fc6a60;
-    border-bottom: 1px solid var(--border);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    padding: 5px 15px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .tabs-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .tabs { display: flex; flex-wrap: wrap; }
-  .tab-button {
-    background-color: transparent;
-    border: none;
-    padding: 10px 15px;
-    font-size: 15px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
-    color: #555;
-    font-weight: 500;
-  }
-  .tab-button:hover { background-color: var(--soft2); }
-  .tab-button.active { border-color: var(--accent); color: var(--accent); }
-  .tell-me { display: flex; align-items: center; gap:8px }
-  .tell-me input {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    width: 260px;
-    transition: all 0.2s;
-  }
-  .tell-me input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.2);
-  }
-  .tab-panel {
-    display: none;
-    padding: 10px 0;
-    margin-top: 5px;
-  }
-  .tab-panel.active {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: flex-start;
-  }
-  .ribbon-group {
-    padding: 0 15px;
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    align-items: center;
-  }
-  .ribbon-group:last-child { border-right: none; }
-  .ribbon-group-title {
-    font-size: 11px;
-    color: var(--muted);
-    text-align: center;
-    margin-top: 5px;
-  }
-  .ribbon-group-items { display: flex; gap: 5px; flex-wrap: wrap; }
-  .ribbon-item, .icon-btn {
-    padding: 8px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: var(--soft);
-    font-size: 14px;
-    transition: background-color 0.2s, transform 0.1s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 34px;
-    gap:6px;
-  }
-  .ribbon-item:hover, .icon-btn:hover { background-color: #e9e9e9; }
-  .ribbon-item:active, .icon-btn:active { transform: scale(0.98); }
-  .ribbon-item.active { background-color: #d1e2f6; border-color: var(--accent); }
-  .theme-select, select, input[type="color"], input[type="number"] {
-    padding: 8px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background:#fff;
-  }
-  .spacer{width:10px}
+        /* Project Manager Sidebar */
+        .sidebar { grid-row: 3; grid-column: 1; background: #fff; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        .project-selector { padding: 10px; border-bottom: 2px solid var(--office-blue); background: #f9f9f9; }
+        .slide-list { flex-grow: 1; overflow-y: auto; padding: 10px; background: #eee; }
+        .slide-thumb { width: 100%; aspect-ratio: 16/9; background: white; border: 2px solid #ccc; margin-bottom: 10px; cursor: pointer; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .slide-thumb.active { border-color: var(--office-blue); box-shadow: 0 0 8px var(--office-blue); }
 
-  /* ---------- App layout ---------- */
-  .app {
-    display: grid;
-    grid-template-columns: 240px 1fr 320px;
-    grid-template-rows: auto 1fr;
-    gap: 0;
-    min-height: calc(100vh - 120px);
-  }
-  .sidebar {
-    background: var(--panel);
-    border-right:1px solid var(--border);
-    display:flex;
-    flex-direction:column;
-    min-height: 0;
-  }
-  .thumbs-header{
-    padding:10px;
-    border-bottom:1px solid var(--border);
-    display:flex;align-items:center;justify-content:space-between
-  }
-  .thumbnails {
-    overflow:auto;
-    padding:10px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    background:#fff;
-  }
-  .thumb {
-    background: var(--thumb-bg);
-    border:1px solid #ddd;
-    border-radius:6px;
-    padding:8px;
-    cursor:grab;
-    position:relative;
-  }
-  .thumb-number{
-    position:absolute;left:6px;top:4px;font-size:12px;color:#666;
-    background:#fff;border:1px solid #ddd;border-radius:3px;padding:1px 4px;
-  }
-  .thumb.active{ outline:2px solid var(--accent) }
-  .thumb-canvas{
-    width: 160px; height: 90px; background:#fff; position:relative; overflow:hidden;
-  }
-  .thumb-title{
-    margin-top:6px;font-size:12px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-  }
+        /* Canvas Area */
+        .workspace { grid-row: 3; grid-column: 2; display: flex; justify-content: center; align-items: center; position: relative; overflow: auto; }
+        .canvas-container { box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: transform 0.3s; }
 
-  .stage {
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background: var(--bg);
-    min-height: 0;
-    position:relative;
-    overflow:auto;
-  }
-  .stage-toolbar{
-    position:absolute; top:10px; left:50%; transform:translateX(-50%);
-    display:flex; gap:6px; background:rgba(255,255,255,0.9); backdrop-filter: blur(6px);
-    border:1px solid #ddd; border-radius:8px; padding:6px 8px; z-index:5;
-  }
-  .zoom-indicator{font-size:12px;color:#555; padding:0 6px}
-  .slide-wrapper{
-    background: #fff;
-    border:1px solid #ccc;
-    box-shadow: 0 6px 26px rgba(0,0,0,0.12);
-    position: relative;
-    width: 1280px; height: 720px; /* 16:9 */
-    transform-origin: top left;
-  }
-  .slide-grid{
-    position:absolute; inset:0; background-image:
-      linear-gradient(to right, transparent 0, transparent 19px, var(--grid) 20px),
-      linear-gradient(to bottom, transparent 0, transparent 19px, var(--grid) 20px);
-    background-size: 20px 20px;
-    opacity:.6; pointer-events:none;
-  }
-  .slide {
-    position: absolute; inset:0; overflow:hidden; background-size:cover; background-position:center;
-  }
-  .selection-box{
-    position:absolute; border:1px dashed var(--accent); background: rgba(0,120,215,0.08); display:none; z-index:9;
-  }
-
-  .rightbar {
-    background: var(--panel);
-    border-left:1px solid var(--border);
-    display:flex; flex-direction:column; min-height:0;
-  }
-  .panel {
-    padding:12px;
-    border-bottom:1px solid var(--border);
-  }
-  .panel h3{
-    margin:0 0 8px 0; font-size:14px; color:#444
-  }
-  .panel .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px }
-  .panel label{ font-size:12px; color:#555; min-width:90px }
-
-  /* ---------- Elements ---------- */
-  .el { position:absolute; outline:none; user-select:contain; }
-  .el[contenteditable="true"]{ cursor:text }
-  .box { border:1px solid transparent; }
-  .selected { outline:2px solid var(--accent) !important; }
-  .locked { pointer-events:none; }
-  .handle {
-    width:9px; height:9px; background:#fff; border:1px solid #333;
-    position:absolute; z-index:3;
-  }
-  .handle.tl{left:-6px; top:-6px; cursor:nwse-resize}
-  .handle.tr{right:-6px; top:-6px; cursor:nesw-resize}
-  .handle.bl{left:-6px; bottom:-6px; cursor:nesw-resize}
-  .handle.br{right:-6px; bottom:-6px; cursor:nwse-resize}
-  .handle.ml{left:-6px; top:50%; transform:translateY(-50%); cursor:ew-resize}
-  .handle.mr{right:-6px; top:50%; transform:translateY(-50%); cursor:ew-resize}
-  .handle.mt{top:-6px; left:50%; transform:translateX(-50%); cursor:ns-resize}
-  .handle.mb{bottom:-6px; left:50%; transform:translateX(-50%); cursor:ns-resize}
-  .rotate{
-    position:absolute; top:-28px; left:50%; transform:translateX(-50%);
-    width:14px; height:14px; border:1px solid #333; border-radius:50%; background:#fff; cursor:grab;
-  }
-
-  /* ---------- Draw canvas ---------- */
-  #drawing-canvas {
-    position: absolute;
-    top: 0; left: 0;
-    z-index: 10;
-    pointer-events: none;
-  }
-  .drawing-canvas-active { cursor: crosshair; pointer-events: auto !important; }
-
-  /* ---------- Presenter ---------- */
-  .presenter {
-    position:fixed; inset:0; background:#000; color:#fff; display:none; align-items:center; justify-content:center;
-  }
-  .presenter .slide-present {
-    width:90vw; height:50.6vw; max-height:90vh; max-width:160vh;
-    background:#000; position:relative; overflow:hidden;
-  }
-  .presenter .notes {
-    position:fixed; left:20px; bottom:20px; font-size:14px; color:#ddd; max-width:40vw; opacity:.9
-  }
-
-  /* ---------- Themes ---------- */
-  .theme-default {}
-  .theme-dark .slide { background-color:#111; color:#eee }
-  .theme-dark .el { color:#eee }
-  .theme-minimal .slide { background-color:#fff; color:#222 }
-
-  /* ---------- Utility ---------- */
-  .hidden{display:none !important}
-  .muted{color:#666}
-  .hr{height:1px; background:var(--border); margin:6px 0}
-  .small{font-size:12px}
-  </style>
+        /* Fullscreen Presentation */
+        canvas:-webkit-full-screen { width: 100vw !important; height: 100vh !important; }
+        
+        #mediaInput { display: none; }
+    </style>
 </head>
 <body>
-  <div class="ribbon-menu">
-    <div class="tabs-container">
-      <div class="tabs">
-        <button class="tab-button active" data-tab="home">Home</button>
-        <button class="tab-button" data-tab="insert">Insert</button>
-        <button class="tab-button" data-tab="design">Design</button>
-        <button class="tab-button" data-tab="view">View</button>
-        <button class="tab-button" data-tab="draw">Draw</button>
-      </div>
-      <div class="tell-me">
-        <input id="command-palette" type="text" placeholder="Tell me what you want to do…" />
-      </div>
+
+<div class="app-container">
+    <div class="title-bar">
+        <span><i class="fas fa-layer-group"></i> <strong id="projNameDisplay">StenoSlides</strong></span>
+        <span>Shortcuts: [Del] Delete, [Ctrl+S] Save, [N] New Slide, [F5] Present</span>
     </div>
 
-    <div class="tab-panel active" id="tab-home">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-new-slide">New slide</button>
-          <button class="ribbon-item" id="btn-dup-slide">Duplicate</button>
-          <button class="ribbon-item" id="btn-del-slide">Delete</button>
+    <div class="ribbon">
+        <div class="ribbon-tabs">
+            <button class="tab-btn active" onclick="switchTab('home')">Home</button>
+            <button class="tab-btn" onclick="switchTab('insert')">Insert</button>
+            <button class="tab-btn" onclick="switchTab('design')">Design</button>
+            <button class="tab-btn" onclick="switchTab('projects')">File / Projects</button>
         </div>
-        <div class="ribbon-group-title">Slides</div>
-      </div>
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-align-left">Align L</button>
-          <button class="ribbon-item" id="btn-align-center">Align C</button>
-          <button class="ribbon-item" id="btn-align-right">Align R</button>
-          <div class="spacer"></div>
-          <button class="ribbon-item" id="btn-align-top">Align T</button>
-          <button class="ribbon-item" id="btn-align-middle">Align M</button>
-          <button class="ribbon-item" id="btn-align-bottom">Align B</button>
+
+        <div id="tab-home" class="ribbon-content active">
+            <div class="control-group">
+                <button class="btn-tool" onclick="addNewSlide()"><i class="fas fa-plus"></i>New Slide</button>
+                <span class="group-label">Slides</span>
+            </div>
+            <div class="control-group">
+                <div style="display:flex; gap:3px;">
+                    <button class="btn-tool" onclick="execCmd('bold')" title="Bold"><i class="fas fa-bold"></i></button>
+                    <button class="btn-tool" onclick="execCmd('italic')" title="Italic"><i class="fas fa-italic"></i></button>
+                    <input type="color" id="fontColor" onchange="changeSelectionColor(this.value)" style="width:30px;height:30px;border:none;cursor:pointer">
+                </div>
+                <span class="group-label">Formatting</span>
+            </div>
+            <div class="control-group">
+                <button class="btn-tool" onclick="deleteObject()"><i class="fas fa-trash"></i>Delete</button>
+                <span class="group-label">Modify</span>
+            </div>
         </div>
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-distribute-h">Distribute H</button>
-          <button class="ribbon-item" id="btn-distribute-v">Distribute V</button>
+
+        <div id="tab-insert" class="ribbon-content">
+            <button class="btn-tool" onclick="addTextbox()"><i class="fas fa-font"></i>Text</button>
+            <button class="btn-tool" onclick="addShape('rect')"><i class="far fa-square"></i>Rect</button>
+            <button class="btn-tool" onclick="addShape('circle')"><i class="far fa-circle"></i>Circle</button>
+            <button class="btn-tool" onclick="triggerMedia()"><i class="fas fa-photo-video"></i>Media</button>
+            <input type="file" id="mediaInput" accept="image/*,video/mp4" onchange="handleMediaUpload(event)">
         </div>
-        <div class="ribbon-group-title">Arrange</div>
-      </div>
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-bring-front">Bring front</button>
-          <button class="ribbon-item" id="btn-send-back">Send back</button>
-          <button class="ribbon-item" id="btn-group">Group</button>
-          <button class="ribbon-item" id="btn-ungroup">Ungroup</button>
-          <button class="ribbon-item" id="btn-lock">Lock</button>
-          <button class="ribbon-item" id="btn-unlock">Unlock</button>
+
+        <div id="tab-design" class="ribbon-content">
+            <div class="control-group">
+                <input type="color" id="slideColor" onchange="changeSlideColor(this.value)" style="width:40px;height:30px;">
+                <span class="group-label">Slide Background</span>
+            </div>
         </div>
-        <div class="ribbon-group-title">Order</div>
-      </div>
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-undo">Undo</button>
-          <button class="ribbon-item" id="btn-redo">Redo</button>
-          <button class="ribbon-item" id="btn-export">Export</button>
-          <button class="ribbon-item" id="btn-import">Import</button>
-          <input type="file" id="import-file" class="hidden" accept="application/json" />
+
+        <div id="tab-projects" class="ribbon-content">
+            <div class="control-group">
+                <select id="projectSelect" onchange="switchProject(this.value)" style="padding:4px;"></select>
+                <span class="group-label">Switch Project</span>
+            </div>
+            <button class="btn-tool" onclick="createNewProject()"><i class="fas fa-file-medical"></i>New Project</button>
+            <button class="btn-tool" onclick="deleteCurrentProject()" style="color:red;"><i class="fas fa-folder-minus"></i>Delete Project</button>
+            <button class="btn-tool" onclick="enterPresentMode()"><i class="fas fa-play"></i>Present (F5)</button>
         </div>
-        <div class="ribbon-group-title">History & IO</div>
-      </div>
     </div>
 
-    <div class="tab-panel" id="tab-insert">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-insert-title">Title</button>
-          <button class="ribbon-item" id="btn-insert-text">Text box</button>
-          <button class="ribbon-item" id="btn-insert-rect">Rectangle</button>
-          <button class="ribbon-item" id="btn-insert-ellipse">Ellipse</button>
-          <button class="ribbon-item" id="btn-insert-image">Image URL</button>
+    <div class="sidebar">
+        <div class="project-selector">
+            <small>Current Slides</small>
         </div>
-        <div class="ribbon-group-title">Elements</div>
-      </div>
+        <div class="slide-list" id="slide-sorter"></div>
     </div>
 
-    <div class="tab-panel" id="tab-design">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <select id="theme-select" class="theme-select">
-            <option value="theme-default">Default</option>
-            <option value="theme-dark">Dark</option>
-            <option value="theme-minimal">Minimal</option>
-          </select>
-          <button class="ribbon-item" id="btn-bg-image">Set background image</button>
-          <button class="ribbon-item" id="btn-bg-clear">Clear background</button>
-        </div>
-        <div class="ribbon-group-title">Theme</div>
-      </div>
+    <div class="workspace" id="presentation-area" onclick="handlePresentationClick()">
+        <canvas id="mainCanvas"></canvas>
     </div>
-
-    <div class="tab-panel" id="tab-view">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-zoom-in">Zoom +</button>
-          <button class="ribbon-item" id="btn-zoom-out">Zoom −</button>
-          <button class="ribbon-item" id="btn-zoom-fit">Fit</button>
-          <span class="zoom-indicator" id="zoom-indicator">100%</span>
-        </div>
-        <div class="ribbon-group-title">Zoom</div>
-      </div>
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-grid-toggle">Toggle grid</button>
-          <label class="ribbon-item">Snap <input type="checkbox" id="snap-toggle" checked /></label>
-        </div>
-        <div class="ribbon-group-title">Grid & snap</div>
-      </div>
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-present">Presenter</button>
-        </div>
-        <div class="ribbon-group-title">Present</div>
-      </div>
-    </div>
-
-    <div class="tab-panel" id="tab-draw">
-      <div class="ribbon-group">
-        <div class="ribbon-group-items">
-          <button class="ribbon-item" id="btn-draw-toggle">Draw mode</button>
-          <input type="color" id="draw-color" value="#ff0000" />
-          <input type="number" id="draw-width" min="1" max="24" value="3" />
-          <button class="ribbon-item" id="btn-draw-clear">Clear strokes</button>
-        </div>
-        <div class="ribbon-group-title">Freehand</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="app theme-default" id="app">
-    <aside class="sidebar">
-      <div class="thumbs-header">
-        <div><strong>Slides</strong></div>
-        <div class="small muted" id="slides-count">0</div>
-      </div>
-      <div class="thumbnails" id="thumbnails"></div>
-    </aside>
-
-    <main class="stage" id="stage">
-      <div class="stage-toolbar">
-        <span class="small muted">Hold Space to pan • Shift to constrain • Cmd/Ctrl+wheel to zoom</span>
-      </div>
-      <div class="slide-wrapper" id="slide-wrapper">
-        <div class="slide-grid" id="slide-grid"></div>
-        <div class="slide" id="slide"></div>
-        <canvas id="drawing-canvas" width="1280" height="720"></canvas>
-        <div class="selection-box" id="selection-box"></div>
-      </div>
-    </main>
-
-    <aside class="rightbar">
-      <div class="panel">
-        <h3>Element</h3>
-        <div class="row"><label>ID</label><div id="prop-id" class="small muted">—</div></div>
-        <div class="row"><label>X</label><input type="number" id="prop-x" /></div>
-        <div class="row"><label>Y</label><input type="number" id="prop-y" /></div>
-        <div class="row"><label>W</label><input type="number" id="prop-w" /></div>
-        <div class="row"><label>H</label><input type="number" id="prop-h" /></div>
-        <div class="row"><label>Rotate</label><input type="number" id="prop-rot" /></div>
-        <div class="row"><label>Fill</label><input type="color" id="prop-fill" /></div>
-        <div class="row"><label>Stroke</label><input type="color" id="prop-stroke" /></div>
-        <div class="row"><label>Stroke px</label><input type="number" id="prop-stroke-w" min="0" value="1"/></div>
-        <div class="row"><label>Opacity</label><input type="number" id="prop-opacity" min="0" max="1" step="0.05" value="1"/></div>
-        <div class="row"><label>Font</label>
-          <select id="prop-font">
-            <option>Segoe UI</option><option>Inter</option><option>Arial</option>
-            <option>Georgia</option><option>Monaco</option>
-          </select>
-        </div>
-        <div class="row"><label>Size</label><input type="number" id="prop-font-size" min="8" value="28"/></div>
-        <div class="row"><label>Weight</label>
-          <select id="prop-font-weight">
-            <option value="400">Normal</option><option value="600">Semi</option><option value="700">Bold</option>
-          </select>
-        </div>
-        <div class="row"><label>Align</label>
-          <select id="prop-text-align">
-            <option>left</option><option>center</option><option>right</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>Slide</h3>
-        <div class="row"><label>Title</label><input type="text" id="slide-title-input" placeholder="Slide title"/></div>
-        <div class="row"><label>Notes</label><input type="text" id="slide-notes-input" placeholder="Speaker notes"/></div>
-        <div class="row"><label>BG color</label><input type="color" id="slide-bg-color" value="#ffffff"/></div>
-      </div>
-    </aside>
-  </div>
-
-  <div class="presenter" id="presenter">
-    <div class="slide-present" id="presenter-slide"></div>
-    <div class="notes" id="presenter-notes"></div>
-  </div>
-
-  <script>
-    // StenoSlides — minimal-yet-advanced slide editor
-(() => {
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-  const uid = () => Math.random().toString(36).slice(2, 9);
-
-  // DOM refs
-  const app = $('#app');
-  const slideWrapper = $('#slide-wrapper');
-  const slideEl = $('#slide');
-  const gridEl = $('#slide-grid');
-  const thumbnails = $('#thumbnails');
-  const slidesCount = $('#slides-count');
-  const selectionBox = $('#selection-box');
-  const presenter = $('#presenter');
-  const presenterSlide = $('#presenter-slide');
-  const presenterNotes = $('#presenter-notes');
-  const drawingCanvas = /** @type {HTMLCanvasElement} */ ($('#drawing-canvas'));
-  const dctx = drawingCanvas.getContext('2d');
-
-  // Props panel refs
-  const prop = {
-    id: $('#prop-id'), x: $('#prop-x'), y: $('#prop-y'),
-    w: $('#prop-w'), h: $('#prop-h'), rot: $('#prop-rot'),
-    fill: $('#prop-fill'), stroke: $('#prop-stroke'), strokeW: $('#prop-stroke-w'),
-    opacity: $('#prop-opacity'), font: $('#prop-font'), fontSize: $('#prop-font-size'),
-    fontWeight: $('#prop-font-weight'), textAlign: $('#prop-text-align')
-  };
-  const slideInputs = {
-    title: $('#slide-title-input'),
-    notes: $('#slide-notes-input'),
-    bgColor: $('#slide-bg-color')
-  };
-
-  const ui = {
-    themeSelect: $('#theme-select'),
-    zoomIndicator: $('#zoom-indicator'),
-    snapToggle: $('#snap-toggle')
-  };
-
-  // Ribbon buttons
-  const btn = id => document.getElementById(id);
-  const B = {
-    newSlide: btn('btn-new-slide'),
-    dupSlide: btn('btn-dup-slide'),
-    delSlide: btn('btn-del-slide'),
-    alignLeft: btn('btn-align-left'),
-    alignCenter: btn('btn-align-center'),
-    alignRight: btn('btn-align-right'),
-    alignTop: btn('btn-align-top'),
-    alignMiddle: btn('btn-align-middle'),
-    alignBottom: btn('btn-align-bottom'),
-    distH: btn('btn-distribute-h'),
-    distV: btn('btn-distribute-v'),
-    bringFront: btn('btn-bring-front'),
-    sendBack: btn('btn-send-back'),
-    group: btn('btn-group'),
-    ungroup: btn('btn-ungroup'),
-    lock: btn('btn-lock'),
-    unlock: btn('btn-unlock'),
-    undo: btn('btn-undo'),
-    redo: btn('btn-redo'),
-    export: btn('btn-export'),
-    import: btn('btn-import'),
-    importFile: /** @type {HTMLInputElement} */ (btn('import-file')),
-    insertTitle: btn('btn-insert-title'),
-    insertText: btn('btn-insert-text'),
-    insertRect: btn('btn-insert-rect'),
-    insertEllipse: btn('btn-insert-ellipse'),
-    insertImage: btn('btn-insert-image'),
-    bgImage: btn('btn-bg-image'),
-    bgClear: btn('btn-bg-clear'),
-    zoomIn: btn('btn-zoom-in'),
-    zoomOut: btn('btn-zoom-out'),
-    zoomFit: btn('btn-zoom-fit'),
-    gridToggle: btn('btn-grid-toggle'),
-    present: btn('btn-present'),
-    drawToggle: btn('btn-draw-toggle'),
-    drawClear: btn('btn-draw-clear'),
-    drawColor: /** @type {HTMLInputElement} */ (btn('draw-color')),
-    drawWidth: /** @type {HTMLInputElement} */ (btn('draw-width'))
-  };
-
-  // Tabs
-  $$('.tab-button').forEach(t => {
-    t.addEventListener('click', () => {
-      $$('.tab-button').forEach(b => b.classList.remove('active'));
-      t.classList.add('active');
-      const tab = t.dataset.tab;
-      $$('.tab-panel').forEach(p => p.classList.remove('active'));
-      $('#tab-' + tab).classList.add('active');
-    });
-  });
-
-  // State
-  const initialSlide = () => ({
-    id: uid(),
-    title: 'Untitled',
-    notes: '',
-    bgColor: '#ffffff',
-    bgImage: '',
-    elements: [],
-    zCounter: 1,
-    strokes: []
-  });
-
-  const state = {
-    slides: [initialSlide()],
-    currentIndex: 0,
-    selection: new Set(), // element ids
-    zoom: 1,
-    isGridVisible: true,
-    snap: true,
-    pan: { active: false, x: 0, y: 0, startX: 0, startY: 0 },
-    history: [],
-    future: [],
-    drawing: { active: false, color: '#ff0000', width: 3, currentPath: [] }
-  };
-
-  // Persistence
-  const save = () => {
-    localStorage.setItem('stenoslides', JSON.stringify({
-      slides: state.slides,
-      currentIndex: state.currentIndex
-    }));
-  };
-  const load = () => {
-    const raw = localStorage.getItem('stenoslides');
-    if (!raw) return;
-    try {
-      const data = JSON.parse(raw);
-      if (Array.isArray(data.slides) && data.slides.length) {
-        state.slides = data.slides;
-        state.currentIndex = Math.min(data.currentIndex ?? 0, state.slides.length - 1);
-      }
-    } catch {}
-  };
-
-  // History
-  const snapshot = () => JSON.stringify(state.slides);
-  const pushHistory = () => {
-    state.history.push(snapshot());
-    state.future = [];
-    if (state.history.length > 50) state.history.shift();
-  };
-  const undo = () => {
-    const prev = state.history.pop();
-    if (!prev) return;
-    state.future.push(snapshot());
-    state.slides = JSON.parse(prev);
-    renderAll();
-  };
-  const redo = () => {
-    const next = state.future.pop();
-    if (!next) return;
-    state.history.push(snapshot());
-    state.slides = JSON.parse(next);
-    renderAll();
-  };
-
-  // Utilities
-  const currentSlide = () => state.slides[state.currentIndex];
-  const getEl = (id) => currentSlide().elements.find(e => e.id === id);
-  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-  const snapV = (v) => state.snap ? Math.round(v / 5) * 5 : v;
-
-  const setTheme = (cls) => {
-    app.classList.remove('theme-default', 'theme-dark', 'theme-minimal');
-    app.classList.add(cls);
-  };
-
-  // Rendering
-  function renderAll() {
-    renderSlide();
-    renderThumbs();
-    renderPropsPanel();
-    save();
-  }
-
-  function renderSlide() {
-    const s = currentSlide();
-    slidesCount.textContent = String(state.slides.length);
-    slideEl.style.backgroundColor = s.bgColor || '#fff';
-    slideEl.style.backgroundImage = s.bgImage ? `url(${s.bgImage})` : 'none';
-    slideEl.innerHTML = ''; // clear
-
-    // draw elements
-    s.elements.forEach(el => {
-      const node = document.createElement(el.tag === 'img' ? 'img' : 'div');
-      node.className = `el box`;
-      node.dataset.id = el.id;
-      node.style.left = el.x + 'px';
-      node.style.top = el.y + 'px';
-      node.style.width = el.w + 'px';
-      node.style.height = el.h + 'px';
-      node.style.position = 'absolute';
-      node.style.opacity = (el.opacity ?? 1);
-      node.style.transform = `rotate(${el.rotate || 0}deg)`;
-      node.style.zIndex = String(el.z || 1);
-      if (el.locked) node.classList.add('locked');
-
-      if (el.type === 'rect') {
-        node.style.background = el.fill || '#dddddd';
-        node.style.border = `${el.strokeW || 1}px solid ${el.stroke || '#333'}`;
-        node.style.borderRadius = (el.radius || 0) + 'px';
-      } else if (el.type === 'ellipse') {
-        node.style.background = el.fill || '#dddddd';
-        node.style.border = `${el.strokeW || 1}px solid ${el.stroke || '#333'}`;
-        node.style.borderRadius = '9999px';
-      } else if (el.type === 'text') {
-        node.contentEditable = 'true';
-        node.style.padding = '8px';
-        node.style.color = el.fill || '#222';
-        node.style.border = `${el.strokeW || 0}px solid ${el.stroke || 'transparent'}`;
-        node.style.fontFamily = el.font || 'Segoe UI, sans-serif';
-        node.style.fontSize = (el.fontSize || 28) + 'px';
-        node.style.fontWeight = el.fontWeight || '400';
-        node.style.textAlign = el.textAlign || 'left';
-        node.innerHTML = el.html || 'Double-click to edit';
-      } else if (el.type === 'img') {
-        node.setAttribute('src', el.src || '');
-        node.style.objectFit = 'cover';
-      }
-
-      // selection UI
-      if (state.selection.has(el.id)) node.classList.add('selected');
-      addHandles(node, el);
-
-      // events
-      attachElEvents(node, el);
-      slideEl.appendChild(node);
-    });
-
-    // strokes
-    redrawStrokes();
-
-    // grid visibility
-    gridEl.style.display = state.isGridVisible ? 'block' : 'none';
-  }
-
-  function renderThumbs() {
-    thumbnails.innerHTML = '';
-    state.slides.forEach((s, i) => {
-      const th = document.createElement('div');
-      th.className = `thumb ${i === state.currentIndex ? 'active' : ''}`;
-      th.draggable = true;
-      th.dataset.index = String(i);
-      const num = document.createElement('div');
-      num.className = 'thumb-number';
-      num.textContent = String(i + 1);
-      const tc = document.createElement('div');
-      tc.className = 'thumb-canvas';
-      const tt = document.createElement('div');
-      tt.className = 'thumb-title';
-      tt.textContent = s.title || 'Untitled';
-
-      // lightweight preview: background color only
-      tc.style.background = s.bgColor || '#fff';
-      if (s.bgImage) tc.style.backgroundImage = `url(${s.bgImage})`;
-      tc.style.backgroundSize = 'cover';
-      tc.style.backgroundPosition = 'center';
-
-      th.append(num, tc, tt);
-      th.addEventListener('click', () => { state.currentIndex = i; state.selection.clear(); renderAll(); });
-      th.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', String(i)));
-      th.addEventListener('dragover', e => e.preventDefault());
-      th.addEventListener('drop', e => {
-        e.preventDefault();
-        const from = +e.dataTransfer.getData('text/plain');
-        const to = i;
-        if (from === to) return;
-        pushHistory();
-        const sp = state.slides.splice(from, 1)[0];
-        state.slides.splice(to, 0, sp);
-        state.currentIndex = to;
-        renderAll();
-      });
-      thumbnails.appendChild(th);
-    });
-  }
-
-  function renderPropsPanel() {
-    const ids = [...state.selection];
-    if (ids.length !== 1) {
-      prop.id.textContent = ids.length ? `${ids.length} selected` : '—';
-      for (const k of ['x','y','w','h','rot','fill','stroke','strokeW','opacity','font','fontSize','fontWeight','textAlign']) {
-        prop[k].value = '';
-      }
-      slideInputs.title.value = currentSlide().title || '';
-      slideInputs.notes.value = currentSlide().notes || '';
-      slideInputs.bgColor.value = currentSlide().bgColor || '#ffffff';
-      return;
-    }
-    const el = getEl(ids[0]);
-    prop.id.textContent = el.id;
-    prop.x.value = el.x ?? 0;
-    prop.y.value = el.y ?? 0;
-    prop.w.value = el.w ?? 100;
-    prop.h.value = el.h ?? 60;
-    prop.rot.value = el.rotate ?? 0;
-    prop.fill.value = el.fill || '#000000';
-    prop.stroke.value = el.stroke || '#000000';
-    prop.strokeW.value = el.strokeW ?? 1;
-    prop.opacity.value = el.opacity ?? 1;
-    prop.font.value = el.font || 'Segoe UI';
-    prop.fontSize.value = el.fontSize ?? 28;
-    prop.fontWeight.value = el.fontWeight ?? '400';
-    prop.textAlign.value = el.textAlign ?? 'left';
-
-    slideInputs.title.value = currentSlide().title || '';
-    slideInputs.notes.value = currentSlide().notes || '';
-    slideInputs.bgColor.value = currentSlide().bgColor || '#ffffff';
-  }
-
-  // Element UI
-  function addHandles(node, el) {
-    if (!state.selection.has(el.id) || el.locked) return;
-    ['tl','tr','bl','br','ml','mr','mt','mb'].forEach(p => {
-      const h = document.createElement('div');
-      h.className = `handle ${p}`;
-      node.appendChild(h);
-    });
-    const rot = document.createElement('div');
-    rot.className = 'rotate';
-    node.appendChild(rot);
-  }
-
-  function attachElEvents(node, el) {
-    node.addEventListener('pointerdown', onPointerDownEl);
-    node.addEventListener('dblclick', e => {
-      e.stopPropagation();
-      if (el.type === 'text') {
-        node.contentEditable = 'true';
-        node.focus();
-        document.execCommand('selectAll', false, null);
-      }
-    });
-    node.addEventListener('input', () => {
-      if (el.type === 'text') {
-        el.html = node.innerHTML;
-        save();
-      }
-    });
-  }
-
-  // Insertions
-  function addText(preset='Text') {
-    pushHistory();
-    const s = currentSlide();
-    const id = uid();
-    s.elements.push({
-      id, type:'text', tag:'div',
-      x: 100, y: 100, w: 480, h: 80, rotate: 0, opacity: 1,
-      fill: '#222', stroke:'transparent', strokeW:0,
-      font: 'Segoe UI, sans-serif', fontSize: preset==='Title' ? 48 : 28, fontWeight: preset==='Title' ? '700' : '400',
-      textAlign:'left', html: preset
-    });
-    state.selection = new Set([id]);
-    renderAll();
-  }
-
-  function addRect() {
-    pushHistory();
-    const id = uid();
-    currentSlide().elements.push({
-      id, type:'rect', tag:'div', x: 160, y: 160, w: 240, h: 140,
-      fill:'#e6f2ff', stroke:'#0078d7', strokeW:2, rotate:0, opacity:1, radius:8, z: ++currentSlide().zCounter
-    });
-    state.selection = new Set([id]);
-    renderAll();
-  }
-
-  function addEllipse() {
-    pushHistory();
-    const id = uid();
-    currentSlide().elements.push({
-      id, type:'ellipse', tag:'div', x: 420, y: 240, w: 180, h: 180,
-      fill:'#ffe6e6', stroke:'#ff4d4d', strokeW:2, rotate:0, opacity:1, z: ++currentSlide().zCounter
-    });
-    state.selection = new Set([id]);
-    renderAll();
-  }
-
-  async function addImageByURL() {
-    const url = prompt('Image URL');
-    if (!url) return;
-    pushHistory();
-    const id = uid();
-    currentSlide().elements.push({
-      id, type:'img', tag:'img', x: 200, y: 150, w: 400, h: 240,
-      src: url, rotate:0, opacity:1, z: ++currentSlide().zCounter
-    });
-    state.selection = new Set([id]);
-    renderAll();
-  }
-
-  // Slide management
-  function newSlide() {
-    pushHistory();
-    state.slides.splice(state.currentIndex + 1, 0, initialSlide());
-    state.currentIndex++;
-    state.selection.clear();
-    renderAll();
-  }
-  function dupSlide() {
-    pushHistory();
-    const s = JSON.parse(JSON.stringify(currentSlide()));
-    s.id = uid();
-    s.title = s.title + ' (copy)';
-    s.elements.forEach(e => e.id = uid());
-    state.slides.splice(state.currentIndex + 1, 0, s);
-    state.currentIndex++;
-    state.selection.clear();
-    renderAll();
-  }
-  function delSlide() {
-    if (state.slides.length === 1) return;
-    pushHistory();
-    state.slides.splice(state.currentIndex, 1);
-    state.currentIndex = clamp(state.currentIndex, 0, state.slides.length - 1);
-    state.selection.clear();
-    renderAll();
-  }
-
-  // Selection & transform
-  let dragCtx = null;
-
-  function elFromEventTarget(target) {
-    const node = target.closest('.el');
-    if (!node) return null;
-    const id = node.dataset.id;
-    return { node, el: getEl(id) };
-  }
-
-  function onPointerDownEl(e) {
-    const info = elFromEventTarget(e.target);
-    if (!info) return;
-    const { node, el } = info;
-    if (el.locked) return;
-
-    e.preventDefault();
-    node.setPointerCapture(e.pointerId);
-
-    const isHandle = e.target.classList.contains('handle');
-    const isRotate = e.target.classList.contains('rotate');
-
-    // selection logic
-    if (!e.shiftKey && !state.selection.has(el.id)) {
-      state.selection = new Set([el.id]);
-    } else if (e.shiftKey && state.selection.has(el.id)) {
-      state.selection.delete(el.id);
-    } else if (e.shiftKey) {
-      state.selection.add(el.id);
-    }
-
-    const selEls = [...state.selection].map(getEl);
-    const start = { x: e.clientX, y: e.clientY };
-    const rect = slideWrapper.getBoundingClientRect();
-    const offsetStage = { x: rect.left, y: rect.top };
-    const originals = selEls.map(o => ({ id:o.id, x:o.x, y:o.y, w:o.w, h:o.h, rotate:o.rotate||0 }));
-
-    dragCtx = { mode: isRotate ? 'rotate' : isHandle ? 'resize' : 'move', handle: e.target.classList[1], start, originals, offsetStage };
-    document.addEventListener('pointermove', onPointerMoveEl);
-    document.addEventListener('pointerup', onPointerUpEl);
-
-    renderAll();
-  }
-
-  function onPointerMoveEl(e) {
-    if (!dragCtx) return;
-    const sel = [...state.selection].map(getEl);
-    const s = currentSlide();
-    const dx = (e.clientX - dragCtx.start.x) / state.zoom;
-    const dy = (e.clientY - dragCtx.start.y) / state.zoom;
-
-    if (dragCtx.mode === 'move') {
-      sel.forEach((o, i) => {
-        const src = dragCtx.originals[i];
-        o.el.x = snapV(src.x + dx);
-        o.el.y = snapV(src.y + dy);
-      });
-    } else if (dragCtx.mode === 'resize' && sel.length === 1) {
-      const { el } = sel[0];
-      const src = dragCtx.originals[0];
-      let x = src.x, y = src.y, w = src.w, h = src.h;
-      const handle = dragCtx.handle;
-      const fx = (delta) => state.snap ? Math.round(delta / 5) * 5 : delta;
-
-      if (handle.includes('r')) { w = fx(src.w + dx); }
-      if (handle.includes('l')) { x = fx(src.x + dx); w = fx(src.w - dx); }
-      if (handle.includes('b')) { h = fx(src.h + dy); }
-      if (handle.includes('t')) { y = fx(src.y + dy); h = fx(src.h - dy); }
-      if (e.shiftKey) { // constrain ratio
-        const ratio = src.w / src.h || 1;
-        if (Math.abs(w / h - ratio) > 0.001) {
-          if (Math.abs(dx) > Math.abs(dy)) h = Math.round(w / ratio);
-          else w = Math.round(h * ratio);
-        }
-      }
-      el.x = Math.min(x, x + w) | 0;
-      el.y = Math.min(y, y + h) | 0;
-      el.w = Math.abs(w) | 0;
-      el.h = Math.abs(h) | 0;
-    } else if (dragCtx.mode === 'rotate' && sel.length === 1) {
-      const { el } = sel[0];
-      const slideRect = slideWrapper.getBoundingClientRect();
-      const cx = slideRect.left + el.x * state.zoom + el.w * state.zoom / 2;
-      const cy = slideRect.top + el.y * state.zoom + el.h * state.zoom / 2;
-      const ang = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI + 90;
-      el.rotate = state.snap ? Math.round(ang / 5) * 5 : ang;
-    }
-
-    renderSlide();
-  }
-
-  function onPointerUpEl() {
-    document.removeEventListener('pointermove', onPointerMoveEl);
-    document.removeEventListener('pointerup', onPointerUpEl);
-    dragCtx = null;
-    pushHistory();
-    save();
-  }
-
-  // Stage interactions: selection marquee, pan, zoom
-  slideEl.addEventListener('pointerdown', e => {
-    // start selection box if not panning
-    if (keys.Space) return;
-    const rect = slideEl.getBoundingClientRect();
-    const startX = (e.clientX - rect.left) / state.zoom;
-    const startY = (e.clientY - rect.top) / state.zoom;
-    selectionBox.style.display = 'block';
-    selectionBox.style.left = startX + 'px';
-    selectionBox.style.top = startY + 'px';
-    selectionBox.style.width = '0px';
-    selectionBox.style.height = '0px';
-
-    function move(ev) {
-      const curX = (ev.clientX - rect.left) / state.zoom;
-      const curY = (ev.clientY - rect.top) / state.zoom;
-      const x = Math.min(startX, curX);
-      const y = Math.min(startY, curY);
-      const w = Math.abs(curX - startX);
-      const h = Math.abs(curY - startY);
-      selectionBox.style.left = x + 'px';
-      selectionBox.style.top = y + 'px';
-      selectionBox.style.width = w + 'px';
-      selectionBox.style.height = h + 'px';
-
-      const box = { x, y, w, h };
-      const ids = currentSlide().elements.filter(el =>
-        el.x < box.x + box.w && el.x + el.w > box.x &&
-        el.y < box.y + box.h && el.y + el.h > box.y
-      ).map(el => el.id);
-      state.selection = new Set(ids);
-      renderSlide();
-    }
-
-    function up() {
-      selectionBox.style.display = 'none';
-      document.removeEventListener('pointermove', move);
-      document.removeEventListener('pointerup', up);
-      save();
-    }
-
-    document.addEventListener('pointermove', move);
-    document.addEventListener('pointerup', up);
-  });
-
-  // Pan with space
-  const keys = { Space: false, Meta: false, Control: false };
-  document.addEventListener('keydown', e => {
-    if (e.code === 'Space') { keys.Space = true; document.body.style.cursor = 'grab'; }
-    if (e.metaKey) keys.Meta = true;
-    if (e.ctrlKey) keys.Control = true;
-  });
-  document.addEventListener('keyup', e => {
-    if (e.code === 'Space') { keys.Space = false; document.body.style.cursor = 'default'; }
-    if (!e.metaKey) keys.Meta = false;
-    if (!e.ctrlKey) keys.Control = false;
-  });
-
-  slideWrapper.addEventListener('pointerdown', e => {
-    if (!keys.Space) return;
-    const start = { x: e.clientX, y: e.clientY };
-    const orig = { x: slideWrapper.scrollLeft, y: slideWrapper.scrollTop };
-    function move(ev) {
-      slideWrapper.scrollLeft = orig.x - (ev.clientX - start.x);
-      slideWrapper.scrollTop = orig.y - (ev.clientY - start.y);
-    }
-    function up() {
-      document.removeEventListener('pointermove', move);
-      document.removeEventListener('pointerup', up);
-    }
-    document.addEventListener('pointermove', move);
-    document.addEventListener('pointerup', up);
-  });
-
-  // Zoom (Ctrl/Cmd + wheel)
-  slideWrapper.addEventListener('wheel', e => {
-    if (!(e.ctrlKey || e.metaKey)) return;
-    e.preventDefault();
-    if (e.deltaY < 0) zoomBy(1.1);
-    else zoomBy(1/1.1);
-  }, { passive: false });
-
-  function applyZoom() {
-    const z = state.zoom;
-    slideEl.style.transform = `scale(${z})`;
-    drawingCanvas.style.transform = `scale(${z})`;
-    gridEl.style.transform = `scale(${z})`;
-    ui.zoomIndicator.textContent = Math.round(z * 100) + '%';
-  }
-
-  function zoomBy(f) {
-    state.zoom = clamp(state.zoom * f, 0.2, 4);
-    applyZoom();
-  }
-
-  function zoomFit() {
-    const cw = slideWrapper.clientWidth - 40;
-    const ch = slideWrapper.clientHeight - 40;
-    const z = Math.min(cw / 1280, ch / 720);
-    state.zoom = clamp(z, 0.2, 4);
-    applyZoom();
-  }
-
-  // Arrange helpers
-  const selectionBounds = () => {
-    const els = [...state.selection].map(getEl).map(x => x.el);
-    if (!els.length) return null;
-    const xs = els.map(e => e.x), ys = els.map(e => e.y);
-    const xe = els.map(e => e.x + e.w), ye = els.map(e => e.y + e.h);
-    const x = Math.min(...xs), y = Math.min(...ys);
-    const w = Math.max(...xe) - x, h = Math.max(...ye) - y;
-    return { x, y, w, h, els };
-  };
-
-  function align(which) {
-    const b = selectionBounds(); if (!b) return;
-    pushHistory();
-    b.els.forEach(el => {
-      if (which === 'left') el.x = b.x;
-      if (which === 'center') el.x = Math.round(b.x + (b.w - el.w)/2);
-      if (which === 'right') el.x = b.x + b.w - el.w;
-      if (which === 'top') el.y = b.y;
-      if (which === 'middle') el.y = Math.round(b.y + (b.h - el.h)/2);
-      if (which === 'bottom') el.y = b.y + b.h - el.h;
-    });
-    renderAll();
-  }
-
-  function distribute(axis) {
-    const b = selectionBounds(); if (!b) return;
-    const els = [...b.els].sort((a,b) => axis==='h' ? a.x - b.x : a.y - b.y);
-    if (els.length < 3) return;
-    pushHistory();
-    if (axis === 'h') {
-      const totalW = els.reduce((s,e) => s + e.w, 0);
-      const space = (els[els.length-1].x + els[els.length-1].w) - els[0].x - totalW;
-      let x = els[0].x + els[0].w;
-      const gaps = els.length - 1;
-      els.slice(1, -1).forEach(e => { e.x = Math.round(x + space / gaps); x = e.x + e.w; });
-    } else {
-      const totalH = els.reduce((s,e) => s + e.h, 0);
-      const space = (els[els.length-1].y + els[els.length-1].h) - els[0].y - totalH;
-      let y = els[0].y + els[0].h;
-      const gaps = els.length - 1;
-      els.slice(1, -1).forEach(e => { e.y = Math.round(y + space / gaps); y = e.y + e.h; });
-    }
-    renderAll();
-  }
-
-  function order(direction) {
-    pushHistory();
-    const s = currentSlide();
-    const maxZ = s.elements.reduce((m,e)=>Math.max(m, e.z||1), 1);
-    const minZ = s.elements.reduce((m,e)=>Math.min(m, e.z||1), 1);
-    s.elements.forEach(e => {
-      if (state.selection.has(e.id)) {
-        e.z = direction === 'front' ? maxZ + 1 : minZ - 1;
-      }
-    });
-    s.zCounter = s.elements.reduce((m,e)=>Math.max(m, e.z||1), 1);
-    renderAll();
-  }
-
-  function grouping(doGroup) {
-    // Simple logical grouping: wrap into a pseudo group element with children
-    pushHistory();
-    const s = currentSlide();
-    if (doGroup) {
-      const ids = [...state.selection];
-      if (ids.length < 2) return;
-      const b = selectionBounds();
-      const groupId = uid();
-      const children = ids.map(id => s.elements.find(e => e.id === id));
-      // Remove children, compute relative offsets
-      s.elements = s.elements.filter(e => !ids.includes(e.id));
-      const rel = children.map(c => ({
-        ...c,
-        relX: c.x - b.x, relY: c.y - b.y
-      }));
-      s.elements.push({
-        id: groupId, type:'group', tag:'div', x:b.x, y:b.y, w:b.w, h:b.h, rotate:0, opacity:1, z: ++s.zCounter, children: rel
-      });
-      state.selection = new Set([groupId]);
-    } else {
-      // ungroup: only if selection contains a group
-      const ids = [...state.selection];
-      const groups = s.elements.filter(e => ids.includes(e.id) && e.type==='group');
-      groups.forEach(g => {
-        const { x,y } = g;
-        (g.children||[]).forEach(c => {
-          const copy = { ...c };
-          delete copy.relX; delete copy.relY;
-          copy.id = uid();
-          copy.x = x + c.relX; copy.y = y + c.relY;
-          s.elements.push(copy);
+</div>
+
+<script>
+    /**
+     * STENOSLIDES 
+     */
+    var canvas;
+    var currentProjectName = "Default Project";
+    var appState = {
+        slides: [],
+        currentSlideIndex: 0
+    };
+
+    function init() {
+        canvas = new fabric.Canvas('mainCanvas', {
+            width: 800,
+            height: 450,
+            backgroundColor: '#ffffff'
         });
-        s.elements = s.elements.filter(e => e.id !== g.id);
-      });
-      state.selection.clear();
+
+        setupKeyboardShortcuts();
+        loadProjectList();
+        loadProject(currentProjectName);
+        
+        // Canvas click should not advance slide unless in fullscreen
+        canvas.on('mouse:down', function(e) {
+            if (document.fullscreenElement) {
+                advanceSlide();
+            }
+        });
     }
-    renderAll();
-  }
 
-  function lockUnlock(lock) {
-    pushHistory();
-    currentSlide().elements.forEach(e => {
-      if (state.selection.has(e.id)) e.locked = lock;
-    });
-    renderAll();
-  }
-
-  // Properties bindings
-  function bindProp(input, apply) {
-    input.addEventListener('input', () => {
-      const ids = [...state.selection];
-      if (!ids.length) return;
-      pushHistory();
-      ids.forEach(id => {
-        const el = getEl(id);
-        apply(el, input.value);
-      });
-      renderAll();
-    });
-  }
-
-  bindProp(prop.x, (el, v) => el.x = snapV(+v));
-  bindProp(prop.y, (el, v) => el.y = snapV(+v));
-  bindProp(prop.w, (el, v) => el.w = Math.max(1, +v));
-  bindProp(prop.h, (el, v) => el.h = Math.max(1, +v));
-  bindProp(prop.rot, (el, v) => el.rotate = +v);
-  bindProp(prop.fill, (el, v) => el.fill = v);
-  bindProp(prop.stroke, (el, v) => el.stroke = v);
-  bindProp(prop.strokeW, (el, v) => el.strokeW = Math.max(0, +v));
-  bindProp(prop.opacity, (el, v) => el.opacity = clamp(+v, 0, 1));
-  bindProp(prop.font, (el, v) => el.font = v);
-  bindProp(prop.fontSize, (el, v) => el.fontSize = Math.max(1, +v));
-  bindProp(prop.fontWeight, (el, v) => el.fontWeight = v);
-  bindProp(prop.textAlign, (el, v) => el.textAlign = v);
-
-  slideInputs.title.addEventListener('input', () => { currentSlide().title = slideInputs.title.value; renderThumbs(); save(); });
-  slideInputs.notes.addEventListener('input', () => { currentSlide().notes = slideInputs.notes.value; save(); });
-  slideInputs.bgColor.addEventListener('input', () => { currentSlide().bgColor = slideInputs.bgColor.value; renderSlide(); save(); });
-
-  // Ribbon actions
-  B.newSlide.onclick = newSlide;
-  B.dupSlide.onclick = dupSlide;
-  B.delSlide.onclick = delSlide;
-
-  B.alignLeft.onclick = () => align('left');
-  B.alignCenter.onclick = () => align('center');
-  B.alignRight.onclick = () => align('right');
-  B.alignTop.onclick = () => align('top');
-  B.alignMiddle.onclick = () => align('middle');
-  B.alignBottom.onclick = () => align('bottom');
-  B.distH.onclick = () => distribute('h');
-  B.distV.onclick = () => distribute('v');
-  B.bringFront.onclick = () => order('front');
-  B.sendBack.onclick = () => order('back');
-  B.group.onclick = () => grouping(true);
-  B.ungroup.onclick = () => grouping(false);
-  B.lock.onclick = () => lockUnlock(true);
-  B.unlock.onclick = () => lockUnlock(false);
-
-  B.undo.onclick = undo;
-  B.redo.onclick = redo;
-
-  B.export.onclick = () => {
-    const data = JSON.stringify({ slides: state.slides }, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'stenoslides.json';
-    a.click();
-  };
-  B.import.onclick = () => B.importFile.click();
-  B.importFile.addEventListener('change', async () => {
-    const file = B.importFile.files[0];
-    if (!file) return;
-    const text = await file.text();
-    try {
-      const data = JSON.parse(text);
-      if (Array.isArray(data.slides)) {
-        pushHistory();
-        state.slides = data.slides;
-        state.currentIndex = 0;
-        renderAll();
-      } else {
-        alert('Invalid file.');
-      }
-    } catch {
-      alert('Invalid JSON.');
+    // PROJECT MANAGEMENT
+    function loadProjectList() {
+        var list = JSON.parse(localStorage.getItem('steno_project_list') || '["Default Project"]');
+        var select = document.getElementById('projectSelect');
+        select.innerHTML = '';
+        var i;
+        for (i = 0; i < list.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = list[i];
+            opt.innerHTML = list[i];
+            select.appendChild(opt);
+        }
+        select.value = currentProjectName;
     }
-    B.importFile.value = '';
-  });
 
-  B.insertTitle.onclick = () => addText('Title');
-  B.insertText.onclick = () => addText('Text');
-  B.insertRect.onclick = addRect;
-  B.insertEllipse.onclick = addEllipse;
-  B.insertImage.onclick = addImageByURL;
-
-  ui.themeSelect.addEventListener('change', () => setTheme(ui.themeSelect.value));
-  B.bgImage.onclick = async () => {
-    const url = prompt('Slide background image URL');
-    if (!url) return;
-    pushHistory();
-    currentSlide().bgImage = url;
-    renderAll();
-  };
-  B.bgClear.onclick = () => { pushHistory(); currentSlide().bgImage = ''; renderAll(); };
-
-  B.zoomIn.onclick = () => zoomBy(1.1);
-  B.zoomOut.onclick = () => zoomBy(1/1.1);
-  B.zoomFit.onclick = () => zoomFit();
-  B.gridToggle.onclick = () => { state.isGridVisible = !state.isGridVisible; renderSlide(); };
-  ui.snapToggle.addEventListener('change', () => { state.snap = ui.snapToggle.checked; });
-
-  // Presenter
-  B.present.onclick = () => {
-    presenter.style.display = 'flex';
-    presenterSlide.innerHTML = '';
-    const s = currentSlide();
-    const slideClone = slideEl.cloneNode(true);
-    slideClone.style.transform = 'scale(1)';
-    slideClone.style.inset = '0';
-    slideClone.style.position = 'absolute';
-    presenterSlide.appendChild(slideClone);
-    presenterNotes.textContent = s.notes || '';
-  };
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && presenter.style.display === 'flex') presenter.style.display = 'none';
-    if (e.key === 'ArrowRight') { state.currentIndex = clamp(state.currentIndex+1, 0, state.slides.length-1); renderAll(); }
-    if (e.key === 'ArrowLeft') { state.currentIndex = clamp(state.currentIndex-1, 0, state.slides.length-1); renderAll(); }
-  });
-
-  // Drawing
-  function setDrawActive(on) {
-    state.drawing.active = on;
-    drawingCanvas.classList.toggle('drawing-canvas-active', on);
-  }
-  B.drawToggle.onclick = () => setDrawActive(!state.drawing.active);
-  B.drawClear.onclick = () => { pushHistory(); currentSlide().strokes = []; redrawStrokes(); save(); };
-  B.drawColor.addEventListener('input', () => state.drawing.color = B.drawColor.value);
-  B.drawWidth.addEventListener('input', () => state.drawing.width = +B.drawWidth.value);
-
-  drawingCanvas.addEventListener('pointerdown', e => {
-    if (!state.drawing.active) return;
-    const rect = drawingCanvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / state.zoom;
-    const y = (e.clientY - rect.top) / state.zoom;
-    state.drawing.currentPath = [{ x, y }];
-    dctx.strokeStyle = state.drawing.color;
-    dctx.lineWidth = state.drawing.width;
-    dctx.lineCap = 'round'; dctx.lineJoin = 'round';
-    dctx.beginPath(); dctx.moveTo(x, y);
-    function move(ev) {
-      const nx = (ev.clientX - rect.left) / state.zoom;
-      const ny = (ev.clientY - rect.top) / state.zoom;
-      state.drawing.currentPath.push({ x: nx, y: ny });
-      dctx.lineTo(nx, ny); dctx.stroke();
+    function createNewProject() {
+        var name = prompt("Enter project name:");
+        if (!name) return;
+        var list = JSON.parse(localStorage.getItem('steno_project_list') || '[]');
+        list.push(name);
+        localStorage.setItem('steno_project_list', JSON.stringify(list));
+        currentProjectName = name;
+        appState = { slides: [], currentSlideIndex: 0 };
+        addNewSlide();
+        saveToStorage();
+        loadProjectList();
     }
-    function up() {
-      document.removeEventListener('pointermove', move);
-      document.removeEventListener('pointerup', up);
-      // commit stroke
-      pushHistory();
-      currentSlide().strokes.push({
-        color: state.drawing.color,
-        width: state.drawing.width,
-        path: state.drawing.currentPath
-      });
-      state.drawing.currentPath = [];
-      save();
+
+    function switchProject(name) {
+        saveToStorage();
+        currentProjectName = name;
+        loadProject(name);
     }
-    document.addEventListener('pointermove', move);
-    document.addEventListener('pointerup', up);
-  });
 
-  function redrawStrokes() {
-    dctx.clearRect(0,0,drawingCanvas.width,drawingCanvas.height);
-    const s = currentSlide();
-    s.strokes.forEach(st => {
-      dctx.beginPath();
-      dctx.strokeStyle = st.color;
-      dctx.lineWidth = st.width;
-      dctx.lineCap = 'round'; dctx.lineJoin = 'round';
-      st.path.forEach((p, i) => {
-        if (i === 0) dctx.moveTo(p.x, p.y);
-        else dctx.lineTo(p.x, p.y);
-      });
-      dctx.stroke();
-    });
-  }
-
-  // Keyboard shortcuts
-  document.addEventListener('keydown', e => {
-    const mod = e.metaKey || e.ctrlKey;
-    if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); if (!e.shiftKey) undo(); else redo(); }
-    if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
-    if (e.key === 'Delete' || e.key === 'Backspace') {
-      if (document.activeElement && document.activeElement.isContentEditable) return;
-      if (!state.selection.size) return;
-      pushHistory();
-      const ids = new Set(state.selection);
-      currentSlide().elements = currentSlide().elements.filter(e2 => !ids.has(e2.id));
-      state.selection.clear();
-      renderAll();
+    function deleteCurrentProject() {
+        if (!confirm("Delete entire project?")) return;
+        var list = JSON.parse(localStorage.getItem('steno_project_list') || '[]');
+        var newList = list.filter(function(i) { return i !== currentProjectName; });
+        localStorage.setItem('steno_project_list', JSON.stringify(newList));
+        localStorage.removeItem('steno_proj_' + currentProjectName);
+        location.reload();
     }
-    if (mod && e.key.toLowerCase() === 'g') { e.preventDefault(); grouping(true); }
-    if (mod && e.shiftKey && e.key.toLowerCase() === 'g') { e.preventDefault(); grouping(false); }
-    if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); dupSlide(); }
-    if (mod && e.key.toLowerCase() === '=') { e.preventDefault(); zoomBy(1.1); }
-    if (mod && e.key.toLowerCase() === '-') { e.preventDefault(); zoomBy(1/1.1); }
-    // arrows to nudge
-    const step = e.shiftKey ? 10 : 1;
-    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key) && state.selection.size) {
-      e.preventDefault();
-      pushHistory();
-      [...state.selection].forEach(id => {
-        const el = getEl(id);
-        if (e.key === 'ArrowUp') el.y = snapV(el.y - step);
-        if (e.key === 'ArrowDown') el.y = snapV(el.y + step);
-        if (e.key === 'ArrowLeft') el.x = snapV(el.x - step);
-        if (e.key === 'ArrowRight') el.x = snapV(el.x + step);
-      });
-      renderAll();
+
+    function saveToStorage() {
+        appState.slides[appState.currentSlideIndex].data = canvas.toJSON();
+        localStorage.setItem('steno_proj_' + currentProjectName, JSON.stringify(appState));
+        document.getElementById('projNameDisplay').innerText = currentProjectName + " (Saved)";
     }
-  });
 
-  // Command palette (very simple)
-  $('#command-palette').addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      const v = e.currentTarget.value.toLowerCase();
-      if (v.includes('title')) addText('Title');
-      else if (v.includes('text')) addText('Text');
-      else if (v.includes('rect')) addRect();
-      else if (v.includes('ellipse')) addEllipse();
-      else if (v.includes('image')) addImageByURL();
-      else if (v.includes('new')) newSlide();
-      else if (v.includes('duplicate')) dupSlide();
-      else if (v.includes('delete')) delSlide();
-      else if (v.includes('present')) B.present.click();
-      else if (v.includes('dark')) setTheme('theme-dark');
-      else if (v.includes('minimal')) setTheme('theme-minimal');
-      else if (v.includes('default')) setTheme('theme-default');
-      e.currentTarget.value = '';
+    function loadProject(name) {
+        var data = localStorage.getItem('steno_proj_' + name);
+        if (data) {
+            appState = JSON.parse(data);
+            loadSlide(appState.currentSlideIndex || 0);
+        } else {
+            addNewSlide();
+        }
+        document.getElementById('projNameDisplay').innerText = currentProjectName;
     }
-  });
 
-  // Init
-  function init() {
-    load();
-    applyZoom();
-    zoomFit();
-    renderAll();
-    // Click outside to clear selection
-    slideWrapper.addEventListener('pointerdown', e => {
-      if (e.target === slideWrapper) { state.selection.clear(); renderSlide(); }
-    });
-  }
+    // SLIDE LOGIC
+    function addNewSlide() {
+        var slide = { id: Date.now(), data: null, background: '#ffffff' };
+        appState.slides.push(slide);
+        loadSlide(appState.slides.length - 1);
+    }
 
-  // Wire UI buttons
-  B.insertTitle.title = 'Add a large title text box';
-  B.insertText.title = 'Add a text box';
-  B.insertRect.title = 'Add a rectangle';
-  B.insertEllipse.title = 'Add an ellipse';
-  B.insertImage.title = 'Insert image by URL';
-  B.bgImage.title = 'Set slide background image';
-  B.bgClear.title = 'Clear slide background';
+    function loadSlide(index) {
+        if (appState.slides[appState.currentSlideIndex]) {
+            appState.slides[appState.currentSlideIndex].data = canvas.toJSON();
+        }
+        appState.currentSlideIndex = index;
+        canvas.clear();
+        var slide = appState.slides[index];
+        if (slide.data) {
+            canvas.loadFromJSON(slide.data, function() {
+                canvas.renderAll();
+            });
+        } else {
+            canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+        }
+        renderThumbs();
+    }
 
-  init();
-})();
+    function renderThumbs() {
+        var container = document.getElementById('slide-sorter');
+        container.innerHTML = '';
+        var i;
+        for (i = 0; i < appState.slides.length; i++) {
+            var thumb = document.createElement('div');
+            thumb.className = 'slide-thumb' + (i === appState.currentSlideIndex ? ' active' : '');
+            thumb.onclick = (function(idx) { return function() { loadSlide(idx); }; })(i);
+            container.appendChild(thumb);
+        }
+    }
 
-    
-  </script>
+    // TOOLS
+    function addTextbox() {
+        var t = new fabric.IText("Type Here", { left: 100, top: 100, fontFamily: 'Segoe UI' });
+        canvas.add(t);
+    }
+
+    function addShape(type) {
+        var s = (type === 'rect') ? new fabric.Rect({ width: 100, height: 100, fill: '#2b579a' }) : 
+                                   new fabric.Circle({ radius: 50, fill: '#2b579a' });
+        s.set({ left: 150, top: 150 });
+        canvas.add(s);
+    }
+
+    function triggerMedia() { document.getElementById('mediaInput').click(); }
+
+    function handleMediaUpload(e) {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+        reader.onload = function(f) {
+            var data = f.target.result;
+            if (file.type.indexOf('image') !== -1) {
+                fabric.Image.fromURL(data, function(img) {
+                    img.scaleToWidth(300);
+                    canvas.add(img);
+                });
+            } else if (file.type.indexOf('video') !== -1) {
+                var videoEl = document.createElement('video');
+                videoEl.src = data;
+                videoEl.loop = true;
+                videoEl.muted = true;
+                videoEl.play();
+                var videoObj = new fabric.Image(videoEl, { left: 100, top: 100, width: 400, height: 225 });
+                canvas.add(videoObj);
+                fabric.util.requestAnimFrame(function render() {
+                    canvas.renderAll();
+                    fabric.util.requestAnimFrame(render);
+                });
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function changeSlideColor(color) {
+        canvas.setBackgroundColor(color, canvas.renderAll.bind(canvas));
+        appState.slides[appState.currentSlideIndex].background = color;
+    }
+
+    function changeSelectionColor(color) {
+        var obj = canvas.getActiveObject();
+        if (obj) { obj.set('fill', color); canvas.renderAll(); }
+    }
+
+    function deleteObject() {
+        var obj = canvas.getActiveObject();
+        if (obj) canvas.remove(obj);
+    }
+
+    function execCmd(cmd) {
+        var obj = canvas.getActiveObject();
+        if (!obj || !obj.set) return;
+        if (cmd === 'bold') obj.set('fontWeight', obj.fontWeight === 'bold' ? 'normal' : 'bold');
+        if (cmd === 'italic') obj.set('fontStyle', obj.fontStyle === 'italic' ? 'normal' : 'italic');
+        canvas.renderAll();
+    }
+
+    // PRESENTATION MODE
+    function enterPresentMode() {
+        var el = document.getElementById('presentation-area');
+        if (el.requestFullscreen) el.requestFullscreen();
+    }
+
+    function advanceSlide() {
+        if (appState.currentSlideIndex < appState.slides.length - 1) {
+            loadSlide(appState.currentSlideIndex + 1);
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+        }
+    }
+
+    function handlePresentationClick() {
+        if (document.fullscreenElement) advanceSlide();
+    }
+
+    // SHORTCUTS
+    function setupKeyboardShortcuts() {
+        window.addEventListener('keydown', function(e) {
+            // Delete key
+            if (e.key === "Delete" || e.key === "Backspace") {
+                if (!canvas.getActiveObject() || canvas.getActiveObject().isEditing) return;
+                deleteObject();
+            }
+            // Ctrl + S (Save)
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveToStorage();
+                alert("Project Saved to Browser Storage");
+            }
+            // N (New Slide)
+            if (e.key.toLowerCase() === 'n' && !e.ctrlKey) {
+                if (canvas.getActiveObject() && canvas.getActiveObject().isEditing) return;
+                addNewSlide();
+            }
+            // F5 (Present)
+            if (e.key === "F5") {
+                e.preventDefault();
+                enterPresentMode();
+            }
+            // Arrow Keys (Navigation)
+            if (e.key === "ArrowRight" || e.key === "PageDown") advanceSlide();
+            if (e.key === "ArrowLeft" || e.key === "PageUp") {
+                if (appState.currentSlideIndex > 0) loadSlide(appState.currentSlideIndex - 1);
+            }
+        });
+    }
+
+    function switchTab(name) {
+        var i, contents = document.getElementsByClassName('ribbon-content'), tabs = document.getElementsByClassName('tab-btn');
+        for (i = 0; i < contents.length; i++) contents[i].classList.remove('active');
+        for (i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+        document.getElementById('tab-' + name).classList.add('active');
+        window.event.currentTarget.classList.add('active');
+    }
+
+    window.onload = init;
+</script>
+
 </body>
 </html>
