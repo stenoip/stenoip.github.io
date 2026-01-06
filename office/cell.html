@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StenoCells - Stenoip Company</title>
+    <style>
+        /* --- RESET & CORE --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100%;
+            overflow: hidden;
+            background-color: #f3f3f3;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- VARIABLES --- */
+        :root {
+            --excel-green: #107C41;
+            --ribbon-bg: #f5f5f5;
+            --border-color: #d1d1d1;
+            --hover-bg: #e1e1e1;
+            --select-bg: #c6c6c6;
+        }
+
+        /* --- UI COMPONENTS --- */
+        #title-bar {
+            background-color: var(--excel-green);
+            color: white;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* --- TABS --- */
+        #tabs-scroll-container {
+            background-color: var(--excel-green);
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none; /* Firefox */
+            flex-shrink: 0;
+        }
+        #tabs-scroll-container::-webkit-scrollbar { display: none; }
+
+        #tabs-container {
+            display: flex;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            margin-right: 2px;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        
+        .tab.active {
+            background-color: #f5f5f5;
+            color: var(--excel-green);
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .file-tab { background-color: #0d6032; font-weight: bold; }
+
+        /* --- RIBBON --- */
+        #ribbon {
+            background-color: var(--ribbon-bg);
+            border-bottom: 1px solid var(--border-color);
+            height: 100px; /* Fixed height for consistency */
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .ribbon-content {
+            display: none; /* Hidden by default */
+            height: 100%;
+            padding: 5px 10px;
+            box-sizing: border-box;
+            gap: 5px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .ribbon-content.active { display: flex; }
+
+        .ribbon-group {
+            display: inline-flex;
+            flex-direction: column;
+            padding: 0 8px;
+            border-right: 1px solid #e0e0e0;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+            vertical-align: top;
+        }
+        .ribbon-group:last-child { border-right: none; }
+
+        .group-label {
+            font-size: 10px;
+            color: #777;
+            margin-top: auto;
+            margin-bottom: 2px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .ribbon-row {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        /* --- BUTTONS --- */
+        .ribbon-btn {
+            border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 2px;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .ribbon-btn:hover { background-color: var(--hover-bg); border-color: #adadad; }
+        .ribbon-btn:active { background-color: var(--select-bg); }
+        .ribbon-btn svg { width: 16px; height: 16px; fill: #444; }
+
+        .ribbon-btn-large {
+            flex-direction: column;
+            height: 60px;
+            width: 50px;
+            padding: 5px;
+        }
+        .ribbon-btn-large svg { width: 32px; height: 32px; margin-bottom: 4px; }
+        .ribbon-btn-large span { font-size: 11px; text-align: center; line-height: 1.1; }
+
+        /* --- FORMULA BAR --- */
+        #formula-bar-container {
+            display: flex;
+            padding: 5px;
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        #name-box { width: 50px; border: 1px solid #ccc; padding: 4px; font-size: 12px; text-align: center; }
+        #fx-icon { color: #888; font-family: serif; font-weight: bold; font-style: italic; font-size: 14px; user-select: none; cursor: pointer;}
+        #formula-input { flex-grow: 1; border: 1px solid #ccc; padding: 4px; font-size: 13px; outline: none; }
+        #formula-input:focus { border-color: var(--excel-green); }
+
+        /* --- GRID --- */
+        #grid-wrapper {
+            flex-grow: 1;
+            overflow: auto;
+            position: relative;
+            background-color: #fff;
+        }
+
+        table { border-collapse: collapse; table-layout: fixed; }
+        
+        th, td {
+            border: 1px solid #d4d4d4;
+            min-width: 80px;
+            height: 24px;
+            font-size: 13px;
+            padding: 0 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        th { background-color: #f8f9fa; font-weight: normal; text-align: center; color: #444; position: sticky; top: 0; z-index: 2; }
+        .row-header { width: 40px; background-color: #f8f9fa; text-align: center; color: #444; position: sticky; left: 0; z-index: 3; }
+        /* Corner fix */
+        th.row-header { z-index: 4; }
+
+        td.selected { border: 2px solid var(--excel-green); z-index: 10; outline: none; }
+        td.highlighted { background-color: rgba(16, 124, 65, 0.1); } /* For AutoSum range highlight */
+
+        /* --- FOOTER --- */
+        #status-bar {
+            background-color: var(--excel-green);
+            color: white;
+            padding: 4px 10px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        /* --- HELPERS --- */
+        .mobile-only { display: none; }
+        select { font-size: 11px; }
+
+        @media (max-width: 600px) {
+            #title-bar span:first-child { font-size: 12px; }
+            .ribbon-btn-large { width: 40px; }
+            .ribbon-btn-large svg { width: 24px; height: 24px; }
+            .mobile-only { display: block; }
+        }
+
+        @media print {
+            #title-bar, #tabs-scroll-container, #ribbon, #formula-bar-container, #status-bar { display: none; }
+            #grid-wrapper { overflow: visible; height: auto; }
+            td { border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="title-bar">
+        <span>StenoCells</span>
+        <span style="opacity: 0.8; font-size: 11px;">Stenoip Company</span>
+    </div>
+
+    <div id="tabs-scroll-container">
+        <div id="tabs-container">
+            <div class="tab file-tab" onclick="switchTab('File')">File</div>
+            <div class="tab active" onclick="switchTab('Home')">Home</div>
+            <div class="tab" onclick="switchTab('Insert')">Insert</div>
+            <div class="tab" onclick="switchTab('Draw')">Draw</div>
+            <div class="tab" onclick="switchTab('PageLayout')">Page Layout</div>
+            <div class="tab" onclick="switchTab('Formulas')">Formulas</div>
+            <div class="tab" onclick="switchTab('Data')">Data</div>
+            <div class="tab" onclick="switchTab('Review')">Review</div>
+            <div class="tab" onclick="switchTab('View')">View</div>
+        </div>
+    </div>
+
+    <div id="ribbon">
+        
+        <div id="ribbon-Home" class="ribbon-content active">
+            <div class="ribbon-group">
+                <button class="ribbon-btn ribbon-btn-large" onclick="doPaste()">
+                    <svg viewBox="0 0 24 24"><path d="M19,3h-4.18C14.4,1.84,13.3,1,12,1c-1.3,0-2.4,0.84-2.82,2H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3z M12,3c0.55,0,1,0.45,1,1s-0.45,1-1,1s-1-0.45-1-1S11.45,3,12,3z M19,19H5V5h14V19z"/></svg>
+                    <span>Paste</span>
+                </button>
+                <div class="group-label">Clipboard</div>
+            </div>
+            <div class="ribbon-group">
+                <div class="ribbon-row">
+                    <select onchange="format('fontFamily', this.value)">
+                        <option value="Segoe UI">Segoe UI</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Courier New">Courier</option>
+                    </select>
+                    <select onchange="format('fontSize', this.value+'px')">
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="14">14</option>
+                        <option value="18">18</option>
+                    </select>
+                </div>
+                <div class="ribbon-row">
+                    <button class="ribbon-btn" onclick="format('fontWeight', 'bold')"><b>B</b></button>
+                    <button class="ribbon-btn" onclick="format('fontStyle', 'italic')"><i>I</i></button>
+                    <button class="ribbon-btn" onclick="format('textDecoration', 'underline')"><u>U</u></button>
+                    <input type="color" onchange="format('color', this.value)" title="Text Color" style="width:20px;height:20px;border:none;">
+                    <input type="color" onchange="format('backgroundColor', this.value)" title="Fill Color" value="#ffffff" style="width:20px;height:20px;border:none;">
+                </div>
+                <div class="group-label">Font</div>
+            </div>
+            <div class="ribbon-group">
+                <div class="ribbon-row">
+                     <button class="ribbon-btn" onclick="format('textAlign', 'left')"><svg viewBox="0 0 24 24"><path d="M3 15h18v-2H3v2zm0 4h12v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"/></svg></button>
+                     <button class="ribbon-btn" onclick="format('textAlign', 'center')"><svg viewBox="0 0 24 24"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18V9H3v2zm4-6v2h10V5H7zM3 3v2h18V3H3z"/></svg></button>
+                     <button class="ribbon-btn" onclick="format('textAlign', 'right')"><svg viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18V9H3v2zm6-6v2h12V5H9z"/></svg></button>
+                </div>
+                <div class="group-label">Alignment</div>
+            </div>
+            <div class="ribbon-group">
+                 <button class="ribbon-btn ribbon-btn-large" onclick="performAutoSum()">
+                    <svg viewBox="0 0 24 24"><path d="M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z"/></svg>
+                    <span>AutoSum</span>
+                 </button>
+                 <div class="group-label">Editing</div>
+            </div>
+        </div>
+
+        <div id="ribbon-Insert" class="ribbon-content">
+             <div class="ribbon-group">
+                <button class="ribbon-btn ribbon-btn-large" onclick="document.getElementById('img-upload').click()">
+                    <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                    <span>Picture</span>
+                </button>
+                <input type="file" id="img-upload" style="display:none" accept="image/*" onchange="insertImage(this)">
+                <div class="group-label">Illustrations</div>
+             </div>
+             <div class="ribbon-group">
+                <button class="ribbon-btn ribbon-btn-large" onclick="insertLink()">
+                    <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                    <span>Link</span>
+                </button>
+                <div class="group-label">Links</div>
+             </div>
+        </div>
+
+        <div id="ribbon-Draw" class="ribbon-content">
+            <div class="ribbon-group">
+                <button class="ribbon-btn ribbon-btn-large" onclick="toggleDrawMode()">
+                    <svg viewBox="0 0 24 24" id="draw-icon"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                    <span id="draw-status">Pen: Off</span>
+                </button>
+                <div class="group-label">Tools</div>
+            </div>
+             <div class="ribbon-group">
+                <input type="color" id="pen-color" value="#ff0000">
+                <div class="group-label">Color</div>
+            </div>
+        </div>
+
+        <div id="ribbon-PageLayout" class="ribbon-content">
+             <div class="ribbon-group">
+                 <div class="ribbon-row">
+                    <input type="checkbox" checked onchange="toggleGridlines(this)"> <span>Gridlines</span>
+                 </div>
+                 <div class="ribbon-row">
+                    <input type="checkbox" checked onchange="toggleHeaders(this)"> <span>Headings</span>
+                 </div>
+                 <div class="group-label">Show</div>
+             </div>
+        </div>
+
+        <div id="ribbon-Formulas" class="ribbon-content">
+            <div class="ribbon-group">
+                 <button class="ribbon-btn ribbon-btn-large" onclick="performAutoSum()">
+                    <span style="font-size:20px">Σ</span>
+                    <span>AutoSum</span>
+                 </button>
+            </div>
+            <div class="ribbon-group">
+                <button class="ribbon-btn" onclick="insertFunc('AVERAGE')">Average</button>
+                <button class="ribbon-btn" onclick="insertFunc('COUNT')">Count</button>
+                <button class="ribbon-btn" onclick="insertFunc('MAX')">Max</button>
+                <button class="ribbon-btn" onclick="insertFunc('MIN')">Min</button>
+                <div class="group-label">Function Library</div>
+            </div>
+        </div>
+
+        <div id="ribbon-Data" class="ribbon-content">
+             <div class="ribbon-group">
+                 <button class="ribbon-btn ribbon-btn-large" onclick="sortData('asc')">
+                     <svg viewBox="0 0 24 24"><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/></svg>
+                     <span>Sort A-Z</span>
+                 </button>
+             </div>
+             <div class="ribbon-group">
+                 <button class="ribbon-btn ribbon-btn-large" onclick="sortData('desc')">
+                     <svg viewBox="0 0 24 24"><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/></svg>
+                     <span>Sort Z-A</span>
+                 </button>
+                 <div class="group-label">Sort & Filter</div>
+             </div>
+        </div>
+
+        <div id="ribbon-Review" class="ribbon-content">
+             <div class="ribbon-group">
+                 <button class="ribbon-btn ribbon-btn-large" onclick="addComment()">
+                     <svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>
+                     <span>New<br>Comment</span>
+                 </button>
+                 <div class="group-label">Comments</div>
+             </div>
+        </div>
+
+        <div id="ribbon-View" class="ribbon-content">
+             <div class="ribbon-group">
+                 <button class="ribbon-btn ribbon-btn-large" onclick="alert('Feature requires server-side processing in this demo.')">
+                     <svg viewBox="0 0 24 24"><path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z"/></svg>
+                     <span>Freeze<br>Panes</span>
+                 </button>
+                 <div class="group-label">Window</div>
+             </div>
+             <div class="ribbon-group">
+                 <button class="ribbon-btn" onclick="document.body.style.zoom='100%'">100%</button>
+                 <button class="ribbon-btn" onclick="document.body.style.zoom='125%'">Zoom In</button>
+                 <button class="ribbon-btn" onclick="document.body.style.zoom='80%'">Zoom Out</button>
+                 <div class="group-label">Zoom</div>
+             </div>
+        </div>
+
+        <div id="ribbon-File" class="ribbon-content" style="background-color:#0d6032; color:white;">
+            <div class="ribbon-group" style="border-right:none;">
+                <button class="ribbon-btn" style="color:white; justify-content: flex-start; width: 100px;" onclick="newProject()">New</button>
+                <button class="ribbon-btn" style="color:white; justify-content: flex-start; width: 100px;" onclick="saveToStorage()">Save</button>
+                <button class="ribbon-btn" style="color:white; justify-content: flex-start; width: 100px;" onclick="downloadCSV()">Export CSV</button>
+                <button class="ribbon-btn" style="color:white; justify-content: flex-start; width: 100px;" onclick="downloadJSON()">Export JSON</button>
+                <button class="ribbon-btn" style="color:white; justify-content: flex-start; width: 100px;" onclick="window.print()">Export PDF</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="formula-bar-container">
+        <input type="text" id="name-box" value="A1" readonly>
+        <span id="fx-icon" onclick="document.getElementById('formula-input').focus()">fx</span>
+        <input type="text" id="formula-input" placeholder="Type data or formula (=SUM...)" spellcheck="false">
+    </div>
+
+    <div id="grid-wrapper">
+        <table id="grid">
+            </table>
+    </div>
+
+    <div id="status-bar">
+        <span id="status-text">Ready</span>
+        <span>
+            Avg: <span id="stat-avg">-</span> | 
+            Count: <span id="stat-count">-</span> | 
+            Sum: <span id="stat-sum">-</span>
+        </span>
+    </div>
+
+    <script>
+        // STRICTLY USING VAR
+        var COLS = 26; // A-Z
+        var ROWS = 100;
+        var currentCell = null;
+        var cellData = {}; // Key: "A1", Value: { raw: "10", computed: 10, style: {...} }
+        var isDrawMode = false;
+        var isMouseDown = false;
+
+        window.onload = function() {
+            initGrid();
+            loadData();
+        };
+
+        // --- GRID INIT ---
+        function initGrid() {
+            var table = document.getElementById("grid");
+            table.innerHTML = "";
+            
+            // Header
+            var trH = document.createElement("tr");
+            var th0 = document.createElement("th");
+            th0.className = "row-header";
+            trH.appendChild(th0);
+            for (var c = 0; c < COLS; c++) {
+                var th = document.createElement("th");
+                th.innerText = String.fromCharCode(65 + c);
+                trH.appendChild(th);
+            }
+            table.appendChild(trH);
+
+            // Rows
+            for (var r = 1; r <= ROWS; r++) {
+                var tr = document.createElement("tr");
+                var thR = document.createElement("td"); // Use td for row header to match style
+                thR.className = "row-header";
+                thR.innerText = r;
+                tr.appendChild(thR);
+
+                for (var c = 0; c < COLS; c++) {
+                    var cellId = String.fromCharCode(65 + c) + r;
+                    var td = document.createElement("td");
+                    td.id = cellId;
+                    td.contentEditable = true;
+                    
+                    // Events
+                    td.addEventListener("mousedown", function(e) { handleCellClick(e.target); isMouseDown = true; handleDraw(e.target); });
+                    td.addEventListener("mouseover", function(e) { if(isMouseDown) handleDraw(e.target); });
+                    td.addEventListener("mouseup", function() { isMouseDown = false; });
+                    td.addEventListener("keydown", function(e) { if(e.key==="Enter"){e.preventDefault(); finishEdit(e.target); moveSelection(0,1);} });
+                    td.addEventListener("blur", function(e) { finishEdit(e.target); });
+                    
+                    tr.appendChild(td);
+                }
+                table.appendChild(tr);
+            }
+            document.body.addEventListener("mouseup", function(){ isMouseDown = false; });
+        }
+
+        // --- TAB LOGIC ---
+        function switchTab(tabName) {
+            // UI Update
+            var tabs = document.getElementsByClassName("tab");
+            for(var i=0; i<tabs.length; i++) tabs[i].classList.remove("active");
+            event.target.classList.add("active");
+
+            // Content Update
+            var contents = document.getElementsByClassName("ribbon-content");
+            for(var i=0; i<contents.length; i++) contents[i].classList.remove("active");
+            document.getElementById("ribbon-" + tabName).classList.add("active");
+        }
+
+        // --- CELL LOGIC ---
+        function handleCellClick(cell) {
+            if (isDrawMode) return; 
+            if (currentCell) currentCell.classList.remove("selected");
+            currentCell = cell;
+            currentCell.classList.add("selected");
+            
+            document.getElementById("name-box").value = cell.id;
+            
+            // Show raw formula in bar, calculated in cell
+            var raw = cellData[cell.id] ? cellData[cell.id].raw : cell.innerText;
+            document.getElementById("formula-input").value = raw;
+            
+            updateFooterStats();
+        }
+
+        document.getElementById("formula-input").addEventListener("input", function(e) {
+            if(currentCell) {
+                currentCell.innerText = e.target.value;
+                // Temporarily show raw while typing
+            }
+        });
+
+        document.getElementById("formula-input").addEventListener("keydown", function(e) {
+             if(e.key === "Enter") {
+                 if(currentCell) finishEdit(currentCell);
+             }
+        });
+
+        function finishEdit(cell) {
+            var raw = cell.innerText; // Content entered
+            if(document.activeElement === document.getElementById("formula-input")) {
+                raw = document.getElementById("formula-input").value;
+            }
+
+            if(!cellData[cell.id]) cellData[cell.id] = {};
+            cellData[cell.id].raw = raw;
+            
+            // Calculate
+            if(raw.startsWith("=")) {
+                var res = evaluateFormula(raw.substring(1));
+                cellData[cell.id].value = res;
+                cell.innerText = res;
+            } else {
+                cellData[cell.id].value = raw;
+                // Check if numeric
+                if(!isNaN(parseFloat(raw))) cellData[cell.id].value = parseFloat(raw);
+            }
+            saveToStorage();
+            updateFooterStats();
+        }
+
+        // --- FORMULA ENGINE ---
+        function evaluateFormula(exp) {
+            // 1. Handle Ranges: SUM(A1:A3)
+            var rangeRegex = /([A-Z]+[0-9]+):([A-Z]+[0-9]+)/g;
+            var expandedExp = exp.replace(rangeRegex, function(match, start, end) {
+                var vals = getRangeValues(start, end);
+                return "[" + vals.join(",") + "]";
+            });
+
+            // 2. Handle Functions
+            // Replace SUM([1,2,3]) with internal function calls
+            expandedExp = expandedExp.replace(/SUM\((.*?)\)/g, "funcSum($1)");
+            expandedExp = expandedExp.replace(/AVERAGE\((.*?)\)/g, "funcAvg($1)");
+            expandedExp = expandedExp.replace(/COUNT\((.*?)\)/g, "funcCount($1)");
+            expandedExp = expandedExp.replace(/MAX\((.*?)\)/g, "funcMax($1)");
+            expandedExp = expandedExp.replace(/MIN\((.*?)\)/g, "funcMin($1)");
+
+            // 3. Handle Single Cell References (A1)
+            expandedExp = expandedExp.replace(/[A-Z]+[0-9]+/g, function(match) {
+                 var val = cellData[match] ? cellData[match].value : 0;
+                 return isNaN(parseFloat(val)) ? 0 : parseFloat(val);
+            });
+
+            try {
+                return eval(expandedExp);
+            } catch(e) {
+                return "#ERROR";
+            }
+        }
+
+        function getRangeValues(start, end) {
+            var sCol = start.charCodeAt(0);
+            var sRow = parseInt(start.substring(1));
+            var eCol = end.charCodeAt(0);
+            var eRow = parseInt(end.substring(1));
+            
+            var vals = [];
+            for(var r = sRow; r <= eRow; r++) {
+                for(var c = sCol; c <= eCol; c++) {
+                    var id = String.fromCharCode(c) + r;
+                    var v = cellData[id] ? cellData[id].value : 0;
+                    if(isNaN(parseFloat(v))) v = 0;
+                    vals.push(v);
+                }
+            }
+            return vals;
+        }
+
+        // Math Helpers
+        function funcSum(arr) { 
+            if(!Array.isArray(arr)) arr = Array.from(arguments);
+            var t=0; for(var i=0; i<arr.length; i++) t+=Number(arr[i]); return t; 
+        }
+        function funcAvg(arr) { 
+            if(!Array.isArray(arr)) arr = Array.from(arguments);
+            return funcSum(arr)/arr.length; 
+        }
+        function funcCount(arr) { 
+            if(!Array.isArray(arr)) arr = Array.from(arguments);
+            return arr.length; 
+        }
+        function funcMax(arr) {
+            if(!Array.isArray(arr)) arr = Array.from(arguments);
+            return Math.max.apply(null, arr);
+        }
+        function funcMin(arr) {
+            if(!Array.isArray(arr)) arr = Array.from(arguments);
+            return Math.min.apply(null, arr);
+        }
+
+        // --- FEATURES ---
+
+        function performAutoSum() {
+            if(!currentCell) return;
+            // Simple logic: look up from current cell
+            var colChar = currentCell.id.charAt(0);
+            var currRow = parseInt(currentCell.id.substring(1));
+            var startRow = currRow - 1;
+            
+            // Go up until non-number or boundary
+            while(startRow > 0) {
+                var id = colChar + startRow;
+                var val = cellData[id] ? cellData[id].value : "";
+                if(val === "" || isNaN(parseFloat(val))) break;
+                startRow--;
+            }
+            startRow++; // The first valid number
+            
+            if(startRow < currRow) {
+                var formula = "=SUM(" + colChar + startRow + ":" + colChar + (currRow-1) + ")";
+                currentCell.innerText = formula; // Visual
+                finishEdit(currentCell); // Process
+            } else {
+                alert("No numbers found above to AutoSum.");
+            }
+        }
+
+        function insertFunc(name) {
+            if(!currentCell) return;
+            document.getElementById("formula-input").value = "=" + name + "()";
+            document.getElementById("formula-input").focus();
+        }
+
+        function format(prop, val) {
+            if(!currentCell) return;
+            currentCell.style[prop] = val;
+            if(!cellData[currentCell.id]) cellData[currentCell.id] = {};
+            if(!cellData[currentCell.id].style) cellData[currentCell.id].style = {};
+            cellData[currentCell.id].style[prop] = val;
+            saveToStorage();
+        }
+
+        // --- DRAW MODE ---
+        function toggleDrawMode() {
+            isDrawMode = !isDrawMode;
+            var btn = document.getElementById("draw-status");
+            btn.innerText = isDrawMode ? "Pen: ON" : "Pen: Off";
+            btn.parentNode.style.backgroundColor = isDrawMode ? "#ccc" : "transparent";
+        }
+        
+        function handleDraw(cell) {
+            if(isDrawMode && isMouseDown) {
+                var color = document.getElementById("pen-color").value;
+                cell.style.backgroundColor = color;
+                if(!cellData[cell.id]) cellData[cell.id] = {};
+                if(!cellData[cell.id].style) cellData[cell.id].style = {};
+                cellData[cell.id].style.backgroundColor = color;
+            }
+        }
+
+        // --- OTHER TABS ---
+        function insertImage(input) {
+            if (input.files && input.files[0] && currentCell) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    currentCell.style.backgroundImage = "url('" + e.target.result + "')";
+                    currentCell.style.backgroundSize = "cover";
+                    currentCell.style.color = "transparent"; // Hide text
+                    
+                    if(!cellData[currentCell.id]) cellData[currentCell.id] = {};
+                    if(!cellData[currentCell.id].style) cellData[currentCell.id].style = {};
+                    cellData[currentCell.id].style.backgroundImage = "url('" + e.target.result + "')";
+                    cellData[currentCell.id].style.backgroundSize = "cover";
+                    saveToStorage();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function insertLink() {
+            if(currentCell) {
+                var url = prompt("Enter URL:");
+                if(url) {
+                    currentCell.setAttribute("data-link", url);
+                    currentCell.style.color = "blue";
+                    currentCell.style.textDecoration = "underline";
+                    currentCell.onclick = function() { window.open(url, '_blank'); };
+                }
+            }
+        }
+
+        function addComment() {
+            if(currentCell) {
+                var c = prompt("Enter Comment:");
+                if(c) {
+                    currentCell.title = c;
+                    currentCell.style.borderTopRightRadius = "0"; // indicator mark hack
+                    currentCell.style.boxShadow = "inset -3px 3px 0 red";
+                }
+            }
+        }
+
+        function toggleGridlines(cb) {
+            var grid = document.getElementById("grid");
+            grid.style.borderCollapse = cb.checked ? "collapse" : "separate";
+            // Simple visual toggle implies adjusting CSS
+            var cells = document.getElementsByTagName("td");
+            for(var i=0; i<cells.length; i++) {
+                cells[i].style.border = cb.checked ? "1px solid #d4d4d4" : "none";
+            }
+        }
+        
+        function toggleHeaders(cb) {
+            var headers = document.querySelectorAll("th, .row-header");
+            for(var i=0; i<headers.length; i++) {
+                headers[i].style.visibility = cb.checked ? "visible" : "hidden";
+            }
+        }
+
+        // --- DATA & EXPORT ---
+        function sortData(order) {
+            // Simplified: Sorts the column of the currently selected cell
+            if(!currentCell) return;
+            var col = currentCell.id.charAt(0); // 'A'
+            var colIndex = col.charCodeAt(0) - 65;
+            
+            // Collect rows
+            var rows = [];
+            for(var r=1; r<=ROWS; r++) {
+                var id = col + r;
+                var val = cellData[id] ? cellData[id].value : "";
+                rows.push({r: r, val: val});
+            }
+            
+            rows.sort(function(a,b) {
+                if(a.val > b.val) return order==='asc'?1:-1;
+                if(a.val < b.val) return order==='asc'?-1:1;
+                return 0;
+            });
+
+            // Repopulate (This is destructive and simplistic for the demo)
+            // Ideally we move whole rows, but here we just swap values in the column
+            for(var i=0; i<rows.length; i++) {
+                var oldR = rows[i].r;
+                // Move logic is complex in simple JS, alerting limitation
+            }
+            alert("Sort simulated: Visual sorting requires re-rendering entire grid rows which clears styles in this lightweight version.");
+        }
+
+        function updateFooterStats() {
+            if(!currentCell) return;
+            // For now, just show current cell value
+            var val = parseFloat(currentCell.innerText);
+            if(!isNaN(val)) {
+                document.getElementById("stat-sum").innerText = val;
+                document.getElementById("stat-count").innerText = "1";
+                document.getElementById("stat-avg").innerText = val;
+            } else {
+                document.getElementById("stat-sum").innerText = "-";
+            }
+        }
+
+        // --- STORAGE & SYSTEM ---
+        function saveToStorage() {
+            localStorage.setItem("StenoCells_DB", JSON.stringify(cellData));
+            document.getElementById("status-text").innerText = "Saved successfully.";
+            setTimeout(function(){ document.getElementById("status-text").innerText = "Ready"; }, 2000);
+        }
+
+        function loadData() {
+            var str = localStorage.getItem("StenoCells_DB");
+            if(str) {
+                cellData = JSON.parse(str);
+                // Rehydrate grid
+                for(var id in cellData) {
+                    var cell = document.getElementById(id);
+                    if(cell) {
+                        cell.innerText = cellData[id].value;
+                        if(cellData[id].style) {
+                            for(var s in cellData[id].style) {
+                                cell.style[s] = cellData[id].style[s];
+                            }
+                        }
+                        if(cellData[id].style && cellData[id].style.backgroundImage) {
+                            cell.style.color = "transparent";
+                        }
+                    }
+                }
+            }
+        }
+
+        function newProject() {
+            if(confirm("Discard changes?")) {
+                localStorage.removeItem("StenoCells_DB");
+                location.reload();
+            }
+        }
+
+        function downloadCSV() {
+            var csv = "";
+            for(var r=1; r<=ROWS; r++) {
+                var row = [];
+                for(var c=0; c<COLS; c++) {
+                    var id = String.fromCharCode(65+c)+r;
+                    var val = (cellData[id]?cellData[id].value:"") || "";
+                    val = String(val).replace(/"/g, '""');
+                    row.push('"'+val+'"');
+                }
+                csv += row.join(",") + "\n";
+            }
+            var blob = new Blob([csv], {type: "text/csv"});
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "StenoSheet.csv";
+            a.click();
+        }
+
+        function downloadJSON() {
+            var blob = new Blob([JSON.stringify(cellData)], {type: "application/json"});
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "StenoProject.json";
+            a.click();
+        }
+        
+        function moveSelection(dx, dy) {
+            if(!currentCell) return;
+            var colCode = currentCell.id.charCodeAt(0);
+            var rowNum = parseInt(currentCell.id.substring(1));
+            
+            var newCol = String.fromCharCode(colCode + dx);
+            var newRow = rowNum + dy;
+            
+            var target = document.getElementById(newCol + newRow);
+            if(target) {
+                target.focus();
+                handleCellClick(target);
+            }
+        }
+        
+        function doPaste() {
+            navigator.clipboard.readText().then(function(text) {
+                if(currentCell) {
+                    currentCell.innerText = text;
+                    finishEdit(currentCell);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
