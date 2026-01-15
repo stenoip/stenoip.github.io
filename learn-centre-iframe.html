@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Center</title>
+
+    <style>
+        :root {
+            --aero-blue: #0088ff;
+            --aero-blue-light: #7bbaff;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            margin: 0;
+            padding: 18px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #0d1a29;
+            text-align: center;
+
+            /* GIF BACKGROUND */
+            background: url("https://media.giphy.com/media/9aIZ60xEzNffW/source.gif")
+                        center / cover no-repeat fixed;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 14px;
+        }
+
+        .rss-links a {
+            display: block;
+            margin: 8px 0;
+            color: var(--aero-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .rss-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* FRUTIGER AERO BUTTON */
+        .more-button {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 12px 22px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            color: #ffffff;
+
+            background: linear-gradient(
+                to bottom,
+                var(--aero-blue-light),
+                var(--aero-blue)
+            );
+
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.6),
+                0 4px 12px rgba(0,0,0,0.25);
+
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .more-button:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.7),
+                0 6px 18px rgba(0,0,0,0.35);
+        }
+
+        .more-button:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass">
+        <h1>BREAKING NEWS!</h1>
+
+        <div class="rss-links" id="rss-links">
+            Loading...
+        </div>
+
+        <a class="more-button" href="learn-centre.html" target="_top">
+            See more on the Learn Centre
+        </a>
+    </div>
+
+    <script>
+        async function loadRSS() {
+            const rssUrl = "http://feeds.bbci.co.uk/news/world/rss.xml";
+            const response = await fetch(
+                `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`
+            );
+            const data = await response.json();
+
+            const container = document.getElementById("rss-links");
+            container.innerHTML = "";
+
+            if (!data.items || data.items.length === 0) {
+                container.textContent = "No news available.";
+                return;
+            }
+
+            // Only first two RSS links
+            data.items.slice(0, 3).forEach(item => {
+                const link = document.createElement("a");
+                link.href = item.link;
+                link.target = "_blank";
+                link.textContent = item.title;
+                container.appendChild(link);
+            });
+        }
+
+        loadRSS();
+    </script>
+
+</body>
+</html>
