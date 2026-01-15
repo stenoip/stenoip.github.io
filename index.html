@@ -7,6 +7,16 @@
     <link rel="icon" href="new-swc.png" type="image/png" />
     <title>StenoKonnect</title>
 
+ <!-- 
+COPYRIGHT 2026 Stenoip Company!
+
+
+    Copying is strictly prohibited.
+
+    -->
+    
+    
+    
     <style>
         /* BASE & FONT STYLES */
         @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
@@ -132,6 +142,235 @@
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #2196F3; }
         input:checked + .slider:before { transform: translateX(20px); }
+        /* WINDOWS 8 TILE GRID */
+
+.add-tile {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.add-tile input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    width: 200px;
+}
+
+.tile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.tile {
+    background: linear-gradient(135deg, #0078d7, #00a2ed);
+    color: white;
+    border-radius: 0px;
+    padding: 20px;
+    height: 120px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+
+.tile:hover {
+    transform: scale(1.05);
+}
+
+.tile-title {
+    font-weight: 700;
+    font-size: 16px;
+    word-break: break-word;
+}
+
+.tile-remove {
+    font-size: 12px;
+    opacity: 0.8;
+    align-self: flex-end;
+}
+/* ADD TILE (PLUS TILE) */
+
+.tile.add-tile {
+    background: #2d2d2d;
+    color: white;
+    font-size: 48px;
+    font-weight: 300;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile.add-tile:hover {
+    background: #3a3a3a;
+}
+
+/* ADD TILE FORM (INSIDE TILE) */
+
+.tile.add-tile form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.tile.add-tile input {
+    padding: 6px;
+    border: none;
+    outline: none;
+    font-size: 12px;
+}
+
+.tile.add-tile button {
+    background: #0078d7;
+    border: none;
+    color: white;
+    padding: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+/* SEARCH BARS */
+
+.search-bars {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.search-bars input {
+    flex: 1;
+    min-width: 240px;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    outline: none;
+    background: white;
+    color: black;
+}
+/* NEWS TILE (IFRAME) */
+
+.news-tile { width: 100%; min-height: 400px; /* adjust as needed */ height: 400px; /* force full height */ margin-top: 20px; background: #f2f2f2; border: 1px solid #ccc; overflow: hidden; display: block; /* simpler */ border-radius: 0; /* flat edges */ } .news-tile iframe { width: 100%; height: 100%; /* now fills parent properly */ border: none; display: block; /* ensures iframe fills parent */ }
+
+/* MY THINGS GRID */
+
+.my-things-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.my-things-grid .tile {
+    background: #0078d7; /* fixed color */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.my-things-grid .tile:hover {
+    background: #005a9e;
+}
+/* SIDEBAR */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;
+    background: #f2f2f2;
+    border-right: 1px solid #ccc;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+.sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    color: #0078d7;
+    font-weight: 500;
+}
+
+.sidebar ul li a:hover {
+    text-decoration: underline;
+}
+
+/* SIDEBAR TOGGLE BUTTON */
+#sidebar-toggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1100;
+    background: #0078d7;
+    color: white;
+    border: none;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 4px;
+}
+
+#sidebar-toggle:hover {
+    background: #005a9e;
+}
+
+/* ADJUST MAIN CONTENT */
+.container {
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar.open ~ .container {
+    margin-left: 220px;
+}
+
+/* RESPONSIVE: small screens */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+    .sidebar.open ~ .container {
+        margin-left: 0;
+    }
+}
+
+
+
+
     </style>
 </head>
 <body>
@@ -144,61 +383,88 @@
 
     <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
-    <div id="main-content" class="container" style="display: none;">
-        
-        <div id="header-placeholder"></div>
+    <div id="main-content" class="container" style="display:none;">
 
-        <div class="header">
-            <h1 style="margin:0;">StenoKonnect</h1>
-            <p>The Solar System's best web portal</p>
-            <div class="intro-toggle-container">
-                <span>Intro Video:</span>
-                <label class="switch">
-                    <input type="checkbox" id="introToggle">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-        </div>
 
-        <div class="portal-hub">
-            <a href="television_guide.html" class="hub-card">
-                <h2>Program Guide</h2>
-                <p>Access the full library of applications, games and calculators.</p>
-            </a>
-            <a href="office/home.html" class="hub-card">
-                <h2>StenoOffices</h2>
-                <p>Professional tools, documents and productivity software.</p>
-            </a>
-            <a href="https://stenoip.github.io/learn-centre" class="hub-card">
-                <h2>Learn Centre</h2>
-                <p>Explore educational resources, news and weather updates.</p>
-            </a>
-        </div>
 
-        <h3 style="text-align:center; color: #10a37f;">Need Help? Ask Praterich Navigator</h3>
-        <div class="ai-assistant-container">
-            <iframe src="ai-helper.html" title="StenoKonnect AI Helper"></iframe>
-        </div>
+<!-- SIDEBAR TOGGLE BUTTON -->
+<button id="sidebar-toggle">&#9776;</button>
 
-        <h3 style="text-align:center;">Wheel of Stenoip</h3>
-        <iframe src="https://stenoip.github.io/wheel_gifs" height="600px" width="100%" style="border-radius:12px; border:none;"></iframe>
 
-        <div class="bulletin-board">
-            <h2 style="text-align: center; color: rgb(255, 140, 0);">The Bulletin Board!</h2>
-            <ul id="bulletin-list"></ul>
-        </div>
+<!-- SIDEBAR NAVIGATION -->
+<div class="sidebar" id="sidebar">
+    <h3>Navigation</h3>
+    <ul>
+        <li><a href="#tile-grid">My Websites</a></li>
+        <li><a href="#my-things-grid">Our Stuff</a></li>
+        <li><a href="#news-tile">News</a></li>
+     
+    </ul>
+</div>
 
-        <button class="aero" id="notification-button" style="display:block; margin: 20px auto;" onclick="requestNotificationPermission()">
-            Sign Up for Notifications
-        </button>
 
-        <div class="footer">
-            <p>Version 1.23 &copy; 2026 Stenoip Company</p>
-            <p><a href="copyright.html">View our terms.</a>  <a href="privacy.html">Privacy Policy</a></p>
-        </div>
+
+<div id="header-placeholder"></div>
+
+    <div class="header">
+        <h1 style="margin:0;">StenoKonnect</h1>
+        <p>Your personal Web Portal</p>
+  <div class="intro-toggle-container" style="margin-top:10px;">
+    <span>Intro Video:</span>
+    <label class="switch">
+        <input type="checkbox" id="introToggle">
+        <span class="slider"></span>
+    </label>
+</div>
+
+
+
+  
+  </div>
+
+  <div class="search-bars">
+    <input
+        type="text"
+        id="tile-search"
+        placeholder="Search my tiles…"
+        oninput="filterTiles(this.value)"
+    >
+
+    <input
+        type="text"
+        id="web-search"
+        placeholder="Search the internet…"
+        onkeydown="handleWebSearch(event)"
+    >
+</div>
+
+<hr>
+    <!-- TILE GRID -->
+        <h2 style="margin top: 40px;">Make Your Own Web-Portal</h2>
+    <div class="tile-grid" id="tile-grid"></div>
+    
+    
+    <!-- NEWS IFRAME -->
+<div class="news-tile">
+    <iframe src="https://stenoip.github.io/learn-centre-iframe.html" title="News" loading="lazy"></iframe>
+</div>
+
+<hr>
+
+<h2 style="margin-top: 40px;">Our Stuff</h2>
+<div class="my-things-grid" id="my-things-grid"></div>
+
+
+    <div class="footer">
+        <p>Version 1.24 © 2026 Stenoip Company</p>
     </div>
 
-    <script src="script.js"></script>
+</div>
+
+
+    <script src= "script.js"></script>
+    
+    
     <script src="load-header.js"></script>
 </body>
 </html>
