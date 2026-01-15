@@ -1,13 +1,17 @@
 {
-  "name": "mail-steno-backend",
+  "name": "stenoip-konnect-backend",
   "version": "1.0.0",
-  "description": "Backend for sending emails with MailSteno",
-  "main": "server.js",
+  "description": "Serverless function to fetch favicon and colours for portal tiles",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "vercel dev"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "nodemailer": "^6.7.2"
+    "axios": "^1.6.0",
+    "jsdom": "^22.1.0",
+    "color-thief-node": "^2.1.0"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
