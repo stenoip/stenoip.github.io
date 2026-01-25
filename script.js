@@ -1,20 +1,19 @@
-
-
 // ===============================
 // COPYRIGHT STENOIP COMPANY!
-
-
-//COPING IS STRICTLY PROHIBETED
-
+// COPING IS STRICTLY PROHIBETED
 // ===============================
 
+var VERCEL_API = "https://stenoip-github-io.vercel.app/api/metadata";
+var TILE_STORAGE_KEY = 'stenokonnect_tiles';
+
+// --- INTRO & CONTENT CONTROL ---
+
 function showMainContent() {
-    const video = document.getElementById('intro-video');
+    var video = document.getElementById('intro-video');
     if (video) {
         video.pause();
         video.style.display = 'none';
     }
-
     document.getElementById('launch-screen').style.display = 'none';
     document.getElementById('skip-btn').style.display = 'none';
     document.getElementById('main-content').style.display = 'block';
@@ -22,14 +21,14 @@ function showMainContent() {
 }
 
 function startExperience() {
-    const introToggle = document.getElementById('introToggle');
+    var introToggle = document.getElementById('introToggle');
     document.getElementById('launch-screen').style.display = 'none';
 
     if (introToggle && introToggle.checked) {
-        const video = document.getElementById('intro-video');
-        video.muted = true; // autoplay-safe
+        var video = document.getElementById('intro-video');
+        video.muted = true;
         video.style.display = 'block';
-        video.play().catch(() => {});
+        video.play().catch(function() {});
         document.getElementById('skip-btn').style.display = 'block';
     } else {
         showMainContent();
@@ -40,19 +39,20 @@ function skipVideo() {
     showMainContent();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const introToggle = document.getElementById('introToggle');
-    const saved = localStorage.getItem('introVideoEnabled');
+// --- INITIALIZATION ---
+
+document.addEventListener('DOMContentLoaded', function() {
+    var introToggle = document.getElementById('introToggle');
+    var saved = localStorage.getItem('introVideoEnabled');
 
     if (introToggle) {
         introToggle.checked = saved === null ? true : saved === 'true';
-
         introToggle.addEventListener('change', function () {
             localStorage.setItem('introVideoEnabled', this.checked);
         });
     }
 
-    const video = document.getElementById('intro-video');
+    var video = document.getElementById('intro-video');
     if (video) {
         video.muted = true;
         video.addEventListener('ended', showMainContent);
@@ -61,25 +61,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!introToggle || !introToggle.checked) {
         showMainContent();
     } else {
-        document.getElementById('launch-screen').style.display = 'flex';
+        var launch = document.getElementById('launch-screen');
+        if (launch) launch.style.display = 'flex';
         if (video) video.style.display = 'none';
     }
 
     renderTiles();
+    renderMyThings();
 });
 
-// ===============================
-// WINDOWS 8 STYLE TILE SYSTEM
-// ===============================
-
-const TILE_STORAGE_KEY = 'stenokonnect_tiles';
+// --- WINDOWS 8 STYLE TILE SYSTEM ---
 
 function getTiles() {
     try {
         return JSON.parse(localStorage.getItem(TILE_STORAGE_KEY)) || [];
-    } catch {
-        return [];
-    }
+    } catch(e) { return []; }
 }
 
 function saveTiles(tiles) {
@@ -87,24 +83,25 @@ function saveTiles(tiles) {
 }
 
 function renderTiles() {
-    const grid = document.getElementById("tile-grid");
+    var grid = document.getElementById("tile-grid");
     if (!grid) return;
 
     grid.innerHTML = '';
-    const tiles = getTiles();
+    var tiles = getTiles();
 
-    // EXISTING TILES
-    tiles.forEach((tile, index) => {
-        const tileEl = document.createElement('div');
+    tiles.forEach(function(tile, index) {
+        var tileEl = document.createElement('div');
         tileEl.className = 'tile';
-        tileEl.onclick = () => window.open(tile.url, '_blank');
+        // Apply dynamic color from API
+        tileEl.style.backgroundColor = tile.color || '#2d89ef'; 
+        tileEl.onclick = function() { window.open(tile.url, '_blank'); };
 
-        tileEl.innerHTML = `
-            <div class="tile-title">${escapeHtml(tile.name)}</div>
-            <div class="tile-remove" title="Remove">✕</div>
-        `;
+        tileEl.innerHTML = 
+            (tile.favicon ? '<img src="' + tile.favicon + '" style="width:32px; height:32px; margin-bottom:10px;">' : '') +
+            '<div class="tile-title">' + escapeHtml(tile.name) + '</div>' +
+            '<div class="tile-remove" title="Remove">✕</div>';
 
-        tileEl.querySelector('.tile-remove').onclick = (e) => {
+        tileEl.querySelector('.tile-remove').onclick = function(e) {
             e.stopPropagation();
             removeTile(index);
         };
@@ -112,162 +109,132 @@ function renderTiles() {
         grid.appendChild(tileEl);
     });
 
-    // ADD TILE (PLUS TILE)
-    const addTileEl = document.createElement('div');
+    var addTileEl = document.createElement('div');
     addTileEl.className = 'tile add-tile';
     addTileEl.innerHTML = '+';
-
-    addTileEl.onclick = () => showAddTileForm(addTileEl);
-
+    addTileEl.onclick = function() { showAddTileForm(addTileEl); };
     grid.appendChild(addTileEl);
 }
 
+function showAddTileForm(tileEl) {
+    tileEl.onclick = null;
+    tileEl.innerHTML = 
+        '<form onsubmit="submitNewTile(event)" style="display:flex; flex-direction:column; gap:5px; padding:10px;">' +
+            '<input type="text" id="new-tile-name" placeholder="Site name" required style="color:black">' +
+            '<input type="text" id="new-tile-url" placeholder="example.com" required style="color:black">' +
+            '<button type="submit" style="cursor:pointer">Add</button>' +
+        '</form>';
+}
 
-function addTile() {
-    const nameInput = document.getElementById('tile-name');
-    const urlInput = document.getElementById('tile-url');
+async function submitNewTile(event) {
+    event.preventDefault();
+    var name = document.getElementById('new-tile-name').value.trim();
+    var url = document.getElementById('new-tile-url').value.trim();
 
-    if (!nameInput || !urlInput) return;
+    if (!name || !url) return;
+    if (!url.startsWith('http')) url = 'https://' + url;
 
-    const name = nameInput.value.trim();
-    let url = urlInput.value.trim();
-
-    if (!name || !url) {
-        alert('Please enter a site name and URL.');
-        return;
+    try {
+        // Fetch metadata from Vercel
+        var response = await fetch(VERCEL_API + "?url=" + encodeURIComponent(url));
+        var meta = await response.json();
+        
+        var tiles = getTiles();
+        tiles.push({ 
+            name: name, 
+            url: url, 
+            favicon: meta.favicon, 
+            color: meta.color 
+        });
+        saveTiles(tiles);
+        renderTiles();
+    } catch (e) {
+        console.error("Backend error:", e);
+        // Fallback if API fails
+        var tilesFallback = getTiles();
+        tilesFallback.push({ name: name, url: url, color: '#2d89ef' });
+        saveTiles(tilesFallback);
+        renderTiles();
     }
-
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-    }
-
-    const tiles = getTiles();
-    tiles.push({ name, url });
-    saveTiles(tiles);
-
-    nameInput.value = '';
-    urlInput.value = '';
-
-    renderTiles();
 }
 
 function removeTile(index) {
-    const tiles = getTiles();
+    var tiles = getTiles();
     tiles.splice(index, 1);
     saveTiles(tiles);
     renderTiles();
 }
 
-// ===============================
-// UTIL
-// ===============================
+// --- UTILS & SEARCH ---
 
 function escapeHtml(text) {
-    return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
-  function showAddTileForm(tileEl) {
-    tileEl.onclick = null;
-
-    tileEl.innerHTML = `
-        <form onsubmit="submitNewTile(event)">
-            <input type="text" id="new-tile-name" placeholder="Site name" required>
-            <input type="url" id="new-tile-url" placeholder="https://example.com" required>
-            <button type="submit">Add</button>
-        </form>
-    `;
-}
-
-function submitNewTile(event) {
-    event.preventDefault();
-
-    const name = document.getElementById('new-tile-name').value.trim();
-    let url = document.getElementById('new-tile-url').value.trim();
-
-    if (!name || !url) return;
-
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-    }
-
-    const tiles = getTiles();
-    tiles.push({ name, url });
-    saveTiles(tiles);
-
-    renderTiles();
-}
-  function filterTiles(query) {
-    const tiles = document.querySelectorAll('.tile:not(.add-tile)');
-    const lower = query.toLowerCase();
-
-    tiles.forEach(tile => {
-        const title = tile.querySelector('.tile-title')?.textContent.toLowerCase() || '';
+function filterTiles(query) {
+    var tiles = document.querySelectorAll('.tile:not(.add-tile)');
+    var lower = query.toLowerCase();
+    tiles.forEach(function(tile) {
+        var title = tile.querySelector('.tile-title')?.textContent.toLowerCase() || '';
         tile.style.display = title.includes(lower) ? '' : 'none';
     });
 }
+
 function handleWebSearch(event) {
     if (event.key === 'Enter') {
-        const query = event.target.value.trim();
+        var query = event.target.value.trim();
         if (!query) return;
-
-        const url = `https://stenoip.github.io/oodles/search?q=${encodeURIComponent(query)}`;
+        var url = "https://stenoip.github.io/oodles/search?q=" + encodeURIComponent(query);
         window.open(url, '_blank');
         event.target.value = '';
     }
 }
-// Fixed My Things (cannot be removed)
-const MY_THINGS = [
+
+// --- FIXED MY THINGS ---
+
+var MY_THINGS = [
     { name: 'StenoKonnect Home', url: 'index.html' },
     { name: 'Learn Centre', url: 'https://stenoip.github.io/learn-centre' },
     { name: 'Television Guide', url: 'television_guide.html' }
 ];
 
 function renderMyThings() {
-    const grid = document.getElementById('my-things-grid');
+    var grid = document.getElementById('my-things-grid');
     if (!grid) return;
-
     grid.innerHTML = '';
-
-    MY_THINGS.forEach(item => {
-        const tile = document.createElement('div');
+    MY_THINGS.forEach(function(item) {
+        var tile = document.createElement('div');
         tile.className = 'tile';
+        tile.style.backgroundColor = '#333';
         tile.textContent = item.name;
-
-        tile.onclick = () => window.open(item.url, '_blank');
+        tile.onclick = function() { window.open(item.url, '_blank'); };
         grid.appendChild(tile);
     });
 }
 
-renderMyThings();
+// --- SIDEBAR LOGIC ---
 
-document.querySelectorAll('.sidebar a[href^="#"]').forEach(anchor => {
+document.querySelectorAll('.sidebar a[href^="#"]').forEach(function(anchor) {
     anchor.addEventListener('click', function(e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        var target = document.querySelector(this.getAttribute('href'));
         if (target) target.scrollIntoView({ behavior: 'smooth' });
     });
 });
 
-const sidebar = document.getElementById('sidebar');
-const toggleBtn = document.getElementById('sidebar-toggle');
+var sidebar = document.getElementById('sidebar');
+var toggleBtn = document.getElementById('sidebar-toggle');
 
-toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-});
+if (toggleBtn) {
+    toggleBtn.addEventListener('click', function() {
+        sidebar.classList.toggle('open');
+    });
+}
 
-// Optional: click outside sidebar to close it
-document.addEventListener('click', (e) => {
-    if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+document.addEventListener('click', function(e) {
+    if (sidebar && toggleBtn && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
         sidebar.classList.remove('open');
     }
 });
-
-
-
-    
-    
