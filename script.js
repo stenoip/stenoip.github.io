@@ -66,11 +66,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (video) video.style.display = 'none';
     }
 
+    migrateOldTiles();
     renderTiles();
     renderMyThings();
 });
 
-// --- WINDOWS 8 STYLE TILE SYSTEM ---
+// --- LOCAL STORAGE UTILITIES ---
 
 function getTiles() {
     try {
@@ -82,6 +83,22 @@ function saveTiles(tiles) {
     localStorage.setItem(TILE_STORAGE_KEY, JSON.stringify(tiles));
 }
 
+// --- MIGRATION: update old tiles with missing colours ---
+
+function migrateOldTiles() {
+    var tiles = getTiles();
+    var updated = false;
+    for (var i = 0; i < tiles.length; i++) {
+        if (!tiles[i].color) {
+            tiles[i].color = getRandomWin8Color();
+            updated = true;
+        }
+    }
+    if (updated) saveTiles(tiles);
+}
+
+// --- WINDOWS 8 STYLE TILE SYSTEM ---
+
 function renderTiles() {
     var grid = document.getElementById("tile-grid");
     if (!grid) return;
@@ -92,8 +109,7 @@ function renderTiles() {
     tiles.forEach(function(tile, index) {
         var tileEl = document.createElement('div');
         tileEl.className = 'tile';
-        // Apply dynamic color from API
-        tileEl.style.backgroundColor = tile.color || '#2d89ef'; 
+        tileEl.style.backgroundColor = tile.color || '#2d89ef';
         tileEl.onclick = function() { window.open(tile.url, '_blank'); };
 
         tileEl.innerHTML = 
@@ -114,6 +130,9 @@ function renderTiles() {
     addTileEl.innerHTML = '+';
     addTileEl.onclick = function() { showAddTileForm(addTileEl); };
     grid.appendChild(addTileEl);
+
+    // Refresh colors for tiles that still have fallback blue
+    refreshTileColors();
 }
 
 function showAddTileForm(tileEl) {
@@ -135,24 +154,22 @@ async function submitNewTile(event) {
     if (!url.startsWith('http')) url = 'https://' + url;
 
     try {
-        // Fetch metadata from Vercel
         var response = await fetch(VERCEL_API + "?url=" + encodeURIComponent(url));
         var meta = await response.json();
-        
+
         var tiles = getTiles();
         tiles.push({ 
             name: name, 
             url: url, 
             favicon: meta.favicon, 
-            color: meta.color 
+            color: meta.color || getRandomWin8Color()
         });
         saveTiles(tiles);
         renderTiles();
     } catch (e) {
         console.error("Backend error:", e);
-        // Fallback if API fails
         var tilesFallback = getTiles();
-        tilesFallback.push({ name: name, url: url, color: '#2d89ef' });
+        tilesFallback.push({ name: name, url: url, color: getRandomWin8Color() });
         saveTiles(tilesFallback);
         renderTiles();
     }
@@ -163,6 +180,29 @@ function removeTile(index) {
     tiles.splice(index, 1);
     saveTiles(tiles);
     renderTiles();
+}
+
+// --- REFRESH TILE COLOURS FOR FALLBACKS ---
+
+function refreshTileColors() {
+    var tiles = getTiles();
+    var updated = false;
+
+    tiles.forEach(async function(tile, index) {
+        if (!tile.color || tile.color === '#2d89ef') {
+            try {
+                var response = await fetch(VERCEL_API + "?url=" + encodeURIComponent(tile.url));
+                var meta = await response.json();
+                tile.color = meta.color || getRandomWin8Color();
+                saveTiles(tiles);
+                renderTiles();
+            } catch(e) {
+                tile.color = getRandomWin8Color();
+                saveTiles(tiles);
+                renderTiles();
+            }
+        }
+    });
 }
 
 // --- UTILS & SEARCH ---
@@ -238,3 +278,10 @@ document.addEventListener('click', function(e) {
         sidebar.classList.remove('open');
     }
 });
+
+// --- WINDOWS 8 COLOURS HELPER ---
+
+function getRandomWin8Color() {
+    var colors = ["#2d89ef", "#603cba", "#1e7145", "#b91d47", "#e3a21a", "#00a300"];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
