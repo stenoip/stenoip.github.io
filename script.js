@@ -131,8 +131,7 @@ function renderTiles() {
     addTileEl.onclick = function() { showAddTileForm(addTileEl); };
     grid.appendChild(addTileEl);
 
-    // Refresh colors for tiles that still have fallback blue
-    refreshTileColors();
+  
 }
 
 function showAddTileForm(tileEl) {
@@ -179,7 +178,7 @@ function removeTile(index) {
     var tiles = getTiles();
     tiles.splice(index, 1);
     saveTiles(tiles);
-    
+    renderTiles();
 }
 
 // --- REFRESH TILE COLOURS FOR FALLBACKS ---
