@@ -1,7 +1,7 @@
 {
   "name": "stenoip-konnect-backend",
   "version": "1.0.0",
-  "description": "Serverless function to fetch favicon and colours for portal tiles",
+  "description": "Serverless function to fetch favicon and colors for portal tiles",
   "main": "index.js",
   "scripts": {
     "start": "vercel dev"
@@ -9,7 +9,7 @@
   "dependencies": {
     "axios": "^1.6.0",
     "jsdom": "^22.1.0",
-    "color-thief-node": "^1.0.3"
+    "fast-average-color-node": "^6.1.0"
   },
   "engines": {
     "node": "24.x"
