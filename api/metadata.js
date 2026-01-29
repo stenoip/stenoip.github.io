@@ -1,36 +1,37 @@
 var axios = require('axios');
 var FAC = require('fast-average-color-node');
-
-var fac = new FAC.FastAverageColor();
+var fac = FAC;
 
 module.exports = async function(req, res) {
-    // CORS headers
+    // CORS headers (must be sent even on errors)
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Handle preflight
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     var targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).json({ error: "No URL provided" });
 
     try {
-        // Favicon URL via Google service
-        var favicon = "https://www.google.com/s2/favicons?sz=128&domain=" + targetUrl;
+        var faviconUrl = "https://www.google.com/s2/favicons?sz=128&domain=" + targetUrl;
 
-        // Extract dominant color from favicon
-        var colorData = await fac.getColorAsync(favicon);
+        // Fetch favicon as arraybuffer
+        var response = await axios.get(faviconUrl, { responseType: 'arraybuffer' });
+        var buffer = Buffer.from(response.data, 'binary');
+
+        // Extract average color
+        var colorData = await fac.getAverageColor(buffer);
 
         res.json({
-            favicon: favicon,
+            favicon: faviconUrl,
             color: colorData.hex
         });
     } catch (error) {
-        // Fallback in case favicon or colour extraction fails
-        res.json({
+        console.error("API error:", error.message);
+        res.status(200).json({
             favicon: '',
-            color: '#2d89ef'
+            color: '#2d89ef' // fallback color
         });
     }
 };
