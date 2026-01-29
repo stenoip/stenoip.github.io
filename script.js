@@ -186,22 +186,29 @@ function removeTile(index) {
 
 function refreshTileColors() {
     var tiles = getTiles();
-    var updated = false;
+    var fetchPromises = [];
 
-    tiles.forEach(async function(tile, index) {
+    tiles.forEach(function(tile, index) {
         if (!tile.color || tile.color === '#2d89ef') {
-            try {
-                var response = await fetch(VERCEL_API + "?url=" + encodeURIComponent(tile.url));
-                var meta = await response.json();
-                tile.color = meta.color || getRandomWin8Color();
-                saveTiles(tiles);
-                renderTiles();
-            } catch(e) {
-                tile.color = getRandomWin8Color();
-                saveTiles(tiles);
-                renderTiles();
+            if (tile.url) {
+                fetchPromises.push(
+                    fetch(VERCEL_API + "?url=" + encodeURIComponent(tile.url))
+                        .then(function(response) { return response.json(); })
+                        .then(function(meta) {
+                            tile.color = meta.color || getRandomWin8Color();
+                        })
+                        .catch(function() {
+                            tile.color = getRandomWin8Color();
+                        })
+                );
             }
         }
+    });
+
+    // Update localStorage and rerender once after all fetches
+    Promise.all(fetchPromises).then(function() {
+        saveTiles(tiles);
+        renderTiles();
     });
 }
 
