@@ -3,7 +3,7 @@ var axios = require('axios');
 module.exports = async function(req, res) {
     // Enable CORS so your GitHub Pages site can talk to Vercel
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Methods', '*');
 
     var targetUrl = req.query.url;
     if (!targetUrl) {
