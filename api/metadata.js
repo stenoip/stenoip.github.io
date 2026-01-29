@@ -1,28 +1,36 @@
 var axios = require('axios');
+var FAC = require('fast-average-color-node');
+
+var fac = new FAC.FastAverageColor();
 
 module.exports = async function(req, res) {
-    // Enable CORS so your GitHub Pages site can talk to Vercel
+    // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Handle preflight
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
     var targetUrl = req.query.url;
-    if (!targetUrl) {
-        return res.status(400).json({ error: "No URL provided" });
-    }
+    if (!targetUrl) return res.status(400).json({ error: "No URL provided" });
 
     try {
-        // Use Google's favicon service (high quality)
+        // Favicon URL via Google service
         var favicon = "https://www.google.com/s2/favicons?sz=128&domain=" + targetUrl;
-        
-        // Default Windows 8-style accent colors to pick from randomly if we can't get a specific one
-        var win8Colors = ["#2d89ef", "#603cba", "#1e7145", "#b91d47", "#e3a21a", "#00a300"];
-        var color = win8Colors[Math.floor(Math.random() * win8Colors.length)];
+
+        // Extract dominant color from favicon
+        var colorData = await fac.getColorAsync(favicon);
 
         res.json({
             favicon: favicon,
-            color: color
+            color: colorData.hex
         });
     } catch (error) {
-        res.json({ favicon: '', color: '#2d89ef' });
+        // Fallback in case favicon or colour extraction fails
+        res.json({
+            favicon: '',
+            color: '#2d89ef'
+        });
     }
 };
