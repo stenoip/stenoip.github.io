@@ -179,7 +179,7 @@ function removeTile(index) {
     var tiles = getTiles();
     tiles.splice(index, 1);
     saveTiles(tiles);
-    renderTiles();
+    
 }
 
 // --- REFRESH TILE COLOURS FOR FALLBACKS ---
