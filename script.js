@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     migrateOldTiles();
     renderTiles();
+    refreshTileColors();
     renderMyThings();
 });
 
