@@ -167,6 +167,7 @@ COPYRIGHT 2026 Stenoip Company!
 }
 
 .tile {
+    position: relative; /* Add this */
     background: linear-gradient(135deg, #0078d7, #00a2ed);
     color: white;
     border-radius: 0px;
@@ -178,6 +179,7 @@ COPYRIGHT 2026 Stenoip Company!
     justify-content: space-between;
     box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     transition: transform 0.2s;
+    overflow: hidden; /* Recommended to keep glass inside corners */
 }
         /* Glass overlay */
 .tile::before {
@@ -477,7 +479,7 @@ COPYRIGHT 2026 Stenoip Company!
 
 
     <div class="footer">
-        <p>Version 1.26 © 2026 Stenoip Company</p>
+        <p>Version 1.28 © 2026 Stenoip Company</p>
     </div>
 
 </div>
