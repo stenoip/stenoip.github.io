@@ -26,7 +26,7 @@ function startExperience() {
 
     if (introToggle && introToggle.checked) {
         var video = document.getElementById('intro-video');
-        video.muted = true;
+        video.muted = false;
         video.style.display = 'block';
         video.play().catch(function() {});
         document.getElementById('skip-btn').style.display = 'block';
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var video = document.getElementById('intro-video');
     if (video) {
-        video.muted = true;
+        video.muted = false;
         video.addEventListener('ended', showMainContent);
     }
 
