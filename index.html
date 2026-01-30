@@ -167,8 +167,7 @@ COPYRIGHT 2026 Stenoip Company!
 }
 
 .tile {
-    position: relative; /* Add this */
-    background: linear-gradient(135deg, #0078d7, #00a2ed);
+    background-color: var(--tile-colour, #2d89ef);
     color: white;
     border-radius: 0px;
     padding: 20px;
@@ -179,28 +178,6 @@ COPYRIGHT 2026 Stenoip Company!
     justify-content: space-between;
     box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     transition: transform 0.2s;
-    overflow: hidden; /* Recommended to keep glass inside corners */
-}
-        /* Glass overlay */
-.tile::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,0.35),
-            rgba(255,255,255,0.05)
-        );
-    backdrop-filter: blur(8px) saturate(140%);
-    -webkit-backdrop-filter: blur(8px) saturate(140%);
-    pointer-events: none;
-}
-
-/* Content stays sharp */
-.tile > * {
-    position: relative;
-    z-index: 1;
 }
 
 .tile:hover {
@@ -391,9 +368,6 @@ COPYRIGHT 2026 Stenoip Company!
     }
 }
 
-
-
-
     </style>
 </head>
 <body>
@@ -479,7 +453,7 @@ COPYRIGHT 2026 Stenoip Company!
 
 
     <div class="footer">
-        <p>Version 1.28 © 2026 Stenoip Company</p>
+        <p>Version 1.30 © 2026 Stenoip Company</p>
     </div>
 
 </div>
