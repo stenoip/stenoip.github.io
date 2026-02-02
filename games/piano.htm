@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stenoip Piano</title>
+    <style>
+        
+        body {
+            font-family: 'Google Sans', sans-serif;
+            background-color: rgb(255, 191, 0); 
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+            padding-top: 60px;   
+        }
+
+        h1 {
+            color: #222;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.4);
+        }
+
+        .instructions {
+            margin-bottom: 30px;
+            color: #444;
+            font-size: 14px;
+        }
+
+        /* Piano Container */
+        #piano-container {
+            position: relative; /* Essential for absolute positioning of black keys */
+            display: flex; /* Arranges white keys in a row */
+            background: #222;
+            padding: 15px 15px 0 15px; /* Top padding creates the 'backboard' look */
+            border-radius: 8px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Common Key Styles */
+        .key {
+            position: relative;
+            cursor: pointer;
+            border-radius: 0 0 4px 4px;
+            user-select: none;
+            transition: background 0.1s, transform 0.05s;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-weight: bold;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+        }
+
+        .key:active, .key.active {
+            transform: translateY(2px);
+        }
+
+        /* White Keys */
+        .white-key {
+            width: 50px; /* Fixed width */
+            height: 220px;
+            background: #fff;
+            border: 1px solid #999;
+            border-top: none; /* Looks cleaner attached to header */
+            z-index: 1;
+            color: #999;
+            font-size: 12px;
+            margin-right: 0; /* Flexbox handles layout */
+        }
+
+        .white-key:active, .white-key.active {
+            background: #eee;
+            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #bbb;
+        }
+
+        /* Black Keys */
+        .black-key {
+            width: 32px;
+            height: 140px;
+            background: #111;
+            position: absolute; /* Taken out of flow to sit on top */
+            z-index: 10;
+            top: 0; /* Align with top of container (excluding padding handled by JS if needed, but here relative to container) */
+            border: 1px solid #000;
+            border-top: none;
+            color: #ccc;
+            font-size: 10px;
+            /* Gradient for 3D effect */
+            background: linear-gradient(to bottom, #333 0%, #000 100%);
+        }
+
+        .black-key:active, .black-key.active {
+            background: #000;
+            box-shadow: inset 0 0 5px #555;
+        }
+
+        /* Labels inside keys */
+        .key-label {
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.2;
+        }
+        .key-shortcut {
+            font-size: 9px;
+            opacity: 0.6;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        .copyright {
+            margin-top: 50px;
+            font-size: 12px;
+            color: #555;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+    <h1>Stenoip Piano</h1>
+    <div class="instructions">Use your mouse or keyboard (A - Enter)</div>
+    
+    <div id="piano-container"></div>
+
+    <div class="copyright">&copy; Stenoip Company</div>
+
+    <script>
+        // Strictly use VAR
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        var audioCtx = new AudioContext();
+
+        // Keyboard mapping for shortcuts
+        // Lower row white: a, s, d, f, g, h, j, k, l, ;
+        // Upper row black: w, e, t, y, u, o, p
+        var keyMap = {
+            'a': 0,  // C4
+            'w': 1,  // C#4
+            's': 2,  // D4
+            'e': 3,  // D#4
+            'd': 4,  // E4
+            'f': 5,  // F4
+            't': 6,  // F#4
+            'g': 7,  // G4
+            'y': 8,  // G#4
+            'h': 9,  // A4
+            'u': 10, // A#4
+            'j': 11, // B4
+            'k': 12, // C5
+            'o': 13, // C#5
+            'l': 14, // D5
+            'p': 15, // D#5
+            ';': 16, // E5
+            "'": 17, // F5
+            ']': 18, // F#5 -- mapping gets tricky here on standard keyboards, adjusting logic below
+            // Extended mapping
+            'z': 12, 'x': 14, 'c': 16, 'v': 17 // Alternative bottom row
+        };
+
+        // Note Data: C4 to C6
+        var notes = [
+            { note: "C4",  freq: 261.63, type: "w", key: "a" },
+            { note: "C#4", freq: 277.18, type: "b", key: "w" },
+            { note: "D4",  freq: 293.66, type: "w", key: "s" },
+            { note: "D#4", freq: 311.13, type: "b", key: "e" },
+            { note: "E4",  freq: 329.63, type: "w", key: "d" },
+            { note: "F4",  freq: 349.23, type: "w", key: "f" },
+            { note: "F#4", freq: 369.99, type: "b", key: "t" },
+            { note: "G4",  freq: 392.00, type: "w", key: "g" },
+            { note: "G#4", freq: 415.30, type: "b", key: "y" },
+            { note: "A4",  freq: 440.00, type: "w", key: "h" },
+            { note: "A#4", freq: 466.16, type: "b", key: "u" },
+            { note: "B4",  freq: 493.88, type: "w", key: "j" },
+            { note: "C5",  freq: 523.25, type: "w", key: "k" },
+            { note: "C#5", freq: 554.37, type: "b", key: "o" },
+            { note: "D5",  freq: 587.33, type: "w", key: "l" },
+            { note: "D#5", freq: 622.25, type: "b", key: "p" },
+            { note: "E5",  freq: 659.25, type: "w", key: ";" },
+            { note: "F5",  freq: 698.46, type: "w", key: "'" },
+            { note: "F#5", freq: 739.99, type: "b", key: "]" }, // Requires standard layout
+            { note: "G5",  freq: 783.99, type: "w", key: "\\" },
+            { note: "G#5", freq: 830.61, type: "b", key: "" }, // ran out of easy keys
+            { note: "A5",  freq: 880.00, type: "w", key: "" },
+            { note: "A#5", freq: 932.33, type: "b", key: "" },
+            { note: "B5",  freq: 987.77, type: "w", key: "" },
+            { note: "C6",  freq: 1046.50, type: "w", key: "" }
+        ];
+
+        var container = document.getElementById('piano-container');
+        var oscillatorMap = {}; // To stop sound on keyup if desired, or prevent overlapping
+
+        // Play Tone Function
+        var playTone = function(freq) {
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+
+            osc.type = 'sine'; // Sine is smoother, Triangle is brassier. 
+            osc.frequency.value = freq;
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            var now = audioCtx.currentTime;
+            
+            // Envelope for click-free sound
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.3, now + 0.02); // Quick Attack
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0); // Decay
+
+            osc.start(now);
+            osc.stop(now + 1.0);
+        };
+
+        // Render Piano
+        var whiteKeysCount = 0;
+        var whiteKeyWidth = 50; // Defined in CSS width
+        var whiteKeyBorder = 2; // 1px left + 1px right
+        var totalWhiteWidth = whiteKeyWidth + whiteKeyBorder; 
+        
+        /* CSS padding on container (left) needs to be accounted for if absolute pos is relative to container
+         However, white keys are in flow, black keys are absolute.
+         If container has padding: 15px.
+         First white key starts at x=15 (visually).
+         Since Black key is absolute relative to container, we must add 15px to calculation. */
+        var containerPadding = 15; 
+        var blackKeyWidth = 32;
+
+        for (var i = 0; i < notes.length; i++) {
+            var n = notes[i];
+            var el = document.createElement('div');
+            
+            // Label HTML
+            var shortcutLabel = n.key ? '<br><span class="key-shortcut">(' + n.key + ')</span>' : '';
+            el.innerHTML = '<div class="key-label">' + n.note + shortcutLabel + '</div>';
+            
+            el.dataset.freq = n.freq;
+            el.dataset.index = i; // Store index for keyboard mapping
+            el.id = 'key-' + i;
+
+            // Mouse Events
+            el.addEventListener('mousedown', function() {
+                playTone(parseFloat(this.dataset.freq));
+                this.classList.add('active');
+            });
+            el.addEventListener('mouseup', function() {
+                this.classList.remove('active');
+            });
+            el.addEventListener('mouseleave', function() {
+                this.classList.remove('active');
+            });
+
+            if (n.type === 'w') {
+                el.className = 'key white-key';
+                container.appendChild(el);
+                whiteKeysCount++;
+            } else {
+                el.className = 'key black-key';
+                // Calculation:
+                // We want the black key to be centered on the line after the previous white key.
+                // Previous white key index is (whiteKeysCount).
+                // Distance = (whiteKeysCount * totalWhiteWidth) + padding - (blackKeyWidth / 2)
+                
+                var leftPos = (whiteKeysCount * totalWhiteWidth) + containerPadding - (blackKeyWidth / 2);
+                
+                // Fine tune: border calculation might be slightly off due to box-sizing.
+                // Default box-sizing is content-box. Width 50 + border 1 + 1 = 52.
+                // The edge of the Nth white key is at N * 52.
+                
+                el.style.left = leftPos + 'px';
+                // Since black keys are absolute, they don't affect flow.
+                // Just append to container.
+                container.appendChild(el);
+            }
+        }
+
+        // Global Keyboard Events
+        window.addEventListener('keydown', function(e) {
+            // Prevent repeating if key is held down
+            if (e.repeat) return;
+
+            var key = e.key.toLowerCase();
+            
+            // Find note index by key char
+            // We loop through notes to find matching key
+            for(var j=0; j<notes.length; j++) {
+                if(notes[j].key === key) {
+                    var btn = document.getElementById('key-' + j);
+                    if(btn) {
+                        playTone(notes[j].freq);
+                        btn.classList.add('active');
+                    }
+                    break;
+                }
+            }
+        });
+
+        window.addEventListener('keyup', function(e) {
+            var key = e.key.toLowerCase();
+            for(var j=0; j<notes.length; j++) {
+                if(notes[j].key === key) {
+                    var btn = document.getElementById('key-' + j);
+                    if(btn) {
+                        btn.classList.remove('active');
+                    }
+                    break;
+                }
+            }
+        });
+
+    </script>
+   <script src="/load-header.js"></script>
+</body>
+</html>
