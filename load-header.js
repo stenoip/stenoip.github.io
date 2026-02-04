@@ -1,7 +1,7 @@
 function loadHeader() {
     // Use the Fetch API to get the content of the header.html file
     // Note: Requires a fetch polyfill for IE11
-    fetch('header.html')
+    fetch('/header.html')
         .then(function(response) {
             // Check if the request was successful
             if (!response.ok) {
