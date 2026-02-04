@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Center - IE11 Edition</title>
+    <style>
+        /* --- IE11 COMPATIBLE STYLES (No CSS Variables) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #cce0ff;
+            /* IE11 fallback gradient */
+            background: linear-gradient(135deg, #cce0ff 0%, #e6f0ff 30%, #ffffff 70%);
+            background-attachment: fixed;
+            color: #0d1a29;
+        }
+
+        header {
+            background: #0088ff;
+            background: linear-gradient(to bottom, #7bbaff, #0088ff);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 32px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .message-board {
+            background: rgba(220, 240, 255, 0.9); /* Higher opacity since blur won't work */
+            padding: 12px 20px;
+            text-align: center;
+            margin: 10px auto;
+            width: 90%;
+            border: 1px solid #ffffff;
+            border-radius: 10px;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 30px auto 80px auto;
+        }
+
+        /* IE11 Flexbox Fixes */
+        .content {
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-pack: distribute;
+            justify-content: space-around;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+        }
+
+        .news, .weather, .clock {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ffffff;
+            border-radius: 25px;
+            padding: 25px;
+            margin: 10px; /* Replaces 'gap' which IE11 doesn't support */
+            -ms-flex: 1 1 300px;
+            flex: 1 1 300px;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #0088ff;
+            border-bottom: 2px solid rgba(0, 136, 255, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .clock-time {
+            font-size: 48px;
+            font-weight: bold;
+            color: #0088ff;
+        }
+
+        .rss-feed-item {
+            background: #ffffff;
+            background: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .copyright {
+            background: #dcf0ff;
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            border-top: 1px solid #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>Learn Center</header>
+
+    <div class="message-board">
+        New Lytze the Fuzbal Comic! <a href="https://stenoip.github.io/comic" style="color:#0088ff; font-weight:bold;">Check it out!</a>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="news">
+                <h2>Latest News</h2>
+                <div id="rss-feed-container">Loading news...</div>
+            </div>
+
+            <div class="weather">
+                <h2>Weather</h2>
+                <div id="weather-fallback">
+                    <a href="https://www.tomorrow.io/weather/" target="_blank">View Detailed Forecast</a>
+                </div>
+            </div>
+
+            <div class="clock">
+                <h2>Current Time</h2>
+                <div class="clock-time" id="clock">00:00:00</div>
+                <div id="date">Loading date...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copyright">
+        &copy; 2026 Stenoip Company. All rights reserved.
+    </div>
+
+    <script>
+        // --- IE11 COMPATIBLE CLOCK (No template literals) ---
+        function updateClock() {
+            var now = new Date();
+            var h = now.getHours();
+            var m = now.getMinutes();
+            var s = now.getSeconds();
+            h = (h < 10) ? "0" + h : h;
+            m = (m < 10) ? "0" + m : m;
+            s = (s < 10) ? "0" + s : s;
+            
+            document.getElementById("clock").innerHTML = h + ":" + m + ":" + s;
+            document.getElementById("date").innerHTML = now.toDateString();
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- IE11 COMPATIBLE RSS FETCH (Using XMLHttpRequest) ---
+        function fetchRSS() {
+            var rssUrl = "http://feeds.bbci.co.uk/news/world/rss.xml";
+            var apiUrl = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(rssUrl);
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", apiUrl, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    var container = document.getElementById("rss-feed-container");
+                    container.innerHTML = "";
+                    
+                    if (data.items) {
+                        for (var i = 0; i < Math.min(data.items.length, 5); i++) {
+                            var item = data.items[i];
+                            
+                            // Simple blacklist check
+                            var title = item.title.toLowerCase();
+                            if (title.indexOf("hate") !== -1 || title.indexOf("blood") !== -1) continue;
+
+                            var div = document.createElement("div");
+                            div.className = "rss-feed-item";
+                            div.innerHTML = '<a href="' + item.link + '" target="_blank" style="color:#38c172; font-weight:bold; text-decoration:none;">' + item.title + '</a>' +
+                                            '<p style="font-size:13px; margin:5px 0;">' + item.description.substring(0, 100) + '...</p>';
+                            container.appendChild(div);
+                        }
+                    }
+                }
+            };
+            xhr.send();
+        }
+        fetchRSS();
+    </script>
+</body>
+</html>
