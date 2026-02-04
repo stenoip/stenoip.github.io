@@ -224,8 +224,8 @@ function handleWebSearch(event) {
 // --- FIXED MY THINGS ---
 
 var MY_THINGS = [
-    { name: 'StenoKonnect Home', url: 'index.html' },
-    { name: 'Learn Centre', url: 'https://stenoip.github.io/learn-centre' },
+    { name: 'Comics', url: '/comic.html' },
+    { name: 'Learn Centre', url: 'https://stenoip.github.io/ie/learn-centre' },
     { name: 'Television Guide', url: 'television_guide.html' }
 ];
 
