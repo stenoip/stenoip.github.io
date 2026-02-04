@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="icon" href="new-swc.png" type="image/png" />
+    <title>StenoKonnect</title>
+
+    <style>
+        /* BASE & FONT STYLES */
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap');
+
+        body {
+            /* Fallback for Google Sans which might not render well in IE11 */
+            font-family: 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: rgb(255, 191, 0); 
+            margin: 0;
+            display: block; /* IE11 flex on body can be buggy */
+            text-align: center;
+            min-height: 100vh;
+            padding-bottom: 50px;
+            padding-top: 60px;   
+        }
+
+        /* AERO BUTTON STYLES - Removed OKLCH and Vars for IE11 */
+        button.aero {
+            background: #5d56f7; /* Fallback Color */
+            background: linear-gradient(to bottom, #4a44d1, #7a74ff);
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+            border: 1px solid #7a74ff;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 1em 10px;
+            padding: 10px 20px;
+            position: relative;
+            color: white; 
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+
+        button.aero:after {
+            content: "";
+            position: absolute;
+            top: 4%; left: 10%; width: 80%; height: 40%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));
+            border-radius: 20px;
+        }
+
+        /* PORTAL STRUCTURE */
+        .container { 
+            width: 90%; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            text-align: left; 
+        }
+        
+        .header {
+            background-color: #eeff00;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* TILE GRID - Flexbox fallback for IE11 Grid issues */
+        .tile-grid, .portal-hub, .my-things-grid {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 30px -10px;
+        }
+
+        .hub-card, .tile {
+            margin: 10px;
+            flex: 1 1 140px;
+            background: #ffffff; /* No backdrop-filter in IE11 */
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            text-align: center;
+            text-decoration: none;
+            color: black;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            min-height: 120px;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .tile {
+            background-color: #2d89ef;
+            color: white;
+            border-radius: 0px;
+            padding: 20px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        /* SEARCH BARS */
+        .search-bars {
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .search-bars input {
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            background: white;
+            color: black;
+            width: 45%;
+            margin-right: 2%;
+        }
+
+        /* NEWS TILE */
+        .news-tile { 
+            width: 100%; 
+            height: 400px; 
+            margin-top: 20px; 
+            background: #f2f2f2; 
+            border: 1px solid #ccc; 
+        } 
+        
+        .news-tile iframe { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+        }
+
+        /* SIDEBAR - Uses pixel values instead of transforms where IE struggles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -220px; /* Hide by default */
+            width: 220px;
+            height: 100%;
+            background: #f2f2f2;
+            border-right: 1px solid #ccc;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        #sidebar-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1100;
+            background: #0078d7;
+            color: white;
+            border: none;
+            padding: 10px 12px;
+            cursor: pointer;
+        }
+
+        .footer { width: 100%; text-align: center; padding: 20px; font-size: 12px; background-color: white; margin-top: 20px; }
+
+    </style>
+</head>
+<body>
+
+<button id="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+<div class="sidebar" id="sidebar">
+    <h3>Navigation</h3>
+    <ul>
+        <li><a href="#tile-grid">My Websites</a></li>
+        <li><a href="#my-things-grid">Our Stuff</a></li>
+        <li><a href="#news-tile">News</a></li>
+    </ul>
+</div>
+
+<div id="main-content" class="container">
+    <div class="header">
+        <h1 style="margin:0;">StenoKonnect</h1>
+        <p>Your personal Web Portal</p>
+        </div>
+
+    <div class="search-bars">
+        <input
+            type="text"
+            id="tile-search"
+            placeholder="Search my tiles…"
+            onkeyup="filterTiles(this.value)"
+        >
+        <input
+            type="text"
+            id="web-search"
+            placeholder="Search the internet…"
+            onkeydown="handleWebSearch(event)"
+        >
+    </div>
+
+    <hr>
+    <h2 style="margin-top: 40px;">Make Your Own Web-Portal</h2>
+    <div class="tile-grid" id="tile-grid">
+        </div>
+    
+    <div class="news-tile">
+        <iframe src="https://stenoip.github.io/learn-centre-iframe.html" title="News"></iframe>
+    </div>
+
+    <hr>
+    <h2 style="margin-top: 40px;">Our Stuff</h2>
+    <div class="my-things-grid" id="my-things-grid">
+        </div>
+
+    <div class="footer">
+        <p>Version 1.31 © 2026 Stenoip Company</p>
+    </div>
+</div>
+
+<script>
+    // Simple IE11 compatible sidebar toggle
+    function toggleSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar.className === 'sidebar') {
+            sidebar.className = 'sidebar open';
+        } else {
+            sidebar.className = 'sidebar';
+        }
+    }
+
+    // Ensure main content is visible (removed display:none from HTML)
+    document.getElementById('main-content').style.display = 'block';
+</script>
+
+<script src="script.js"></script>
+<script src="load-header.js"></script>
+
+</body>
+</html>
