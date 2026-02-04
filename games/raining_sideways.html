@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>It's raining sideways!</title>
+<link rel="icon" href="/new-swc.png" type="image/png" />
+<style>
+body { 
+    margin: 0; 
+    overflow: hidden; /* Prevents scrolling while playing */
+    background: #1a1a1a;
+    padding-top: 160px; 
+}
+canvas { 
+    display: block; 
+ 
+    border: 2px solid #ff0055; 
+    max-width: 100vw;
+    max-height: 100vh;
+}
+</style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// Responsive Setup
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+var player = { x: canvas.width/2, y: canvas.height/2, size: 20, color: "#00ffcc" };
+var bullets = [];
+var score = 0;
+var highScore = localStorage.getItem("highScore") || 0;
+var gameActive = true;
+
+// Universal Input (Mouse & Touch)
+function move(e) {
+    if(!gameActive) return;
+    var pos = e.touches ? e.touches[0] : e;
+    var rect = canvas.getBoundingClientRect();
+    player.x = pos.clientX - rect.left;
+    player.y = pos.clientY - rect.top;
+    if(e.touches) e.preventDefault();
+}
+canvas.addEventListener("mousemove", move);
+canvas.addEventListener("touchmove", move, { passive: false });
+
+function createBullet() {
+    if (!gameActive) return;
+    var isBig = Math.random() > 0.9;
+    bullets.push({
+        x: canvas.width + 50,
+        y: Math.random() * canvas.height,
+        size: isBig ? 40 : 8, // Slightly bigger for mobile visibility
+        speed: isBig ? 2 : 3 + Math.random() * 5,
+        color: isBig ? "#ffaa00" : "#ff0055"
+    });
+}
+
+function update() {
+    if (!gameActive) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    score++;
+
+    // Draw Player
+    ctx.fillStyle = player.color;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = player.color;
+    ctx.fillRect(player.x - player.size/2, player.y - player.size/2, player.size, player.size);
+    ctx.shadowBlur = 0;
+
+    // Bullets
+    bullets.forEach((b, index) => {
+        b.x -= b.speed;
+        ctx.fillStyle = b.color;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        var dx = player.x - b.x;
+        var dy = player.y - b.y;
+        var distance = Math.sqrt(dx*dx + dy*dy);
+
+        if (distance < (player.size/2 + b.size)) endGame();
+        if (b.x < -100) bullets.splice(index, 1);
+    });
+
+    // HUD
+    ctx.fillStyle = "white";
+    ctx.font = "bold 20px Arial";
+    ctx.fillText(`SCORE: ${score}`, 20, 40);
+    ctx.fillText(`BEST: ${highScore}`, 20, 70);
+
+    requestAnimationFrame(update);
+}
+
+function endGame() {
+    gameActive = false;
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+    }
+    // Using a custom confirmation instead of alert for better mobile feel
+    if(confirm(`DRENCHED!\nScore: ${score}\nBest: ${highScore}\n\nRestart? \n Copyright Stenoip Company`)) {
+        location.reload();
+    }
+}
+
+setInterval(createBullet, 120); // Slightly slower spawn for mobile balance
+update();
+
+</script>
+
+<script src="/load-header.js"></script>
+
+</body>
+</html>
+
