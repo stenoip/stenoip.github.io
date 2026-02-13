@@ -86,4 +86,4 @@ StenoKonnect is built on a foundation of trust. Unlike large technology corporat
 
 ## Licence
 
-© 2025 Stenoip Company. All rights reserved.
+© 2026 Stenoip Company. All rights reserved.
