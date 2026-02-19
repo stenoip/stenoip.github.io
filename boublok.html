@@ -19,7 +19,7 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding-top: 60px; 
+    overflow: hidden;
   }
   .editor-buttons {
     display: flex;
@@ -27,6 +27,7 @@
     padding: 10px;
     background-color: #007bff;
     color: white;
+    flex-shrink: 0;
   }
   .editor-buttons button {
     padding: 10px 20px;
@@ -35,30 +36,45 @@
     color: white;
     cursor: pointer;
   }
-  .editor-buttons button:hover {
-    background-color: #0056b3;
-  }
+  .editor-buttons button:hover { background-color: #0056b3; }
+
   .editor-container {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
+
   .editor {
     flex: 1;
     display: flex;
-    gap: 1px;
+    overflow: hidden; /* Prevents stretching */
     background: #ddd;
   }
+
+  /* Draggable Divider */
+  .resizer {
+    width: 6px;
+    cursor: col-resize;
+    background: #444;
+    transition: background 0.2s;
+    z-index: 10;
+  }
+  .resizer:hover { background: #007bff; }
+
   .CodeMirror {
-    flex: 1;
-    height: 100%;
+    width: 50%; /* Starting width */
+    height: 100% !important;
     font-size: 14px;
   }
+  
   iframe {
     flex: 1;
     border: none;
-    margin: 0;
+    background: white;
+    height: 100%;
   }
+
   #console-panel {
     background: #111;
     color: #0f0;
@@ -68,6 +84,7 @@
     display: flex;
     flex-direction: column;
     border-top: 2px solid #444;
+    flex-shrink: 0;
   }
   #console-header {
     background: #222;
@@ -76,49 +93,40 @@
     justify-content: space-between;
     align-items: center;
     color: #fff;
-    font-weight: bold;
   }
   #console-output {
     flex: 1;
     overflow-y: auto;
     padding: 5px;
   }
-  #clear-console {
-    background: #444;
-    color: white;
-    border: none;
-    padding: 4px 8px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  #clear-console:hover {
-    background: #666;
-  }
 </style>
 </head>
 <body>
- <div id="header-placeholder"></div> 
- <div class="editor-buttons">
-    <button onclick="runCode()">Run</button>
-    <button onclick="saveCode()">Save</button>
+  <div class="editor-buttons">
+    <div>
+      <button onclick="runCode()">Run</button>
+      <button onclick="saveCode()">Save</button>
+    </div>
     <button id="switch-btn" onclick="switchEditor()">Switch to p5.js</button>
   </div>
 
   <div class="editor-container">
     <div id="html-editor" class="editor">
       <textarea id="html-code"></textarea>
+      <div class="resizer"></div>
       <iframe id="output" sandbox="allow-scripts allow-same-origin"></iframe>
     </div>
+
     <div id="p5-editor" class="editor" style="display: none;">
       <textarea id="p5-code"></textarea>
+      <div class="resizer"></div>
       <iframe id="p5-output" sandbox="allow-scripts allow-same-origin"></iframe>
     </div>
 
-    <!-- Console Panel -->
     <div id="console-panel">
       <div id="console-header">
         Console
-        <button id="clear-console">Clear</button>
+        <button id="clear-console" style="background:#444; color:white; border:none; padding:2px 8px; cursor:pointer;">Clear</button>
       </div>
       <div id="console-output"></div>
     </div>
@@ -131,21 +139,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/html-hint.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/javascript-hint.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
 
 <script>
- // === Autocomplete for p5.js ===
+// === Autocomplete for p5.js ===
 function getHints(cm) {
-  const p5Functions = [
-    'setup','draw','createCanvas','background','fill','stroke','noFill','noStroke',
-    'rect','ellipse','line','point','triangle','quad','curve','bezier','arc',
-    'beginShape','endShape','vertex','push','pop','translate','rotate','scale',
-    'mouseX','mouseY','pmouseX','pmouseY','width','height','random','map',
-    'constrain','abs','round','floor','ceil','int','float','text','textSize',
-    'textFont','textLeading','textStyle','textWidth'
-  ];
+  const p5Functions = ['setup','draw','createCanvas','background','fill','stroke','rect','ellipse','line','mouseX','mouseY','width','height','random','map'];
   const cursor = cm.getCursor();
   const line = cm.getLine(cursor.line);
   const start = cursor.ch;
@@ -156,106 +156,78 @@ function getHints(cm) {
   return { list: hints, from: from };
 }
 
-// === CodeMirror editors ===
+// === Initialize Editors ===
 const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-code'), {
-  mode: 'htmlmixed', theme: 'material-darker', lineNumbers: true, tabSize: 2,
+  mode: 'htmlmixed', theme: 'material-darker', lineNumbers: true, 
   autoCloseBrackets: true, autoCloseTags: true,
   extraKeys: { "Ctrl-Space": "autocomplete" },
   hintOptions: { hint: CodeMirror.hint.html, alignWithWord: true }
 });
+
 const p5Editor = CodeMirror.fromTextArea(document.getElementById('p5-code'), {
-  mode: 'javascript', theme: 'material-darker', lineNumbers: true, tabSize: 2,
+  mode: 'javascript', theme: 'material-darker', lineNumbers: true,
   autoCloseBrackets: true,
   extraKeys: { "Ctrl-Space": "autocomplete" },
   hintOptions: { hint: getHints, alignWithWord: true }
 });
 
-// === Load saved code or defaults ===
-htmlEditor.setValue(localStorage.getItem('html-code') || 
-`<!DOCTYPE html>
-<html>
-<body>
-<h1>Hello, Boublok!</h1>
-<script>
-console.log("HTML console ready");
-<\/script>
-</body>
-</html>`);
+// === Load Storage ===
+htmlEditor.setValue(localStorage.getItem('html-code') || `<!DOCTYPE html>\n<html>\n<body>\n<h1>Hello, Boublok!</h1>\n<script>console.log("HTML console ready");<\/script>\n</body>\n</html>`);
+p5Editor.setValue(localStorage.getItem('p5-code') || `function setup() {\n  createCanvas(400, 400);\n  console.log("p5.js console ready");\n}\nfunction draw() {\n  background(220);\n  ellipse(mouseX, mouseY, 50, 50);\n}`);
 
-p5Editor.setValue(localStorage.getItem('p5-code') || 
-`function setup() {
-  createCanvas(400, 400);
-  console.log("p5.js console ready");
+// === Draggable Divider Logic ===
+function initResizers() {
+  const resizers = document.querySelectorAll('.resizer');
+  resizers.forEach(resizer => {
+    const container = resizer.parentElement;
+    const editorEl = container.querySelector('.CodeMirror');
+    const iframeEl = container.querySelector('iframe');
+
+    resizer.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      iframeEl.style.pointerEvents = 'none'; // Prevent iframe from stealing mouse
+      document.addEventListener('mousemove', resize);
+      document.addEventListener('mouseup', stopResize);
+    });
+
+    function resize(e) {
+      const containerRect = container.getBoundingClientRect();
+      const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+      if (newWidth > 15 && newWidth < 85) {
+        editorEl.style.width = `${newWidth}%`;
+      }
+    }
+
+    function stopResize() {
+      iframeEl.style.pointerEvents = 'auto';
+      document.removeEventListener('mousemove', resize);
+      document.removeEventListener('mouseup', stopResize);
+      htmlEditor.refresh();
+      p5Editor.refresh();
+    }
+  });
 }
-function draw() {
-  background(220);
-  ellipse(mouseX, mouseY, 50, 50);
-}`);
 
-// === Debounced run ===
-let debounceTimer;
-const runCodeDebounced = () => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(runCode, 500);
-};
-htmlEditor.on('change', () => { localStorage.setItem('html-code', htmlEditor.getValue()); runCodeDebounced(); });
-p5Editor.on('change', () => { localStorage.setItem('p5-code', p5Editor.getValue()); runCodeDebounced(); });
-
-// === Clear console button ===
-document.getElementById('clear-console').addEventListener('click', () => {
-  document.getElementById('console-output').innerHTML = '';
-});
-
-// === Console injection script (runs before user code) ===
+// === Console Logic ===
 function getConsoleInjection() {
-  return `
-<script>
-(function(){
-  const parentConsole = window.parent;
-
-  function serializeArg(arg) {
-    if (arg instanceof Error) {
-      return arg.name + ": " + arg.message + "\\n" + arg.stack;
-    }
-    if (typeof arg === 'object') {
-      try { return JSON.stringify(arg); }
-      catch(e) { return String(arg); }
-    }
-    return String(arg);
-  }
-
-  function sendToParent(type, args) {
-    parentConsole.postMessage({
-      type: type,
-      args: Array.from(args).map(serializeArg)
-    }, '*');
-  }
-
-  // Override console methods
-  ['log','warn','error','info'].forEach(type => {
-    const orig = console[type];
-    console[type] = function() {
-      orig.apply(console, arguments);
-      sendToParent(type, arguments);
-    };
-  });
-
-  // Capture uncaught errors
-  window.onerror = function(message, source, lineno, colno, error) {
-    sendToParent('error', [message + " (" + source + ":" + lineno + ":" + colno + ")", error && error.stack ? error.stack : '']);
-  };
-
-  // Capture unhandled promise rejections
-  window.addEventListener('unhandledrejection', function(event) {
-    sendToParent('error', ['Unhandled Promise Rejection:', event.reason]);
-  });
-})();
-<\/script>
-`;
+  return `<script>
+    (function(){
+      const parentWin = window.parent;
+      function serialize(arg) {
+        try { return (typeof arg === 'object') ? JSON.stringify(arg) : String(arg); }
+        catch(e) { return String(arg); }
+      }
+      ['log','warn','error','info'].forEach(type => {
+        const orig = console[type];
+        console[type] = function() {
+          orig.apply(console, arguments);
+          parentWin.postMessage({ type: type, args: Array.from(arguments).map(serialize) }, '*');
+        };
+      });
+    })();
+  <\/script>`;
 }
 
-
-// === Parent listener for iframe messages ===
 window.addEventListener('message', (event) => {
   if (!event.data || !event.data.type) return;
   const output = document.getElementById('console-output');
@@ -265,93 +237,42 @@ window.addEventListener('message', (event) => {
   output.scrollTop = output.scrollHeight;
 });
 
-// === Run code in iframe ===
+//  Run & Save 
+var debounceTimer;
+const runCodeDebounced = () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(runCode, 500);
+};
+
+htmlEditor.on('change', () => { localStorage.setItem('html-code', htmlEditor.getValue()); runCodeDebounced(); });
+p5Editor.on('change', () => { localStorage.setItem('p5-code', p5Editor.getValue()); runCodeDebounced(); });
+
 function runCode() {
-  const isHtmlVisible = document.getElementById('html-editor').style.display !== 'none';
-  if (isHtmlVisible) {
-    // Inject console before user HTML
-    document.getElementById('output').srcdoc =
-      getConsoleInjection() + htmlEditor.getValue();
+  const isHtml = document.getElementById('html-editor').style.display !== 'none';
+  if (isHtml) {
+    document.getElementById('output').srcdoc = getConsoleInjection() + htmlEditor.getValue();
   } else {
-    const code = p5Editor.getValue();
-    const html = `
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<style>html,body{margin:0;padding:0;}</style>
-<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"><\/script>
-${getConsoleInjection()}
-</head>
-<body>
-<script>
-${code}
-<\/script>
-</body>
-</html>`;
+    const html = `<html><head><script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"><\/script>${getConsoleInjection()}</head><body><script>${p5Editor.getValue()}<\/script></body></html>`;
     document.getElementById('p5-output').srcdoc = html;
   }
 }
 
-// === Save code to file ===
-function saveCode() {
-  const isHtmlVisible = document.getElementById('html-editor').style.display !== 'none';
-  if (isHtmlVisible) {
-    download('code.html', htmlEditor.getValue(), 'text/html');
-  } else {
-    const code = p5Editor.getValue();
-    const html = `
-<!doctype html>
-<html><head><meta charset="utf-8">
-<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"><\/script>
-</head><body>
-<script>
-${code}
-<\/script>
-</body></html>`;
-    download('code-p5.html', html, 'text/html');
-  }
-}
-
-function download(filename, content, type) {
-  const blob = new Blob([content], { type });
-  const a = Object.assign(document.createElement('a'), {
-    href: URL.createObjectURL(blob),
-    download: filename
-  });
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 0);
-}
-
-// === Switch between HTML and p5.js editors ===
 function switchEditor() {
   const htmlDiv = document.getElementById('html-editor');
   const p5Div = document.getElementById('p5-editor');
-  const button = document.getElementById('switch-btn');
-
-  const htmlVisible = htmlDiv.style.display !== 'none';
-  htmlDiv.style.display = htmlVisible ? 'none' : 'flex';
-  p5Div.style.display = htmlVisible ? 'flex' : 'none';
-  button.textContent = htmlVisible ? 'Switch to HTML' : 'Switch to p5.js';
-
-  runCodeDebounced();
+  const btn = document.getElementById('switch-btn');
+  const isHtml = htmlDiv.style.display !== 'none';
+  htmlDiv.style.display = isHtml ? 'none' : 'flex';
+  p5Div.style.display = isHtml ? 'flex' : 'none';
+  btn.textContent = isHtml ? 'Switch to HTML' : 'Switch to p5.js';
+  isHtml ? p5Editor.refresh() : htmlEditor.refresh();
+  runCode();
 }
 
-// === Keyboard shortcut: Ctrl/Cmd + Enter ===
-document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    e.preventDefault();
-    runCode();
-  }
-});
+document.getElementById('clear-console').onclick = () => document.getElementById('console-output').innerHTML = '';
 
-// === Initial run ===
+initResizers();
 runCode();
-
 </script>
-
-  <script src="/load-header.js"></script>
 </body>
 </html>
