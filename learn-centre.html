@@ -1,157 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="new-swc.png" type="image/png">
-    <title>Learn Center</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>StenoipKonnect</title>
+    
+      <meta name="description" content="A personal web portal and the latest news in science" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="new-swc.png" type="image/png" />
+    <link rel="stylesheet" href="styles.css">
     <style>
-        /* --- FRUTIGER AERO VARIABLES --- */
-        :root {
-            --text-color: #0d1a29; /* Dark Blue Text */
-            --primary-bg: #e6f0ff; /* Light, bright background */
-            --glass-fill-light: rgba(255, 255, 255, 0.7); /* Light glass surface */
-            --glass-fill-dark: rgba(220, 240, 255, 0.85); /* Slightly darker glass for main blocks */
-            --glass-border: rgba(255, 255, 255, 0.9);
-            --accent-blue: #0088ff; /* Vibrant Aero Blue */
-            --accent-green: #38c172; /* Secondary Nature Green */
-            --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
-            --shadow-heavy: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        /* --- BODY: SKY/NATURE BACKGROUND --- */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-            min-height: 100vh;
-            /* Bright, glossy background (Sky/Water) */
-            background: linear-gradient(135deg, #cce0ff 0%, #e6f0ff 30%, #fff 70%),
-                        radial-gradient(circle at 80% 20%, #ccffcc 0%, transparent 20%);
-            background-attachment: fixed;
-            color: var(--text-color);
-        }
-
-        /* --- GLASSMOPHISM MIXIN (applied to most elements) --- */
-        .glass {
-            background: var(--glass-fill-dark);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-light);
-            border-radius: 15px;
-            transition: all 0.3s ease;
-        }
-
-        header {
-            background: linear-gradient(to bottom, #7bbaff, var(--accent-blue)); /* Glossy Blue Header */
-            color: white;
-            padding: 20px 20px;
-            text-align: center;
-            font-size: 32px;
-            width: 100%;
-            box-sizing: border-box;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-        }
-
-        .message-board {
-            background: var(--glass-fill-dark); /* Glassy Message Board */
-            color: var(--text-color);
-            padding: 12px 20px;
-            text-align: center;
-            font-size: 18px;
-            width: 100%;
-            box-sizing: border-box;
-            margin-top: 10px;
-            border-radius: 10px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
-        }
-
-        .message-board a {
-            color: var(--accent-blue);
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .message-board a:hover {
-            text-decoration: underline;
-        }
-
-        .container {
-            width: 95%; /* Increased width for better use of space */
-            max-width: 1300px;
-            margin: 30px 20px 60px; /* Added bottom margin for footer */
-        }
-
-        .content {
-            display: flex;
-            justify-content: space-around;
-            gap: 25px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-
-        /* Individual Sections (News, Weather, Clock) */
-        .news, .weather, .clock {
-            padding: 25px;
-            flex: 1;
-            /* Applying glass style */
-            background: var(--glass-fill-light);
-            backdrop-filter: blur(12px);
-            box-shadow: var(--shadow-heavy);
-            border-radius: 25px; /* More rounded */
-            max-width: 450px;
-            min-width: 250px;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            color: var(--accent-blue);
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-            margin-top: 0;
-            margin-bottom: 15px;
-            border-bottom: 2px solid rgba(0, 136, 255, 0.3);
-            padding-bottom: 5px;
-        }
-
-        .rss-feed-item {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .rss-feed-item a {
-            color: var(--accent-green); /* Green links */
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .rss-feed-item a:hover {
-            text-decoration: underline;
-        }
-
-        .rss-feed-item p {
-            margin: 5px 0 0;
-            color: var(--text-color);
-            font-size: 0.95rem;
-        }
-
-        /* Weather Section Styling */
-        .weather h2 {
-            border-color: rgba(56, 193, 114, 0.3);
-        }
-
-        /* Clock Section Styling */
+    /* Clock Section Styling */
         .clock {
             text-align: center;
         }
@@ -176,54 +35,79 @@
             color: var(--text-color);
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .content {
-                flex-direction: column;
-                align-items: center;
-                gap: 15px;
-            }
-            .news, .weather, .clock {
-                width: 95%;
-                max-width: none;
-                padding: 20px;
-            }
-            header {
-                font-size: 28px;
-                padding: 15px;
-            }
-        }
-
-        /* Copyright Section (Fixed Bottom) */
-        .copyright {
-            background: var(--glass-fill-dark);
-            backdrop-filter: blur(10px);
-            color: var(--text-color);
-            padding: 10px 0;
-            text-align: center;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box;
-            position: fixed;
-            bottom: 0;
-            z-index: 100;
-            border-top: 1px solid var(--glass-border);
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
     </style>
-</head>
-<body>
-    <header>
-        Learn Center
-    </header>
+  </head>
 
-    <div class="message-board">
-        <span>New Lytze the Fuzbal Comic!<a href="https://stenoip.github.io/comic">Check it out!</a></span>
-    </div>
+  <body>
+   
+ 
+      <div id="background"></div>
+      <div id="websiteContainer">
+        <div class="website-spacers"></div>
+        
+        <header id="mainHeader">
+          <div class="header-logo-text">
+            <a href="/" title="Home"><img src="https://stenoip.github.io/new-swc.png" id="logo" alt="Logo" /></a>
+            <div class="header-text">
+              <span class="header-title">StenoipKonnect</span>
+              <span class="header-motto">Your web portal</span>
+            </div>
+          </div>
+          <div class="toggle-buttons-divs">
+            <span id="hideNavbarButtonText">Menu ></span>
+            <img src="images/navbar_button.png" alt="Toggle" id="navbarToggleButton" />
+          </div>
+        </header>
 
-    <div class="container">
-        <div class="content">
-            <div class="news">
+        <div id="navAndContentContainer">
+          <aside>
+            <div id="navigationMenu">
+              <nav class="nav-categories" aria-label="Main Content">
+                <span class="navbar-titles">Main Content</span>
+                <a href="index.html" class="nav-active"><img src="images/introduction.png" class="nav-icons" alt="" />Home</a>
+                <a href="articles/index.html" class="nav-inactive"><img src="images/wallpapers.png" class="nav-icons" alt="" />Articles</a>
+                <a href="about.html" class="nav-inactive"><img src="images/resources.png" class="nav-icons" alt="" />About</a>
+                <a href="space.html" class="nav-inactive"><img src="images/history.png" class="nav-icons" alt="" />Space</a>
+                <a href="https://stenoip.github.io/oodles" class="nav-inactive"><img src="images/icons.png" class="nav-icons" alt="" />Metasearch</a>
+               </nav>
+              <nav class="nav-categories" aria-label="Entertainment">
+                <span class="navbar-titles">Entertainment</span>
+                <a href="games/home.html" class="nav-inactive"><img src="https://stenoip.github.io/icons/games.png" class="nav-icons" alt="" />StenoipPlay</a>
+                <a href="comic.html" class="nav-inactive"><img src="https://stenoip.github.io/icons/comic.png" class="nav-icons" alt="" />Stenoip Komysk</a>
+                <a href="https://stenoip.github.io/albums" class="nav-inactive"><img src="https://img1.picmix.com/output/stamp/normal/6/4/0/6/2466046_12382.png" class="nav-icons" alt="" />Praterich A.I's music</a>
+                <a href="video.html" class="nav-inactive"><img src="images/videos.png" class="nav-icons" alt="" />Videos</a>
+              </nav>
+
+              <nav class="nav-categories" aria-label="Community">
+                <span class="navbar-titles">Community</span>
+                <a href="https://stenoip.github.io/praterich/" class="nav-inactive"><img src="https://stenoip.github.io/praterich/praterich.png" class="nav-icons" alt="" />Praterich A.I</a>
+                <a href="https://stenoip.github.io/ringzauber" class="nav-inactive"><img src="ringzauber.ico" class="nav-icons" alt="" />Ringzauber</a>
+                <a href="https://stenoip.github.io/oodles" class="nav-inactive"><img src="https://stenoip.github.io/oodles/favicon.ico" class="nav-icons" alt="" />Oodles Metasearch</a>
+              </nav>
+
+              <div class="nav-categories">
+                <button id="navSoundToggle">Sounds Off</button>
+                <button id="navThemeChanger">Themes</button>
+              </div>
+            </div>
+          </aside>
+
+          <main id="mainContent">
+            <section>
+              <header>
+                <h1>Learn-Centre</h1>
+                <div class="glass-borders">
+                  <div class="section-banners aero-borders">
+                    <img src="https://stenoip.github.io/skonnect_ribbon.png" alt="Banner" id="introBanner" />
+                  </div>
+                </div>
+              </header>
+
+              <div class="glass-borders">
+                <article class="styled-containers styled-containers-spaced aero-borders">
+                
+                 
+              <div class="news">
                 <h2>Latest News</h2>
                 <div id="rss-feed-container">Loading...</div>
                 
@@ -236,67 +120,19 @@
                     The embedded YouTube video is the intellectual property of <a href="https://www.cbc.ca/" target="_blank">CBC</a>. The RSS feed is sourced from the <a href="https://www.bbc.com/" target="_blank">BBC</a>. All content is protected under applicable copyright laws. For detailed information regarding rights and usage, please refer to the respective copyright policies:
                     <a href="https://www.cbc.ca/aboutus/copyright.html" target="_blank">CBC Copyright Policy</a> and <a href="https://www.bbc.com/usingthebbc/copyright/" target="_blank">BBC Copyright Policy</a>.
                 </p>
+                  </div>
 
-                <script>
-                    async function fetchRSSFeed() {
-                        const rssUrl = "http://feeds.bbci.co.uk/news/world/rss.xml";
-                        // Note: A server-side proxy is typically needed for real-world RSS fetching due to CORS policy.
-                        // We continue using the public API for demonstration purposes.
-                        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
-                        const data = await response.json();
+                </article>
+              </div>
 
-                        const container = document.getElementById("rss-feed-container");
-                        container.innerHTML = "";
+         
 
-                        if (data.items) {
-                            data.items.forEach(item => {
-                                // Define keywords that are inappropriate.
-                                const blacklistKeywords = [
-                                    "LGBT", "lesbian", "gay", "bisexual", "transgender", "queer", "pride",
-                                    "war in Gaza", "Hate", "Blood"
-                                ];
 
-                                // Check if the title or description contains any of the blacklist keywords
-                                const containsBlacklistedKeyword = blacklistKeywords.some(keyword =>
-                                    item.title.toLowerCase().includes(keyword.toLowerCase()) ||
-                                    item.description.toLowerCase().includes(keyword.toLowerCase())
-                                );
+              
 
-                                // If the news item contains any blacklisted keywords, skip it
-                                if (containsBlacklistedKeyword) {
-                                    return;
-                                }
-
-                                // Create the RSS feed item elements and append them
-                                const div = document.createElement("div");
-                                div.classList.add("rss-feed-item");
-
-                                const link = document.createElement("a");
-                                link.href = item.link;
-                                link.target = "_blank";
-                                link.textContent = item.title;
-
-                                const description = document.createElement("p");
-                                const cleanDescription = item.description
-                                    .replace(/<br\s*\/?>/g, "")
-                                    .replace(/<span[^>]*>.*?<\/span>/g, "");
-                                description.textContent = cleanDescription;
-
-                                div.appendChild(link);
-                                div.appendChild(description);
-
-                                container.appendChild(div);
-                            });
-                        } else {
-                            container.textContent = "No items found in the RSS feed.";
-                        }
-                    }
-
-                    fetchRSSFeed();
-                </script>
-            </div>
-
-            <div class="weather">
+              
+               <div class="glass-borders">
+                <div class="weather">
                 <h2>Weather Forecast</h2>
 
                 <div class="tomorrow-widget">
@@ -378,14 +214,86 @@
                     updateClock();
                 </script>
             </div>
+              </div>
+              
+
+             <div class="glass-borders">
+                <article class="styled-containers styled-containers-spaced aero-borders">
+                <h4 style="margin-top: 40px;">Copyright Stenoip Company</h4>
+                <small></small>
+            
+                </article>
+              </div>
+            </section>
+          </main>
         </div>
+        <div class="website-spacers"></div>
+      </div>
     </div>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4433722838067397"
-        crossorigin="anonymous"></script>
+    
+  
+    <script src="/javascript/navbar.min.js" async></script>
+    <script src="/javascript/jquery.min.js"></script>
+    <script src="/javascript/magnific-popup.min.js"></script>
+  
+  
+  
+   <script>
+                    async function fetchRSSFeed() {
+                        const rssUrl = "http://feeds.bbci.co.uk/news/world/rss.xml";
+                        // Note: A server-side proxy is typically needed for real-world RSS fetching due to CORS policy.
+                        // We continue using the public API for demonstration purposes.
+                        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
+                        const data = await response.json();
 
-    <div class="copyright">
-        <span>&copy; 2025 Stenoip Company. All rights reserved.</span>
-    </div>
+                        const container = document.getElementById("rss-feed-container");
+                        container.innerHTML = "";
 
-</body>
+                        if (data.items) {
+                            data.items.forEach(item => {
+                                // Define keywords that are inappropriate.
+                                const blacklistKeywords = [
+                                    "LGBT",  "transgender", "pride",
+                                    "war in Gaza", "Hate", "Blood"
+                                ];
+
+                                // Check if the title or description contains any of the blacklist keywords
+                                const containsBlacklistedKeyword = blacklistKeywords.some(keyword =>
+                                    item.title.toLowerCase().includes(keyword.toLowerCase()) ||
+                                    item.description.toLowerCase().includes(keyword.toLowerCase())
+                                );
+
+                                // If the news item contains any blacklisted keywords, skip it
+                                if (containsBlacklistedKeyword) {
+                                    return;
+                                }
+
+                                // Create the RSS feed item elements and append them
+                                const div = document.createElement("div");
+                                div.classList.add("rss-feed-item");
+
+                                const link = document.createElement("a");
+                                link.href = item.link;
+                                link.target = "_blank";
+                                link.textContent = item.title;
+
+                                const description = document.createElement("p");
+                                const cleanDescription = item.description
+                                    .replace(/<br\s*\/?>/g, "")
+                                    .replace(/<span[^>]*>.*?<\/span>/g, "");
+                                description.textContent = cleanDescription;
+
+                                div.appendChild(link);
+                                div.appendChild(description);
+
+                                container.appendChild(div);
+                            });
+                        } else {
+                            container.textContent = "No items found in the RSS feed.";
+                        }
+                    }
+
+                    fetchRSSFeed();
+                </script>
+  </body>
 </html>
