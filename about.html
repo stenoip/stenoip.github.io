@@ -1,164 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="new-swc_11zon.png">
-    <title>About Us - Stenoip Konnect</title>
-    <style>
-        /* FRUTIGER AERO AESTHETIC STYLES */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>StenoipKonnect</title>
+    
+      <meta name="description" content="A personal web portal and the latest news in science" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="new-swc.png" type="image/png" />
+    <link rel="stylesheet" href="styles.css">
+  </head>
 
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            background-color: #e6f0ff; 
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><defs><radialGradient id="g" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"><stop offset="0%" style="stop-color:rgb(220, 240, 255);stop-opacity:1" /><stop offset="100%" style="stop-color:rgb(255,255,255);stop-opacity:1" /></radialGradient></defs><rect width="100%" height="100%" fill="url(#g)" /></svg>');
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0;
-            color: #333;
-        }
+  <body>
+   
+ 
+      <div id="background"></div>
+      <div id="websiteContainer">
+        <div class="website-spacers"></div>
+        
+        <header id="mainHeader">
+          <div class="header-logo-text">
+            <a href="/" title="Home"><img src="https://stenoip.github.io/new-swc.png" id="logo" alt="Logo" /></a>
+            <div class="header-text">
+              <span class="header-title">StenoipKonnect</span>
+              <span class="header-motto">Your web portal</span>
+            </div>
+          </div>
+          <div class="toggle-buttons-divs">
+            <span id="hideNavbarButtonText">Menu ></span>
+            <img src="images/navbar_button.png" alt="Toggle" id="navbarToggleButton" />
+          </div>
+        </header>
 
-        .container {
-            width: 90%;
-            max-width: 900px;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            margin: 60px 0;
-        }
+        <div id="navAndContentContainer">
+          <aside>
+            <div id="navigationMenu">
+              <nav class="nav-categories" aria-label="Main Content">
+                <span class="navbar-titles">Main Content</span>
+                <a href="index.html" class="nav-active"><img src="images/introduction.png" class="nav-icons" alt="" />Home</a>
+                <a href="articles/index.html" class="nav-inactive"><img src="images/wallpapers.png" class="nav-icons" alt="" />Articles</a>
+                <a href="about.html" class="nav-inactive"><img src="images/resources.png" class="nav-icons" alt="" />About</a>
+                <a href="space.html" class="nav-inactive"><img src="images/history.png" class="nav-icons" alt="" />Space</a>
+                <a href="https://stenoip.github.io/oodles" class="nav-inactive"><img src="images/icons.png" class="nav-icons" alt="" />Metasearch</a>
+               </nav>
+              <nav class="nav-categories" aria-label="Entertainment">
+                <span class="navbar-titles">Entertainment</span>
+                <a href="games/home.html" class="nav-inactive"><img src="https://stenoip.github.io/icons/games.png" class="nav-icons" alt="" />StenoipPlay</a>
+                <a href="comic.html" class="nav-inactive"><img src="https://stenoip.github.io/icons/comic.png" class="nav-icons" alt="" />Stenoip Komysk</a>
+                <a href="https://stenoip.github.io/albums" class="nav-inactive"><img src="https://img1.picmix.com/output/stamp/normal/6/4/0/6/2466046_12382.png" class="nav-icons" alt="" />Praterich A.I's music</a>
+                <a href="video.html" class="nav-inactive"><img src="images/videos.png" class="nav-icons" alt="" />Videos</a>
+              </nav>
 
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 15px 30px;
-            background: linear-gradient(180deg, rgba(0, 150, 255, 0.8), rgba(0, 100, 200, 0.9));
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 10;
-            text-align: left;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
+              <nav class="nav-categories" aria-label="Community">
+                <span class="navbar-titles">Community</span>
+                <a href="https://stenoip.github.io/praterich/" class="nav-inactive"><img src="https://stenoip.github.io/praterich/praterich.png" class="nav-icons" alt="" />Praterich A.I</a>
+                <a href="https://stenoip.github.io/ringzauber" class="nav-inactive"><img src="ringzauber.ico" class="nav-icons" alt="" />Ringzauber</a>
+                <a href="https://stenoip.github.io/oodles" class="nav-inactive"><img src="https://stenoip.github.io/oodles/favicon.ico" class="nav-icons" alt="" />Oodles Metasearch</a>
+              </nav>
 
-        .header a {
-            color: #ffffff;
-            text-decoration: none;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
-            margin-right: 20px;
-            padding: 5px 0;
-            transition: color 0.3s;
-            display: inline-flex;
-            align-items: center;
-        }
+              <div class="nav-categories">
+                <button id="navSoundToggle">Sounds Off</button>
+                <button id="navThemeChanger">Themes</button>
+              </div>
+            </div>
+          </aside>
 
-        .header a:hover {
-            color: #ccffff;
-            text-decoration: underline;
-        }
+          <main id="mainContent">
+            <section>
+              <header>
+                <h1>About</h1>
+                <div class="glass-borders">
+                  <div class="section-banners aero-borders">
+                    <img src="https://stenoip.github.io/skonnect_ribbon.png" alt="Banner" id="introBanner" />
+                  </div>
+                </div>
+              </header>
 
-        .home-icon {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            margin-right: 6px;
-            background: url('/new-swc.png') no-repeat center center;
-            background-size: contain;
-            border: 1px solid transparent; 
-         }
+              <div class="glass-borders">
+                <article class="styled-containers styled-containers-spaced aero-borders">
+                <h2 style="margin-top: 40px;">Introduction</h2>
+                 
+                  <p>Stenoip Konnect is a multi-functional digital platform located in North America. We provide users with two distinct services: 
+                      a customizable web portal for organizing frequently visited websites and a dedicated information hub for space exploration news and educational content. 
+                      Our goal is to provide these technical resources while maintaining a high standard of user privacy.</p>
 
-        .menuItems {
-            display: inline-block;
-        }
 
-        .container h1 {
-            font-size: 36px;
-            color: #0077cc;
-            margin-bottom: 10px;
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
-        }
+                </article>
+              </div>
 
-        .container h2 {
-            font-size: 24px;
-            color: #0055aa;
-            margin-top: 25px;
-            margin-bottom: 15px;
-        }
+               <div class="glass-borders">
+                <article class="styled-containers styled-containers-spaced aero-borders">
+                <h2 style="margin-top: 40px;">Introduction</h2>
+                 
+                  <p>Stenoip Konnect is a multi-functional digital platform located in North America. We provide users with two distinct services: 
+                      a customizable web portal for organizing frequently visited websites and a dedicated information hub for space exploration news and educational content. 
+                      Our goal is to provide these technical resources while maintaining a high standard of user privacy.</p>
 
-        .container p {
-            font-size: 16px;
-            line-height: 1.7;
-            margin-bottom: 1.5em;
-        }
 
-        .carousel img {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-            margin-bottom: 20px;
-        }
+                </article>
+              </div>
 
-        .canva-embed { 
-             border-radius: 10px; 
-             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
-             margin-top: 1.5em; 
-             margin-bottom: 1em;
-        }
 
-        hr {
-            border: 0;
-            height: 1px;
-            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 150, 255, 0.7), rgba(0, 0, 0, 0));
-            margin: 30px 0;
-        }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <nav>
-            <span class="menuItems"><a href="index.html"><span class="home-icon"></span>Home</a></span>
-            <span class="menuItems"><a href="about.html">About Us</a></span>
-        </nav>
-    </header>
+                <div class="glass-borders">
+                <article class="styled-containers styled-containers-spaced aero-borders">
+                <h2 style="margin-top: 40px;">Web Portal</h2>
+                 
+                  <p>The first component of Stenoip Konnect is a web portal. This interface allows users to save, organize
+                      and access their favourite external links and web-based applications from a single page. 
+                      It is designed to replace traditional browser bookmarks with a centralized, visual dashboard that improves navigation efficiency.</p>
 
-    <div class="container" id="main-content">
-        <h1>Stenoip Konnect: Our Mission</h1>
-        <hr>
 
-        <div class="carousel">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPWfp3LQW1pOPD1MqocR2sHjLcxG8rY_Il0Q&s" alt="Modern computer interface.">
-            <p>Stenoip Konnect is a multi-functional digital platform located in North America. We provide users with two distinct services: a customizable web portal for organizing frequently visited websites and a dedicated information hub for space exploration news and educational content. Our goal is to provide these technical resources while maintaining a high standard of user privacy.</p>
+                  
+                    <div
+                  class="history-wider history-text-images-right history-text-images"
+                >
+                  
+                    <img
+                      src="web_cubes.png"
+                      alt="Windows Vista Desktop"
+                      class="history-img-wider"
+                    />
+                  
+
+                  <p>
+                    Frutiger Aero Website by Solinus</p>
+                </div>
+                </article>
+              </div>
+
+
+              
+               <div class="glass-borders">
+                <article class="styled-containers styled-containers-spaced aero-borders">
+                <h2 style="margin-top: 40px;">Space News and Privacy</h2>
+                 
+                  <p>The second component is an information service focused on astronomy 
+                    and space flight. This section provides current news updates, detailed reports on planetary science and answers to specific scientific questions. 
+                    This content is kept separate from the web portal to ensure 
+                    that the news and utility functions do not interfere with one another.</p>
+
+            <p>
+              Stenoip Konnect operates without monetizing personal user data 
+              or tracking browsing activity across the web. We provide advanced 
+              technology for free while ensuring your search history and site 
+              usage remain confidential. We prioritize a secure environment 
+              where users can manage their links and access information without 
+              data surveillance.
+
+
+                  </p>
+            
+                </article>
+              </div>
+              
+
+             <div class="glass-borders">
+                <article class="styled-containers styled-containers-spaced aero-borders">
+                <h4 style="margin-top: 40px;">Copyright Stenoip Company</h4>
+                <small></small>
+            
+                </article>
+              </div>
+            </section>
+          </main>
         </div>
-
-        <h2>Section 1: The Web Portal</h2>
-        <p>The first component of Stenoip Konnect is a web portal. This interface allows users to save, organize, and access their favorite external links and web-based applications from a single page. It is designed to replace traditional browser bookmarks with a centralized, visual dashboard that improves navigation efficiency.</p>
-
-        <h2>Section 2: Space News and Information</h2>
-        <p>The second component is an information service focused on astronomy and space flight. This section provides current news updates, detailed reports on planetary science, and answers to specific scientific questions. This content is kept separate from the web portal to ensure that the news and utility functions do not interfere with one another.</p>
-
-        <img src="https://stenoip.github.io/products.png" alt="A graphic illustrating Stenoip Konnect services." height="20%" width="100%">
-
-        <h2>Privacy and Security</h2>
-        <p>Stenoip Konnect operates without monetizing personal user data or tracking browsing activity across the web. We provide advanced technology for free while ensuring your search history and site usage remain confidential. We prioritize a secure environment where users can manage their links and access information without data surveillance.</p>
-
-        <hr>
-        <div style="position: relative; width: 100%; height: 0; padding-top: 56.25%; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); border-radius: 8px; overflow: hidden;" class="canva-embed">
-            <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-                src="https://www.canva.com/design/DAGxlQovwG8/vBiNLqANTktLdGCRIPPrlA/watch?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
-            </iframe>
-        </div>
-        <p style="text-align: center;">View this video generated by our Large Language Model, <strong>Praterich</strong>.</p>
-
-        <hr>
-        <a href="index.html">Return to Home Page</a>
+        <div class="website-spacers"></div>
+      </div>
     </div>
-</body>
+    
+  
+    <script src="/javascript/navbar.min.js" async></script>
+    <script src="/javascript/jquery.min.js"></script>
+    <script src="/javascript/magnific-popup.min.js"></script>
+  </body>
 </html>
