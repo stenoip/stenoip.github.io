@@ -1,204 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>StenoipKonnect</title>
+    
+      <meta name="description" content="A personal web portal and the latest news in science" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="new-swc.png" type="image/png" />
-    <title>StenoKonnect</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
 
-    <style>
-        /* BASE & FONT STYLES */
-        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500&display=swap');
-
-        :root {
-            --bottom-glow: radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.7), transparent);
-        }
-
-        body {
-            font-family: 'Google Sans', sans-serif;
-            background-color: rgb(255, 191, 0); 
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            padding-bottom: 50px;
-            padding-top: 60px;   
-        }
-
-        /* AERO BUTTON STYLES */
-        button.aero {
-            --hue: 245; 
-            --button-background: oklch(75% 0.1 var(--hue) / 0.8);
-            --bg-dark: oklch(45% 0.1 var(--hue) / 0.75);
-            background: var(--bottom-glow), linear-gradient(to bottom, var(--bg-dark), var(--button-background));
-            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--button-background);
-            border-radius: 9999px;
-            cursor: pointer;
-            margin: 1em 1ex;
-            padding: 1ex 1em;
-            position: relative;
-            text-shadow: 0 2px .5em #0003;
-            transition: all 300ms;
-            color: white; 
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-        }
-
-        button.aero::after {
-            content: "";
-            position: absolute;
-            top: 4%; left: 0.5em; width: calc(100% - 1em); height: 40%;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));
-            border-radius: 9999px;
-        }
-
-        /* INTRO & LAUNCH STYLES */
-        .intro-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; }
-        .launch-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: green; color: white; text-align: center; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; z-index: 15; }
-        .skip-btn { position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; background-color: rgb(66, 133, 244); color: white; border: none; border-radius: 20px; cursor: pointer; z-index: 20; }
-
-        /* PORTAL STRUCTURE */
-        .container { width: 90%; max-width: 800px; }
-        
-        .header {
-            background-color: rgba(238, 255, 0);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        /* PORTAL HUB STYLES */
-        .portal-hub {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            width: 100%;
-            margin: 30px 0;
-        }
-
-        .hub-card {
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            text-decoration: none;
-            color: black;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-
-        .hub-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.5); }
-
-        /* CHATBOT IFRAME CONTAINER */
-        .ai-assistant-container {
-            width: 100%;
-            height: 450px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 20px;
-            border: 2px solid #10a37f;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            margin: 30px 0;
-            position: relative;
-        }
-
-        .ai-assistant-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .bulletin-board {
-            border: 2px dashed rgb(255, 165, 0);
-            padding: 15px;
-            margin: 25px 0;
-            background-color: rgb(255, 255, 224);
-            border-radius: 8px;
-        }
-
-        .footer { width: 100%; text-align: center; padding: 20px; font-size: 12px; background-color: rgba(255, 255, 255, 0.8); margin-top: 20px; }
-
-        /* TOGGLE */
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #2196F3; }
-        input:checked + .slider:before { transform: translateX(20px); }
-    </style>
-</head>
-<body>
-
+  <body>
     <div class="launch-screen" id="launch-screen" onclick="startExperience()">Click to Launch</div>
 
-    <video id="intro-video" class="intro-video" autoplay playsinline muted>
-        <source src="https://stenoip.github.io/intro.mp4" type="video/mp4" />
+    <video id="intro-video" class="intro-video" autoplay playsinline>
+        <source src="https://stenoip.github.io/new_intro.mp4" type="video/mp4" />
     </video>
 
     <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
-    <div id="main-content" class="container" style="display: none;">
+    <div id="main-content" class="container" style="display:none;">
+      <div id="background"></div>
+      <div id="websiteContainer">
+        <div class="website-spacers"></div>
         
-        <div id="header-placeholder"></div>
-
-        <div class="header">
-            <h1 style="margin:0;">StenoKonnect</h1>
-            <p>The Solar System's best web portal</p>
-            <div class="intro-toggle-container">
-                <span>Intro Video:</span>
-                <label class="switch">
-                    <input type="checkbox" id="introToggle">
-                    <span class="slider round"></span>
-                </label>
+        <header id="mainHeader">
+          <div class="header-logo-text">
+            <a href="/" title="Home"><img src="https://stenoip.github.io/new-swc.png" id="logo" alt="Logo" /></a>
+            <div class="header-text">
+              <span class="header-title">StenoipKonnect</span>
+              <span class="header-motto">Your web portal</span>
             </div>
+          </div>
+          <div class="toggle-buttons-divs">
+            <span id="hideNavbarButtonText">Menu ></span>
+            <img src="images/navbar_button.png" alt="Toggle" id="navbarToggleButton" />
+          </div>
+        </header>
+
+        <div id="navAndContentContainer">
+          <aside>
+            <div id="navigationMenu">
+              <nav class="nav-categories" aria-label="Main Content">
+                <span class="navbar-titles">Main Content</span>
+                <a href="index" class="nav-active"><img src="images/introduction.png" class="nav-icons" alt="" />Intro</a>
+                <a href="wallpapers" class="nav-inactive"><img src="images/wallpapers.png" class="nav-icons" alt="" />Arctilces</a>
+                <a href="resources" class="nav-inactive"><img src="images/resources.png" class="nav-icons" alt="" />About</a>
+                <a href="history" class="nav-inactive"><img src="images/history.png" class="nav-icons" alt="" />Space</a>
+                <a href="icons" class="nav-inactive"><img src="images/icons.png" class="nav-icons" alt="" />Metasearch</a>
+               </nav>
+              <nav class="nav-categories" aria-label="Entertainment">
+                <span class="navbar-titles">Entertainment</span>
+                <a href="music" class="nav-inactive"><img src="images/music.png" class="nav-icons" alt="" />StenoipPlay</a>
+                <a href="flash_media" class="nav-inactive"><img src="images/flash_media.png" class="nav-icons" alt="" />Fssss</a>
+                <a href="indie_games" class="nav-inactive"><img src="images/indie_games.png" class="nav-icons" alt="" />shbisiubsiub</a>
+                <a href="videos" class="nav-inactive"><img src="images/videos.png" class="nav-icons" alt="" />Videos</a>
+              </nav>
+
+              <nav class="nav-categories" aria-label="Community">
+                <span class="navbar-titles">Community</span>
+                <a href="https://archive.org/" class="nav-inactive"><img src="images/forum.png" class="nav-icons" alt="" />Praterich A.I</a>
+                <a href="chat_room" class="nav-inactive"><img src="images/chat_room.png" class="nav-icons" alt="" />Ringzauber</a>
+                <a href="https://stenoip.github.io/ooldes" class="nav-inactive"><img src="images/guestbook.png" class="nav-icons" alt="" />Oodles Metasearch</a>
+              </nav>
+
+              <div class="nav-categories">
+                <button id="navSoundToggle">Sounds Off</button>
+                <button id="navThemeChanger">Themes</button>
+              </div>
+            </div>
+          </aside>
+
+          <main id="mainContent">
+            <section>
+              <header>
+                <h1>Introduction</h1>
+                <div class="glass-borders">
+                  <div class="section-banners aero-borders">
+                    <img src="The+Selection+Wheel3.gif" alt="Banner" id="introBanner" />
+                  </div>
+                </div>
+              </header>
+
+              <div class="glass-borders">
+                <article class="styled-containers styled-containers-spaced aero-borders">
+                  <p>
+                    Welcome to StenoipKonnect by Stenoip Company
+                    <label class="switch">
+                      <input type="checkbox" id="introToggle">
+                      <span class="slider"></span>
+                    </label>
+                  </p>
+
+                  <div class="search-bars">
+                    <input type="text" id="tile-search" placeholder="Search my tiles…" oninput="filterTiles(this.value)">
+                    <input type="text" id="web-search" placeholder="Search the internet…" onkeydown="handleWebSearch(event)">
+                  </div>
+                </article>
+              </div>
+
+              <div class="glass-borders">
+                <h2 style="margin-top: 40px;">Make Your Own Web-Portal</h2>
+                <div class="tile-grid" id="tile-grid"></div>
+              </div>
+
+              <div class="glass-borders">
+                <article class="gallery-articles styled-containers styled-containers-spaced aero-borders">
+                  <header>
+                    <h2>Space Gallery</h2>
+                    <p>concepts.</p>
+                  </header>
+
+                  <div class="gallery-containers">
+                    <div class="gallery-images-containers">
+                      <a href="images/introduction/asadal.jpg" title="Asadal Stock Photography" class="spotlight">
+                        <img src="images/introduction/thumbnails/asadal.jpg" alt="Stock Photo" />
+                        <span>image</span>
+                      </a>
+                      <a href="images/introduction/windows_vista.jpg" title="Windows Vista (2007)" class="spotlight">
+                        <img src="images/introduction/thumbnails/windows_vista.jpg" alt="Vista" />
+                        <span>image</span>
+                      </a>
+                      <a href="images/introduction/wii.jpg" title="Wii (2006)" class="spotlight">
+                        <img src="images/introduction/thumbnails/wii.jpg" alt="Wii UI" />
+                        <span>image</span>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+          </main>
         </div>
-
-        <div class="portal-hub">
-            <a href="television_guide.html" class="hub-card">
-                <h2>Program Guide</h2>
-                <p>Access the full library of applications, games and calculators.</p>
-            </a>
-            <a href="office/home.html" class="hub-card">
-                <h2>StenoOffices</h2>
-                <p>Professional tools, documents and productivity software.</p>
-            </a>
-            <a href="https://stenoip.github.io/learn-centre" class="hub-card">
-                <h2>Learn Centre</h2>
-                <p>Explore educational resources, news and weather updates.</p>
-            </a>
-        </div>
-
-        <h3 style="text-align:center; color: #10a37f;">Need Help? Ask Praterich Navigator</h3>
-        <div class="ai-assistant-container">
-            <iframe src="ai-helper.html" title="StenoKonnect AI Helper"></iframe>
-        </div>
-
-        <h3 style="text-align:center;">Wheel of Stenoip</h3>
-        <iframe src="https://stenoip.github.io/wheel_gifs" height="600px" width="100%" style="border-radius:12px; border:none;"></iframe>
-
-        <div class="bulletin-board">
-            <h2 style="text-align: center; color: rgb(255, 140, 0);">The Bulletin Board!</h2>
-            <ul id="bulletin-list"></ul>
-        </div>
-
-        <button class="aero" id="notification-button" style="display:block; margin: 20px auto;" onclick="requestNotificationPermission()">
-            Sign Up for Notifications
-        </button>
-
-        <div class="footer">
-            <p>Version (TESTING.HTML) &copy; Stenoip Company</p>
-            <p><a href="copyright.html">View our terms.</a>  <a href="privacy.html">Privacy Policy</a></p>
-        </div>
+        <div class="website-spacers"></div>
+      </div>
     </div>
-
+    
     <script src="script.js"></script>
-    <script src="load-header.js"></script>
-</body>
+    <script src="/javascript/navbar.min.js" async></script>
+    <script src="/javascript/jquery.min.js"></script>
+    <script src="/javascript/magnific-popup.min.js"></script>
+  </body>
 </html>
