@@ -6,14 +6,66 @@
 var VERCEL_API = "https://stenoip-github-io.vercel.app/api/metadata";
 var TILE_STORAGE_KEY = 'stenokonnect_tiles';
 
+// --- INTRO & CONTENT CONTROL ---
+
+function showMainContent() {
+    var video = document.getElementById('intro-video');
+    if (video) {
+        video.pause();
+        video.style.display = 'none';
+    }
+    document.getElementById('launch-screen').style.display = 'none';
+    document.getElementById('skip-btn').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    document.body.style.overflowY = 'auto';
+}
+
+function startExperience() {
+    var introToggle = document.getElementById('introToggle');
+    document.getElementById('launch-screen').style.display = 'none';
+
+    if (introToggle && introToggle.checked) {
+        var video = document.getElementById('intro-video');
+        video.muted = false;
+        video.style.display = 'block';
+        // IE Fix: Removed the .catch() arrow function to prevent syntax errors
+        video.play(); 
+        document.getElementById('skip-btn').style.display = 'block';
+    } else {
+        showMainContent();
+    }
+}
+
+function skipVideo() {
+    showMainContent();
+}
+
 // --- INITIALIZATION ---
 
 document.addEventListener('DOMContentLoaded', function() {
-    var mainContent = document.getElementById('main-content');
-    if (mainContent) {
-        mainContent.style.display = 'block';
+    var introToggle = document.getElementById('introToggle');
+    var saved = localStorage.getItem('introVideoEnabled');
+
+    if (introToggle) {
+        introToggle.checked = saved === null ? true : saved === 'true';
+        introToggle.addEventListener('change', function () {
+            localStorage.setItem('introVideoEnabled', this.checked);
+        });
     }
-    document.body.style.overflowY = 'auto';
+
+    var video = document.getElementById('intro-video');
+    if (video) {
+        video.muted = false;
+        video.addEventListener('ended', showMainContent);
+    }
+
+    if (!introToggle || !introToggle.checked) {
+        showMainContent();
+    } else {
+        var launch = document.getElementById('launch-screen');
+        if (launch) launch.style.display = 'flex';
+        if (video) video.style.display = 'none';
+    }
 
     migrateOldTiles();
     renderTiles();
@@ -25,16 +77,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function getTiles() {
     try {
-        var data = localStorage.getItem(TILE_STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
+        return JSON.parse(localStorage.getItem(TILE_STORAGE_KEY)) || [];
     } catch(e) { return []; }
 }
 
 function saveTiles(tiles) {
     localStorage.setItem(TILE_STORAGE_KEY, JSON.stringify(tiles));
 }
-
-// --- MIGRATION ---
 
 function migrateOldTiles() {
     var tiles = getTiles();
@@ -48,7 +97,7 @@ function migrateOldTiles() {
     if (updated) saveTiles(tiles);
 }
 
-// --- WINDOWS 8 STYLE TILE SYSTEM ---
+// WINDOWS 8 STYLE TILE SYSTEM 
 
 function renderTiles() {
     var grid = document.getElementById("tile-grid");
@@ -57,30 +106,27 @@ function renderTiles() {
     grid.innerHTML = '';
     var tiles = getTiles();
 
+    // Standard for loop for IE stability
     for (var i = 0; i < tiles.length; i++) {
-        (function(tile, index) {
+        (function(index) {
+            var tile = tiles[index];
             var tileEl = document.createElement('div');
             tileEl.className = 'tile';
             tileEl.style.backgroundColor = tile.color || '#2d89ef';
             tileEl.onclick = function() { window.open(tile.url, '_blank'); };
 
-            var imgHtml = tile.favicon ? '<img src="' + tile.favicon + '" style="width:32px; height:32px; margin-bottom:10px;">' : '';
-            
             tileEl.innerHTML = 
-                imgHtml +
+                (tile.favicon ? '<img src="' + tile.favicon + '" style="width:32px; height:32px; margin-bottom:10px;">' : '') +
                 '<div class="tile-title">' + escapeHtml(tile.name) + '</div>' +
                 '<div class="tile-remove" title="Remove">✕</div>';
 
-            var removeBtn = tileEl.getElementsByClassName('tile-remove')[0];
-            removeBtn.onclick = function(e) {
-                if (!e) var e = window.event;
-                e.cancelBubble = true;
-                if (e.stopPropagation) e.stopPropagation();
+            tileEl.querySelector('.tile-remove').onclick = function(e) {
+                if (e.stopPropagation) e.stopPropagation(); else e.cancelBubble = true;
                 removeTile(index);
             };
 
             grid.appendChild(tileEl);
-        })(tiles[i], i);
+        })(i);
     }
 
     var addTileEl = document.createElement('div');
@@ -93,67 +139,42 @@ function renderTiles() {
 function showAddTileForm(tileEl) {
     tileEl.onclick = null;
     tileEl.innerHTML = 
-        '<form id="new-tile-form" style="display:flex; flex-direction:column; padding:10px;">' +
+        '<form onsubmit="submitNewTile(event)" style="display:flex; flex-direction:column; padding:10px;">' +
             '<input type="text" id="new-tile-name" placeholder="Site name" required style="color:black; margin-bottom:5px;">' +
             '<input type="text" id="new-tile-url" placeholder="example.com" required style="color:black; margin-bottom:5px;">' +
             '<button type="submit" style="cursor:pointer">Add</button>' +
         '</form>';
-
-    var form = document.getElementById('new-tile-form');
-    form.onsubmit = function(event) {
-        submitNewTile(event);
-        return false;
-    };
 }
 
-/**
-  UPDATED: Optimistic Tile Submission
-  Saves the tile immediately so it works even if the API fails.
- */
+//Replaced async/await with standard Promises (.then)
 function submitNewTile(event) {
-    if (event.preventDefault) event.preventDefault();
+    if (event.preventDefault) event.preventDefault(); else event.returnValue = false;
     
-    var name = document.getElementById('new-tile-name').value;
-    var url = document.getElementById('new-tile-url').value;
+    var name = document.getElementById('new-tile-name').value.trim();
+    var url = document.getElementById('new-tile-url').value.trim();
 
     if (!name || !url) return;
     if (url.indexOf('http') !== 0) url = 'https://' + url;
 
-    // 1. Create the tile object immediately
-    var tiles = getTiles();
-    var newTile = { 
-        name: name, 
-        url: url, 
-        favicon: '', 
-        color: getRandomWin8Color() 
-    };
-
-    // 2. Save and Re-render right away
-    tiles.push(newTile);
-    saveTiles(tiles);
-    renderTiles();
-
-    // 3. Background fetch for extra metadata (Favicon/Theme Color)
-    if (typeof fetch !== 'undefined') {
-        fetch(VERCEL_API + "?url=" + encodeURIComponent(url))
-            .then(function(response) { return response.json(); })
-            .then(function(meta) {
-                // Update the tile in storage with the new metadata
-                var currentTiles = getTiles();
-                for (var i = 0; i < currentTiles.length; i++) {
-                    if (currentTiles[i].url === url && currentTiles[i].name === name) {
-                        currentTiles[i].favicon = meta.favicon || currentTiles[i].favicon;
-                        currentTiles[i].color = meta.color || currentTiles[i].color;
-                        break;
-                    }
-                }
-                saveTiles(currentTiles);
-                renderTiles();
-            })
-            .catch(function(e) {
-                console.log("Metadata service unavailable, tile kept with defaults.");
+    fetch(VERCEL_API + "?url=" + encodeURIComponent(url))
+        .then(function(response) { return response.json(); })
+        .then(function(meta) {
+            var tiles = getTiles();
+            tiles.push({ 
+                name: name, 
+                url: url, 
+                favicon: meta.favicon, 
+                color: meta.color || getRandomWin8Color()
             });
-    }
+            saveTiles(tiles);
+            renderTiles();
+        })
+        .catch(function(e) {
+            var tilesFallback = getTiles();
+            tilesFallback.push({ name: name, url: url, color: getRandomWin8Color() });
+            saveTiles(tilesFallback);
+            renderTiles();
+        });
 }
 
 function removeTile(index) {
@@ -167,23 +188,28 @@ function removeTile(index) {
 
 function refreshTileColors() {
     var tiles = getTiles();
-    if (typeof fetch === 'undefined') return;
-
     var fetchPromises = [];
+
     for (var i = 0; i < tiles.length; i++) {
-        var tile = tiles[i];
-        if (!tile.color || tile.color === '#2d89ef') {
-            (function(t) {
-                var p = fetch(VERCEL_API + "?url=" + encodeURIComponent(t.url))
-                    .then(function(res) { return res.json(); })
-                    .then(function(meta) { t.color = meta.color || getRandomWin8Color(); })
-                    .catch(function() { t.color = getRandomWin8Color(); });
-                fetchPromises.push(p);
-            })(tile);
-        }
+        (function(tile) {
+            if (!tile.color || tile.color === '#2d89ef') {
+                if (tile.url) {
+                    fetchPromises.push(
+                        fetch(VERCEL_API + "?url=" + encodeURIComponent(tile.url))
+                            .then(function(response) { return response.json(); })
+                            .then(function(meta) {
+                                tile.color = meta.color || getRandomWin8Color();
+                            })
+                            .catch(function() {
+                                tile.color = getRandomWin8Color();
+                            })
+                    );
+                }
+            }
+        })(tiles[i]);
     }
 
-    if (fetchPromises.length > 0 && typeof Promise !== 'undefined') {
+    if (fetchPromises.length > 0) {
         Promise.all(fetchPromises).then(function() {
             saveTiles(tiles);
             renderTiles();
@@ -195,37 +221,37 @@ function refreshTileColors() {
 
 function escapeHtml(text) {
     var div = document.createElement('div');
-    div.innerText = text; 
+    div.innerText = text; // innerText is safer in IE for simple escaping
     return div.innerHTML;
 }
 
 function filterTiles(query) {
-    var tiles = document.getElementsByClassName('tile');
+    var tiles = document.querySelectorAll('.tile:not(.add-tile)');
     var lower = query.toLowerCase();
-    for (var i = 0; i < tiles.length; i++) {
-        if (tiles[i].className.indexOf('add-tile') !== -1) continue;
-        var titleContainer = tiles[i].getElementsByClassName('tile-title')[0];
-        var title = titleContainer ? titleContainer.innerText.toLowerCase() : '';
-        tiles[i].style.display = title.indexOf(lower) !== -1 ? '' : 'none';
-    }
+    // IE Fix: Convert NodeList to Array so forEach works
+    Array.prototype.slice.call(tiles).forEach(function(tile) {
+        var titleEl = tile.querySelector('.tile-title');
+        var title = titleEl ? titleEl.innerText.toLowerCase() : '';
+        tile.style.display = title.indexOf(lower) !== -1 ? '' : 'none';
+    });
 }
 
 function handleWebSearch(event) {
     var key = event.which || event.keyCode;
     if (key === 13) {
-        var query = event.target.value;
+        var query = event.target.value.trim();
         if (!query) return;
-        var url = "https://stenoip.github.io/oodles/ie11/search?q=" + encodeURIComponent(query);
+        var url = "https://stenoip.github.io/oodles/search?q=" + encodeURIComponent(query);
         window.open(url, '_blank');
         event.target.value = '';
     }
 }
 
-// --- FIXED MY THINGS ---
+//  FIXED MY THINGS 
 
 var MY_THINGS = [
-    { name: 'Comics', url: '/comic.html' },
-    { name: 'Learn Centre', url: 'https://stenoip.github.io/ie/learn-centre' },
+    { name: 'StenoKonnect Home', url: 'index.html' },
+    { name: 'Learn Centre', url: 'https://stenoip.github.io/learn-centre' },
     { name: 'Television Guide', url: 'television_guide.html' }
 ];
 
@@ -237,7 +263,7 @@ function renderMyThings() {
         (function(item) {
             var tile = document.createElement('div');
             tile.className = 'tile';
-            tileElStyle(tile);
+            tile.style.backgroundColor = '#333';
             tile.innerText = item.name;
             tile.onclick = function() { window.open(item.url, '_blank'); };
             grid.appendChild(tile);
@@ -245,30 +271,39 @@ function renderMyThings() {
     }
 }
 
-function tileElStyle(el) {
-    el.style.backgroundColor = '#333';
-    el.style.height = '120px';
-    el.style.display = 'inline-block';
-    el.style.margin = '5px';
-    el.style.width = '140px';
-}
-
 // --- SIDEBAR LOGIC ---
+
+var anchors = document.querySelectorAll('.sidebar a[href^="#"]');
+Array.prototype.slice.call(anchors).forEach(function(anchor) {
+    anchor.addEventListener('click', function(e) {
+        if (e.preventDefault) e.preventDefault();
+        var targetId = this.getAttribute('href');
+        var target = document.querySelector(targetId);
+        if (target) {
+            // IE Fix: smooth scroll isn't supported natively, this falls back to instant scroll
+            target.scrollIntoView(); 
+        }
+    });
+});
 
 var sidebar = document.getElementById('sidebar');
 var toggleBtn = document.getElementById('sidebar-toggle');
 
 if (toggleBtn) {
-    toggleBtn.onclick = function() {
+    toggleBtn.addEventListener('click', function() {
         if (sidebar.className.indexOf('open') !== -1) {
-            sidebar.className = 'sidebar';
+            sidebar.className = sidebar.className.replace(' open', '');
         } else {
-            sidebar.className = 'sidebar open';
+            sidebar.className += ' open';
         }
-    };
+    });
 }
 
-// --- WINDOWS 8 COLOURS HELPER ---
+document.addEventListener('click', function(e) {
+    if (sidebar && toggleBtn && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+        sidebar.className = sidebar.className.replace(' open', '');
+    }
+});
 
 function getRandomWin8Color() {
     var colors = ["#2d89ef", "#603cba", "#1e7145", "#b91d47", "#e3a21a", "#00a300"];
