@@ -1,23 +1,27 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Stenoip-Pages</title>
+    <title>What if Pluto replaced Earth's orbit - StenoipKonnect</title>
     
       <meta name="description" content="What happens when Pluto takes Earth's spot? A simulation of orbital chaos, planetary collisions, an angry sun and Pluto's demise." />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/new-swc.png" type="image/png" />
     <link rel="stylesheet" href="https://stenoip.github.io/styles.css">
     <style>
+      .body-colour {
+        background-color: rgba(133, 147, 247, 0.6);
+        color: rgb(0,0,0);
+      }
+      
       .ribbon-menu {
-    background-color: #858df7;
-    border-bottom: 1px solid #e0e0e0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    padding: 5px 15px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background-color: rgba(133, 147, 247, 0.9) !important; /* Force a solid-ish color */
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+    display: block !important; /* Ensure it is visible */
 }
 
 .tabs-container {
@@ -261,6 +265,26 @@
         min-height: 80vh; /* Adjusts minimum height for mobile view */
         font-size: 1em; /* Uses relative font size */
     }
+  /* Removes the dark gradient and background from H1 inside the editor */
+#editor h1 {
+    background: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    color: rgb(0,0,0); /* Standard dark grey/black for text */
+    font-size: 2em; /* Makes it look like a document header */
+    justify-content: flex-start; /* Aligns to left instead of center */
+    margin-bottom: 0.5em;
+    padding: 0;
+    max-width: 100%;
+}
+
+/* Adjusts the paragraph text in the editor */
+#editor p {
+    color: rgb(0,0,0);
+    font-size: 16px;
+    line-height: 1.6;
+    text-shadow: none !important; /* Removes the black shadow from styles.css */
+}
    
       </style>
 
@@ -335,7 +359,11 @@
          
                
 
-
+		<div class="body-colour">
+          
+              
+              
+              
                 <div class="glass-borders">
               
                     <div class="tabs-container">
@@ -506,7 +534,7 @@
                
               
               </div>
-
+</div>
 
              
             </section>
