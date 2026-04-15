@@ -44,7 +44,9 @@ function skipVideo() {
 document.addEventListener('DOMContentLoaded', function() {
     var introToggle = document.getElementById('introToggle');
     var saved = localStorage.getItem('introVideoEnabled');
+    var video = document.getElementById('intro-video');
 
+    // 1. Initialize Toggle State
     if (introToggle) {
         introToggle.checked = saved === null ? true : saved === 'true';
         introToggle.addEventListener('change', function () {
@@ -52,20 +54,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    var video = document.getElementById('intro-video');
+    // 2. Setup Video listeners but keep it strictly paused and hidden
     if (video) {
-        video.muted = false;
+        video.pause(); // Force pause on load
+        video.muted = true; // Stay muted to satisfy browser autoplay policies
+        video.style.display = 'none'; // Ensure it's hidden
         video.addEventListener('ended', showMainContent);
     }
 
-    if (!introToggle || !introToggle.checked) {
-        showMainContent();
-    } else {
+    // 3. Logic for Launch Screen vs Main Content
+    if (introToggle && introToggle.checked) {
+        // Show the launch screen (the "Green Screen" area)
         var launch = document.getElementById('launch-screen');
-        if (launch) launch.style.display = 'flex';
-        if (video) video.style.display = 'none';
+        if (launch) {
+            launch.style.display = 'flex';
+        }
+        // Main content stays hidden until startExperience is called
+        document.getElementById('main-content').style.display = 'none';
+    } else {
+        // No intro needed, go straight to app
+        showMainContent();
     }
 
+    // Initialize the rest of the UI
     migrateOldTiles();
     renderTiles();
     refreshTileColors();
