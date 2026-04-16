@@ -229,7 +229,7 @@ function insertMedia(event) {
 }
 
 function insertChart() {
-    alert("THERE ARE NO CHARTS YET!);
+    alert("THERE ARE NO CHARTS YET!");
 }
 
 //  DATA TAB (SORTING)
