@@ -1,52 +1,267 @@
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StenoSlides - Stenoip Company</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>StenoipSlides - StenoipKonnect</title>
+    
+      <meta name="description" content="Free alternative to Microsoft Powerpoint on your browser!" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/new-swc.png" type="image/png" />
+    <link rel="stylesheet" href="https://stenoip.github.io/styles.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <style>
-        :root { --office-blue: rgb(255,150,80); --ribbon-gray: #f3f2f1; --border-color: #edebe9; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #444; }
-        
-        /* Layout */
-        .app-container { display: grid; grid-template-rows: 30px auto 1fr; grid-template-columns: 220px 1fr; height: 100vh; }
-        .title-bar { grid-column: 1 / -1; background: var(--office-blue); color: #fff; padding: 5px 15px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Ribbon */
-        .ribbon { grid-column: 1 / -1; background: var(--ribbon-gray); border-bottom: 1px solid #ccc; z-index: 20; }
-        .ribbon-tabs { display: flex; background: #fff; border-bottom: 1px solid #ddd; }
-        .tab-btn { padding: 8px 15px; border: none; background: none; cursor: pointer; font-size: 12px; }
-        .tab-btn.active { border-bottom: 3px solid var(--office-blue); font-weight: bold; }
-        .ribbon-content { display: none; padding: 5px 10px; align-items: center; overflow-x: auto; }
-        .ribbon-content.active { display: flex; }
-        .control-group { display: flex; flex-direction: column; align-items: center; border-right: 1px solid #ccc; padding: 0 10px; margin-right: 5px; height: 60px; justify-content: center; }
-        .group-label { font-size: 9px; color: #777; margin-top: 2px; }
-        .btn-tool { background: none; border: 1px solid transparent; padding: 4px; cursor: pointer; border-radius: 3px; font-size: 11px; display: flex; flex-direction: column; align-items: center; min-width: 50px; }
-        .btn-tool:hover { background: #d1d1d1; }
-        .btn-tool i { font-size: 16px; margin-bottom: 2px; color: var(--office-blue); }
+      .body-colour {
+        background-color: rgba(233, 147, 7, 0.6);
+        color: rgb(0,0,0);
+      }
+      
+      /* Layout */
+.app-container {
+    display: grid;
+    grid-template-rows: 30px auto 1fr;
+    grid-template-columns: 220px 1fr;
+    height: 100vh;
+}
 
-        /* Project Manager Sidebar */
-        .sidebar { grid-row: 3; grid-column: 1; background: #fff; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
-        .project-selector { padding: 10px; border-bottom: 2px solid var(--office-blue); background: #f9f9f9; }
-        .slide-list { flex-grow: 1; overflow-y: auto; padding: 10px; background: #eee; }
-        .slide-thumb { width: 100%; aspect-ratio: 16/9; background: white; border: 2px solid #ccc; margin-bottom: 10px; cursor: pointer; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .slide-thumb.active { border-color: var(--office-blue); box-shadow: 0 0 8px var(--office-blue); }
+.title-bar {
+    grid-column: 1 / -1;
+    background: var(--office-blue);
+    color: rgb(255, 255, 255);
+    padding: 5px 15px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        /* Canvas Area */
-        .workspace { grid-row: 3; grid-column: 2; display: flex; justify-content: center; align-items: center; position: relative; overflow: auto; }
-        .canvas-container { box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: transform 0.3s; }
+/* Ribbon */
+.ribbon {
+    grid-column: 1 / -1;
+    background: var(--ribbon-gray);
+    border-bottom: 1px solid rgb(204, 204, 204);
+    z-index: 20;
+}
 
-        /* Fullscreen Presentation */
-        canvas:-webkit-full-screen { width: 100vw !important; height: 100vh !important; }
-        
-        #mediaInput { display: none; }
-    </style>
+.ribbon-tabs {
+    display: flex;
+    background: rgb(255, 255, 255);
+    border-bottom: 1px solid rgb(221, 221, 221);
+}
+
+.tab-btn {
+    padding: 8px 15px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.tab-btn.active {
+    border-bottom: 3px solid var(--office-blue);
+    font-weight: bold;
+}
+
+.ribbon-content {
+    display: none;
+    padding: 5px 10px;
+    align-items: center;
+    overflow-x: auto;
+}
+
+.ribbon-content.active {
+    display: flex;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid rgb(204, 204, 204);
+    padding: 0 10px;
+    margin-right: 5px;
+    height: 60px;
+    justify-content: center;
+}
+
+.group-label {
+    font-size: 9px;
+    color: rgb(119, 119, 119);
+    margin-top: 2px;
+}
+
+.btn-tool {
+    background: none;
+    border: 1px solid transparent;
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+}
+
+.btn-tool:hover {
+    background: rgb(209, 209, 209);
+}
+
+.btn-tool i {
+    font-size: 16px;
+    margin-bottom: 2px;
+    color: var(--office-blue);
+}
+
+/* Project Manager Sidebar */
+.sidebar {
+    grid-row: 3;
+    grid-column: 1;
+    background: rgb(255, 255, 255);
+    border-right: 1px solid rgb(221, 221, 221);
+    display: flex;
+    flex-direction: column;
+}
+
+.project-selector {
+    padding: 10px;
+    border-bottom: 2px solid var(--office-blue);
+    background: rgb(249, 249, 249);
+}
+
+.slide-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgb(238, 238, 238);
+}
+
+.slide-thumb {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: rgb(255, 255, 255);
+    border: 2px solid rgb(204, 204, 204);
+    margin-bottom: 10px;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slide-thumb.active {
+    border-color: var(--office-blue);
+    box-shadow: 0 0 8px var(--office-blue);
+}
+
+/* Canvas Area */
+.workspace {
+    grid-row: 3;
+    grid-column: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: auto;
+}
+
+.canvas-container {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s;
+}
+
+/* Fullscreen Presentation */
+canvas:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+#mediaInput {
+    display: none;
+}
+      </style>
+
+
 </head>
-<body>
 
-<div class="app-container">
+  <body>
+   
+ 
+      <div id="background"></div>
+      <div id="websiteContainer">
+        <div class="website-spacers"></div>
+        
+        <header id="mainHeader">
+          <div class="header-logo-text">
+            <a href="/" title="Home"><img src="https://stenoip.github.io/new-swc.png" id="logo" alt="Logo" /></a>
+            <div class="header-text">
+              <span class="header-title">StenoipKonnect</span>
+              <span class="header-motto">Your web portal</span>
+            </div>
+          </div>
+          <div class="toggle-buttons-divs">
+            <span id="hideNavbarButtonText">Menu ></span>
+            <img src="images/navbar_button.png" alt="Toggle" id="navbarToggleButton" />
+          </div>
+        </header>
+
+        <div id="navAndContentContainer">
+          <aside>
+            <div id="navigationMenu">
+              <nav class="nav-categories" aria-label="Main Content">
+                <span class="navbar-titles">Main Content</span>
+                <a href="/index.html" class="nav-active"><img src="images/introduction.png" class="nav-icons" alt="" />Home</a>
+                <a href="index.html" class="nav-inactive"><img src="images/wallpapers.png" class="nav-icons" alt="" />Articles</a>
+                <a href="/about.html" class="nav-inactive"><img src="images/resources.png" class="nav-icons" alt="" />About</a>
+                <a href="/space.html" class="nav-inactive"><img src="images/history.png" class="nav-icons" alt="" />Space</a>
+                <a href="https://stenoip.github.io/oodles" class="nav-inactive"><img src="images/icons.png" class="nav-icons" alt="" />Metasearch</a>
+               </nav>
+              <nav class="nav-categories" aria-label="Entertainment">
+                <span class="navbar-titles">Entertainment</span>
+                <a href="/games/home.html" class="nav-inactive"><img src="https://stenoip.github.io/icons/games.png" class="nav-icons" alt="" />StenoipPlay</a>
+                <a href="/comic.html" class="nav-inactive"><img src="https://stenoip.github.io/icons/comic.png" class="nav-icons" alt="" />Stenoip Komysk</a>
+                <a href="https://stenoip.github.io/albums" class="nav-inactive"><img src="https://img1.picmix.com/output/stamp/normal/6/4/0/6/2466046_12382.png" class="nav-icons" alt="" />Praterich A.I's music</a>
+                <a href="/video.html" class="nav-inactive"><img src="images/videos.png" class="nav-icons" alt="" />Videos</a>
+              </nav>
+
+              <nav class="nav-categories" aria-label="Community">
+                <span class="navbar-titles">Community</span>
+                <a href="https://stenoip.github.io/praterich/" class="nav-inactive"><img src="https://stenoip.github.io/praterich/praterich.png" class="nav-icons" alt="" />Praterich A.I</a>
+                <a href="https://stenoip.github.io/ringzauber" class="nav-inactive"><img src="ringzauber.ico" class="nav-icons" alt="" />Ringzauber</a>
+                <a href="https://stenoip.github.io/oodles" class="nav-inactive"><img src="https://stenoip.github.io/oodles/favicon.ico" class="nav-icons" alt="" />Oodles Metasearch</a>
+              </nav>
+
+              <div class="nav-categories">
+                <button id="navSoundToggle">Sounds Off</button>
+                <button id="navThemeChanger">Themes</button>
+              </div>
+            </div>
+          </aside>
+
+          <main id="mainContent">
+            <section>
+              <header>
+                <h1>StenoipPages</h1>
+                <div class="glass-borders">
+                  <div class="section-banners aero-borders">
+                    <img src="https://stenoip.github.io/skonnect_ribbon.png" alt="Banner" id="introBanner" />
+                  </div>
+                </div>
+              </header>
+
+         
+               
+
+		<div class="body-colour">
+          
+              
+              
+              
+                <div class="glass-borders">
+              
+                 
+   
+                  <div class="app-container">
     <div class="title-bar">
         <span><i class="fas fa-layer-group"></i> <strong id="projNameDisplay">StenoSlides</strong></span>
         <span>Shortcuts: [Del] Delete, [Ctrl+S] Save, [N] New Slide, [F5] Present</span>
@@ -54,10 +269,11 @@
 
     <div class="ribbon">
         <div class="ribbon-tabs">
-            <button class="tab-btn active" onclick="switchTab('home')">Home</button>
+          <button class="tab-btn" onclick="switchTab('projects')">File</button> 
+          <button class="tab-btn active" onclick="switchTab('home')">Home</button>
             <button class="tab-btn" onclick="switchTab('insert')">Insert</button>
             <button class="tab-btn" onclick="switchTab('design')">Design</button>
-            <button class="tab-btn" onclick="switchTab('projects')">File / Projects</button>
+            
         </div>
 
         <div id="tab-home" class="ribbon-content active">
@@ -116,258 +332,25 @@
         <canvas id="mainCanvas"></canvas>
     </div>
 </div>
+                  
 
-<script>
-    /**
-     * STENOSLIDES 
-     */
-    var canvas;
-    var currentProjectName = "Default Project";
-    var appState = {
-        slides: [],
-        currentSlideIndex: 0
-    };
+               
+              
+              </div>
+</div>
 
-    function init() {
-        canvas = new fabric.Canvas('mainCanvas', {
-            width: 800,
-            height: 450,
-            backgroundColor: '#ffffff'
-        });
-
-        setupKeyboardShortcuts();
-        loadProjectList();
-        loadProject(currentProjectName);
-        
-        // Canvas click should not advance slide unless in fullscreen
-        canvas.on('mouse:down', function(e) {
-            if (document.fullscreenElement) {
-                advanceSlide();
-            }
-        });
-    }
-
-    // PROJECT MANAGEMENT
-    function loadProjectList() {
-        var list = JSON.parse(localStorage.getItem('steno_project_list') || '["Default Project"]');
-        var select = document.getElementById('projectSelect');
-        select.innerHTML = '';
-        var i;
-        for (i = 0; i < list.length; i++) {
-            var opt = document.createElement('option');
-            opt.value = list[i];
-            opt.innerHTML = list[i];
-            select.appendChild(opt);
-        }
-        select.value = currentProjectName;
-    }
-
-    function createNewProject() {
-        var name = prompt("Enter project name:");
-        if (!name) return;
-        var list = JSON.parse(localStorage.getItem('steno_project_list') || '[]');
-        list.push(name);
-        localStorage.setItem('steno_project_list', JSON.stringify(list));
-        currentProjectName = name;
-        appState = { slides: [], currentSlideIndex: 0 };
-        addNewSlide();
-        saveToStorage();
-        loadProjectList();
-    }
-
-    function switchProject(name) {
-        saveToStorage();
-        currentProjectName = name;
-        loadProject(name);
-    }
-
-    function deleteCurrentProject() {
-        if (!confirm("Delete entire project?")) return;
-        var list = JSON.parse(localStorage.getItem('steno_project_list') || '[]');
-        var newList = list.filter(function(i) { return i !== currentProjectName; });
-        localStorage.setItem('steno_project_list', JSON.stringify(newList));
-        localStorage.removeItem('steno_proj_' + currentProjectName);
-        location.reload();
-    }
-
-    function saveToStorage() {
-        appState.slides[appState.currentSlideIndex].data = canvas.toJSON();
-        localStorage.setItem('steno_proj_' + currentProjectName, JSON.stringify(appState));
-        document.getElementById('projNameDisplay').innerText = currentProjectName + " (Saved)";
-    }
-
-    function loadProject(name) {
-        var data = localStorage.getItem('steno_proj_' + name);
-        if (data) {
-            appState = JSON.parse(data);
-            loadSlide(appState.currentSlideIndex || 0);
-        } else {
-            addNewSlide();
-        }
-        document.getElementById('projNameDisplay').innerText = currentProjectName;
-    }
-
-    // SLIDE LOGIC
-    function addNewSlide() {
-        var slide = { id: Date.now(), data: null, background: '#ffffff' };
-        appState.slides.push(slide);
-        loadSlide(appState.slides.length - 1);
-    }
-
-    function loadSlide(index) {
-        if (appState.slides[appState.currentSlideIndex]) {
-            appState.slides[appState.currentSlideIndex].data = canvas.toJSON();
-        }
-        appState.currentSlideIndex = index;
-        canvas.clear();
-        var slide = appState.slides[index];
-        if (slide.data) {
-            canvas.loadFromJSON(slide.data, function() {
-                canvas.renderAll();
-            });
-        } else {
-            canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
-        }
-        renderThumbs();
-    }
-
-    function renderThumbs() {
-        var container = document.getElementById('slide-sorter');
-        container.innerHTML = '';
-        var i;
-        for (i = 0; i < appState.slides.length; i++) {
-            var thumb = document.createElement('div');
-            thumb.className = 'slide-thumb' + (i === appState.currentSlideIndex ? ' active' : '');
-            thumb.onclick = (function(idx) { return function() { loadSlide(idx); }; })(i);
-            container.appendChild(thumb);
-        }
-    }
-
-    // TOOLS
-    function addTextbox() {
-        var t = new fabric.IText("Type Here", { left: 100, top: 100, fontFamily: 'Segoe UI' });
-        canvas.add(t);
-    }
-
-    function addShape(type) {
-        var s = (type === 'rect') ? new fabric.Rect({ width: 100, height: 100, fill: '#2b579a' }) : 
-                                   new fabric.Circle({ radius: 50, fill: '#2b579a' });
-        s.set({ left: 150, top: 150 });
-        canvas.add(s);
-    }
-
-    function triggerMedia() { document.getElementById('mediaInput').click(); }
-
-    function handleMediaUpload(e) {
-        var file = e.target.files[0];
-        var reader = new FileReader();
-        reader.onload = function(f) {
-            var data = f.target.result;
-            if (file.type.indexOf('image') !== -1) {
-                fabric.Image.fromURL(data, function(img) {
-                    img.scaleToWidth(300);
-                    canvas.add(img);
-                });
-            } else if (file.type.indexOf('video') !== -1) {
-                var videoEl = document.createElement('video');
-                videoEl.src = data;
-                videoEl.loop = true;
-                videoEl.muted = true;
-                videoEl.play();
-                var videoObj = new fabric.Image(videoEl, { left: 100, top: 100, width: 400, height: 225 });
-                canvas.add(videoObj);
-                fabric.util.requestAnimFrame(function render() {
-                    canvas.renderAll();
-                    fabric.util.requestAnimFrame(render);
-                });
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function changeSlideColor(color) {
-        canvas.setBackgroundColor(color, canvas.renderAll.bind(canvas));
-        appState.slides[appState.currentSlideIndex].background = color;
-    }
-
-    function changeSelectionColor(color) {
-        var obj = canvas.getActiveObject();
-        if (obj) { obj.set('fill', color); canvas.renderAll(); }
-    }
-
-    function deleteObject() {
-        var obj = canvas.getActiveObject();
-        if (obj) canvas.remove(obj);
-    }
-
-    function execCmd(cmd) {
-        var obj = canvas.getActiveObject();
-        if (!obj || !obj.set) return;
-        if (cmd === 'bold') obj.set('fontWeight', obj.fontWeight === 'bold' ? 'normal' : 'bold');
-        if (cmd === 'italic') obj.set('fontStyle', obj.fontStyle === 'italic' ? 'normal' : 'italic');
-        canvas.renderAll();
-    }
-
-    // PRESENTATION MODE
-    function enterPresentMode() {
-        var el = document.getElementById('presentation-area');
-        if (el.requestFullscreen) el.requestFullscreen();
-    }
-
-    function advanceSlide() {
-        if (appState.currentSlideIndex < appState.slides.length - 1) {
-            loadSlide(appState.currentSlideIndex + 1);
-        } else {
-            if (document.exitFullscreen) document.exitFullscreen();
-        }
-    }
-
-    function handlePresentationClick() {
-        if (document.fullscreenElement) advanceSlide();
-    }
-
-    // SHORTCUTS
-    function setupKeyboardShortcuts() {
-        window.addEventListener('keydown', function(e) {
-            // Delete key
-            if (e.key === "Delete" || e.key === "Backspace") {
-                if (!canvas.getActiveObject() || canvas.getActiveObject().isEditing) return;
-                deleteObject();
-            }
-            // Ctrl + S (Save)
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                saveToStorage();
-                alert("Project Saved to Browser Storage");
-            }
-            // N (New Slide)
-            if (e.key.toLowerCase() === 'n' && !e.ctrlKey) {
-                if (canvas.getActiveObject() && canvas.getActiveObject().isEditing) return;
-                addNewSlide();
-            }
-            // F5 (Present)
-            if (e.key === "F5") {
-                e.preventDefault();
-                enterPresentMode();
-            }
-            // Arrow Keys (Navigation)
-            if (e.key === "ArrowRight" || e.key === "PageDown") advanceSlide();
-            if (e.key === "ArrowLeft" || e.key === "PageUp") {
-                if (appState.currentSlideIndex > 0) loadSlide(appState.currentSlideIndex - 1);
-            }
-        });
-    }
-
-    function switchTab(name) {
-        var i, contents = document.getElementsByClassName('ribbon-content'), tabs = document.getElementsByClassName('tab-btn');
-        for (i = 0; i < contents.length; i++) contents[i].classList.remove('active');
-        for (i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
-        document.getElementById('tab-' + name).classList.add('active');
-        window.event.currentTarget.classList.add('active');
-    }
-
-    window.onload = init;
-</script>
-
-</body>
+               
+            </section>
+          </main>
+        </div>
+        <div class="website-spacers"></div>
+      </div>
+   
+    <script src="https://stenoip.github.io/slides-script.js"></script>
+  
+    <script src="/javascript-imports/navbar.min.js" async></script>
+    <script src="/javascript-imports/jquery.min.js"></script>
+    <script src="/javascript-imports/magnific-popup.min.js"></script>
+    
+  </body>
 </html>
