@@ -1,0 +1,52 @@
+Year of Stenoip. Two Thousand and Twenty Five
+
+
+December 2024 - Stenoip Wonder Computer is a webportal. Unlike the modern version were it focuses on being an Office Suite(like M365 Copilot or Google Workspace). Stenoip Wonder Computer is vaguely attempting to be an OS with not just Office tools but A.I, Drawing, Games, Phone, Camera, Maps and etc. 
+
+The 4 products of Stenoip Company(Praterich, StenoipKonnect, Oodles and Ringzauber all existed on SWC). Ringzauber and Oodles did not exist at this time.
+
+6th January 2025 - StenoipSearch(now Oodles Metasearch) created. Powered by Google Search API. StenoipSearch bar integrated to home page of SWC. 
+
+MOST OF IN-BETWEEN periods are spent adding games and other content to the SWC.
+
+17th March 2025 - Redesign of SWC (version 0.56)
+
+May/April 2025 - More Redesigns of SWC
+
+10th June 2025 - Ringzauber Alpha released to the public on the SWC for download (Ringzauber 1.4) First platform to "get independence" from the SWC.
+
+July 2025 - Experimentation of StenoSearch with its own crawler.
+
+15th July 2025? - StenoSearch renamed to Oodles in the experiment
+
+4th August 2025 - Oodles gets its own repo and site (no CSS). First project by Stenoip Company using a backend.
+
+11th August 2025 - The SWC office suite is released.
+
+16th August 2025 - Praterich gets its own repo and "gets independence" from Stenoip Wonder Computer.
+
+13th September 2025 -  
+    -- Ringzauber 1.5 releases to the public(officially as an "agentic browser"). However, it was not a true agentic browser since it was controlled by text commands (think analogy to Alexa or Siri).
+   -- Oodles officially "gets independence" from Stenoip Wonder Computer and is renmaed to "Oodles Index Generator"
+
+14th September 2025 - 
+SWC celebrated 100th version. (version 1.00)
+
+19th October 2025 -
+ Oodles is renamed to Oodles Metasearch Engine.
+
+24th October 2025 -
+ Oodles Metasearch gets a new Hyper Frutiger Aero design.
+
+5th November 2025-
+ The SWC is renamed to StenoipKonnect, attempting to focus on making a webportal like Clever. Office suite, games and tools still remained and the site was still cluttered.
+
+24th December 2025 - Ringzauber 1.6 releases. It was A.I capture, more A.I commands, improved web browsing and a new UI design.
+
+25th December 2025 - Christmas Cel
+
+
+
+
+
+
