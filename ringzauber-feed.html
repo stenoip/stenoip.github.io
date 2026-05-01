@@ -84,9 +84,12 @@
 
 <div id="content-wrapper">
     <!-- NEWS LAYER -->
+  
     <div id="rss-links" class="fade-layer">
-        <p style="font-size: 0.7rem; letter-spacing: 2px; color: var(--accent); margin: 0 0 10px 0;">URGENT DISPATCH</p>
-        <!-- Links injected here -->
+        <p style="font-size: 0.7rem; letter-spacing: 2px; color: var(--red); margin: 0 0 10px 0;">WORLD EXCLUSIVE</p>
+        <div id="inject-here" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            PRINTING LATEST NEWS...
+        </div>
     </div>
 
     <!-- AD LAYER -->
@@ -109,53 +112,51 @@
 </div>
 
 <script>
+    function triggerCrossFade() {
+        document.getElementById("rss-links").classList.add("hidden");
+        document.getElementById("ad-layer").classList.add("visible");
+    }
+
     async function loadRSS() {
-        const rssUrl = "http://feeds.bbci.co.uk/news/world/rss.xml";
+        // Using HTTPS to prevent Load Errors
+        const rssUrl = "https://feeds.bbci.co.uk/news/world/rss.xml";
+        const target = document.getElementById("inject-here");
+
         try {
             const response = await fetch(
                 `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`
             );
             const data = await response.json();
 
-            const container = document.getElementById("rss-links");
-            
             if (!data.items || data.items.length === 0) {
-                container.textContent = "THE PRESSES HAVE STALLED.";
+                target.textContent = "THE PRESSES HAVE STALLED.";
                 return;
             }
 
-            // Slice first 3 as requested
+            target.innerHTML = "";
             data.items.slice(0, 3).forEach(item => {
                 const link = document.createElement("a");
-                link.href = "#"; // Prevent default redirect to BBC
+                link.href = "#";
                 link.textContent = item.title;
                 
                 link.onclick = (e) => {
                     e.preventDefault();
                     triggerCrossFade();
-                    // Open the target site in a new tab
                     window.open("https://stenoip.github.io/learn-centre", "_blank");
                 };
                 
-                container.appendChild(link);
+                target.appendChild(link);
             });
+
+            // AUTOMATIC FADE after 5 seconds
+            setTimeout(() => {
+                triggerCrossFade();
+            }, 5000);
+
         } catch (e) {
-            console.error("News failed to load");
+            target.textContent = "COMMUNICATION LINE BROKEN.";
+            console.error("News failed to load", e);
         }
-    }
-
-    function triggerCrossFade() {
-        const news = document.getElementById("rss-links");
-        const ads = document.getElementById("ad-layer");
-
-        news.classList.add("hidden");
-        ads.classList.add("visible");
-
-        // Optional: Reset back to news after 30 seconds
-        setTimeout(() => {
-            ads.classList.remove("visible");
-            news.classList.remove("hidden");
-        }, 30000);
     }
 
     loadRSS();
