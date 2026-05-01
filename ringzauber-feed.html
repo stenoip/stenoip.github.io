@@ -112,54 +112,64 @@
 </div>
 
 <script>
-    function triggerCrossFade() {
-        document.getElementById("rss-links").classList.add("hidden");
-        document.getElementById("ad-layer").classList.add("visible");
-    }
+    function showNews() {
+    document.getElementById("rss-links").classList.remove("hidden");
+    document.getElementById("ad-layer").classList.remove("visible");
+}
 
-    async function loadRSS() {
-        // Using HTTPS to prevent Load Errors
-        const rssUrl = "https://feeds.bbci.co.uk/news/world/rss.xml";
-        const target = document.getElementById("inject-here");
+function showAds() {
+    document.getElementById("rss-links").classList.add("hidden");
+    document.getElementById("ad-layer").classList.add("visible");
+}
 
-        try {
-            const response = await fetch(
-                `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`
-            );
-            const data = await response.json();
+async function loadRSS() {
+    const rssUrl = "https://feeds.bbci.co.uk/news/world/rss.xml";
+    const target = document.getElementById("inject-here");
 
-            if (!data.items || data.items.length === 0) {
-                target.textContent = "THE PRESSES HAVE STALLED.";
-                return;
-            }
+    try {
+        const response = await fetch(
+            `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`
+        );
+        const data = await response.json();
 
-            target.innerHTML = "";
-            data.items.slice(0, 3).forEach(item => {
-                const link = document.createElement("a");
-                link.href = "#";
-                link.textContent = item.title;
-                
-                link.onclick = (e) => {
-                    e.preventDefault();
-                    triggerCrossFade();
-                    window.open("https://stenoip.github.io/learn-centre", "_blank");
-                };
-                
-                target.appendChild(link);
-            });
-
-            // AUTOMATIC FADE after 5 seconds
-            setTimeout(() => {
-                triggerCrossFade();
-            }, 5000);
-
-        } catch (e) {
-            target.textContent = "COMMUNICATION LINE BROKEN.";
-            console.error("News failed to load", e);
+        if (!data.items || data.items.length === 0) {
+            target.textContent = "THE PRESSES HAVE STALLED.";
+            return;
         }
-    }
 
-    loadRSS();
+        target.innerHTML = "";
+        data.items.slice(0, 3).forEach(item => {
+            const link = document.createElement("a");
+            link.href = "#";
+            link.textContent = item.title;
+            
+            link.onclick = (e) => {
+                e.preventDefault();
+                showAds();
+                window.open("https://stenoip.github.io/learn-centre", "_blank");
+            };
+            
+            target.appendChild(link);
+        });
+
+        // --- THE LOOPING LOGIC ---
+        setInterval(() => {
+            const newsLayer = document.getElementById("rss-links");
+            // Check if news is currently hidden
+            if (newsLayer.classList.contains("hidden")) {
+                showNews();
+            } else {
+                showAds();
+            }
+        }, 3000); // Swaps every 3 seconds
+
+    } catch (e) {
+        target.textContent = "COMMUNICATION LINE BROKEN.";
+        console.error("News failed to load", e);
+    }
+}
+
+loadRSS();
 </script>
 
 </body>
