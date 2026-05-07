@@ -419,6 +419,12 @@ td input:focus {
                     <button class="ribbon-item" onclick="document.getElementById('file-upload').click()">Open JSON</button>
                     <input type="file" id="file-upload" accept=".json" style="display: none;" onchange="openJSON(event)">
                     <button class="ribbon-item" onclick="toggleBrowserStorage()" id="storage-btn">Storage: OFF</button>
+					<button class="ribbon-item" onclick="uploadToCloud()">
+     			Upload to Cloud
+				</button>
+				<button class="ribbon-item" onclick="window.location.href='index.html'">
+    			Open from Cloud
+				</button>
                 </div>
                 <div class="ribbon-group-title">File Operations</div>
             </div>
