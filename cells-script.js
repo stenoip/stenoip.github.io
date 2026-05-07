@@ -282,6 +282,50 @@ function sortData(direction) {
     refreshGrid();
 }
 
+
+// --- CLOUD INTEGRATION (CELLS) ---
+const CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
+
+async function uploadToCloud() {
+    let filename = prompt("Enter a name for your cloud spreadsheet:");
+    if (!filename) return;
+    if (!filename.endsWith('.cells.json')) filename += '.cells.json';
+
+    const blob = new Blob([JSON.stringify(cellData)], { type: 'application/json' });
+    const formData = new FormData();
+    formData.append('file', blob, filename);
+
+    try {
+        await fetch(`${CLOUD_URL}/upload`, { method: 'POST', body: formData });
+        alert("Spreadsheet uploaded to cloud successfully!");
+    } catch (e) {
+        alert("Cloud upload failed: " + e);
+    }
+}
+
+async function loadFromCloud(filename) {
+    try {
+        const response = await fetch(`${CLOUD_URL}/download/${filename}`);
+        if (!response.ok) throw new Error("File not found");
+        const data = await response.json();
+        cellData = data;
+        refreshGrid();
+        document.title = filename + " - Steno Cells";
+    } catch (e) {
+        alert("Failed to load from cloud: " + e);
+    }
+}
+
+// Check URL for file on load
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileToOpen = urlParams.get('file');
+    if (fileToOpen) {
+        loadFromCloud(fileToOpen);
+    }
+});
+
+
 // --- DRAW TAB ---
 function resizeCanvas() {
     if (!canvas) return;
