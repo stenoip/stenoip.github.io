@@ -303,3 +303,71 @@ function getRandomWin8Color() {
     var colors = ["#2d89ef", "#603cba", "#1e7145", "#b91d47", "#e3a21a", "#00a300"];
     return colors[Math.floor(Math.random() * colors.length)];
 }
+    var CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
+    async function fetchFiles() {
+        try {
+            const response = await fetch(`${CLOUD_URL}/files`);
+            const data = await response.json();
+            renderFiles(data.files);
+        } catch (error) {
+            console.error("Error fetching files:", error);
+        }
+    }
+
+    function renderFiles(files) {
+        var list = document.getElementById('fileList');
+        list.innerHTML = '';
+        if (files.length === 0) list.innerHTML = '<p>No files in the cloud yet.</p>';
+
+        files.forEach(file => {
+            const li = document.createElement('li');
+            li.className = 'file-item';
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.innerText = file;
+            
+            const actions = document.createElement('div');
+            
+            const openBtn = document.createElement('button');
+            openBtn.className = 'btn btn-open';
+            openBtn.innerText = 'Open';
+            openBtn.onclick = () => openFile(file);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-delete';
+            deleteBtn.innerText = 'Delete';
+            deleteBtn.onclick = () => deleteFile(file);
+
+            actions.appendChild(openBtn);
+            actions.appendChild(deleteBtn);
+            
+            li.appendChild(nameSpan);
+            li.appendChild(actions);
+            list.appendChild(li);
+        });
+    }
+
+    function openFile(filename) {
+        // Route to the correct app based on our strict naming convention
+        if (filename.endsWith('.cells.json')) {
+            window.location.href = `cells.html?file=${filename}`;
+        } else if (filename.endsWith('.slides.json')) {
+            window.location.href = `slides.html?file=${filename}`;
+        } else if (filename.endsWith('.pages.html')) {
+            window.location.href = `pages.html?file=${filename}`;
+        } else {
+            alert("Unknown file type! Cannot open.");
+        }
+    }
+
+    async function deleteFile(filename) {
+        if (!confirm(`Are you sure you want to delete ${filename}?`)) return;
+        try {
+            await fetch(`${CLOUD_URL}/delete/${filename}`, { method: 'DELETE' });
+            fetchFiles(); // Refresh list
+        } catch (error) {
+            console.error("Error deleting file:", error);
+        }
+    }
+
+    window.onload = fetchFiles;  
