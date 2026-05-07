@@ -14,6 +14,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="new-swc.png" type="image/png" />
     <link rel="stylesheet" href="styles.css">
+    
+    <style>
+     .file-list { list-style: none;
+          padding: 0; }
+        .file-item { display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px;
+          border-bottom: 1px solid #eee;
+      }
+        .btn { padding: 8px 16px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          color: white;
+          margin-left: 5px;
+      }
+        .btn-open {
+          background-color: rgb(0,172,0);
+      }
+        .btn-delete {
+          background-color: #d9534f;
+      }
+        .apps-nav {
+          margin-bottom: 20px;
+          display: flex;
+          gap: 10px;
+      }
+        .apps-nav a {
+          padding: 10px 15px;
+          background: #ddd;
+          text-decoration: none;
+          color: #333;
+          border-radius: 4px;
+      }
+      .tile-cloud-container {
+        all: revert;
+        
+      }
+    </style>
   </head>
 
   <body>
@@ -95,9 +135,11 @@
                 <h2 style="margin-top: 40px;">Welcome to StenoipKonnect</h2>
                  
                   <p>
-                    Stenoip is pronounced <strong>Stick-no-ikp</strong> Get started by saving your favourite sites and read the latest news. 
+                    Stenoip is pronounced <strong>Stick-no-ikp</strong> 
                   <br>
-                    <br>
+                    Welcome to an alternative to Microsoft 365 and Google Workspace.
+                    The same classic office suite with <strong>No Subscription!</strong>
+                    <hr>
                     Toggle intro video
                     <label class="switch">
                       <input type="checkbox" id="introToggle">
@@ -110,19 +152,16 @@
               </div>
 
               <div class="glass-borders">
-                <h2 style="margin-top: 40px;">Make Your Own Web-Portal</h2>
+             <h1 class="tile-cloud-container">Create ...</h1>
+    <div class="apps-nav">
+        <a href="pages.html">New Document</a>
+        <a href="cells.html">New Cells Spreadsheet</a>
+        <a href="slides.html">New Slides Presentation</a>
+    </div>
 
-<small> Click plus to add your tiles. Each tile has your favourite website. Use the search bar to search through your tiles. 
-Use the other search bar to search the internet (with the A.I powered Oodles Metasearch).
-</small>
-
-                
-                                  <div class="search-bars">
-                    <input type="text" id="tile-search" placeholder="Search my tiles…" oninput="filterTiles(this.value)">
-                    <input type="text" id="web-search" placeholder="Search the internet…" onkeydown="handleWebSearch(event)">
-                  </div>
-                
-                <div class="tile-grid" id="tile-grid"></div>
+    <h2 class="tile-cloud-container">Cloud Files</h2>
+    <ul class="file-list" id="fileList">
+        </ul>
               </div>
 
               <div class="glass-borders">
@@ -161,7 +200,7 @@ Use the other search bar to search the internet (with the A.I powered Oodles Met
                 <div class="glass-borders">
                 <article class="styled-containers styled-containers-spaced aero-borders">
                 <h4 style="margin-top: 40px;">Copyright Stenoip Company</h4>
-                <small>Version 1.41 ( &copy; 2026 Stenoip Company)</small>
+                <small>Version 1.42 ( &copy; 2026 Stenoip Company)</small>
             
                 </article>
               </div>
