@@ -1,4 +1,4 @@
- document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabPanels = document.querySelectorAll('.tab-panel');
         const editor = document.getElementById('editor');
@@ -23,7 +23,50 @@
         const readModeBtn = document.getElementById('readModeBtn');
         const printLayoutBtn = document.getElementById('printLayoutBtn');
 
-        // --- NEW AUTO-SAVE FUNCTIONALITY ---
+       // --- CLOUD INTEGRATION (PAGES) ---
+const CLOUD_URL = 'http://localhost:8000';
+const uploadCloudBtn = document.getElementById('uploadCloudBtn'); // Make sure you add this button to your HTML!
+
+if (uploadCloudBtn) {
+    uploadCloudBtn.addEventListener('click', async () => {
+        let filename = prompt("Enter a name for your cloud document:");
+        if (!filename) return;
+        if (!filename.endsWith('.pages.html')) filename += '.pages.html';
+
+        const content = editor.innerHTML;
+        const blob = new Blob([content], { type: 'text/html' });
+        const formData = new FormData();
+        formData.append('file', blob, filename);
+
+        try {
+            await fetch(`${CLOUD_URL}/upload`, { method: 'POST', body: formData });
+            alert("Document uploaded to cloud successfully!");
+        } catch (e) {
+            alert("Cloud upload failed: " + e);
+        }
+    });
+}
+
+async function loadFromCloud(filename) {
+    try {
+        const response = await fetch(`${CLOUD_URL}/download/${filename}`);
+        if (!response.ok) throw new Error("File not found");
+        const htmlContent = await response.text();
+        editor.innerHTML = htmlContent;
+        document.title = filename + " - Steno Pages";
+    } catch (e) {
+        alert("Failed to load from cloud: " + e);
+    }
+}
+
+// Check URL for file on load
+const urlParams = new URLSearchParams(window.location.search);
+const fileToOpen = urlParams.get('file');
+if (fileToOpen) {
+    loadFromCloud(fileToOpen);
+} 
+       
+       // --- NEW AUTO-SAVE FUNCTIONALITY ---
         const AUTOSAVE_KEY = 'documentContent';
         const AUTOSAVE_INTERVAL = 5000; // Save every 5 seconds
 
