@@ -242,5 +242,52 @@ var canvas;
         document.getElementById('tab-' + name).classList.add('active');
         window.event.currentTarget.classList.add('active');
     }
+// --- CLOUD INTEGRATION (SLIDES) ---
+const CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
+
+async function uploadToCloud() {
+    var filename = prompt("Enter a name for your cloud presentation:", currentProjectName);
+    if (!filename) return;
+    if (!filename.endsWith('.slides.json')) filename += '.slides.json';
+
+    saveToStorage(); // Ensure appState is perfectly up to date
+
+    const blob = new Blob([JSON.stringify(appState)], { type: 'application/json' });
+    const formData = new FormData();
+    formData.append('file', blob, filename);
+
+    try {
+        await fetch(`${CLOUD_URL}/upload`, { method: 'POST', body: formData });
+        alert("Presentation uploaded to cloud successfully!");
+    } catch (e) {
+        alert("Cloud upload failed: " + e);
+    }
+}
+
+async function loadFromCloud(filename) {
+    try {
+        const response = await fetch(`${CLOUD_URL}/download/${filename}`);
+        if (!response.ok) throw new Error("File not found");
+        const data = await response.json();
+        
+        currentProjectName = filename.replace('.slides.json', '');
+        appState = data;
+        loadSlide(appState.currentSlideIndex || 0);
+        document.getElementById('projNameDisplay').innerText = currentProjectName + " (Cloud)";
+    } catch (e) {
+        alert("Failed to load from cloud: " + e);
+    }
+}
+
+// Intercept init to check for cloud file
+const originalInit = init;
+init = function() {
+    originalInit();
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileToOpen = urlParams.get('file');
+    if (fileToOpen) {
+        loadFromCloud(fileToOpen);
+    }
+};
 
     window.onload = init;
