@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const printLayoutBtn = document.getElementById('printLayoutBtn');
 
        // --- CLOUD INTEGRATION (PAGES) ---
-const CLOUD_URL = 'http://localhost:8000';
-const uploadCloudBtn = document.getElementById('uploadCloudBtn'); // Make sure you add this button to your HTML!
+const CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
+const uploadCloudBtn = document.getElementById('uploadCloudBtn'); 
 
 if (uploadCloudBtn) {
     uploadCloudBtn.addEventListener('click', async () => {
