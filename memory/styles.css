@@ -1,0 +1,103 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgb(240, 240, 2);
+
+  font-family: 'Franklin Gothic Medium',
+               'Arial Narrow',
+               Arial,
+               sans-serif;
+}
+
+h1 {
+  
+  text-align: center;
+  font-size: 1.5em;
+  
+}
+/* Game Board */
+.memory-game {
+  width: 640px;
+  height: 640px;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  perspective: 1000px;
+}
+
+/* Memory Cards */
+.memory-card {
+  width: calc(25% - 10px);
+  height: calc(33.333% - 10px);
+
+  margin: 5px;
+
+  position: relative;
+
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+
+  cursor: pointer;
+}
+
+/* Flip Effect */
+.memory-card.flip {
+  transform: rotateY(180deg);
+}
+
+/* Front + Back Faces */
+.front-face,
+.back-face {
+  width: 100%;
+  height: 100%;
+
+  padding: 20px;
+
+  position: absolute;
+
+  border-radius: 10px;
+
+  background: #d6f356;
+
+  backface-visibility: hidden;
+
+  object-fit: cover;
+}
+
+/* Front Face */
+.front-face {
+  transform: rotateY(180deg);
+}
+
+/* Optional Hover Effect */
+.memory-card:hover {
+  transform: scale(1.03);
+}
+
+/* Keep hover from breaking flipped cards */
+.memory-card.flip:hover {
+  transform: rotateY(180deg) scale(1.03);
+}
+
+.party-mode {
+  animation: discoParty 0.2s infinite linear;
+}
+
+@keyframes discoParty {
+  0% { background-color: #ff0055; }
+  20% { background-color: #00ff66; }
+  40% { background-color: #00ffff; }
+  60% { background-color: #ffff00; }
+  80% { background-color: #ff00ff; }
+  100% { background-color: #ff0055; }
+}
