@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>L.O.L Cloud</title>
+    <style>
+        body {  
+  font-family: sans-serif; 
+  max-width: 500px; 
+  margin: 50px auto; 
+}
+
+.section { 
+  border: 1px solid #ccc; 
+  padding: 20px; 
+  border-radius: 8px; 
+  margin-bottom: 20px; 
+}
+
+ul { 
+  list-style: none; 
+  padding: 0; 
+}
+
+li { 
+  display: flex; 
+  justify-content: space-between; 
+  padding: 8px 0; 
+  border-bottom: 1px solid #eee; 
+}
+
+a { 
+  text-decoration: none; 
+  color: #007bff; 
+  font-weight: bold; 
+}
+    </style>
+</head>
+<body>
+
+    <div class="section">
+        <h3>Upload File</h3>
+        <input type="file" id="fileInput">
+        <button onclick="uploadFile()">Upload</button>
+        <p id="status"></p>
+    </div>
+
+    <div class="section">
+        <h3>Files on Cloud</h3>
+        <button onclick="loadFiles()">Refresh List</button>
+        <ul id="fileList"></ul>
+    </div>
+
+    <script>
+        var API_URL = "http://localhost:8000";
+
+function uploadFile() {
+    var fileInput = document.getElementById('fileInput');
+    var formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+
+    fetch(API_URL + "/upload", { method: "POST", body: formData })
+        .then(function (response) {
+            if (response.ok) {
+                document.getElementById('status').innerText = "Upload success!";
+                loadFiles(); // Refresh list after upload
+            }
+        });
+}
+
+function loadFiles() {
+    var listElement = document.getElementById('fileList');
+    listElement.innerHTML = "Loading...";
+
+
+    fetch(API_URL + "/files")
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            listElement.innerHTML = ""; // Clear list
+            
+           
+            data.files.forEach(function (filename) {
+                var li = document.createElement('li');
+                
+              
+                li.innerHTML = '\n' +
+                    '<span>' + filename + '</span>\n' +
+                    '<a href="' + API_URL + '/download/' + filename + '" target="_blank">Download</a>\n';
+                
+                listElement.appendChild(li);
+            });
+        })
+        .catch(function (e) {
+            listElement.innerHTML = "Error loading files.";
+        });
+}
+
+// Load files automatically when the page opens
+loadFiles();
+    </script>
+</body>
+</html>
