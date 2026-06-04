@@ -176,38 +176,60 @@ function renderFiles(files) {
     });
 }
 
+
+
 function openFile(filename) {
     var lowerName = filename.toLowerCase();
+    var targetId = 'file-item-' + btoa(filename).replace(/=/g, '');
+    var li = document.getElementById(targetId);
     
+    if (!li) return;
+
+    // Check if preview already exists to toggle it off
+    var existingPreview = li.querySelector('.file-preview');
+    if (existingPreview) {
+        existingPreview.parentNode.removeChild(existingPreview);
+        return;
+    }
+
     if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.png') || lowerName.endsWith('.gif') || lowerName.endsWith('.webp')) {
-        var targetId = 'file-item-' + btoa(filename).replace(/=/g, '');
-        var li = document.getElementById(targetId);
         
-        if (li) {
-            var existingPreview = li.querySelector('.file-preview');
-            if (existingPreview) {
-                existingPreview.parentNode.removeChild(existingPreview);
-                return;
-            }
+        // Fetch the file as a binary Blob instead of pointing to a URL
+        fetch(CLOUD_URL + '/files/' + encodeURIComponent(filename))
+            .then(function(response) {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.blob(); 
+            })
+            .then(function(blob) {
+                var previewContainer = document.createElement('div');
+                previewContainer.className = 'file-preview';
+                
+                var img = document.createElement('img');
+                // Create a temporary local URL for the fetched binary data
+                var objectUrl = URL.createObjectURL(blob);
+                img.src = objectUrl; 
+                img.alt = filename;
+                img.style.maxWidth = '150px';
+                img.style.maxHeight = '150px';
+                img.style.objectFit = 'contain';
+                img.style.borderRadius = '4px';
+                img.style.border = '1px solid #ccc';
+                img.style.marginTop = '5px';
+                
+                // Clean up memory after the image loads
+                img.onload = function() {
+                    URL.revokeObjectURL(objectUrl);
+                };
+                img.addEventListener('error', handlePreviewError);
 
-            var previewContainer = document.createElement('div');
-            previewContainer.className = 'file-preview';
-            
-            var img = document.createElement('img');
-            img.src = CLOUD_URL + '/files/' + encodeURIComponent(filename); 
-            img.alt = filename;
-            img.style.maxWidth = '150px';
-            img.style.maxHeight = '150px';
-            img.style.objectFit = 'contain';
-            img.style.borderRadius = '4px';
-            img.style.border = '1px solid #ccc';
-            img.style.marginTop = '5px';
-            
-            img.addEventListener('error', handlePreviewError);
+                previewContainer.appendChild(img);
+                li.appendChild(previewContainer);
+            })
+            .catch(function(error) {
+                console.error("Preview fetch failed:", error);
+                alert("Failed to load image preview.");
+            });
 
-            previewContainer.appendChild(img);
-            li.appendChild(previewContainer);
-        }
     } else if (filename.endsWith('.cells.json')) {
         window.location.href = 'cells.html?file=' + filename;
     } else if (filename.endsWith('.slides.json')) {
@@ -220,12 +242,29 @@ function openFile(filename) {
 }
 
 function downloadFile(filename) {
-    var a = document.createElement('a');
-    a.href = CLOUD_URL + '/files/' + encodeURIComponent(filename);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Fetch the file as a Blob to download via code
+    fetch(CLOUD_URL + '/files/' + encodeURIComponent(filename))
+        .then(function(response) {
+            if (!response.ok) throw new Error("Download failed");
+            return response.blob();
+        })
+        .then(function(blob) {
+            var a = document.createElement('a');
+            var objectUrl = URL.createObjectURL(blob);
+            
+            a.href = objectUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Clean up
+            document.body.removeChild(a);
+            URL.revokeObjectURL(objectUrl);
+        })
+        .catch(function(error) {
+            console.error("Error downloading file:", error);
+            alert("Failed to download file.");
+        });
 }
 
 function handleDeleteSuccess() {
