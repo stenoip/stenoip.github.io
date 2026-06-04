@@ -194,77 +194,46 @@ function openFile(filename) {
 
     if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.png') || lowerName.endsWith('.gif') || lowerName.endsWith('.webp')) {
         
-        // Fetch the file as a binary Blob instead of pointing to a URL
-        fetch(CLOUD_URL + '/files/' + encodeURIComponent(filename))
-            .then(function(response) {
-                if (!response.ok) throw new Error("Network response was not ok");
-                return response.blob(); 
-            })
-            .then(function(blob) {
-                var previewContainer = document.createElement('div');
-                previewContainer.className = 'file-preview';
-                
-                var img = document.createElement('img');
-                // Create a temporary local URL for the fetched binary data
-                var objectUrl = URL.createObjectURL(blob);
-                img.src = objectUrl; 
-                img.alt = filename;
-                img.style.maxWidth = '150px';
-                img.style.maxHeight = '150px';
-                img.style.objectFit = 'contain';
-                img.style.borderRadius = '4px';
-                img.style.border = '1px solid #ccc';
-                img.style.marginTop = '5px';
-                
-                // Clean up memory after the image loads
-                img.onload = function() {
-                    URL.revokeObjectURL(objectUrl);
-                };
-                img.addEventListener('error', handlePreviewError);
+        var previewContainer = document.createElement('div');
+        previewContainer.className = 'file-preview';
+        
+        var img = document.createElement('img');
+        // Correct endpoint & direct link assignment (No fetch/blob required!)
+        img.src = CLOUD_URL + '/download/' + encodeURIComponent(filename); 
+        img.alt = filename;
+        img.style.maxWidth = '150px';
+        img.style.maxHeight = '150px';
+        img.style.objectFit = 'contain';
+        img.style.borderRadius = '4px';
+        img.style.border = '1px solid #ccc';
+        img.style.marginTop = '5px';
+        
+        img.addEventListener('error', handlePreviewError);
 
-                previewContainer.appendChild(img);
-                li.appendChild(previewContainer);
-            })
-            .catch(function(error) {
-                console.error("Preview fetch failed:", error);
-                alert("Failed to load image preview.");
-            });
+        previewContainer.appendChild(img);
+        li.appendChild(previewContainer);
 
     } else if (filename.endsWith('.cells.json')) {
-        window.location.href = 'cells.html?file=' + filename;
+        window.location.href = 'cells.html?file=' + encodeURIComponent(filename);
     } else if (filename.endsWith('.slides.json')) {
-        window.location.href = 'slides.html?file=' + filename;
+        window.location.href = 'slides.html?file=' + encodeURIComponent(filename);
     } else if (filename.endsWith('.pages.html')) {
-        window.location.href = 'pages.html?file=' + filename;
+        window.location.href = 'pages.html?file=' + encodeURIComponent(filename);
     } else {
         alert("Unknown file type! Cannot open.");
     }
 }
 
 function downloadFile(filename) {
-    // Fetch the file as a Blob to download via code
-    fetch(CLOUD_URL + '/files/' + encodeURIComponent(filename))
-        .then(function(response) {
-            if (!response.ok) throw new Error("Download failed");
-            return response.blob();
-        })
-        .then(function(blob) {
-            var a = document.createElement('a');
-            var objectUrl = URL.createObjectURL(blob);
-            
-            a.href = objectUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            
-            // Clean up
-            document.body.removeChild(a);
-            URL.revokeObjectURL(objectUrl);
-        })
-        .catch(function(error) {
-            console.error("Error downloading file:", error);
-            alert("Failed to download file.");
-        });
+    // Mimics the working script setup cleanly without breaking on large files
+    var a = document.createElement('a');
+    a.href = CLOUD_URL + '/download/' + encodeURIComponent(filename);
+    a.download = filename;
+    a.target = '_blank'; // Opens in a new tab if the browser prefers to preview it
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 function handleDeleteSuccess() {
