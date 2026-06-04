@@ -1,11 +1,3 @@
-// ===============================
-// COPYRIGHT STENOIP COMPANY!
-// COPING IS STRICTLY PROHIBETED
-// ===============================
-
-var VERCEL_API = "https://stenoip-github-io.vercel.app/api/metadata";
-var TILE_STORAGE_KEY = 'stenokonnect_tiles';
-
 // --- INTRO & CONTENT CONTROL ---
 
 function showMainContent() {
@@ -41,285 +33,101 @@ function skipVideo() {
 
 // --- INITIALIZATION ---
 
-document.addEventListener('DOMContentLoaded', function() {
+function handleIntroToggleChange() {
+    localStorage.setItem('introVideoEnabled', this.checked);
+}
+
+function handleVideoEnded() {
+    showMainContent();
+}
+
+function handleDOMContentLoaded() {
     var introToggle = document.getElementById('introToggle');
     var saved = localStorage.getItem('introVideoEnabled');
     var video = document.getElementById('intro-video');
 
-    // 1. Initialize Toggle State
     if (introToggle) {
         introToggle.checked = saved === null ? true : saved === 'true';
-        introToggle.addEventListener('change', function () {
-            localStorage.setItem('introVideoEnabled', this.checked);
-        });
+        introToggle.addEventListener('change', handleIntroToggleChange);
     }
 
-    // 2. Setup Video listeners but keep it strictly paused and hidden
     if (video) {
-        video.pause(); // Force pause on load
-        video.muted = true; // Stay muted to satisfy browser autoplay policies
-        video.style.display = 'none'; // Ensure it's hidden
-        video.addEventListener('ended', showMainContent);
+        video.pause(); 
+        video.muted = true; 
+        video.style.display = 'none'; 
+        video.addEventListener('ended', handleVideoEnded);
     }
 
-    // 3. Logic for Launch Screen vs Main Content
     if (introToggle && introToggle.checked) {
-        // Show the launch screen (the "Green Screen" area)
         var launch = document.getElementById('launch-screen');
         if (launch) {
             launch.style.display = 'flex';
         }
-        // Main content stays hidden until startExperience is called
         document.getElementById('main-content').style.display = 'none';
     } else {
-        // No intro needed, go straight to app
         showMainContent();
     }
-
-    // Initialize the rest of the UI
-    migrateOldTiles();
-    renderTiles();
-    refreshTileColors();
-    renderMyThings();
-});
-
-// --- LOCAL STORAGE UTILITIES ---
-
-function getTiles() {
-    try {
-        return JSON.parse(localStorage.getItem(TILE_STORAGE_KEY)) || [];
-    } catch(e) { return []; }
 }
 
-function saveTiles(tiles) {
-    localStorage.setItem(TILE_STORAGE_KEY, JSON.stringify(tiles));
-}
-
-// --- MIGRATION: update old tiles with missing colours ---
-
-function migrateOldTiles() {
-    var tiles = getTiles();
-    var updated = false;
-    for (var i = 0; i < tiles.length; i++) {
-        if (!tiles[i].color) {
-            tiles[i].color = getRandomWin8Color();
-            updated = true;
-        }
-    }
-    if (updated) saveTiles(tiles);
-}
-
-// --- WINDOWS 8 STYLE TILE SYSTEM ---
-
-function renderTiles() {
-    var grid = document.getElementById("tile-grid");
-    if (!grid) return;
-
-    grid.innerHTML = '';
-    var tiles = getTiles();
-
-    tiles.forEach(function(tile, index) {
-        var tileEl = document.createElement('div');
-        tileEl.className = 'tile';
-        tileEl.style.backgroundColor = tile.color || '#2d89ef';
-        tileEl.onclick = function() { window.open(tile.url, '_blank'); };
-
-        tileEl.innerHTML = 
-            (tile.favicon ? '<img src="' + tile.favicon + '" style="width:32px; height:32px; margin-bottom:10px;">' : '') +
-            '<div class="tile-title">' + escapeHtml(tile.name) + '</div>' +
-            '<div class="tile-remove" title="Remove">✕</div>';
-
-        tileEl.querySelector('.tile-remove').onclick = function(e) {
-            e.stopPropagation();
-            removeTile(index);
-        };
-
-        grid.appendChild(tileEl);
-    });
-
-    var addTileEl = document.createElement('div');
-    addTileEl.className = 'tile add-tile';
-    addTileEl.innerHTML = '+';
-    addTileEl.onclick = function() { showAddTileForm(addTileEl); };
-    grid.appendChild(addTileEl);
-}
-
-function showAddTileForm(tileEl) {
-    tileEl.onclick = null;
-    tileEl.innerHTML = 
-        '<form onsubmit="submitNewTile(event)" style="display:flex; flex-direction:column; gap:5px; padding:10px;">' +
-            '<input type="text" id="new-tile-name" placeholder="Site name" required style="color:black">' +
-            '<input type="text" id="new-tile-url" placeholder="example.com" required style="color:black">' +
-            '<button type="submit" style="cursor:pointer">Add</button>' +
-        '</form>';
-}
-
-async function submitNewTile(event) {
-    event.preventDefault();
-    var name = document.getElementById('new-tile-name').value.trim();
-    var url = document.getElementById('new-tile-url').value.trim();
-
-    if (!name || !url) return;
-    if (!url.startsWith('http')) url = 'https://' + url;
-
-    try {
-        var response = await fetch(VERCEL_API + "?url=" + encodeURIComponent(url));
-        var meta = await response.json();
-
-        var tiles = getTiles();
-        tiles.push({ 
-            name: name, 
-            url: url, 
-            favicon: meta.favicon, 
-            color: meta.color || getRandomWin8Color()
-        });
-        saveTiles(tiles);
-        renderTiles();
-    } catch (e) {
-        console.error("Backend error:", e);
-        var tilesFallback = getTiles();
-        tilesFallback.push({ name: name, url: url, color: getRandomWin8Color() });
-        saveTiles(tilesFallback);
-        renderTiles();
-    }
-}
-
-// --- UTILS & SEARCH ---
-
-function removeTile(index) {
-    var tiles = getTiles();
-    tiles.splice(index, 1);
-    saveTiles(tiles);
-    renderTiles();
-}
-
-function refreshTileColors() {
-    var tiles = getTiles();
-    var fetchPromises = [];
-
-    tiles.forEach(function(tile, index) {
-        if (!tile.color || tile.color === '#2d89ef') {
-            if (tile.url) {
-                fetchPromises.push(
-                    fetch(VERCEL_API + "?url=" + encodeURIComponent(tile.url))
-                        .then(function(response) { return response.json(); })
-                        .then(function(meta) {
-                            tile.color = meta.color || getRandomWin8Color();
-                        })
-                        .catch(function() {
-                            tile.color = getRandomWin8Color();
-                        })
-                );
-            }
-        }
-    });
-
-    Promise.all(fetchPromises).then(function() {
-        saveTiles(tiles);
-        renderTiles();
-    });
-}
-
-function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function filterTiles(query) {
-    var tiles = document.querySelectorAll('.tile:not(.add-tile)');
-    var lower = query.toLowerCase();
-    tiles.forEach(function(tile) {
-        var title = tile.querySelector('.tile-title')?.textContent.toLowerCase() || '';
-        tile.style.display = title.includes(lower) ? '' : 'none';
-    });
-}
-
-function handleWebSearch(event) {
-    if (event.key === 'Enter') {
-        var query = event.target.value.trim();
-        if (!query) return;
-        var url = "https://stenoip.github.io/oodles/search?q=" + encodeURIComponent(query);
-        window.open(url, '_blank');
-        event.target.value = '';
-    }
-}
-
-// --- FIXED MY THINGS ---
-
-var MY_THINGS = [
-    { name: 'StenoKonnect Home', url: 'index.html' },
-    { name: 'Learn Centre', url: 'https://stenoip.github.io/learn-centre' },
-    { name: 'Television Guide', url: 'television_guide.html' }
-];
-
-function renderMyThings() {
-    var grid = document.getElementById('my-things-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    MY_THINGS.forEach(function(item) {
-        var tile = document.createElement('div');
-        tile.className = 'tile';
-        tile.style.backgroundColor = '#333';
-        tile.textContent = item.name;
-        tile.onclick = function() { window.open(item.url, '_blank'); };
-        grid.appendChild(tile);
-    });
-}
-
-// --- SIDEBAR LOGIC ---
-
-document.querySelectorAll('.sidebar a[href^="#"]').forEach(function(anchor) {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        var target = document.querySelector(this.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-    });
-});
-
-var sidebar = document.getElementById('sidebar');
-var toggleBtn = document.getElementById('sidebar-toggle');
-
-if (toggleBtn) {
-    toggleBtn.addEventListener('click', function() {
-        sidebar.classList.toggle('open');
-    });
-}
-
-document.addEventListener('click', function(e) {
-    if (sidebar && toggleBtn && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-        sidebar.classList.remove('open');
-    }
-});
-
-function getRandomWin8Color() {
-    var colors = ["#2d89ef", "#603cba", "#1e7145", "#b91d47", "#e3a21a", "#00a300"];
-    return colors[Math.floor(Math.random() * colors.length)];
-}
+document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
 
 // --- CLOUD STORAGE SYSTEM ---
 
 var CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
 
-async function fetchFiles() {
-    try {
-        const response = await fetch(`${CLOUD_URL}/files`);
-        const data = await response.json();
-        renderFiles(data.files);
-    } catch (error) {
-        console.error("Error fetching files:", error);
+function handleFetchResponse(response) {
+    return response.json();
+}
+
+function handleFetchSuccess(data) {
+    renderFiles(data.files);
+}
+
+function handleFetchError(error) {
+    console.error("Error fetching files:", error);
+}
+
+function fetchFiles() {
+    fetch(CLOUD_URL + '/files')
+        .then(handleFetchResponse)
+        .then(handleFetchSuccess)
+        .catch(handleFetchError);
+}
+
+function handleOpenClick(e) {
+    var filename = e.target.getAttribute('data-filename');
+    openFile(filename);
+}
+
+function handleDownloadClick(e) {
+    var filename = e.target.getAttribute('data-filename');
+    downloadFile(filename);
+}
+
+function handleDeleteClick(e) {
+    var filename = e.target.getAttribute('data-filename');
+    deleteFile(filename);
+}
+
+function handlePreviewError(e) {
+    var container = e.target.parentNode;
+    if (container) {
+        container.parentNode.removeChild(container);
     }
+    alert("Failed to load image preview.");
 }
 
 function renderFiles(files) {
     var list = document.getElementById('fileList');
     list.innerHTML = '';
-    if (files.length === 0) list.innerHTML = '<p>No files in the cloud yet.</p>';
+    if (files.length === 0) {
+        list.innerHTML = '<p>No files in the cloud yet.</p>';
+    }
 
-    files.forEach(file => {
-        const li = document.createElement('li');
+    files.forEach(function(file) {
+        var li = document.createElement('li');
         li.className = 'file-item';
-        // Add styling support for structural items if needed via flex
+        li.id = 'file-item-' + btoa(file).replace(/=/g, ''); 
         li.style.display = 'flex';
         li.style.flexDirection = 'column';
         li.style.gap = '10px';
@@ -327,54 +135,67 @@ function renderFiles(files) {
         li.style.padding = '10px';
         li.style.border = '1px solid #ddd';
 
-        // Top Row: Name and Actions
-        const mainRow = document.createElement('div');
+        var mainRow = document.createElement('div');
         mainRow.style.display = 'flex';
         mainRow.style.justifyContent = 'space-between';
         mainRow.style.alignItems = 'center';
         
-        const nameSpan = document.createElement('span');
+        var nameSpan = document.createElement('span');
         nameSpan.innerText = file;
         mainRow.appendChild(nameSpan);
         
-        const actions = document.createElement('div');
+        var actions = document.createElement('div');
         actions.style.display = 'flex';
         actions.style.gap = '5px';
         
-        // 1. Open Button
-        const openBtn = document.createElement('button');
+        var openBtn = document.createElement('button');
         openBtn.className = 'btn btn-open';
         openBtn.innerText = 'Open';
-        openBtn.onclick = () => openFile(file);
+        openBtn.setAttribute('data-filename', file);
+        openBtn.addEventListener('click', handleOpenClick);
         actions.appendChild(openBtn);
 
-        // 2. Download Button
-        const downloadBtn = document.createElement('button');
+        var downloadBtn = document.createElement('button');
         downloadBtn.className = 'btn btn-download';
         downloadBtn.innerText = 'Download';
         downloadBtn.style.cursor = 'pointer';
-        downloadBtn.onclick = () => downloadFile(file);
+        downloadBtn.setAttribute('data-filename', file);
+        downloadBtn.addEventListener('click', handleDownloadClick);
         actions.appendChild(downloadBtn);
 
-        // 3. Delete Button
-        const deleteBtn = document.createElement('button');
+        var deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn btn-delete';
         deleteBtn.innerText = 'Delete';
-        deleteBtn.onclick = () => deleteFile(file);
+        deleteBtn.setAttribute('data-filename', file);
+        deleteBtn.addEventListener('click', handleDeleteClick);
         actions.appendChild(deleteBtn);
         
         mainRow.appendChild(actions);
         li.appendChild(mainRow);
+        list.appendChild(li);
+    });
+}
 
-        // Bottom Row: Image Preview (If file matches image extensions)
-        const lowerName = file.toLowerCase();
-        if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.png') || lowerName.endsWith('.gif') || lowerName.endsWith('.webp')) {
-            const previewContainer = document.createElement('div');
+function openFile(filename) {
+    var lowerName = filename.toLowerCase();
+    
+    if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.png') || lowerName.endsWith('.gif') || lowerName.endsWith('.webp')) {
+        var targetId = 'file-item-' + btoa(filename).replace(/=/g, '');
+        var li = document.getElementById(targetId);
+        
+        if (li) {
+            var existingPreview = li.querySelector('.file-preview');
+            if (existingPreview) {
+                existingPreview.parentNode.removeChild(existingPreview);
+                return;
+            }
+
+            var previewContainer = document.createElement('div');
             previewContainer.className = 'file-preview';
             
-            const img = document.createElement('img');
-            img.src = `${CLOUD_URL}/files/${encodeURIComponent(file)}`; // Targets the served static route on your backend
-            img.alt = file;
+            var img = document.createElement('img');
+            img.src = CLOUD_URL + '/files/' + encodeURIComponent(filename); 
+            img.alt = filename;
             img.style.maxWidth = '150px';
             img.style.maxHeight = '150px';
             img.style.objectFit = 'contain';
@@ -382,385 +203,45 @@ function renderFiles(files) {
             img.style.border = '1px solid #ccc';
             img.style.marginTop = '5px';
             
-            // Fail-safe handling if the specific file server path doesn't open via direct /files route
-            img.onerror = function() {
-                previewContainer.remove(); 
-            };
+            img.addEventListener('error', handlePreviewError);
 
             previewContainer.appendChild(img);
             li.appendChild(previewContainer);
         }
-
-        list.appendChild(li);
-    });
-}
-
-function openFile(filename) {
-    if (filename.endsWith('.cells.json')) {
-        window.location.href = `cells.html?file=${filename}`;
+    } else if (filename.endsWith('.cells.json')) {
+        window.location.href = 'cells.html?file=' + filename;
     } else if (filename.endsWith('.slides.json')) {
-        window.location.href = `slides.html?file=${filename}`;
+        window.location.href = 'slides.html?file=' + filename;
     } else if (filename.endsWith('.pages.html')) {
-        window.location.href = `pages.html?file=${filename}`;
+        window.location.href = 'pages.html?file=' + filename;
     } else {
         alert("Unknown file type! Cannot open.");
     }
 }
 
 function downloadFile(filename) {
-    // Creates an on-the-fly anchor wrapper to force download stream pipeline natively
-    const a = document.createElement('a');
-    a.href = `${CLOUD_URL}/files/${encodeURIComponent(filename)}`;
+    var a = document.createElement('a');
+    a.href = CLOUD_URL + '/files/' + encodeURIComponent(filename);
     a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
 }
 
-async function deleteFile(filename) {
-    if (!confirm(`Are you sure you want to delete ${filename}?`)) return;
-    try {
-        await fetch(`${CLOUD_URL}/delete/${filename}`, { method: 'DELETE' });
-        fetchFiles(); 
-    } catch (error) {
-        console.error("Error deleting file:", error);
-    }
+function handleDeleteSuccess() {
+    fetchFiles();
+}
+
+function handleDeleteError(error) {
+    console.error("Error deleting file:", error);
+}
+
+function deleteFile(filename) {
+    if (!confirm('Are you sure you want to delete ' + filename + '?')) return;
+    
+    fetch(CLOUD_URL + '/delete/' + filename, { method: 'DELETE' })
+        .then(handleDeleteSuccess)
+        .catch(handleDeleteError);
 }
 
 window.onload = fetchFiles;
-function skipVideo() {
-    showMainContent();
-}
-
-// --- INITIALIZATION ---
-
-document.addEventListener('DOMContentLoaded', function() {
-    var introToggle = document.getElementById('introToggle');
-    var saved = localStorage.getItem('introVideoEnabled');
-    var video = document.getElementById('intro-video');
-
-    // 1. Initialize Toggle State
-    if (introToggle) {
-        introToggle.checked = saved === null ? true : saved === 'true';
-        introToggle.addEventListener('change', function () {
-            localStorage.setItem('introVideoEnabled', this.checked);
-        });
-    }
-
-    // 2. Setup Video listeners but keep it strictly paused and hidden
-    if (video) {
-        video.pause(); // Force pause on load
-        video.muted = true; // Stay muted to satisfy browser autoplay policies
-        video.style.display = 'none'; // Ensure it's hidden
-        video.addEventListener('ended', showMainContent);
-    }
-
-    // 3. Logic for Launch Screen vs Main Content
-    if (introToggle && introToggle.checked) {
-        // Show the launch screen (the "Green Screen" area)
-        var launch = document.getElementById('launch-screen');
-        if (launch) {
-            launch.style.display = 'flex';
-        }
-        // Main content stays hidden until startExperience is called
-        document.getElementById('main-content').style.display = 'none';
-    } else {
-        // No intro needed, go straight to app
-        showMainContent();
-    }
-
-    // Initialize the rest of the UI
-    migrateOldTiles();
-    renderTiles();
-    refreshTileColors();
-    renderMyThings();
-});
-
-// --- LOCAL STORAGE UTILITIES ---
-
-function getTiles() {
-    try {
-        return JSON.parse(localStorage.getItem(TILE_STORAGE_KEY)) || [];
-    } catch(e) { return []; }
-}
-
-function saveTiles(tiles) {
-    localStorage.setItem(TILE_STORAGE_KEY, JSON.stringify(tiles));
-}
-
-// --- MIGRATION: update old tiles with missing colours ---
-
-function migrateOldTiles() {
-    var tiles = getTiles();
-    var updated = false;
-    for (var i = 0; i < tiles.length; i++) {
-        if (!tiles[i].color) {
-            tiles[i].color = getRandomWin8Color();
-            updated = true;
-        }
-    }
-    if (updated) saveTiles(tiles);
-}
-
-// --- WINDOWS 8 STYLE TILE SYSTEM ---
-
-function renderTiles() {
-    var grid = document.getElementById("tile-grid");
-    if (!grid) return;
-
-    grid.innerHTML = '';
-    var tiles = getTiles();
-
-    tiles.forEach(function(tile, index) {
-        var tileEl = document.createElement('div');
-        tileEl.className = 'tile';
-        tileEl.style.backgroundColor = tile.color || '#2d89ef';
-        tileEl.onclick = function() { window.open(tile.url, '_blank'); };
-
-        tileEl.innerHTML = 
-            (tile.favicon ? '<img src="' + tile.favicon + '" style="width:32px; height:32px; margin-bottom:10px;">' : '') +
-            '<div class="tile-title">' + escapeHtml(tile.name) + '</div>' +
-            '<div class="tile-remove" title="Remove">✕</div>';
-
-        tileEl.querySelector('.tile-remove').onclick = function(e) {
-            e.stopPropagation();
-            removeTile(index);
-        };
-
-        grid.appendChild(tileEl);
-    });
-
-    var addTileEl = document.createElement('div');
-    addTileEl.className = 'tile add-tile';
-    addTileEl.innerHTML = '+';
-    addTileEl.onclick = function() { showAddTileForm(addTileEl); };
-    grid.appendChild(addTileEl);
-
-  
-}
-
-function showAddTileForm(tileEl) {
-    tileEl.onclick = null;
-    tileEl.innerHTML = 
-        '<form onsubmit="submitNewTile(event)" style="display:flex; flex-direction:column; gap:5px; padding:10px;">' +
-            '<input type="text" id="new-tile-name" placeholder="Site name" required style="color:black">' +
-            '<input type="text" id="new-tile-url" placeholder="example.com" required style="color:black">' +
-            '<button type="submit" style="cursor:pointer">Add</button>' +
-        '</form>';
-}
-
-async function submitNewTile(event) {
-    event.preventDefault();
-    var name = document.getElementById('new-tile-name').value.trim();
-    var url = document.getElementById('new-tile-url').value.trim();
-
-    if (!name || !url) return;
-    if (!url.startsWith('http')) url = 'https://' + url;
-
-    try {
-        var response = await fetch(VERCEL_API + "?url=" + encodeURIComponent(url));
-        var meta = await response.json();
-
-        var tiles = getTiles();
-        tiles.push({ 
-            name: name, 
-            url: url, 
-            favicon: meta.favicon, 
-            color: meta.color || getRandomWin8Color()
-        });
-        saveTiles(tiles);
-        renderTiles();
-    } catch (e) {
-        console.error("Backend error:", e);
-        var tilesFallback = getTiles();
-        tilesFallback.push({ name: name, url: url, color: getRandomWin8Color() });
-        saveTiles(tilesFallback);
-        renderTiles();
-    }
-}
-
-function removeTile(index) {
-    var tiles = getTiles();
-    tiles.splice(index, 1);
-    saveTiles(tiles);
-    renderTiles();
-}
-
-// --- REFRESH TILE COLOURS FOR FALLBACKS ---
-
-function refreshTileColors() {
-    var tiles = getTiles();
-    var fetchPromises = [];
-
-    tiles.forEach(function(tile, index) {
-        if (!tile.color || tile.color === '#2d89ef') {
-            if (tile.url) {
-                fetchPromises.push(
-                    fetch(VERCEL_API + "?url=" + encodeURIComponent(tile.url))
-                        .then(function(response) { return response.json(); })
-                        .then(function(meta) {
-                            tile.color = meta.color || getRandomWin8Color();
-                        })
-                        .catch(function() {
-                            tile.color = getRandomWin8Color();
-                        })
-                );
-            }
-        }
-    });
-
-    // Update localStorage and rerender once after all fetches
-    Promise.all(fetchPromises).then(function() {
-        saveTiles(tiles);
-        renderTiles();
-    });
-}
-
-// --- UTILS & SEARCH ---
-
-function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function filterTiles(query) {
-    var tiles = document.querySelectorAll('.tile:not(.add-tile)');
-    var lower = query.toLowerCase();
-    tiles.forEach(function(tile) {
-        var title = tile.querySelector('.tile-title')?.textContent.toLowerCase() || '';
-        tile.style.display = title.includes(lower) ? '' : 'none';
-    });
-}
-
-function handleWebSearch(event) {
-    if (event.key === 'Enter') {
-        var query = event.target.value.trim();
-        if (!query) return;
-        var url = "https://stenoip.github.io/oodles/search?q=" + encodeURIComponent(query);
-        window.open(url, '_blank');
-        event.target.value = '';
-    }
-}
-
-// --- FIXED MY THINGS ---
-
-var MY_THINGS = [
-    { name: 'StenoKonnect Home', url: 'index.html' },
-    { name: 'Learn Centre', url: 'https://stenoip.github.io/learn-centre' },
-    { name: 'Television Guide', url: 'television_guide.html' }
-];
-
-function renderMyThings() {
-    var grid = document.getElementById('my-things-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    MY_THINGS.forEach(function(item) {
-        var tile = document.createElement('div');
-        tile.className = 'tile';
-        tile.style.backgroundColor = '#333';
-        tile.textContent = item.name;
-        tile.onclick = function() { window.open(item.url, '_blank'); };
-        grid.appendChild(tile);
-    });
-}
-
-// --- SIDEBAR LOGIC ---
-
-document.querySelectorAll('.sidebar a[href^="#"]').forEach(function(anchor) {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        var target = document.querySelector(this.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-    });
-});
-
-var sidebar = document.getElementById('sidebar');
-var toggleBtn = document.getElementById('sidebar-toggle');
-
-if (toggleBtn) {
-    toggleBtn.addEventListener('click', function() {
-        sidebar.classList.toggle('open');
-    });
-}
-
-document.addEventListener('click', function(e) {
-    if (sidebar && toggleBtn && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-        sidebar.classList.remove('open');
-    }
-});
-
-// --- WINDOWS 8 COLOURS HELPER ---
-
-function getRandomWin8Color() {
-    var colors = ["#2d89ef", "#603cba", "#1e7145", "#b91d47", "#e3a21a", "#00a300"];
-    return colors[Math.floor(Math.random() * colors.length)];
-}
-    var CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
-    async function fetchFiles() {
-        try {
-            const response = await fetch(`${CLOUD_URL}/files`);
-            const data = await response.json();
-            renderFiles(data.files);
-        } catch (error) {
-            console.error("Error fetching files:", error);
-        }
-    }
-
-    function renderFiles(files) {
-        var list = document.getElementById('fileList');
-        list.innerHTML = '';
-        if (files.length === 0) list.innerHTML = '<p>No files in the cloud yet.</p>';
-
-        files.forEach(file => {
-            const li = document.createElement('li');
-            li.className = 'file-item';
-            
-            const nameSpan = document.createElement('span');
-            nameSpan.innerText = file;
-            
-            const actions = document.createElement('div');
-            
-            const openBtn = document.createElement('button');
-            openBtn.className = 'btn btn-open';
-            openBtn.innerText = 'Open';
-            openBtn.onclick = () => openFile(file);
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn btn-delete';
-            deleteBtn.innerText = 'Delete';
-            deleteBtn.onclick = () => deleteFile(file);
-
-            actions.appendChild(openBtn);
-            actions.appendChild(deleteBtn);
-            
-            li.appendChild(nameSpan);
-            li.appendChild(actions);
-            list.appendChild(li);
-        });
-    }
-
-    function openFile(filename) {
-        // Route to the correct app based on our strict naming convention
-        if (filename.endsWith('.cells.json')) {
-            window.location.href = `cells.html?file=${filename}`;
-        } else if (filename.endsWith('.slides.json')) {
-            window.location.href = `slides.html?file=${filename}`;
-        } else if (filename.endsWith('.pages.html')) {
-            window.location.href = `pages.html?file=${filename}`;
-        } else {
-            alert("Unknown file type! Cannot open.");
-        }
-    }
-
-    async function deleteFile(filename) {
-        if (!confirm(`Are you sure you want to delete ${filename}?`)) return;
-        try {
-            await fetch(`${CLOUD_URL}/delete/${filename}`, { method: 'DELETE' });
-            fetchFiles(); // Refresh list
-        } catch (error) {
-            console.error("Error deleting file:", error);
-        }
-    }
-
-    window.onload = fetchFiles;  
