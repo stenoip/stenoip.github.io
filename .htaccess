@@ -1,4 +1,0 @@
-<Limit GET POST>
-  Order allow,deny
-  Allow from all
-</Limit>
