@@ -127,18 +127,25 @@
              (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
     </div>
-
+<!-- 
     <div style="display:none;">
         Latest tournament updates, match fixtures, group breakdowns, stadium news, 
         and premium football journalism. High-quality editorial coverage for the 
         global sports fan.
     </div>
 </div>
-
+-->
 <script>
     var intervalLoop = null;
+    var allMatches = [];
+    var currentMatchIndex = 0;
+    var tournamentName = "World Cup 2026";
 
     function showNews() {
+        // Rotate and slice to the next batch of 3 games right before showing the news
+        if (allMatches.length > 0) {
+            renderThreeGames();
+        }
         document.getElementById("rss-links").classList.remove("hidden");
         document.getElementById("ad-layer").classList.remove("visible");
     }
@@ -167,80 +174,11 @@
         return s;
     }
 
-    function renderMatchSchedule() {
+    // New worker loop to construct table showing only 3 matches at a time
+    function renderThreeGames() {
         var target = document.getElementById("inject-here");
-        target.innerHTML = '<div class="countdown-title">CONNECTING TO SPORTS SERVER...</div>';
-
-        // AJAX Request configured in raw ES5 XMLHttpRequest
-        var xhr = new XMLHttpRequest();
-        // Public open soccer endpoint filtering upcoming tournament match metadata
-        xhr.open("GET", "https://fifa.balldontlie.io/api/v1/matches?seasons[]=2026&per_page=4", true);
         
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    try {
-                        var response = JSON.parse(xhr.responseText);
-                        var matches = response.data;
-
-                        if (!matches || matches.length === 0) {
-                            fallBackToStaticSchedule();
-                            return;
-                        }
-
-                        var tableHtml = '<div class="countdown-title">Live Server Fixtures</div>' +
-                            '<table class="match-table">' +
-                            '<thead>' +
-                            '<tr>' +
-                            '<th>Match</th>' +
-                            '<th>Time</th>' +
-                            '<th>Venue</th>' +
-                            '</tr>' +
-                            '</thead>' +
-                            '<tbody>';
-
-                        for (var i = 0; i < matches.length; i++) {
-                            var match = matches[i];
-                            var homeTeam = match.home_team ? match.home_team.name : "TBD";
-                            var awayTeam = match.away_team ? match.away_team.name : "TBD";
-                            var venueName = match.stadium ? match.stadium : "Tournament Arena";
-                            
-                            // Formats server timestamp into recognizable text
-                            var rawDate = new Date(match.kickoff_utc);
-                            var formattedDate = rawDate.toLocaleDateString() + "<br>" + rawDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-                            tableHtml += '<tr>' +
-                                '<td class="match-team">' + homeTeam + ' vs ' + awayTeam + '</td>' +
-                                '<td>' + formattedDate + '</td>' +
-                                '<td>' + venueName + '</td>' +
-                                '</tr>';
-                        }
-
-                        tableHtml += '</tbody></table>';
-                        target.innerHTML = tableHtml;
-
-                    } catch (e) {
-                        fallBackToStaticSchedule();
-                    }
-                } else {
-                    fallBackToStaticSchedule();
-                }
-            }
-        };
-        xhr.send();
-    }
-
-    // Dynamic failover structure if the open public server rejects connection or is down
-    function fallBackToStaticSchedule() {
-        var target = document.getElementById("inject-here");
-        var staticMatches = [
-            { date: "June 11", time: "3:00 PM ET", teams: "Mexico vs South Africa", venue: "Mexico City Stadium" },
-            { date: "June 11", time: "10:00 PM ET", teams: "South Korea vs Czechia", venue: "Estadio Guadalajara" },
-            { date: "June 12", time: "3:00 PM ET", teams: "Canada vs Bosnia", venue: "Toronto Stadium" },
-            { date: "June 12", time: "9:00 PM ET", teams: "USA vs Paraguay", venue: "Los Angeles Stadium" }
-        ];
-
-        var tableHtml = '<div class="countdown-title">Upcoming Fixtures (Backup Feed)</div>' +
+        var tableHtml = '<div class="countdown-title">' + tournamentName + ' Fixtures</div>' +
             '<table class="match-table">' +
             '<thead>' +
             '<tr>' +
@@ -251,22 +189,80 @@
             '</thead>' +
             '<tbody>';
 
-        for (var i = 0; i < staticMatches.length; i++) {
-            var m = staticMatches[i];
+        // Grab exactly 3 matches from the array based on the sliding index pointer
+        for (var i = 0; i < 3; i++) {
+            var lookupIndex = (currentMatchIndex + i) % allMatches.length;
+            var match = allMatches[lookupIndex];
+
+            // Safely compute native local client time configurations out of JSON structure
+            var cleanTime = match.time.replace('UTC', '').trim();
+            var sign = cleanTime.includes('-') ? '-' : '+';
+            var timeParts = cleanTime.split(sign);
+            var rawTime = timeParts[0];
+            var offset = timeParts[1] || '0';
+            if (!offset.includes(':')) { offset = offset.padStart(2, '0') + ':00'; }
+
+            var finalDate = new Date(match.date + 'T' + rawTime + ':00' + sign + offset);
+            if (isNaN(finalDate.getTime())) { 
+                finalDate = new Date(match.date + 'T' + match.time.split(' ')[0]); 
+            }
+
+            var localDateStr = finalDate.toLocaleDateString() + "<br>" + finalDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
             tableHtml += '<tr>' +
-                '<td class="match-team">' + m.teams + '</td>' +
-                '<td>' + m.date + '<br>' + m.time + '</td>' +
-                '<td>' + m.venue + '</td>' +
+                '<td class="match-team">' + match.team1 + ' vs ' + match.team2 + '<br><small style="color:#777; font-weight:normal;">' + match.round + ' • ' + match.group + '</small></td>' +
+                '<td>' + localDateStr + '</td>' +
+                '<td>' + match.ground + '</td>' +
                 '</tr>';
         }
 
         tableHtml += '</tbody></table>';
         target.innerHTML = tableHtml;
+
+        // Step the counter forward by 3 for the next view cycle rotation
+        currentMatchIndex = (currentMatchIndex + 3) % allMatches.length;
+    }
+
+    function fetchMatchSchedule() {
+        var target = document.getElementById("inject-here");
+        target.innerHTML = '<div class="countdown-title">CONNECTING TO SPORTS SERVER...</div>';
+
+        var xhr = new XMLHttpRequest();
+       
+        xhr.open("GET", "https://raw.githubusercontent.com/openfootball/world-cup.json/master/2026/worldcup.json", true);
+        
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.name) tournamentName = response.name;
+                        
+                        allMatches = response.matches;
+
+                        if (!allMatches || allMatches.length === 0) {
+                            target.innerHTML = '<div class="countdown-title">No Fixtures Found</div>';
+                            return;
+                        }
+
+                        // Build initial 3 match grid layout immediately and fire down loops
+                        renderThreeGames();
+                        startAdLoop();
+
+                    } catch (e) {
+                        target.innerHTML = '<div class="countdown-title">Parser Error</div>';
+                    }
+                } else {
+                    target.innerHTML = '<div class="countdown-title">API Connection Dropped</div>';
+                }
+            }
+        };
+        xhr.send();
     }
 
     function initCountdown() {
-        // Tournament Target Launch: June 11, 2026, 15:00:00 UTC-4
-        var targetDate = new Date("2026-06-11T15:00:00-04:00").getTime();
+        // Tournament Target Launch: June 11, 2026, 13:00:00 UTC-6
+        var targetDate = new Date("2026-06-11T13:00:00-06:00").getTime();
         var timerElement = document.getElementById("countdown-timer");
 
         var countdownInterval = setInterval(function() {
@@ -275,8 +271,7 @@
 
             if (difference <= 0) {
                 clearInterval(countdownInterval);
-                renderMatchSchedule();
-                startAdLoop();
+                fetchMatchSchedule();
                 return;
             }
 
