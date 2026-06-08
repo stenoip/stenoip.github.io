@@ -47,7 +47,7 @@ function handleDOMContentLoaded() {
     var video = document.getElementById('intro-video');
 
     if (introToggle) {
-        introToggle.checked = saved === null ? true : saved === 'true';
+        introToggle.checked = saved === null ? false : saved === 'true';
         introToggle.addEventListener('change', handleIntroToggleChange);
     }
 
