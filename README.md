@@ -1,95 +1,89 @@
 
-# StenoipKonnect
 
-**StenoipKonnect** is a modern, privacy-first web portal created by Stenoip Company. It provides users with two distinct services: a customizable web portal for organizing frequently visited websites and a dedicated information hub for space exploration news and educational content. Our goal is to provide these resources while maintaining a high standard of user privacy.
+# Stenoip's SkyDisc is the future
+
+![Oodles Logo](https://stenoip.github.io/new-swc.png)
+
+...
 
 
-It all started in 2021 as *Stenoip Wonder Computer*, with a big idea to build an operating system using just HTML. While that turned out to be a bit too ambitious, the vision shifted and grew into something even better: a single online space for productivity, entertainment and learning, all with user privacy at the heart of everything. Website at https://stenoip.github.io
+**Stenoip SkyDisc** (or SkyDisc) is the private cloud platform with no bloatware. Simple, safe, secure (you know the drill).
+However, this Cloud Platform uses the nostalgic *Frutiger Aero* style. Fun fact, the server is powered by a cheap Chromebook!
 
----
 
-## How to pronounce Steno
-
-Steno is pronounced Stick-noh. Stenoip is pronounced Stick-ikp
----
-
-## About the Name
-
-The original name, *Stenoip Wonder Computer*, was created by the founder at age 10. Although imaginative, it led to some confusion. Many assumed it was a downloadable operating system or a physical device. As the platform matured, a clearer name was needed. **StenoipKonnect** reflects the site's true purpose: a place to explore and stay safe online.
 
 ---
 
-## Mission
 
-Stenoip Company is committed to building technology that puts users first. StenoipKonnect offers:
+### Stenoip Pages
 
-- A unified interface for accessing diverse web tools
-- Entertainment and educational resources
-- A strict privacy-first approach—no tracking, no data monetisation
-- Latest news in human developments in space
-- Comics!
-- Answering curious questions
+You know the drill, its the typing platform.
 
+
+
+### Stenoip Deck
+
+Must I explain, its the slides area!
+
+
+
+
+
+### Stenoip Cells
+
+You already know what this one IS!
+ 
 ---
 
-## Programme Guide
+# FAQ
 
-### Office & AI
-- StenoOffices – Office tools suite
-- Praterich AI – Proprietary large language model
+## Did A.I generate this project.
 
-### Calculators & Utilities
-- TI-30XIIS Calculator (`calculator_ti30xiis.html`)
-- TI-84 Graphing Calculator (`calculator_ti84.html`)
-- Kompmasine (`kompmasine.html`)
-- Kompmasine Functions (`kompmasine-functions.html`)
-- Drawing Tool (`draw.html`)
--And many more 
+No! As Stenoip Comapny, we are clear of what is A.I and want is not and we will not lie.
 
-### Entertainment
-- Windows XP Simulation (`windows-xp-simulation.html`)
-- StenoTOANSTIK Arcade
-- StenoVids and StenoVids Plus
-- FlappyBird, Tetris, 2048
-- Zuiz Quiz
+Artifical Intelligence has been used to recommend, modify and point out errors. 
+We have used A.I to create the python server that powers the cloud. 
+We must clarify that this project did not come from the datacentre but
+rather a hobby of having your website
+
+You may see A.I generated comments that were part of reviews and sessions to improve the project. We enjoy
+coding and the joy of HTML, CSS and JS.
+
+See our fun programs made by humans at Khan Academy: https://www.khanacademy.org/profile/kaid_1027634215520834248783660/projects
+
+## Where did all the games, comics and articles go?
+
+That is in the past. Past me was immature trying to make a site with comics, clocks, videos and Office tools. I mean Come On.
+This is mature me. Mature people make everyday tools that humans can use because the site is not cluttered in pop-ups
+and bloat.
+
+I am moving all articles and comics to a new site named **Panels And Pixels** were I talk about
+the What-If's in science and History, humorious Comics and critiques. These do not belong on a cloud platform.
+
+## Any work in progress?
 
 
-- StenoKomysk Comics (est. 2016)
--And many more 
+The amount of WIP is insane. So insane in fact, we are still building.
 
-### Downloadables
-- SearXNG Instructions
-- Ringzauber Browser
+  _To be added:_
+  -  More icons
+  -  Compression of Files
+  -  StenoipMail (or SMail? We don't have a name yet)
+  -  Social Media?
+  -  An alternative Youtube?
+  -  Cloud Farts?
+  -  I am just making things up now
 
-### Educational Tools
-- Zuiz Quiz
-- PHet Gravity Simulation
-- Solar System Scope
-
-### Tools
-- StenoFerkenne Maps
-- Clocker
-- Compass (`compass.html`)
-- Testing Lab (`testing.html`)
-- Blog (`blog.html`)
--And many more 
-
+  
 ---
 
-## Privacy Commitment
 
-StenoipKonnect is built on a foundation of trust. Unlike large technology corporations, we do not track your activity or monetise your personal data. Your history remains your own.
 
----
 
-## Company Information
+## Credits
 
-- **Developer**: Stenoip Company
-- **Headquarters**: North America (Trinidad and Tobago)
-- **Contact & Terms**: Available via the home page (https://stenoip.github.io)
+Built by Stenoip Company.  2024-2026. LONG LIVE FRUTIGER AERO!
+
+* **AI:** Powered by the Praterich model via Groq AI API.
 
 ---
-
-## Licence
-
-© 2026 Stenoip Company. All rights reserved.
