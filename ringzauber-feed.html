@@ -178,7 +178,7 @@
     function renderThreeGames() {
         var target = document.getElementById("inject-here");
         
-        var tableHtml = '<div class="countdown-title">' + tournamentName + ' Fixtures</div>' +
+        var tableHtml = '<div class="countdown-title">' + tournamentName + ' Matches</div>' +
             '<table class="match-table">' +
             '<thead>' +
             '<tr>' +
@@ -241,7 +241,7 @@
                         allMatches = response.matches;
 
                         if (!allMatches || allMatches.length === 0) {
-                            target.innerHTML = '<div class="countdown-title">No Fixtures Found</div>';
+                            target.innerHTML = '<div class="countdown-title">No Matches Found</div>';
                             return;
                         }
 
