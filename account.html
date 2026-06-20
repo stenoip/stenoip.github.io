@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /> 
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Account Management - Stenoip SkyDisc</title>
+    <meta name="description" content="A personal web portal and the latest news in science" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="new-swc.png" type="image/png" />
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+      .file-list { list-style: none; padding: 0; }
+      .file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+      .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; color: white; margin-left: 5px; }
+      .btn-open { background-color: rgb(0,172,0); }
+      .btn-delete { background-color: #d9534f; }
+      .apps-nav { margin-bottom: 20px; display: flex; gap: 10px; }
+      .apps-nav a { padding: 10px 15px; background: #ddd; text-decoration: none; color: #333; border-radius: 4px; }
+      .tile-cloud-container { all: revert; }
+      
+      /* Context styling for account inputs */
+      .auth-input-field {
+        width: 100%;
+        max-width: 350px;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+      .account-action-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="launch-screen" id="launch-screen" onclick="startExperience()">Click to Launch</div>
+
+    <video id="intro-video" class="intro-video" autoplay playsinline>
+        <source src="https://stenoip.github.io/intro.mp4" type="video/mp4" />
+    </video>
+
+    <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
+
+    <div id="main-content" class="container" style="display:none;">
+      <div id="background"></div>
+      <div id="websiteContainer">
+        <div class="website-spacers"></div>
+        
+        <header id="mainHeader">
+          <div class="header-logo-text">
+            <a href="/" title="Home"><img src="https://stenoip.github.io/new-swc.png" id="logo" alt="Logo" /></a>
+            <div class="header-text">
+              <span class="header-title">SkyDisc</span>
+              <span class="header-motto">Build, share and link up wherever you are.</span>
+            </div>
+          </div>
+          <div class="toggle-buttons-divs">
+            <span id="hideNavbarButtonText">Menu ></span>
+            <img src="menu_button.png" alt="Toggle" id="navbarToggleButton" />
+          </div>
+        </header>
+
+        <div id="navAndContentContainer">
+          <aside>
+            <div id="navigationMenu">
+              <nav class="nav-categories" aria-label="Main Content">
+                <span class="navbar-titles">Main Content</span>
+                <a href="index.html" class="nav-inactive"><img src="new-swc.png" class="nav-icons" alt="" />Home</a>
+                <a href="cloud.html" class="nav-inactive"><img src="user.png" class="nav-icons" alt="" />My Files</a>
+                <a href="pages.html" class="nav-inactive"><img src="pages.png" class="nav-icons" alt="" />Stenoip Pages</a>
+                <a href="cells.html" class="nav-inactive"><img src="cells.png" class="nav-icons" alt="" />Stenoip Cells</a>
+                <a href="slides.html" class="nav-inactive"><img src="deck.png" class="nav-icons" alt="" />Stenoip Deck</a>
+                <a href="account.html" class="nav-active"><img src="user.png" class="nav-icons" alt="" />Account</a>
+              </nav>
+
+              <div class="nav-categories">
+                <button id="navSoundToggle">Sounds Off</button>
+                <button id="navThemeChanger">Themes</button>
+              </div>
+            </div>
+          </aside>
+
+          <main id="mainContent">
+            <section>
+              <header>
+                <h1>Account Control</h1>
+                <div class="glass-borders">
+                  <div class="section-banners aero-borders">
+                    <img src="https://stenoip.github.io/skonnect_ribbon.png" alt="Banner" id="introBanner" />
+                  </div>
+                </div>
+              </header>
+
+              <div class="glass-borders" id="logged-out-view" style="display: none;">
+                <article class="styled-containers styled-containers-spaced aero-borders" style="text-align: center;">
+                  <h2 style="margin-top: 20px;">Sign In or Register</h2>
+                  <p>Access your individual storage profile by logging in with your email credentials below.</p>
+                  <div style="margin: 20px auto; max-width: 350px;">
+                    <input type="email" id="auth-email" class="auth-input-field" placeholder="Email Address"><br>
+                    <input type="password" id="auth-password" class="auth-input-field" placeholder="Password"><br>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                      <button onclick="submitLogin()" class="account-action-btn btn-open" style="flex: 1;">Log In</button>
+                      <button onclick="submitSignup()" class="account-action-btn" style="flex: 1; background-color: #5bc0de;">Sign Up</button>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              <div class="glass-borders" id="logged-in-view" style="display: none;">
+                <article class="styled-containers styled-containers-spaced aero-borders" style="text-align: center;">
+                  <h2 style="margin-top: 20px;">Your Workspace Account</h2>
+                  <p id="user-display" style="font-weight: bold; font-size: 16px; color: rgb(0,140,0); margin: 15px 0;"></p>
+                  <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                  <div style="display: flex; flex-direction: column; gap: 12px; max-width: 300px; margin: 0 auto; padding-bottom: 20px;">
+                    <button onclick="changePassword()" class="account-action-btn" style="background-color: #f0ad4e;">Change Password</button>
+                    <button onclick="logout()" class="account-action-btn" style="background-color: #777;">Log Out Session</button>
+                    <button onclick="deleteAccount()" class="account-action-btn btn-delete">Delete Account Permanently</button>
+                  </div>
+                </article>
+              </div>
+
+              <div class="glass-borders">
+                <article class="styled-containers styled-containers-spaced aero-borders">
+                  <h4 style="margin-top: 40px;">Copyright Stenoip Company</h4>
+                </article>
+              </div>
+            
+            </section>
+          </main>
+        </div>
+        <div class="website-spacers"></div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.7.2/bluebird.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/3.6.20/fetch.min.js"></script>
+    <script src="script.js"></script>
+    <script src="/javascript-imports/navbar.min.js" async></script>
+    <script src="/javascript-imports/jquery.min.js"></script>
+    <script src="/javascript-imports/magnific-popup.min.js"></script>
+    <script src="https://keepandroidopen.org/banner.js"></script>
+  </body>
+</html>
