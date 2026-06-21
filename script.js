@@ -118,9 +118,9 @@ var CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
 
 function getAuthHeaders() {
     return {
-        'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + localStorage.getItem('authToken')
     };
+
 }
 
 // --- AUTHENTICATION ACTIONS (SIGN IN / SIGN OUT / SIGN UP) ---
@@ -222,9 +222,12 @@ function handleFetchError(error) {
 
 function fetchFiles() {
     fetch(CLOUD_URL + '/files', { headers: getAuthHeaders() })
-        .then(handleFetchResponse)
-        .then(handleFetchSuccess)
-        .catch(handleFetchError);
+        .then(function(res) { 
+            if (res.status === 401) throw new Error("Unauthorized");
+            return res.json(); 
+        })
+        .then(function(data) { renderFiles(data.files || []); })
+        .catch(function(error) { console.error("Error fetching files:", error); });
 }
 
 function handleOpenClick(e) {
@@ -392,9 +395,12 @@ function handleDeleteError(error) {
 function deleteFile(filename) {
     if (!confirm('Are you sure you want to delete ' + filename + '?')) return;
     
-    fetch(CLOUD_URL + '/delete/' + filename, { method: 'DELETE', headers: getAuthHeaders() })
-        .then(handleDeleteSuccess)
-        .catch(handleDeleteError);
+    fetch(CLOUD_URL + '/delete/' + encodeURIComponent(filename), { 
+        method: 'DELETE', 
+        headers: getAuthHeaders() 
+    })
+    .then(function() { fetchFiles(); })
+    .catch(function(err) { console.error("Error deleting file:", err); });
 }
 
 window.onload = function() {
