@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,48 +8,148 @@
     <meta name="description" content="A personal web portal and the latest news in science" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="new-swc.png" type="image/png" />
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://stenoip.github.io/styles.css">
     
     <style>
-      .file-list { list-style: none; padding: 0; }
-      .file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-      .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; color: white; margin-left: 5px; }
-      .btn-open { background-color: rgb(0,172,0); }
-      .btn-delete { background-color: #d9534f; }
-      .apps-nav { margin-bottom: 20px; display: flex; gap: 10px; }
-      .apps-nav a { padding: 10px 15px; background: #ddd; text-decoration: none; color: #333; border-radius: 4px; }
-      .tile-cloud-container { all: revert; }
-      
-      /* Context styling for account inputs */
-      .auth-input-field {
-        width: 100%;
-        max-width: 350px;
-        padding: 10px;
-        margin: 8px 0;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-        box-sizing: border-box;
-      }
-      .account-action-btn {
-        padding: 10px 20px;
-        font-size: 14px;
-        font-weight: bold;
-        border-radius: 4px;
-        border: none;
-        cursor: pointer;
-        color: white;
-      }
+.file-list { 
+  list-style: none; 
+  padding: 0; 
+}
+
+.file-item { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 10px; 
+  border-bottom: 1px solid #eee; 
+}
+
+.btn { 
+  padding: 8px 16px; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  color: white; 
+  margin-left: 5px; 
+}
+
+.btn-open { 
+  background-color: rgb(0, 172, 0); 
+}
+
+.btn-delete { 
+  background-color: rgb(217, 83, 79); 
+}
+
+.apps-nav { 
+  margin-bottom: 20px; 
+  display: flex; 
+  gap: 10px; 
+}
+
+.apps-nav a { 
+  padding: 10px 15px; 
+  background: #ddd; 
+  text-decoration: none; 
+  color: #333; 
+  border-radius: 4px; 
+}
+
+.tile-cloud-container { 
+  all: revert; 
+}
+
+.auth-input-field {
+  width: 100%;
+  max-width: 350px;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.account-action-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  cursor: pointer;
+  color: white;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+  transition: all 300ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.account-action-btn::after {
+  content: "";
+  position: absolute;
+  top: 4%;
+  left: 8%;
+  width: 84%;
+  height: 40%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.05));
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.account-action-btn.btn-open {
+  background: 
+    radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.6), transparent),
+    linear-gradient(to bottom, rgb(0, 110, 0), rgb(0, 172, 0)) !important;
+}
+
+.account-action-btn[style*="#5bc0de"],
+.account-action-btn[style*="#5bc0de"] {
+  background: 
+    radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.6), transparent),
+    linear-gradient(to bottom, rgb(42, 171, 210), rgb(91, 192, 222)) !important;
+}
+
+.account-action-btn[style*="#f0ad4e"],
+.account-action-btn[style*="#f0ad4e"] {
+  background: 
+    radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.6), transparent),
+    linear-gradient(to bottom, rgb(236, 151, 31), rgb(240, 173, 78)) !important;
+}
+
+.account-action-btn[style*="#777"],
+.account-action-btn[style*="#777"] {
+  background: 
+    radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.4), transparent),
+    linear-gradient(to bottom, rgb(68, 68, 68), rgb(119, 119, 119)) !important;
+}
+
+.account-action-btn.btn-delete {
+  background: 
+    radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.6), transparent),
+    linear-gradient(to bottom, rgb(201, 48, 44), rgb(217, 83, 79)) !important;
+}
+
+.account-action-btn:hover,
+.account-action-btn:focus {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.account-action-btn:active {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  transform: translateY(1px);
+  filter: brightness(0.95);
+}
     </style>
   </head>
 
   <body>
-    <div class="launch-screen" id="launch-screen" onclick="startExperience()">Click to Launch</div>
-
-    <video id="intro-video" class="intro-video" autoplay playsinline>
-        <source src="https://stenoip.github.io/intro.mp4" type="video/mp4" />
-    </video>
-
+    
+ 
     <button class="skip-btn" id="skip-btn" onclick="skipVideo()">Skip Intro</button>
 
     <div id="main-content" class="container" style="display:none;">
@@ -103,8 +204,8 @@
 
               <div class="glass-borders" id="logged-out-view" style="display: none;">
                 <article class="styled-containers styled-containers-spaced aero-borders" style="text-align: center;">
-                  <h2 style="margin-top: 20px;">Sign In or Register</h2>
-                  <p>Access your individual storage profile by logging in with your email credentials below.</p>
+                  <h2 style="margin-top: 20px;">Create the Stenoip ID</h2>
+                  <p>Sign up on the SkyDisc, sync Ringzauber and Oodles and More!</p>
                   <div style="margin: 20px auto; max-width: 350px;">
                     <input type="email" id="auth-email" class="auth-input-field" placeholder="Email Address"><br>
                     <input type="password" id="auth-password" class="auth-input-field" placeholder="Password"><br>
@@ -144,7 +245,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.7.2/bluebird.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/3.6.20/fetch.min.js"></script>
-    <script src="script.js"></script>
+    <script src="https://stenoip.github.io/script.js"></script>
     <script src="/javascript-imports/navbar.min.js" async></script>
     <script src="/javascript-imports/jquery.min.js"></script>
     <script src="/javascript-imports/magnific-popup.min.js"></script>
