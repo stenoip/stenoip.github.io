@@ -1,16 +1,12 @@
-// --- INTRO & CONTENT CONTROL ---
-
 function checkAuthRouting() {
     var token = localStorage.getItem('authToken');
     var isAuthPage = window.location.pathname.indexOf('account.html') !== -1;
 
-    // Gatekeeper: Redirect unauthenticated users immediately to the account login page
     if (!token && !isAuthPage) {
         window.location.href = 'account.html';
         return false;
     }
 
-    // Dynamic UI state adjustments specifically for the account management elements
     if (isAuthPage) {
         var loggedOutView = document.getElementById('logged-out-view');
         var loggedInView = document.getElementById('logged-in-view');
@@ -72,8 +68,6 @@ function skipVideo() {
     showMainContent();
 }
 
-// --- INITIALIZATION ---
-
 function handleIntroToggleChange() {
     localStorage.setItem('introVideoEnabled', this.checked);
 }
@@ -112,18 +106,13 @@ function handleDOMContentLoaded() {
 
 document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
 
-// --- CLOUD STORAGE SYSTEM ---
-
 var CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
 
 function getAuthHeaders() {
     return {
         'Authorization': 'Bearer ' + localStorage.getItem('authToken')
     };
-
 }
-
-// --- AUTHENTICATION ACTIONS (SIGN IN / SIGN OUT / SIGN UP) ---
 
 function submitSignup() {
     var email = document.getElementById('auth-email').value;
@@ -160,7 +149,7 @@ function submitLogin() {
     .then(function(data) {
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('userEmail', data.email);
-        window.location.href = 'index.html'; // Go back to Home dashboard upon successful auth
+        window.location.href = 'index.html'; 
     })
     .catch(function(err) { alert(err.message); });
 }
@@ -206,8 +195,6 @@ function deleteAccount() {
     });
 }
 
-// --- SECURED STORAGE DISPATCHERS ---
-
 function handleFetchResponse(response) {
     return response.json();
 }
@@ -227,7 +214,13 @@ function fetchFiles() {
             return res.json(); 
         })
         .then(function(data) { renderFiles(data.files || []); })
-        .catch(function(error) { console.error("Error fetching files:", error); });
+        .catch(function(error) { 
+            console.error("Error fetching files:", error); 
+            var list = document.getElementById('fileList');
+            if (list) {
+                list.innerHTML = '<p style="color: #d9534f; padding: 10px; border: 1px solid #d9534f; border-radius: 4px;"><strong>Connection Error:</strong> Could not connect to the cloud server. Make sure your Tailscale node is running and you are logged in!</p>';
+            }
+        });
 }
 
 function handleOpenClick(e) {
@@ -327,13 +320,12 @@ function openFile(filename) {
         return;
     }
 
-    if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.png') || lowerName.endsWith('.gif') || lowerName.endsWith('.webp')) {
+    if (lowerName.indexOf('.jpg') !== -1 || lowerName.indexOf('.jpeg') !== -1 || lowerName.indexOf('.png') !== -1 || lowerName.indexOf('.gif') !== -1 || lowerName.indexOf('.webp') !== -1) {
         
         var previewContainer = document.createElement('div');
         previewContainer.className = 'file-preview';
         var img = document.createElement('img');
         
-        // Secure Blob Delivery: Required to pass authentication tokens so unlogged users cannot intercept data
         fetch(CLOUD_URL + '/download/' + encodeURIComponent(filename), { headers: getAuthHeaders() })
             .then(function(res) { 
                 if(!res.ok) throw new Error();
@@ -355,11 +347,11 @@ function openFile(filename) {
             })
             .catch(function() { alert("Authentication error loading image preview."); });
 
-    } else if (filename.endsWith('.cells.json')) {
+    } else if (filename.indexOf('.cells.json') !== -1) {
         window.location.href = 'cells.html?file=' + encodeURIComponent(filename);
-    } else if (filename.endsWith('.slides.json')) {
+    } else if (filename.indexOf('.slides.json') !== -1) {
         window.location.href = 'slides.html?file=' + encodeURIComponent(filename);
-    } else if (filename.endsWith('.pages.html')) {
+    } else if (filename.indexOf('.pages.html') !== -1) {
         window.location.href = 'pages.html?file=' + encodeURIComponent(filename);
     } else {
         alert("Unknown file type! Cannot open.");
@@ -367,7 +359,6 @@ function openFile(filename) {
 }
 
 function downloadFile(filename) {
-    // Secure Authenticated Download via Blob generation to maintain account restrictions
     fetch(CLOUD_URL + '/download/' + encodeURIComponent(filename), { headers: getAuthHeaders() })
         .then(function(res) { 
             if (!res.ok) throw new Error();
