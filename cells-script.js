@@ -6,14 +6,12 @@ var useBrowserStorage = false;
 var isDrawingMode = false;
 var isDrawing = false;
 
-// DOM Elements
 var gridHead = document.getElementById('grid-head');
 var gridBody = document.getElementById('grid-body');
 var formulaBar = document.getElementById('formula-bar');
 var canvas = document.getElementById('drawing-canvas');
 var ctx = canvas ? canvas.getContext('2d') : null;
 
-// INITIALIZATION 
 window.onload = function() {
     initGrid();
     loadFromStorage();
@@ -21,7 +19,6 @@ window.onload = function() {
     window.addEventListener('resize', resizeCanvas);
 };
 
-// RIBBON & TABS LOGIC 
 function switchTab(tabName) {
     var buttons = document.getElementsByClassName('tab-button');
     var panels = document.getElementsByClassName('tab-panel');
@@ -37,7 +34,6 @@ function switchTab(tabName) {
     document.getElementById('tab-' + tabName).classList.add('active');
 }
 
-// GRID ENGINE
 function getColName(index) {
     return String.fromCharCode(65 + index);
 }
@@ -130,7 +126,11 @@ function evaluateCell(cellId, visited) {
     var cellRefRegex = /[A-Z]+\d+/g;
     
     var parsedFormula = formula.replace(cellRefRegex, function(match) {
-        var refValue = evaluateCell(match, Object.assign({}, visited));
+        var newVisited = {};
+        for (var k in visited) {
+            if (visited.hasOwnProperty(k)) newVisited[k] = visited[k];
+        }
+        var refValue = evaluateCell(match, newVisited);
         if (refValue === "" || refValue === undefined) return 0;
         if (refValue === "#REF!" || refValue === "#ERROR!") return refValue;
         return isNaN(refValue) ? '"' + refValue + '"' : refValue;
@@ -157,7 +157,6 @@ function refreshGrid() {
     }
 }
 
-// FILE TAB
 function toggleBrowserStorage() {
     useBrowserStorage = !useBrowserStorage;
     document.getElementById('storage-btn').innerText = "Storage: " + (useBrowserStorage ? "ON" : "OFF");
@@ -205,17 +204,16 @@ function openJSON(event) {
     reader.readAsText(file);
 }
 
-// INSERT TAB
 function insertMedia(event) {
     var file = event.target.files[0];
     if (!file) return;
     var reader = new FileReader();
     reader.onload = function(e) {
         var element;
-        if (file.type.startsWith('image/')) {
+        if (file.type.indexOf('image/') === 0) {
             element = document.createElement('img');
             element.src = e.target.result;
-        } else if (file.type.startsWith('video/')) {
+        } else if (file.type.indexOf('video/') === 0) {
             element = document.createElement('video');
             element.src = e.target.result;
             element.controls = true;
@@ -232,7 +230,6 @@ function insertChart() {
     alert("THERE ARE NO CHARTS YET!");
 }
 
-//  DATA TAB (SORTING)
 function sortData(direction) {
     if (!currentCellId) {
         alert("Please select a cell in the column you want to sort.");
@@ -282,51 +279,71 @@ function sortData(direction) {
     refreshGrid();
 }
 
+var CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
 
-// --- CLOUD INTEGRATION (CELLS) ---
-const CLOUD_URL = 'https://penguin.tail6139c3.ts.net';
-
-async function uploadToCloud() {
-    let filename = prompt("Enter a name for your cloud spreadsheet:");
+function uploadToCloud() {
+    var filename = prompt("Enter a name for your cloud spreadsheet:");
     if (!filename) return;
-    if (!filename.endsWith('.cells.json')) filename += '.cells.json';
+    if (filename.indexOf('.cells.json') === -1) filename += '.cells.json';
 
-    const blob = new Blob([JSON.stringify(cellData)], { type: 'application/json' });
-    const formData = new FormData();
+    var blob = new Blob([JSON.stringify(cellData)], { type: 'application/json' });
+    var formData = new FormData();
     formData.append('file', blob, filename);
 
-    try {
-        await fetch(`${CLOUD_URL}/upload`, { method: 'POST', body: formData });
+    var token = localStorage.getItem('authToken');
+
+    fetch(CLOUD_URL + '/upload', { 
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: formData 
+    })
+    .then(function(res) {
+        if (!res.ok) throw new Error("Upload rejected. Check login status.");
         alert("Spreadsheet uploaded to cloud successfully!");
-    } catch (e) {
-        alert("Cloud upload failed: " + e);
-    }
+    })
+    .catch(function(e) {
+        alert("Cloud upload failed: " + e.message);
+    });
 }
 
-async function loadFromCloud(filename) {
-    try {
-        const response = await fetch(`${CLOUD_URL}/download/${filename}`);
-        if (!response.ok) throw new Error("File not found");
-        const data = await response.json();
+function loadFromCloud(filename) {
+    var token = localStorage.getItem('authToken');
+    fetch(CLOUD_URL + '/download/' + filename, {
+        headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(response) {
+        if (!response.ok) throw new Error("File not found or access denied");
+        return response.json();
+    })
+    .then(function(data) {
         cellData = data;
         refreshGrid();
         document.title = filename + " - Steno Cells";
-    } catch (e) {
-        alert("Failed to load from cloud: " + e);
-    }
+    })
+    .catch(function(e) {
+        alert("Failed to load from cloud: " + e.message);
+    });
 }
 
-// Check URL for file on load
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const fileToOpen = urlParams.get('file');
+function getQueryParam(param) {
+    var search = window.location.search.substring(1);
+    var vars = search.split('&');
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        if (decodeURIComponent(pair[0]) === param) {
+            return decodeURIComponent(pair[1]);
+        }
+    }
+    return null;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var fileToOpen = getQueryParam('file');
     if (fileToOpen) {
         loadFromCloud(fileToOpen);
     }
 });
 
-
-// --- DRAW TAB ---
 function resizeCanvas() {
     if (!canvas) return;
     var editor = document.getElementById('editor');
