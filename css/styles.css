@@ -5,7 +5,7 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background: url("assets/grey_gradient.jpg") no-repeat center center / cover;
+    background: url("/assets/grey_gradient.jpg") no-repeat center center / cover;
     min-height: 100vh;
     overflow-x: clip;
 }
@@ -23,7 +23,7 @@ header {
     The Header is inspired from apple.com from 2011/12.
     */ 
     
-    background: url("assets/orange-gloss.jpg") repeat-x center center / cover;
+    background: url("/assets/orange-gloss.jpg") repeat-x center center / cover;
     background-color: #c2c2c2;
     padding: 8px 16px;
     margin: 10px 20px 0 20px;
@@ -259,7 +259,7 @@ button:active {
 /* This will change every 5 ms to another tile!*/
 .tile-hero {
     grid-column: span 4;
-    background-image: url("assets/tiles/large-tile.png");
+    background-image: url("/assets/tiles/large-tile.png");
     background-position: top left;
     background-repeat: no-repeat;
     background-size: cover;
@@ -278,28 +278,28 @@ button:active {
 
 /* Advertisement Tiles*/
 .tile-praterich  {
-    background-image: url("assets/tiles/praterich-tile.png");
+    background-image: url("/assets/tiles/praterich-tile.png");
     background-position: top left;
     background-repeat: no-repeat;
     background-size: cover;
 }
 
 .tile-news     { 
-    background-image: url("assets/tiles/news-tile.png");
+    background-image: url("/assets/tiles/news-tile.png");
     background-position: top left;
     background-repeat: no-repeat;
     background-size: cover;
 }
 
 .tile-ringzauber     {
-    background-image: url("assets/tiles/ringzauber-tile.png");
+    background-image: url("/assets/tiles/ringzauber-tile.png");
     background-position: top left;
     background-repeat: no-repeat;
     background-size: cover;
 }
 
 .tile-khan     { 
-    background-image: url("assets/tiles/khan-tile.png");
+    background-image: url("/assets/tiles/khan-tile.png");
     background-position: top left;
     background-repeat: no-repeat;
     background-size: cover;
