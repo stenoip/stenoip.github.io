@@ -142,22 +142,22 @@ for your own game without permission! *
         <!-- Yes. I still use jQuery in 2026-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
         <script>
-        $("#title").hide();
-        $("#subtitle").hide();
-        $("#title").slideDown(1000, function() {
-            $("#subtitle").fadeIn();
-        });
-          
-          $("#search-btn").on("click", function() {
-            var query = document.getElementById("search-input").value;
-            
-            
-            window.location.href = "https://stenoip.github.io/oodles/search.html?q=" + encodeURIComponent(query);
- 
-          });
+    $("#title").hide();
+    $("#subtitle").hide();
+    $("#title").slideDown(1000, function() {
+        $("#subtitle").fadeIn();
+    });
+      
+    // Listen for the form submission (triggers on button click OR pressing Enter)
+    $(".search-box").on("submit", function(e) {
+        e.preventDefault(); // Stop the page from reloading normally
         
-            
-        </script>
-
+        var query = $("#search-input").val();
+        
+        if (query.trim() !== "") {
+            window.location.href = "https://stenoip.github.io/oodles/search.html?q=" + encodeURIComponent(query);
+        }
+    });
+    </script>
     </body>
 </html>
