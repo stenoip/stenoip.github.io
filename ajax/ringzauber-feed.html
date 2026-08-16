@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4433722838067397" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --bg-color: #fcfaf2; /* Newsprint color */
+            --accent: #d32f2f;   /* Sensationalist red */
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: var(--bg-color);
+            font-family: "Georgia", serif;
+            overflow: hidden;
+        }
+
+        /* Container for the swap effect */
+        #content-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Common styling for both states */
+        .fade-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Info Link Styles (Yellow Journalism) */
+        #rss-links {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        /* Countdown specific typography */
+        .countdown-title {
+            font-weight: 900;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #000;
+            width: 90%;
+            padding-bottom: 4px;
+        }
+
+        #countdown-timer {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent);
+            letter-spacing: 2px;
+            margin: 10px 0;
+        }
+
+        /* Matches Table styling */
+        .match-table {
+            width: 95%;
+            border-collapse: collapse;
+            font-family: sans-serif;
+            font-size: 0.75rem;
+            margin-top: 5px;
+        }
+
+        .match-table th {
+            border-bottom: 2px solid #000;
+            text-transform: uppercase;
+            font-weight: 900;
+            padding: 4px;
+            text-align: left;
+        }
+
+        .match-table td {
+            padding: 6px 4px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .match-team {
+            font-weight: bold;
+        }
+
+        /* Ad Layer Styles */
+        #ad-layer {
+            opacity: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Utility classes for the fade */
+        .hidden { opacity: 0 !important; pointer-events: none !important; }
+        .visible { opacity: 1 !important; pointer-events: auto !important; }
+    </style>
+</head>
+<body>
+
+<div id="content-wrapper">
+    <div id="rss-links" class="fade-layer">
+        <p style="font-size: 0.7rem; letter-spacing: 2px; color: var(--accent); margin: 0 0 5px 0;">WORLD EXCLUSIVE</p>
+        <div id="inject-here" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+            <div class="countdown-title">FIFA World Cup Kickoff Countdown</div>
+            <div id="countdown-timer">00:00:00:00</div>
+        </div>
+    </div>
+
+    <div id="ad-layer" class="fade-layer">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-4433722838067397"
+             data-ad-slot="8016190618"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+<!-- 
+    <div style="display:none;">
+        Latest tournament updates, match fixtures, group breakdowns, stadium news, 
+        and premium football journalism. High-quality editorial coverage for the 
+        global sports fan.
+    </div>
+</div>
+-->
+<script>
+    var intervalLoop = null;
+    var allMatches = [];
+    var currentMatchIndex = 0;
+    var tournamentName = "World Cup 2026";
+
+    function showNews() {
+        // Rotate and slice to the next batch of 3 games right before showing the news
+        if (allMatches.length > 0) {
+            renderThreeGames();
+        }
+        document.getElementById("rss-links").classList.remove("hidden");
+        document.getElementById("ad-layer").classList.remove("visible");
+    }
+
+    function showAds() {
+        document.getElementById("rss-links").classList.add("hidden");
+        document.getElementById("ad-layer").classList.add("visible");
+    }
+
+    function startAdLoop() {
+        if (intervalLoop) return;
+        intervalLoop = setInterval(function() {
+            var newsLayer = document.getElementById("rss-links");
+            if (newsLayer.classList.contains("hidden")) {
+                showNews();
+            } else {
+                showAds();
+            }
+        }, 3000);
+    }
+
+    // Helper function to handle string zero padding in ES5
+    function padZero(num) {
+        var s = num + "";
+        while (s.length < 2) s = "0" + s;
+        return s;
+    }
+
+    // New worker loop to construct table showing only 3 matches at a time
+    function renderThreeGames() {
+        var target = document.getElementById("inject-here");
+        
+        var tableHtml = '<div class="countdown-title">' + tournamentName + ' Matches</div>' +
+            '<table class="match-table">' +
+            '<thead>' +
+            '<tr>' +
+            '<th>Match</th>' +
+            '<th>Time</th>' +
+            '<th>Venue</th>' +
+            '</tr>' +
+            '</thead>' +
+            '<tbody>';
+
+        // Grab exactly 3 matches from the array based on the sliding index pointer
+        for (var i = 0; i < 3; i++) {
+            var lookupIndex = (currentMatchIndex + i) % allMatches.length;
+            var match = allMatches[lookupIndex];
+
+            // Safely compute native local client time configurations out of JSON structure
+            var cleanTime = match.time.replace('UTC', '').trim();
+            var sign = cleanTime.includes('-') ? '-' : '+';
+            var timeParts = cleanTime.split(sign);
+            var rawTime = timeParts[0];
+            var offset = timeParts[1] || '0';
+            if (!offset.includes(':')) { offset = offset.padStart(2, '0') + ':00'; }
+
+            var finalDate = new Date(match.date + 'T' + rawTime + ':00' + sign + offset);
+            if (isNaN(finalDate.getTime())) { 
+                finalDate = new Date(match.date + 'T' + match.time.split(' ')[0]); 
+            }
+
+            var localDateStr = finalDate.toLocaleDateString() + "<br>" + finalDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            tableHtml += '<tr>' +
+                '<td class="match-team">' + match.team1 + ' vs ' + match.team2 + '<br><small style="color:#777; font-weight:normal;">' + match.round + ' • ' + match.group + '</small></td>' +
+                '<td>' + localDateStr + '</td>' +
+                '<td>' + match.ground + '</td>' +
+                '</tr>';
+        }
+
+        tableHtml += '</tbody></table>';
+        target.innerHTML = tableHtml;
+
+        // Step the counter forward by 3 for the next view cycle rotation
+        currentMatchIndex = (currentMatchIndex + 3) % allMatches.length;
+    }
+
+    function fetchMatchSchedule() {
+        var target = document.getElementById("inject-here");
+        target.innerHTML = '<div class="countdown-title">CONNECTING TO SPORTS SERVER...</div>';
+
+        var xhr = new XMLHttpRequest();
+       
+        xhr.open("GET", "https://raw.githubusercontent.com/openfootball/world-cup.json/master/2026/worldcup.json", true);
+        
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.name) tournamentName = response.name;
+                        
+                        allMatches = response.matches;
+
+                        if (!allMatches || allMatches.length === 0) {
+                            target.innerHTML = '<div class="countdown-title">No Matches Found</div>';
+                            return;
+                        }
+
+                        // Build initial 3 match grid layout immediately and fire down loops
+                        renderThreeGames();
+                        startAdLoop();
+
+                    } catch (e) {
+                        target.innerHTML = '<div class="countdown-title">Parser Error</div>';
+                    }
+                } else {
+                    target.innerHTML = '<div class="countdown-title">API Connection Dropped</div>';
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    function initCountdown() {
+        // Tournament Target Launch: June 11, 2026, 13:00:00 UTC-6
+        var targetDate = new Date("2026-06-11T13:00:00-06:00").getTime();
+        var timerElement = document.getElementById("countdown-timer");
+
+        var countdownInterval = setInterval(function() {
+            var now = new Date().getTime();
+            var difference = targetDate - now;
+
+            if (difference <= 0) {
+                clearInterval(countdownInterval);
+                fetchMatchSchedule();
+                return;
+            }
+
+            var days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            timerElement.textContent = padZero(days) + ":" + padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds);
+        }, 10000);
+    }
+
+    initCountdown();
+</script>
+
+</body>
+</html>

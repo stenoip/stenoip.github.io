@@ -1,89 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="utf-8">
         <title>Stenoip.com</title>
-        <link rel="icon" href="stenoip_company_mini.png" type="image/png" />
-
-        <!-- Copyright Stenoip Company 2026. All rights reserved.-->
-        <style>
-            html, body {
-                background-color: orange;
-                color: white;
-                font-family: arial;
-              	margin: 0;
-                overflow-x: hidden;
-                overflow-y: hidden;
-                
-            }
-            #logo {
-                border:  solid yellow;
-                width: 200px;
-              	box-shadow: 9px 9px 9px black;
-            }
-          
-          h5 {
-            margin-top: 10px;
-            
-          }
-          
-          #other-half {
-            background-color: red;
-            min-height: 100vh;
-          }
-          
-          #search {
-            padding: 8px;
-            box-shadow: 9px 9px 9px;
-            border: solid;
-          }
-          
-          #search-btn {
-            padding: 8px;
-            background-color: green;
-            color: white;
-            box-shadow: 9px 9px 9px black;
-          	border: none;
-          }
-          
-        </style>
+        <link rel="stylesheet" href="css/styles.css">
+       
     </head>
     <body>
-    
-        <img id="logo" src="stenoip_company_logo.png">
-        <h1 id="ani-text">This is Stenoip.com (Under Construction)</h1>
-      <div id="other-half">
-        
-       
-      <hr>
-      	<p>In the meantime, please use our other sites:
-          
-          <a href="https://stenoip.github.io/oodles">Oodles Metasearch</a>, 
-          <a href="https://stenoip.github.io/ringzauber-site">Ringzauber</a> and <a href="https://stenoip.github.io/praterich">Praterich A.I</a></p>
-      
-  		<h5>
-          Or search the web with Oodles Metasearch:
-  		</h5>
-        <input id="search" placeholder="Search the web"> 
-        <button id="search-btn">
-        Search
-        </button>
+        <div class="sticky-nav">
+            
+            <header>
+                <img src="assets/stenoip_company_mini.png" class="logo" alt="Logo">
+                <form class="search-box">
+                    <input placeholder="Search the Web" id="search-input">
+                    <button type="submit" id="search-btn">Q</button>
+                </form>
+            </header>
+            <div class="menu-bar">
+                <ol>
+                    <li><a href="https://stenoip.github.io/oodles">Oodles Metasearch</a></li>
+                    <li><a href="https://stenoip.github.io/ringzauber">Ringzauber Browser</a></li>
+                    <li><a href="https://stenoip.github.io/praterich">Praterich A.I</a></li>
+                    <li><a href="https://stenoip.github.io/privacy">Privacy and Policy</a></li>
+                    <li><a href="https://stenoip.github.io/terms">Terms</a></li>
+                    <li><a href="https://stenoip.github.io/news">News</a></li>
+                </ol>
+            </div>
 
-          <br>
-          <h6>&copy; Stenoip Company 2026. Sidenote: Stenoip Company is pronounced "Stick-no-ikp".</h6>
+
+        </div>
+
+        <div class="image-band">
+            <video autoplay loop muted playsinline class="hero-media">
+                <source src="assets/video-banner.mp4" type="video/mp4">
+               
+            </video>
+            <div class="banner-overlay">
+                <h1 id="title">Stenoip Company</h1>
+                <p id="subtitle">The creators of Oodles Metasearch and Ringzauber</p>
+            </div>
+        </div>
+
+        <div class="column-container">
+        <!-- I had no great CSS names for the rows, so the names 
+         will just be based by colour.
+        -->
+            <div class="white-tile-row">
+                <div class="tiles tile-hero">
+                  
+                </div>
+               
+               <!-- I just realized naming the classes tile-praterich or tile-green
+                whilst the image name is praterich-tile.png is quite confusing!
+                -->
+               <a href="https://stenoip.github.io/whats-praterich"> <div class="tiles tile-praterich"></div></a>
+                <a href="https://stenoip.github.io/news"><div class="tiles tile-news"></div></a>
+               <a href="https://stenoip.github.io/whats-ringzauber"> <div class="tiles tile-ringzauber"></div></a>
+                <a href="https://www.khanacademy.org/profile/amareannan"><div class="tiles tile-khan"></div></a>
+            </div>
+
+            <div class="grey-tile-row">
+               
+                    <h3>Question of the Week</h3>
+                    <iframe src="https://forms.gle/FdEQVtZ7rwzsGFx98" class="question-iframe"></iframe>
+                <!--
+                
+               I am not sure what to put here yet.  Maybe ads? :(
+               <p></p>
+
+                -->
+            </div>
+
+            <div class="peoples-tile-row">
+                <a href="https://stenoip.github.io/products"><div class="tiles tile-blue">For Tech</div></a>
+                <a href="https://stenoip.github.io/devs"><div class="tiles tile-dark-green">For Developers</div></a>
+                <a href="https://stenoip.github.io/comics"><div class="tiles tile-orange">For Comics</div></a>
+                
+            </div>
+        </div>
+
+        <div class="text-content-section">
+            <h2 class="section-heading">Top products</h2>
+            
+            <div class="products-grid">
+                <div class="product-card">
+                    <h3>Oodles Homeport</h3>
+                    <p>Oodles Homeport is a private search engine you run right on your own computer, so your search history stays completely offline and hidden from big tech companies.</p>
+                    <button class="btn-link">Download now!</button>
+                </div>
+
+                <div class="product-card">
+                    <h3>Ringzauber Python</h3>
+                    <p>The browser of the 2020s that is private and built from the ground up with Artifical intelligence.</p>
+                    <button class="btn-link">Download Now!</button>
+                </div>
+            </div>
+
+            <div class="bottom-info-grid">
+                <div class="info-block">
+                    <h3>Product support</h3>
+                    <h4>Stenoip Answers</h4>
+                    <p>Another glitch? <a href="answers.html">We have your answers!</a></p>
+                </div>
+
+                <div class="info-block">
+                    <h3>Popular downloads</h3>
+                    <p><a href="https://github.com/stenoip/Ringzauber">Ringzauber Python</a></p>
+                </div>
+
+                <div class="info-block">
+                    <h3>Latest news</h3>
+                    <p><a href=" ">Why we are going to end support for Ringzauber Py!</a></p>
+                </div>
+            </div>
         
-        </div> 
+        </div>
+
+        <footer>
+            &copy; Stenoip Company
+        </footer>
+
         <!-- Yes. I still use jQuery in 2026-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
         <script>
-        $("#logo").hide();
-        $("#ani-text").hide();
-        $("#logo").slideDown(1000, function() {
-            $("#ani-text").fadeIn();
+        $("#title").hide();
+        $("#subtitle").hide();
+        $("#title").slideDown(1000, function() {
+            $("#subtitle").fadeIn();
         });
           
           $("#search-btn").on("click", function() {
-            var query = document.getElementById("search").value;
+            var query = document.getElementById("search-input").value;
             
             
             window.location.href = "https://stenoip.github.io/oodles/search.html?q=" + encodeURIComponent(query);
@@ -92,6 +139,6 @@
         
             
         </script>
-        
+
     </body>
 </html>
