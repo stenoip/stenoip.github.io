@@ -18,9 +18,11 @@ content etc shall be penalised to the fullest extent of the law. Even on the Moo
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: Roboto, "Segoe UI", Arial, sans-serif;
     margin: 0;
-    background: url("/assets/grey_gradient.jpg") no-repeat center center / cover;
+    background: url("/assets/black-hexagons.jpg") no-repeat center center / cover;
+    background-color: #000000;
+    color: #eeeeee;
     min-height: 100vh;
     overflow-x: clip;
 }
@@ -39,16 +41,16 @@ header {
     */ 
     
     background: url("/assets/orange-gloss.jpg") repeat-x center center / cover;
-    background-color: #c2c2c2;
-    padding: 8px 16px;
+    background-color: #1a1a1a;
+    padding: 10px 16px;
     margin: 10px 20px 0 20px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    border: 1px solid #888888;
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 5px rgba(0, 0, 0, 0.25);
+    border: 1px solid #333333;
+    border-bottom: 2px solid #33b5e5;
+    border-radius: 4px 4px 0 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 p {
@@ -62,24 +64,25 @@ h1, body > p {
 button {
     display: inline-block;
     padding: 8px 16px;
-    font-family: Arial, sans-serif;
+    font-family: Roboto, Arial, sans-serif;
     font-size: 14px;
-    color: #333333;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
-    border: 1px solid #999999;
-    background: #e0e0e0 linear-gradient(to bottom, #ffffff 0%, #cccccc 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(0, 0, 0, 0.15);
+    color: #ffffff;
+    text-shadow: none;
+    border: 1px solid #444444;
+    background: #222222 linear-gradient(to bottom, #333333 0%, #111111 100%);
+    box-shadow: none;
+    border-radius: 2px;
     cursor: pointer;
 }
 
 button:hover {
-    background-image: linear-gradient(to bottom, #ffffff 0%, #b8b8b8 100%);
-    border-color: #777777;
+    background: #333333;
+    border-color: #33b5e5;
 }
 
 button:active {
-    background-image: linear-gradient(to bottom, #b8b8b8 0%, #e0e0e0 100%);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    background: #33b5e5;
+    color: #000000;
 }
 
 .search-box {
@@ -90,45 +93,46 @@ button:active {
 }
 
 #search-input {
-    background: #222222;
-    border: 1px solid #111111;
+    background: #111111;
+    border: 1px solid #444444;
     border-right: none;
-    border-radius: 4px 0 0 4px;
+    border-radius: 2px 0 0 2px;
     margin-left: 0;
-    padding: 7px 12px;
-    font-family: Arial, sans-serif;
+    padding: 8px 12px;
+    font-family: Roboto, Arial, sans-serif;
     font-size: 13px;
     color: #ffffff;
     width: 100%;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
     outline: none;
 }
 
+#search-input:focus {
+    border-color: #33b5e5;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 5px rgba(51, 181, 229, 0.5);
+}
+
 #search-input::placeholder {
-    color: #aaaaaa;
+    color: #777777;
 }
 
 #search-btn {
-    background: #555555 linear-gradient(to bottom, #7d7d7d 0%, #4a4a4a 50%, #333333 51%, #222222 100%);
-    border: 1px solid #111111;
-    border-radius: 0 4px 4px 0;
-    padding: 7px 14px;
+    background: #333333 linear-gradient(to bottom, #444444 0%, #222222 100%);
+    border: 1px solid #444444;
+    border-radius: 0 2px 2px 0;
+    padding: 8px 14px;
     margin-left: 0;
     color: #ffffff;
     font-size: 13px;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.8);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: none;
+    box-shadow: none;
     cursor: pointer;
     flex-shrink: 0;
 }
 
 #search-btn:hover {
-    background: #666666 linear-gradient(to bottom, #8e8e8e 0%, #5b5b5b 50%, #444444 51%, #333333 100%);
-}
-
-#search-btn:active {
-    background: #333333;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+    border-color: #33b5e5;
+    color: #33b5e5;
 }
 
 .logo {
@@ -138,12 +142,12 @@ button:active {
 }
 
 .menu-bar {
-    background-color: #444444;
+    background-color: #111111;
     padding: 10px 16px;
     margin: 0 20px 20px 20px;
     border: 1px solid #333333;
     border-top: none;
-    border-radius: 0 0 6px 6px;
+    border-radius: 0 0 4px 4px;
 }
 
 .menu-bar ol {
@@ -156,14 +160,17 @@ button:active {
 }
 
 .menu-bar li a {
-    color: #ffffff;
-    font-size: 14px;
+    color: #aaaaaa;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     cursor: pointer;
     text-decoration: none;
 }
 
 .menu-bar li a:hover {
-    text-decoration: underline;
+    color: #33b5e5;
+    text-decoration: none;
 }
 
 .image-band {
@@ -172,7 +179,7 @@ button:active {
     margin: 0 0 30px 0;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -199,7 +206,7 @@ button:active {
     justify-content: center;
     align-items: center;
     text-align: center;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.5);
     color: #ffffff;
     z-index: 2;
     padding: 20px;
@@ -208,18 +215,17 @@ button:active {
 
 .banner-overlay h1 {
     font-size: 42px;
-    font-weight: bold;
+    font-weight: 300;
     letter-spacing: 2px;
     margin: 0 0 10px 0;
     text-transform: uppercase;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
 }
 
 .banner-overlay p {
     font-size: 18px;
     margin: 0;
-    color: #f0f0f0;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    color: #cccccc;
 }
 
 .column-container {
@@ -243,9 +249,10 @@ button:active {
 .grey-tile-row {
     flex: 1.5; 
     min-width: 220px;
-    background-color: #f2f2f2;
+    background-color: #161616;
+    border: 1px solid #333333;
     padding: 20px;
-    color: #333;
+    color: #eeeeee;
     min-height: 400px;
 }
 
@@ -260,7 +267,7 @@ button:active {
 }
 
 .tiles {
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     padding: 15px;
     color: #ffffff;
     font-size: 14px;
@@ -269,6 +276,11 @@ button:active {
     display: flex;
     align-items: flex-end;
     box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.tiles:hover {
+    border-color: #33b5e5;
 }
 
 /* This will change every 5 ms to another tile!*/
@@ -285,11 +297,11 @@ button:active {
 }
 
 .tile-blue        { background-color: #0072c6; }
-.tile-orange     { background-color: #d85121; }
-.tile-green      { background-color: #7eb900; }
-.tile-yellow     { background-color: #e3a000; }
-.tile-dark-green { background-color: #008a00; }
-.tile-purple     { background-color: #68217a; }
+.tile-orange      { background-color: #d85121; }
+.tile-green       { background-color: #7eb900; }
+.tile-yellow      { background-color: #e3a000; }
+.tile-dark-green  { background-color: #008a00; }
+.tile-purple      { background-color: #68217a; }
 
 /* Advertisement Tiles*/
 .tile-praterich  {
@@ -299,21 +311,21 @@ button:active {
     background-size: cover;
 }
 
-.tile-news     { 
+.tile-news       { 
     background-image: url("/assets/tiles/news-tile.png");
     background-position: top left;
     background-repeat: no-repeat;
     background-size: cover;
 }
 
-.tile-ringzauber     {
+.tile-ringzauber       {
     background-image: url("/assets/tiles/ringzauber-tile.png");
     background-position: top left;
     background-repeat: no-repeat;
     background-size: cover;
 }
 
-.tile-khan     { 
+.tile-khan       { 
     background-image: url("/assets/tiles/khan-tile.png");
     background-position: top left;
     background-repeat: no-repeat;
@@ -323,21 +335,23 @@ button:active {
 /* I just realized naming the classes tile-praterich or tile-green whilst the image name is praterich-tile.png is quite confusing! */
 
 .text-content-section {
-    background-color: #ffffff;
+    background-color: #161616;
+    border: 1px solid #333333;
     margin: 0 20px 20px 20px;
     padding: 25px;
-    border-radius: 0px;
-    color: #333333;
+    color: #eeeeee;
 }
 
 .section-heading {
-    font-size: 24px;
-    font-weight: normal;
-    color: #555555;
+    font-size: 20px;
+    font-weight: 300;
+    color: #33b5e5;
     margin-top: 0;
     margin-bottom: 20px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #333333;
     padding-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .products-grid {
@@ -349,14 +363,14 @@ button:active {
 
 .product-card h3 {
     font-size: 15px;
-    color: #0072c6;
+    color: #33b5e5;
     margin-top: 0;
     margin-bottom: 8px;
 }
 
 .product-card p {
     font-size: 13px;
-    color: #555555;
+    color: #aaaaaa;
     line-height: 1.4;
     margin-bottom: 12px;
 }
@@ -364,16 +378,16 @@ button:active {
 .btn-link {
     display: inline-block;
     padding: 4px 12px;
-    border: 1px solid #cccccc;
-    color: #0072c6;
+    border: 1px solid #444444;
+    color: #33b5e5;
     text-decoration: none;
     font-size: 12px;
-    border-radius: 0px;
+    background: #222222;
 }
 
 .btn-link:hover {
-    border-color: #999999;
-    background-color: #f8f8f8;
+    border-color: #33b5e5;
+    background-color: #111111;
 }
 
 .bottom-info-grid {
@@ -383,28 +397,28 @@ button:active {
 }
 
 .info-block h3 {
-    font-size: 20px;
-    font-weight: normal;
-    color: #555555;
+    font-size: 18px;
+    font-weight: 300;
+    color: #33b5e5;
     margin-top: 0;
     margin-bottom: 12px;
 }
 
 .info-block h4 {
     font-size: 14px;
-    color: #0072c6;
+    color: #ffffff;
     margin-top: 0;
     margin-bottom: 6px;
 }
 
 .info-block p {
     font-size: 13px;
-    color: #555555;
+    color: #aaaaaa;
     line-height: 1.4;
 }
 
 .info-block a {
-    color: #0072c6;
+    color: #33b5e5;
     text-decoration: none;
     font-size: 13px;
 }
