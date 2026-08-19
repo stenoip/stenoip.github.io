@@ -31,6 +31,9 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
+  
+  
+  margin: 0;
 }
 
 header {
@@ -43,13 +46,15 @@ header {
     background: url("/assets/orange-gloss.jpg") repeat-x center center / cover;
     background-color: #1a1a1a;
     padding: 10px 16px;
-    margin: 10px 20px 0 20px;
+    
     display: flex;
     flex-direction: row;
     align-items: center;
     border: 1px solid #333333;
     border-bottom: 2px solid #33b5e5;
-    border-radius: 4px 4px 0 0;
+    border-left: none; /* Removed left margin/border space to span edge-to-edge */
+    border-right: none; /* Removed right margin/border space to span edge-to-edge */
+
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -88,7 +93,7 @@ button:active {
     display: flex;
     flex: 1;
     max-width: 450px;
-    margin-left: 15px;
+    margin-left: px;
 }
 
 #search-input {
@@ -143,10 +148,11 @@ button:active {
 .menu-bar {
     background-color: #111111;
     padding: 10px 16px;
-    margin: 0 20px 20px 20px;
+    margin: 0; /* Removed the left/right 20px margins to remove the gap */
     border: 1px solid #333333;
     border-top: none;
-    border-radius: 0 0 4px 4px;
+    border-left: none; /* Removed side borders to sit completely flush */
+    border-right: none; /* Removed side borders to sit completely flush */
 }
 
 .menu-bar ol {
@@ -317,7 +323,7 @@ button:active {
     background-size: cover;
 }
 
-.tile-ringzauber       {
+.tile-ringzauber        {
     background-image: url("/assets/tiles/ringzauber-tile.png");
     background-position: top left;
     background-repeat: no-repeat;
@@ -427,9 +433,8 @@ button:active {
 }
 
 @media (max-width: 768px) {
-    header, 
-    .menu-bar, 
-    .text-content-section, 
+    /* Removed header and .menu-bar from this block so they don't get mobile side margins either */
+    .text-content-section,  
     .column-container {
         margin-left: 10px;
         margin-right: 10px;
@@ -439,6 +444,11 @@ button:active {
         flex-wrap: wrap;
         gap: 10px;
         padding: 10px;
+        margin: 0; /* Kept margin at 0 for mobile */
+    }
+
+    .menu-bar {
+        margin: 0; /* Kept margin at 0 for mobile */
     }
 
     .search-box {
