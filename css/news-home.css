@@ -23,6 +23,8 @@ body {
     background: url("/assets/grey_gradient.jpg") no-repeat center center / cover;
     min-height: 100vh;
     overflow-x: clip;
+    display: flex;
+    flex-direction: column;
 }
 
 .sticky-nav {
@@ -328,6 +330,7 @@ button:active {
     padding: 25px;
     border-radius: 0px;
     color: #333333;
+    flex: 1;
 }
 
 .section-heading {
