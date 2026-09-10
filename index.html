@@ -22,7 +22,7 @@ for your own game without permission! *
     <head>
         <meta charset="utf-8">
         <title>Stenoip.com</title>
-        <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" href="https://stenoip.com/css/styles.css">
         <link rel="icon" href="assets/stenoip_company_mini.png" type="image/png">
        
     </head>
@@ -30,7 +30,7 @@ for your own game without permission! *
         <div class="sticky-nav">
             
             <header>
-               <a href="/"><img src="assets/stenoip_company_mini.png" class="logo" alt="Logo"></a>
+               <a href="/"><img src="https://stenoip.com/assets/stenoip_company_mini.png" class="logo" alt="Logo"></a>
                 <form class="search-box">
                     <input placeholder="Search the Web" id="search-input">
                     <button type="submit" id="search-btn">Q</button>
@@ -52,7 +52,7 @@ for your own game without permission! *
 
         <div class="image-band">
             <video autoplay loop muted playsinline class="hero-media">
-                <source src="assets/video-banner.mp4" type="video/mp4">
+                <source src="https://stenoip.com/assets/video-banner.mp4" type="video/mp4">
                
             </video>
             <div class="banner-overlay">
@@ -159,6 +159,115 @@ for your own game without permission! *
             window.location.href = "https://stenoip.github.io/oodles/search.html?q=" + encodeURIComponent(query);
         }
     });
+    </script>
+
+
+    <script>
+        
+        
+
+        var $dailyTile = $(".tile-hero");
+        var dailyTile = $dailyTile[0];
+        
+        
+        
+        var tileList = [
+         "tiles/large-tile.png",
+         "tiles/large-tile2.png", 
+         "tiles/large-tile3.png"
+        ]
+
+
+        
+        // Hide it initially by pushing it off-screen to the left and fading out
+        
+        
+
+        var num = 0;
+        /*
+        
+        function addNum() {
+            
+            num++
+            console.log(num)
+
+            if(num === 3) {
+                num = num - 3
+            }
+        };
+
+        window.setInterval(addNum, "8000")
+        */
+
+        function changeTile() {
+            // Set the background using the current 'num' index
+            $dailyTile.css("backgroundImage", "url(" + tileList[num] + ")");
+            $dailyTile.css({ opacity: 0, 
+                marginLeft: "-100%" 
+            });
+
+
+            // Animate it back to its normal position and fade it in
+            $dailyTile.animate({ opacity: 1, 
+                marginLeft: "0px" }, 3000);
+            
+            if (num === 0) {
+                var tileLink = document.createElement("a");
+                tileLink.href = "https://stenoip.com/oodles";
+                tileLink.style.display = "block";
+                tileLink.style.width = "100%";
+                tileLink.style.height = "100%";
+                dailyTile.appendChild(tileLink);
+            }
+            /*
+            else if (num === 1) {
+                var tileLink = document.createElement("a");
+                tileLink.href = "https://stenoip.com/praterich";
+                tileLink.style.display = "block";
+                tileLink.style.width = "100%";
+                tileLink.style.height = "100%";
+                dailyTile.appendChild(tileLink);
+            }
+
+            else {
+                var tileLink = document.createElement("a");
+                tileLink.href = "https://stenoip.com/ringzauber-site";
+                tileLink.style.display = "block";
+                tileLink.style.width = "100%";
+                tileLink.style.height = "100%";
+                dailyTile.appendChild(tileLink);
+            }
+                */
+
+            // Increment the number for the *next* time the timer ticks
+            num++;
+            if (num === tileList.length) { 
+                num = 0;
+            }
+
+            
+
+            
+        }
+
+
+        changeTile();
+        window.setInterval(changeTile, 8000);
+            
+        /*
+
+        //Testing block
+        dailyTile.innerHTML = "e"
+
+        var tileLink = document.createElement("a");
+        tileLink.href = "https://stenoip.com/oodles";
+        tileLink.style.display = "block";
+        tileLink.style.width = "100%";
+        tileLink.style.height = "100%";
+        dailyTile.appendChild(tileLink);
+        */
+
+        // $dailyTile.style.backgroundImage = "url('https://stenoip.com/logo.png')" 
     </script>
     </body>
 </html>
