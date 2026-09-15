@@ -47,14 +47,14 @@
         }
     </style>
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            let countdown = 10;
-            const countdownElement = document.getElementById('countdown');
-            const interval = setInterval(() => {
+        document.addEventListener('DOMContentLoaded', function() {
+            var countdown = 10;
+            var countdownElement = document.getElementById('countdown');
+            var interval = window.setInterval(() => {
                 countdown--;
                 countdownElement.textContent = countdown;
                 if (countdown === 0) {
-                    clearInterval(interval);
+                    window.clearInterval(interval);
                 }
             }, 1000);
         });
