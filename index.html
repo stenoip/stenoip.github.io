@@ -25,6 +25,13 @@ for your own game without permission! *
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://stenoip.com/css/styles.css">
         <link rel="icon" href="assets/stenoip_company_mini.png" type="image/png">
+        <style>
+            .news-feed {
+                display: block;
+                margin: 5px;
+            }
+            
+        </style>
        
     </head>
     <body>
@@ -269,6 +276,57 @@ for your own game without permission! *
         */
 
         // $dailyTile.style.backgroundImage = "url('https://stenoip.com/logo.png')" 
+    </script>
+    <!-- News  and product Feed AJAX -->
+    <script>
+        var newsHeader = document.getElementById("news-header")
+        var ourRequest = new XMLHttpRequest();
+        ourRequest.open("GET", "https://stenoip.com/ajax/curr-news.json");
+        ourRequest.onload = function() {
+            // console.log(ourRequest.responseText)
+            var currJSON = JSON.parse(ourRequest.responseText)
+            // console.log(currJSON)
+            /*
+            var p = $("<p>");
+            p.text(currJSON[0].title);
+            $("body").append(p)
+            
+
+            var $link = $("#news");
+            var link = $link[0];
+            
+            // link.src = currJSON[0].url;
+            // link.textContent = currJSON[0].title;
+
+            */
+
+
+            for (var i = 0; i < 3; i++) {
+                var newsTitle = document.createElement("a");
+                newsTitle.textContent = currJSON[i].title
+                newsTitle.href = currJSON[i].url
+                newsTitle.className = "news-feed"
+                newsHeader.appendChild(newsTitle);
+                
+
+
+                var newsInfo = document.createElement("p");
+                newsInfo.textContent = currJSON[i].description;
+                newsInfo.className = "news-feed"
+                newsHeader.appendChild(newsInfo);
+                
+
+
+
+
+
+
+            }
+            
+           
+        };
+
+        ourRequest.send();
     </script>
     </body>
 </html>
