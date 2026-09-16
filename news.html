@@ -64,16 +64,10 @@ for your own game without permission! *
 
 			-->
             
-                <div class="product-card">
-                    <h3>End-Of-Life for Ringzauber Python</h3>
-                    <p>22-08-2026</p>
-                  	<p>Learn why Stenoip Company is retiring 
-                  their newest browser due to problematic
-                  issues.</p>
-                   <a href="https://stenoip.com/news/why-is-ringzauber-py-being-retired.html"> <button class="btn-link">Read Now</button></a>
-                </div>
+                
+              
             </div>
-
+		
         
         
         </div>
@@ -81,6 +75,74 @@ for your own game without permission! *
 
        
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script>
+        var newsHeader = document.getElementById("news-header")
+        var ourRequest = new XMLHttpRequest();
+        ourRequest.open("GET", "https://stenoip.com/ajax/curr-news.json");
+        ourRequest.onload = function() {
+            // console.log(ourRequest.responseText)
+            var currJSON = JSON.parse(ourRequest.responseText)
+            // console.log(currJSON)
+            /*
+            var p = $("<p>");
+            p.text(currJSON[0].title);
+            $("body").append(p)
+            
+
+            var $link = $("#news");
+            var link = $link[0];
+            
+            // link.src = currJSON[0].url;
+            // link.textContent = currJSON[0].title;
+
+            */
+
+
+            for (var i = 0; i < currJSON.length; i++) {
+                /*
+              	var newsTitle = document.createElement("a");
+                newsTitle.textContent = currJSON[i].title
+                newsTitle.href = currJSON[i].url
+                newsTitle.className = "news-feed"
+                newsHeader.appendChild(newsTitle);
+                
+
+
+                var newsInfo = document.createElement("p");
+                newsInfo.textContent = currJSON[i].description;
+                newsInfo.className = "news-feed"
+                newsHeader.appendChild(newsInfo);
+              */
+              
+              	var newsCard = document.createElement("div");
+              	newsCard.innerHTML = `
+              <div class='product-card'>
+                    <h3>  ` + currJSON[i].title +`</h3>
+                    <p>` + currJSON[i].date + `</p>
+                  	<p>`+ currJSON[i].description +`</p>
+                   <a href=' ` + currJSON[i].url + ` '> <button class='btn-link'>Read Now</button></a>
+                </div>
+            </div>
+            `
+                var productsGrid = document.getElementsByClassName("products-grid")[0];
+              
+                productsGrid.appendChild(newsCard)
+                
+              
+                
+
+
+
+
+
+
+            }
+            
+           
+        };
+
+        ourRequest.send();
+    </script>
        
     </body>
 </html>
