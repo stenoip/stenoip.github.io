@@ -2,265 +2,237 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="/swc_mystery.png" type="image/png" />
-  <title>404 - Page Not Found</title>
+  <title>Oodles — Page not found</title>
+  <link rel="icon" href="oodles/2025_09_13_0vp_Kleki.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts & Material Icons -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,750&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
-    /* RESET */
-    * {
+    body {
+      background: url("/assets/grey_gradient.jpg") no-repeat center center / cover;
+      font-family: 'Roboto', sans-serif;
+      color: #212121;
       margin: 0;
-      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
-    /* FRUTIGER AERO BODY STYLES */
-    body {
-      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-      height: 100vh;
-      width: 100%;
-      /* Set the body as a flex container to center the text content */
-      display: flex; 
-      flex-direction: column; /* Stack content vertically */
+    header {
+      background: url("/assets/orange-gloss.jpg") repeat-x center center / cover;
+      text-align: center;
+      padding: 16px 24px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+      z-index: 10;
+    }
+
+    header img {
+      max-height: 56px;
+      object-fit: contain;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
       justify-content: center;
       align-items: center;
-      text-align: center; /* Center text within the body/content */
-      /* Background: Light Aero blue gradient */
-      background: radial-gradient(circle at top left, #a5d8ff, #e6f7ff, #b3ecff);
-      overflow: hidden;
-      position: relative;
-    }
-    
-    /* CANVAS FOR WAVES - Full screen, positioned absolutely, behind content */
-    #myCanvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      filter: url(#shadowed-goo);
-      z-index: 1; /* Below the content */
-    }
-    
-    /* HIDE SVG FILTER DEFINITIONS */
-    svg {
-      display: none;
+      padding: 24px 16px;
+      box-sizing: border-box;
     }
 
-    /* NEW STYLES for the FLOATING CONTENT CARD */
-    .floating-content {
-      /* Replaces .container styling */
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(12px);
-      border-radius: 24px;
-      padding: 40px 60px;
-      width: 300px; /* Give it a fixed width */
-      box-shadow: 0 12px 40px rgba(0,0,0,0.25),
-                  inset 2px 2px 8px rgba(255,255,255,0.8),
-                  inset -2px -2px 8px rgba(0,0,0,0.1);
-      animation: popIn 1.2s ease forwards;
-      z-index: 10; /* Above everything */
-      position: relative;
+    .panel {
+      background: rgba(255, 255, 255, 0.5);
+  	  backdrop-filter: blur(12px);
+      border-radius: 2px; 
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+      padding: 32px;
+      max-width: 500px;
+      width: 100%;
+      box-sizing: border-box;
     }
-    
-    .floating-content h1 {
-      font-size: 72px;
-      color: #0078d7;
-      text-shadow: 0 4px 12px rgba(0,0,0,0.3),
-                   0 0 20px rgba(0,200,255,0.6);
-      margin-bottom: 20px;
-      animation: float 3s ease-in-out infinite;
+
+    h1 {
+      font-size: 24px;
+      font-weight: 500;
+      color: #212121;
+      margin-top: 0;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    
-    .floating-content p {
-      font-size: 22px;
-      color: #004466;
-      margin-bottom: 30px;
-      animation: fadeIn 2s ease forwards;
+
+    h1 .material-icons {
+      font-size: 28px;
+      color: #3f51b5;
     }
-    
-    a {
-      display: inline-block;
-      padding: 14px 28px;
-      border-radius: 16px;
-      background: linear-gradient(145deg, #ffffff, #d0f0ff);
-      box-shadow: inset 2px 2px 6px rgba(255,255,255,0.9),
-                  inset -2px -2px 6px rgba(0,0,0,0.1),
-                  6px 6px 16px rgba(0,0,0,0.3);
-      color: #0078d7;
-      font-weight: bold;
+
+    p {
+      color: #727272;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    a.btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #3f51b5;
+      color: #ffffff;
+      border-radius: 2px;
       text-decoration: none;
-      transition: transform 0.25s ease, box-shadow 0.3s ease;
+      font-weight: 500;
+      font-size: 14px;
+      text-transform: uppercase; /* Classic MD1 Uppercase Button Text */
+      letter-spacing: 0.5px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+      transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
-    a:hover {
-      transform: translateY(-4px) scale(1.05);
-      box-shadow: inset 2px 2px 6px rgba(255,255,255,1),
-                  inset -2px -2px 6px rgba(0,0,0,0.05),
-                  8px 8px 20px rgba(0,0,0,0.4);
+
+    a.btn:hover {
+      background: #303f9f;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
     }
-    
-    img {
-      width: 200px;
-      margin-top: 30px;
-      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
-      animation: bounce 2.5s infinite;
+
+    .search-box-container {
+      margin-top: 24px;
+      margin-bottom: 24px;
     }
-    
-    /* Floating bubbles */
-    .bubble {
+
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input-wrapper .material-icons {
       position: absolute;
-      bottom: -150px;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(200,255,255,0.3));
-      border-radius: 50%;
-      animation: rise 25s infinite ease-in;
-      z-index: 5; 
+      left: 12px;
+      color: #727272;
+      font-size: 20px;
     }
-    
-    .bubble:nth-child(1) { width: 120px; height: 120px; left: 15%; animation-duration: 20s; }
-    .bubble:nth-child(2) { width: 80px; height: 80px; left: 40%; animation-duration: 28s; }
-    .bubble:nth-child(3) { width: 150px; height: 150px; left: 65%; animation-duration: 32s; }
-    .bubble:nth-child(4) { width: 60px; height: 60px; left: 80%; animation-duration: 24s; }
-    
-    /* Animations */
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
-    @keyframes rise { 0% { transform: translateY(0) scale(1); opacity: 0.7; } 100% { transform: translateY(-130vh) scale(1.6); opacity: 0; } }
-    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
+      font-family: 'Roboto', sans-serif;
+      border: none;
+      border-bottom: 2px solid #9e9e9e; /* Classic MD1 bottom-border-only input style */
+      background-color: transparent;
+      color: #212121;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-bottom-color: #3f51b5;
+    }
+
+    button.search-btn {
+      margin-top: 16px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: 'Roboto', sans-serif;
+      background-color: #ff4081; 
+      color: #ffffff;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+      transition: background-color 0.2s, box-shadow 0.2s;
+    }
+
+    button.search-btn:hover {
+      background-color: #f50057;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    }
+
+    .tips {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 13px;
+      color: #727272;
+      padding-left: 18px;
+    }
+
+    .tips li {
+      margin: 6px 0;
+      line-height: 1.4;
+    }
+
+    .msg {
+      font-size: 12px;
+      color: #d32f2f; /* Classic MD1 Error Red */
+      min-height: 16px;
+      margin-top: 4px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: #727272;
+    }
   </style>
 </head>
-
 <body>
-  
-  <canvas id="myCanvas"></canvas>
-  
-  <div class="floating-content">
-    <p>&copy; Stenoip Company</p>
-    <h1>404 Error</h1>
-    <p>The requested URL was not found on this server.</p>
-    <p><a href="/"> Return to Homepage </a></p>
-    <img src="/swc_mystery.png" alt="404 image">
-    <p> Stenoip Wonder Computer</p>
+
+  <header>
+    <img src="https://stenoip.com/assets/stenoip_company_mini.png" alt="Oodles Logo">
+  </header>
+
+  <div class="container">
+    <div class="panel">
+      <h1>
+        <span class="material-icons">error</span>
+        404 Error! Page not found
+      </h1>
+      <p>We couldn’t find the page you were looking for. Try searching Oodles or go back to the homepage.</p>
+      
+      <a class="btn" href="/">
+        <span class="material-icons" style="font-size: 18px;">home</span>
+        Return to the homepage
+      </a>
+
+      <div class="search-box-container">
+        <div class="search-input-wrapper">
+          <span class="material-icons">search</span>
+          <input type="text" id="searchInput" placeholder="Search Oodles..." onkeydown="if(event.key === 'Enter') goSearch()">
+        </div>
+        <div id="msg" class="msg"></div>
+        <button class="search-btn" onclick="goSearch()">Search</button>
+      </div>
+
+      <ul class="tips">
+        <li><strong>Check the URL:</strong> Spelling and capitalization matter.</li>
+        <li><strong>Use the navigation:</strong> Try the SWC, Videos, News or Maps from the main page.</li>
+        <li><strong>Start fresh:</strong> Head back home and explore.</li>
+      </ul>
+    </div>
   </div>
 
-  <div class="bubble"></div>
-  <div class="bubble"></div>
-  <div class="bubble"></div>
-  <div class="bubble"></div>
-  
-  <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
-    <defs>
-      <filter id="shadowed-goo">
-        <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
-        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -7"
-          result="goo" />
-        <feGaussianBlur in="goo" result="shadow" stdDeviation="3" />
-        <feColorMatrix in="shadow" mode="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 -0.2"
-          result="shadow" />
-        <feOffset in="shadow" dx="1" dy="1" result="shadow" />
-        <feBlend in2="shadow" in="goo" result="goo" />
-        <feBlend in2="goo" in="SourceGraphic" result="mix" />
-      </filter>
-      <filter id="goo">
-        <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
-        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -7"
-          result="goo" />
-        <feBlend in2="goo" in="SourceGraphic" result="mix" />
-      </filter>
-    </defs>
-  </svg>
-  
-  <script>
-    var twoPi = Math.PI * 2;
+  <footer>© Stenoip Company</footer>
 
-    class App {
-      constructor() {
-        this.canvas = document.getElementById("myCanvas");
-        this.context = this.canvas.getContext("2d");
-        this.height = this.canvas.height = window.innerHeight;
-        this.width = this.canvas.width = window.innerWidth;
-        this.center = { x: this.width / 2, y: this.height / 2 };
-        this.circleContainers = [];
-        window.addEventListener("resize", () => this.resizeCanvas(), false);
-      }
-      resizeCanvas() {
-        this.height = this.canvas.height = window.innerHeight;
-        this.width = this.canvas.width = window.innerWidth;
-        this.center = { x: this.width / 2, y: this.height / 2 };
-        this.circleContainers = [];
-        this.initializeCircleContainers();
-      }
-      initializeCircleContainers() {
-        for (var i = 0; i < this.width + 100; i += 100) {
-          for (var j = 0; j < this.height + 100; j += 100) {
-            var circleContainer = new CircleContainer(this.context, i, j);
-            circleContainer.initializeCircles();
-            this.circleContainers.push(circleContainer);
-          }
-        }
-      }
-      update() { for (var k = 0; k < this.circleContainers.length; k++) { this.circleContainers[k].update(); } }
-      render() {
-        this.context.clearRect(0, 0, this.width, this.height);
-        for (var l = 0; l < this.circleContainers.length; l++) { this.circleContainers[l].render(); }
-      }
-      loop() {
-        this.update();
-        this.render();
-        window.requestAnimationFrame(() => this.loop());
-      }
-    }
-    
-    class CircleContainer {
-      constructor(context, x, y) {
-        this.context = context;
-        this.position = { x, y };
-        this.numberOfCircles = 19;
-        this.circles = [];
-        this.baseRadius = 20;
-        this.bounceRadius = 150;
-        this.singleSlice = twoPi / this.numberOfCircles;
-      }
-      initializeCircles() {
-        for (var m = 0; m < this.numberOfCircles; m++) {
-          this.circles.push(new Circle(this.position.x, this.position.y + Math.random(), this.baseRadius, this.bounceRadius, m * this.singleSlice));
-        }
-      }
-      update() { for (var n = 0; n < this.numberOfCircles; n++) { this.circles[n].update(this.context); } }
-      render() { for (var o = 0; o < this.numberOfCircles; o++) { this.circles[o].render(this.context); } }
-    }
-    
-    class Circle {
-      constructor(x, y, baseRadius, bounceRadius, angleCircle) {
-        this.basePosition = { x, y };
-        this.position = { x, y };
-        this.speed = 0.01;
-        this.baseSize = 10;
-        this.size = 10;
-        this.angle = x + y;
-        this.baseRadius = baseRadius;
-        this.bounceRadius = bounceRadius;
-        this.angleCircle = angleCircle;
-      }
-      update() {
-        this.position.x = this.basePosition.x + Math.cos(this.angleCircle) * (Math.sin(this.angle + this.angleCircle) * this.bounceRadius + this.baseRadius);
-        this.position.y = this.basePosition.y + Math.sin(this.angleCircle) * (Math.sin(this.angle + this.angleCircle) * this.bounceRadius + this.baseRadius);
-        this.size = Math.cos(this.angle) * 8 + this.baseSize;
-        this.angle += this.speed;
-      }
-      render(context) {
-        context.fillStyle = "hsl(190, 100%, " + (50 + this.size * 2) + "%)";
-        context.beginPath();
-        context.arc(this.position.x, this.position.y, this.size, 0, twoPi);
-        context.fill();
-      }
-    }
-    
-    window.onload = function () {
-      var app = new App();
-      app.initializeCircleContainers();
-      app.loop();
-    };
+  <script>
+    var BACKEND_BASE = 'https://oodles-backend.vercel.app';
+    function goSearch() {      
+      var q = document.getElementById('searchInput').value.trim();      
+      if (!q) {        
+        document.getElementById('msg').innerText = 'Please enter a search term.';        
+        return;      
+      }      
+      window.location.href = 'https://stenoip.github.io/oodles/search?q=' + encodeURIComponent(q);    }
   </script>
+
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"5d6e73960fe94fda9ecd088d8e72c471","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
