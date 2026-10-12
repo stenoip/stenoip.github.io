@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The New Learn Centre - Stenoip.com</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,750&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!--
+    
+HEED THIS WARNING!
+
+This document/script/comic/game/HTML/DVD player is under the control and 
+lawful copyright of the Stenoip Company as of the year printed out below:
+
+[2026]
+
+All those who thiefth this document/script/comic/game/HTML/DVD player or any object, substance,
+content etc shall be penalised to the fullest extent of the law. Even on the Moon!
+
+
+
+    -->
+
+    <style>
+        body {
+            background-image: linear-gradient(to top, rgb(32, 146, 57), rgb(39, 160, 39));
+            background-repeat: no-repeat;
+            min-height: 100vh; 
+            min-width: 100%;
+            font-family: "Roboto", sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        header {
+            background: linear-gradient(
+                180deg, 
+                #3ba28a 0%, 
+                #23a38e 50%, 
+                #197263 51%, 
+                #1f8a78 100%
+            );
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            color: white;
+            padding: 18px;
+            position: sticky;
+            top: 0;
+        }
+        section {
+            background: linear-gradient(
+                180deg, 
+                rgba(255, 255, 255, 0.25) 0%,    
+                rgba(18, 50, 35, 0.85) 30%,     
+                rgba(10, 30, 20, 0.95) 70%
+            );
+            color: white;
+            padding: 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            border-radius: 2px;
+            
+            margin: 10px;
+        }
+
+        section:hover {
+            box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .nothing-section {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            
+        }
+
+        #rain-card {
+            background-image: url("wet-glass.gif");
+            background-repeat: no-repeat;
+            background-position: cover;
+            background-size: cover;
+            /*
+            min-height: 100vh;
+            min-width: 100vw;
+            */
+
+          
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px; 
+            padding: 20px;
+        }
+
+        #news-grid {
+            background-color: rgba(57, 209, 95, 0.8);
+            color: white;
+            padding: 40px;
+            backdrop-filter: blur(12px);
+            display: grid;
+            /* Automatically fits as many 250px columns as possible, then stacks them */
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px; 
+            padding: 20px;
+        }
+
+        #news-grid h1 {
+           
+            display: block;
+        }
+
+        .greeting {
+            color: whitesmoke;
+            font-weight: 100;
+        }
+
+        #news-title {
+            color: aqua;
+            text-decoration: none;
+        }
+
+        footer {
+            display: block;
+            background-color: #23a38e;
+            margin: 0;
+            padding: 10px;
+            
+        }
+
+        footer p {
+            display: inline;
+            margin: 100px;
+        }
+
+        @media (max-width: 768px) {
+            #grid {
+                grid-template-columns: 1fr; 
+            }
+        }
+
+
+
+     
+            
+        
+    </style>
+</head>
+<body>
+
+    <header>Learn-Centre</header>
+<h1 class="greeting">The Weather is...</h1>
+
+<!--
+
+    ONCE AGAIN:
+    
+HEED THIS WARNING!
+
+This document/script/comic/game/HTML/DVD player is under the control and 
+lawful copyright of the Stenoip Company as of the year printed out below:
+
+[2026]
+
+All those who thiefth this document/script/comic/game/HTML/DVD player or any object, substance,
+content etc shall be penalised to the fullest extent of the law. Even on the Moon!
+
+
+
+    -->
+
+<div id="grid">
+
+
+    <section>
+        <h1 id="temperature">Column 1</h1>
+        <p id="wind-gust"></p>
+
+    </section>
+    <section>
+        <!--
+        Use Chart.JS to show tempertures hourly
+        -->
+    </section>
+    <section id="rain-card">
+       
+        <h1 id="rain-statement">Column 3</h1>
+        <p id="rain-details">Column 3</p>
+        
+    </section>
+
+
+</div> 
+
+
+<div id="news-grid">
+
+<section class="nothing-section">
+<h1 class="greeting">Breaking News ...</h1>
+</section>
+
+
+
+
+    
+</div> 
+
+<footer>
+<p>&copy; Stenoip Company</p>
+
+ <a href="http://stenoip.com/privacy"><p>Privacy Policy</p></a>
+
+    <a href="http://stenoip.com/terms"><p>Terms and Conditions</p></a>
+
+    <a href="http://stenoip.com/products"><p>Products</p></a>
+
+</footer>
+
+<script>
+    
+
+    /*
+    
+    FINAL WARNING! IF YOU BREAK THE LAW, YOU GO TO JAIL (or sued in
+    the 6 figures. It's your choice)!
+
+This document/script/comic/game/HTML/DVD player is under the control and 
+lawful copyright of the Stenoip Company AS of the year printed out below:
+
+[2026]
+
+All those who thiefth this document/script/comic/game/HTML/DVD player or any object, substance,
+content etc shall be penalised to the fullest extent of the law. Even on the Moon!
+
+
+
+    */
+
+
+
+    var ourRequest = new XMLHttpRequest();
+    ourRequest.open("GET", "https://api.open-meteo.com/v1/forecast?latitude=40.9304&longitude=-73.8979&current=temperature_2m,wind_speed_10m,precipitation");
+    ourRequest.onload = function() {
+        // Card 1
+        var tempText = document.getElementById("temperature");
+        var windText = document.getElementById("wind-gust");
+
+        // Card 3
+        var rainText = document.getElementById("rain-statement");
+        var rainSubtext = document.getElementById("rain-details");
+        var rainCard = document.getElementById("rain-card")
+        
+        var currJSON = JSON.parse(ourRequest.responseText);
+        var temperatures = currJSON.current.temperature_2m;
+
+        // var temperatures = 37; 
+
+        var windGust = currJSON.current.wind_speed_10m; 
+        var precipitation = currJSON.current.precipitation;
+        
+        // var precipitation = 5.5;
+
+        tempText.innerHTML = temperatures + "°C";
+        windText.innerHTML = "Wind speed is <strong>" + windGust + "</strong> km/h!";
+        rainSubtext.innerHTML = "The precipitation is <strong>" + precipitation + "</strong> millimetres!";
+
+        // Changes the background to a cool blue/dark gradient if it's under 15°C
+        function tempCheck() {
+            if (temperatures < 0) {
+                document.body.style.backgroundImage = "linear-gradient(to top, rgb(40, 40, 60), rgb(80, 100, 140))";
+                
+            }
+
+            if (temperatures <= 19 && temperatures > 0) {
+                document.body.style.backgroundImage = "linear-gradient(to top, rgb(10, 30, 60), rgb(120, 200, 240))";
+            }
+
+            else if (temperatures >= 19 && temperatures <= 37){
+                return
+            }
+
+            else if (temperatures > 37) {
+                document.body.style.backgroundImage = "linear-gradient(to top, rgb(0, 0, 0), rgb(10, 10, 10))";
+            }
+        }
+
+        tempCheck();
+
+
+        function rainCheck() {
+            if (precipitation < 0.1) {
+                rainText.innerHTML = "No Rain!"
+                rainCard.style.backgroundImage = "url('sun-and-hills.jpg')"
+            }
+             
+            else if (precipitation > 0.1 && precipitation <= 0.5) {
+                rainText.innerHTML = "Drizzle Outside"
+            }
+            
+            else if (precipitation > 0.5 && precipitation <= 2.5) {
+                rainText.innerHTML = "It's Raining (Light)"
+            }
+
+            else if (precipitation > 2.5 && precipitation <= 7.5) {
+                rainText.innerHTML = "It's Raining"
+            }
+
+            else  {
+                rainText.innerHTML = "DANGER! HEAVY RAIN!"
+                rainCard.style.backgroundImage = "url('storm.gif')";
+            }
+          
+        }
+
+        rainCheck();
+
+
+
+    };
+
+        ourRequest.send();
+
+    var ourNewsRequest = new XMLHttpRequest();    
+    ourNewsRequest.open("GET", "https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Ffeeds.bbci.co.uk%2Fnews%2Frss.xml")
+    ourNewsRequest.onload = function() {
+        var currNewsJSON = JSON.parse(ourNewsRequest.responseText);
+        var news = currNewsJSON.items;
+
+            
+
+          
+
+        for (var i = 0; i < 6; i++) {
+            var newsContainer = document.getElementById("news-grid");
+            var newsItem = document.createElement("div");
+
+            newsItem.innerHTML = `
+                <section id=''>
+                    <img src=' ` + currNewsJSON.items[i].enclosure.thumbnail +`'>
+                    <a href=" `+ currNewsJSON.items[i].link + ` "><h3 id='news-title'>` + currNewsJSON.items[i].title + `</h3></a>
+                    
+                    <p id=''> `+ currNewsJSON.items[i].description + ` </p>
+
+                </section>
+            `
+
+            newsContainer.appendChild(newsItem)
+
+            
+        }
+        
+
+        
+
+    };
+
+   ourNewsRequest.send();
+
+
+</script>
+</body>
+</html>
