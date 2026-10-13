@@ -238,7 +238,13 @@ content etc shall be penalised to the fullest extent of the law. Even on the Moo
 
 
     */
-
+    document.addEventListener('click', function(e) {
+        var link = e.target.closest('a');
+        if (link && link.href) {
+            e.preventDefault();
+            window.open(link.href, '_blank');
+        }
+    });
 
 
     var ourRequest = new XMLHttpRequest();
